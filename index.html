@@ -2264,6 +2264,7 @@ function _sibHTML(s, ri) {
         <div class="lo-sib-btns">
           <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="Αγαπημένο">${isFav?'★':'☆'}</span>
           ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="Άνοιγμα">↗</span>`:''}
+          ${s._dbId?`<span class="action-btn icon-only" onclick="event.stopPropagation();ungroupListing('${s._dbId}')" title="✂️ Αποσύνδεση από group" style="color:var(--red);border-color:var(--red)">✂️</span>`:''}
         </div>
       </div>
     </div>
