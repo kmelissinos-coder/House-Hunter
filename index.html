@@ -924,11 +924,21 @@
     <div class="stat-pill"><strong id="stat-active">—</strong> ενεργές</div>
     <div class="stat-pill">avg <strong id="stat-avg">—</strong></div>
     <div class="stat-pill">avg €/τ.μ. <strong id="stat-ppm">—</strong></div>
-  </div>
-  <div style="display:flex;gap:8px;align-items:center">
+    <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
     <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="Αναίρεση (Ctrl+Z)" disabled>↩</button>
     <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="Επανάληψη (Ctrl+Y)" disabled>↪</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
     <button class="refresh-btn" onclick="loadData()">⟳ Ανανέωση</button>
+    <div class="upload-zone" id="dropzone" onclick="document.getElementById('csvInput').click()"
+         ondragover="event.preventDefault();this.classList.add('drag')"
+         ondragleave="this.classList.remove('drag')"
+         ondrop="handleDrop(event)"
+         style="padding:6px 14px;margin:0;width:auto;min-width:220px;text-align:center">
+      <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
+      <div class="upload-text" style="font-size:12px">📂 Προσθήκη δεδομένων από άλλη πλατφόρμα</div>
+      <div class="upload-sub" style="font-size:10px">Σύρε ή κλίκαρε · CSV από XE, Nodaliste κ.λπ.</div>
+    </div>
   </div>
 </header>
 
@@ -1007,14 +1017,6 @@
   <label for="showDeleted">Εμφάνιση αγγελιών με X (διαγραμμένες/απόρριψη)</label>
 </div>
 
-<div class="upload-zone" id="dropzone" onclick="document.getElementById('csvInput').click()" 
-     ondragover="event.preventDefault();this.classList.add('drag')"
-     ondragleave="this.classList.remove('drag')"
-     ondrop="handleDrop(event)">
-  <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
-  <div class="upload-text">📂 Προσθήκη δεδομένων από άλλη πλατφόρμα</div>
-  <div class="upload-sub">Σύρε ή κλίκαρε για να ανεβάσεις CSV από XE, Nodaliste κ.λπ.</div>
-</div>
 
 <div class="results-count" id="resultsCount"></div>
 
