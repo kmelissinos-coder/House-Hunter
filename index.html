@@ -1,0 +1,2334 @@
+<!-- filename: house_hunter.html -->
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House Hunter — Αθήνα Βόρεια</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1916;
+    --surface2: #222119;
+    --border: #2e2c27;
+    --accent: #d4a853;
+    --accent2: #7eb89a;
+    --accent3: #c97b6a;
+    --text: #e8e4dc;
+    --text2: #9b9790;
+    --text3: #5c5a55;
+    --green: #5a9e78;
+    --red: #c06060;
+    --yellow: #c9a84c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 60px; /* Space for fixed bottom bars */
+  }
+
+  /* HEADER */
+  header {
+    padding: 28px 40px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--text2); font-size: 13px; font-family: 'DM Sans', sans-serif; display: block; font-weight: 300; letter-spacing: 0.5px; }
+
+  .header-stats {
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+  }
+  .stat-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .stat-pill strong { color: var(--accent); font-size: 14px; margin-right: 4px; }
+
+  .refresh-btn {
+    background: var(--accent);
+    color: #0f0e0c;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .refresh-btn:hover { opacity: 0.85; }
+  .refresh-btn:disabled { opacity: 0.5; cursor: default; }
+
+  /* PLATFORM TABS */
+  .platform-bar {
+    padding: 14px 40px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .platform-tab {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .platform-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .platform-tab.active { background: var(--accent); color: #0f0e0c; border-color: var(--accent); }
+  .platform-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+  /* CONTROLS */
+  .controls {
+    padding: 16px 40px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px 8px 34px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text3); font-size: 14px;
+  }
+
+  select, .filter-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  select:focus, .filter-select:focus { border-color: var(--accent); }
+  select option { background: var(--surface2); }
+
+  .view-toggle {
+    display: flex; gap: 4px; margin-left: auto;
+  }
+  .view-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 7px 12px;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .view-btn:first-child { border-radius: 6px 0 0 6px; }
+  .view-btn:last-child { border-radius: 0 6px 6px 0; }
+  .view-btn.active { background: var(--surface2); color: var(--accent); border-color: var(--accent); }
+
+  /* SORT ROW */
+  .sort-row {
+    padding: 10px 40px;
+    display: flex; gap: 8px; align-items: center;
+    font-size: 12px; color: var(--text3);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .sort-btn {
+    background: none; border: none; color: var(--text3);
+    cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif;
+    padding: 3px 8px; border-radius: 4px; transition: all 0.15s;
+  }
+  .sort-btn:hover, .sort-btn.active { color: var(--accent); background: rgba(212,168,83,0.08); }
+
+  /* RANGE FILTERS */
+  .range-filters {
+    padding: 12px 40px;
+    display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .range-group { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+  .range-group input[type=number] {
+    width: 80px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 8px;
+    color: var(--text);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+  .range-label { color: var(--text3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* GRID VIEW */
+  .grid-container {
+    padding: 24px 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(212,168,83,0.4);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .card.deleted { opacity: 0.35; }
+  .card.favorited { border-color: rgba(212,168,83,0.6); }
+
+  .card-img-wrap {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: var(--surface2);
+  }
+  .card-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    display: block;
+  }
+  .card:hover .card-img-wrap img { transform: scale(1.06); }
+  .no-img {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text3); font-size: 28px;
+  }
+
+  .card-badge {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(15,14,12,0.85);
+    border: 1px solid var(--border);
+    padding: 3px 9px; border-radius: 4px;
+    font-size: 11px; color: var(--text2);
+    backdrop-filter: blur(4px);
+  }
+  .platform-badge {
+    position: absolute; top: 10px; right: 10px;
+    padding: 3px 9px; border-radius: 4px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .fav-btn {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(15,14,12,0.8);
+    border: 1px solid var(--border);
+    border-radius: 50%; width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 14px;
+    backdrop-filter: blur(4px);
+    transition: transform 0.15s;
+  }
+  .fav-btn:hover { transform: scale(1.15); }
+
+  .house-id-badge {
+    position: absolute; bottom: 10px; left: 10px;
+    background: var(--accent);
+    color: #0f0e0c;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 700;
+  }
+
+  .card-body { padding: 14px 16px; }
+
+  .card-top {
+    display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;
+  }
+  .card-location {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px; color: var(--text);
+    line-height: 1.2;
+  }
+  .card-type {
+    font-size: 11px; color: var(--text3);
+    margin-top: 2px;
+  }
+  .card-price {
+    font-size: 17px; font-weight: 600;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  .price-sqm {
+    font-size: 10px; color: var(--text3);
+    text-align: right; margin-top: 2px;
+  }
+
+  .card-specs {
+    display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0 8px;
+  }
+  .spec-tag {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 4px;
+    font-size: 11px; color: var(--text2);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .energy-badge {
+    display: inline-block;
+    padding: 2px 7px; border-radius: 3px;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--text3);
+  }
+  .agency-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
+  .card-actions { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; justify-content: flex-end; margin-top: 4px; }
+  .action-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px; color: var(--text2);
+    cursor: pointer; transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 3px;
+    user-select: none;
+  }
+  .action-btn.icon-only {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    justify-content: center;
+    gap: 0;
+    font-size: 12px;
+    line-height: 1;
+  }
+  .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* LIST VIEW */
+  .list-container { padding: 0 40px 24px; }
+  .list-item {
+    display: flex; gap: 16px; align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    overflow: hidden;
+  }
+  .list-item:hover { border-color: rgba(212,168,83,0.4); transform: translateX(2px); }
+  .list-item.deleted { opacity: 0.35; }
+  .list-item.favorited { border-color: rgba(212,168,83,0.5); }
+
+  .list-thumb {
+    width: 80px; height: 56px;
+    border-radius: 5px; object-fit: cover;
+    background: var(--surface2); flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .list-item:hover .list-thumb { transform: scale(1.05); }
+  .list-no-img { width: 80px; height: 56px; border-radius: 5px; background: var(--surface2); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 18px; }
+
+  .list-main { flex: 1; min-width: 0; }
+  .list-top { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+  .list-location { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--text); }
+  .list-type { font-size: 11px; color: var(--text3); }
+  .list-specs { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--text2); }
+  .list-spec { display: flex; align-items: center; gap: 3px; }
+
+  .list-right { text-align: right; flex-shrink: 0; }
+  .list-price { font-size: 16px; font-weight: 600; color: var(--accent); }
+  .list-ppm { font-size: 10px; color: var(--text3); }
+  .list-actions { display: flex; gap: 4px; margin-top: 6px; justify-content: flex-end; flex-wrap: wrap; }
+
+  /* LOADING / EMPTY */
+  .loading {
+    text-align: center; padding: 80px 40px;
+    color: var(--text2);
+  }
+  .loading-spinner {
+    width: 36px; height: 36px; border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty { text-align: center; padding: 60px 40px; color: var(--text3); font-size: 14px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 1000;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    max-width: 680px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    position: relative;
+  }
+  .modal-img { width: 100%; height: 260px; object-fit: cover; border-radius: 13px 13px 0 0; display: block; }
+  .modal-no-img { width: 100%; height: 180px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--text3); border-radius: 13px 13px 0 0; }
+  .modal-body { padding: 24px; }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: rgba(15,14,12,0.8); border: 1px solid var(--border);
+    color: var(--text); border-radius: 50%; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px; backdrop-filter: blur(4px);
+    transition: background 0.15s;
+  }
+  .modal-close:hover { background: var(--surface2); }
+  .modal-title { font-family: 'DM Serif Display', serif; font-size: 24px; margin-bottom: 4px; }
+  .modal-subtitle { color: var(--text2); font-size: 13px; margin-bottom: 20px; }
+  .modal-price-row {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px; margin-bottom: 20px;
+  }
+  .modal-price-left { display: flex; align-items: baseline; gap: 10px; }
+  .modal-price { font-size: 28px; font-weight: 600; color: var(--accent); }
+  .modal-ppm { color: var(--text3); font-size: 13px; }
+  .modal-action-btns {
+    display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end;
+    align-items: flex-start; flex-shrink: 0;
+  }
+  .mab {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 7px 13px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border); background: var(--surface2); color: var(--text);
+    transition: all 0.15s; white-space: nowrap; text-decoration: none;
+  }
+  .mab:hover { border-color: var(--accent); color: var(--accent); }
+  .mab.open-btn  { background: var(--accent); color: #0f0e0c; border-color: var(--accent); }
+  .mab.open-btn:hover { opacity: 0.85; }
+  .mab.fav-btn-m.active  { background: rgba(212,168,83,0.18); border-color: var(--accent); color: var(--accent); }
+  .mab.hide-btn-m.active { background: rgba(192,60,60,0.18);  border-color: var(--red);    color: var(--red);    }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .modal-field { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .modal-field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 4px; }
+  .modal-field-value { font-size: 14px; color: var(--text); }
+  .modal-notes { background: rgba(212,168,83,0.08); border: 1px solid rgba(212,168,83,0.2); border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px; color: var(--text2); }
+  
+  .modal-btn {
+    padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none;
+    border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+    transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .modal-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .modal-btn.primary { background: var(--accent); color: #0f0e0c; border-color: var(--accent); }
+  .modal-btn.primary:hover { opacity: 0.85; color: #0f0e0c; }
+
+  /* SCORE BAR */
+  .score-bar-wrap { margin: 16px 0; }
+  .score-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .score-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; transition: width 0.6s; }
+
+  /* ENERGY COLORS */
+  .e-Aplus2 { background: #1e7a4a; color: #fff; }
+  .e-Aplus  { background: #2a9d5c; color: #fff; }
+  .e-A      { background: #52b96e; color: #fff; }
+  .e-B      { background: #90c94c; color: #000; }
+  .e-C      { background: #f0d44a; color: #000; }
+  .e-D      { background: #f5a623; color: #000; }
+  .e-E      { background: #e07a30; color: #fff; }
+  .e-Z      { background: #c94040; color: #fff; }
+  .e-H      { background: #8b2020; color: #fff; }
+  .e-other  { background: var(--surface2); color: var(--text2); }
+
+  /* PLATFORM COLORS */
+  .p-spitogatos { background: rgba(41,128,185,0.15); color: #5dade2; }
+  .p-xe         { background: rgba(46,204,113,0.15); color: #58d68d; }
+  .p-nodaliste  { background: rgba(231,76,60,0.15);  color: #ec7063; }
+  .p-other      { background: rgba(149,165,166,0.15); color: #aab7b8; }
+
+  /* UPLOAD SECTION */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    margin: 0 40px 16px;
+  }
+  .upload-zone:hover { border-color: var(--accent); }
+  .upload-zone.drag { border-color: var(--accent); background: rgba(212,168,83,0.05); }
+  .upload-zone input { display: none; }
+  .upload-text { font-size: 13px; color: var(--text2); }
+  .upload-sub  { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* COMPARISON & GROUPING BARS */
+  .compare-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--accent);
+    padding: 12px 40px;
+    display: flex; align-items: center; gap: 12px;
+    z-index: 200; transform: translateY(100%);
+    transition: transform 0.3s;
+    flex-wrap: wrap;
+  }
+  .compare-bar.open { transform: translateY(0); }
+  .compare-items { display: flex; gap: 10px; flex: 1; flex-wrap: wrap; }
+  .compare-item {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 10px;
+    font-size: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .compare-remove { cursor: pointer; color: var(--text3); transition: color 0.15s; }
+  .compare-remove:hover { color: var(--red); }
+  .compare-btn {
+    background: var(--accent); color: #0f0e0c; border: none;
+    padding: 8px 20px; border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap;
+  }
+  .compare-clear {
+    background: none; border: 1px solid var(--border); color: var(--text2);
+    padding: 8px 14px; border-radius: 6px; font-size: 12px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* NEW GROUPING BAR STYLE */
+  .grouping-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #221d12;
+    border-top: 2px solid var(--accent);
+    padding: 14px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 210; transform: translateY(100%);
+    transition: transform 0.3s;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  }
+  .grouping-bar.open { transform: translateY(0); }
+  .grouping-info { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+  .grouping-cancel {
+    background: none; border: 1px solid var(--border); color: var(--text2);
+    padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;
+  }
+
+  /* COMPARE MODAL */
+  .compare-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8); z-index: 1100;
+    align-items: flex-start; justify-content: center;
+    padding: 30px 20px; overflow-y: auto;
+    backdrop-filter: blur(6px);
+  }
+  .compare-modal-overlay.open { display: flex; }
+  .compare-modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; width: 100%; max-width: 1000px;
+    padding: 28px;
+  }
+  .compare-modal h2 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 20px; color: var(--accent); }
+  .compare-table { width: 100%; border-collapse: collapse; }
+  .compare-table th, .compare-table td {
+    padding: 10px 14px; text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .compare-table th { color: var(--text3); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .compare-table td { color: var(--text); }
+  .compare-table td:first-child { color: var(--text2); font-size: 11px; }
+  .compare-img { width: 90px; height: 60px; object-fit: cover; border-radius: 4px; }
+  .compare-no-img { width: 90px; height: 60px; background: var(--surface2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--text3); }
+  .best { color: var(--green) !important; font-weight: 600; }
+  .worst { color: var(--red) !important; }
+  .close-compare {
+    float: right; background: none; border: 1px solid var(--border); color: var(--text2);
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 12px; margin-bottom: 16px;
+  }
+
+  .results-count { font-size: 12px; color: var(--text3); padding: 8px 40px 0; }
+  
+  .show-deleted-wrap { padding: 8px 40px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+  .toggle-check { cursor: pointer; }
+
+  /* MAP */
+  #map-container { height: calc(100vh - 320px); min-height: 500px; margin: 0; }
+  #map { width: 100%; height: 100%; }
+  .leaflet-popup-content-wrapper {
+    background: var(--surface2) !important; border: 1px solid var(--border) !important;
+    border-radius: 8px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+  }
+  .leaflet-popup-tip { background: var(--surface2) !important; }
+  .map-popup { font-family: 'DM Sans', sans-serif; color: var(--text); min-width: 200px; }
+  .map-popup img { width: 100%; height: 110px; object-fit: cover; border-radius: 5px; margin-bottom: 8px; display: block; }
+  .map-popup-loc { font-family: 'DM Serif Display', serif; font-size: 15px; }
+  .map-popup-price { color: var(--accent); font-size: 16px; font-weight: 600; margin: 4px 0; }
+  .map-popup-specs { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .map-popup-link { display: inline-block; background: var(--accent); color: #0f0e0c; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; margin-top: 4px; }
+  .map-legend { position: absolute; bottom: 20px; left: 10px; z-index: 1000; background: rgba(26,25,22,0.92); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--text2); }
+  .map-legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .map-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* GROUPED PROPERTY CARD */
+  .grouped-card {
+    background: var(--surface); border: 2px solid var(--accent);
+    border-radius: 10px; overflow: hidden; position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .grouped-card:hover { transform: translateY(-3px); box-shadow: 0 10px 36px rgba(212,168,83,0.2); }
+  .photo-strip {
+    display: flex; height: 185px; overflow: hidden; gap: 2px;
+    background: var(--surface2); cursor: zoom-in; position: relative;
+  }
+  .photo-strip-img {
+    flex: 1; object-fit: cover; min-width: 0;
+    transition: flex 0.3s ease, filter 0.2s;
+  }
+  .photo-strip:hover .photo-strip-img { flex: 0.5; filter: brightness(0.8); }
+  .photo-strip:hover .photo-strip-img:hover { flex: 3; filter: brightness(1); }
+  .photo-strip-noimg { flex:1; display:flex; align-items:center; justify-content:center; font-size:32px; color:var(--text3); }
+  .photo-count-pill {
+    position:absolute; bottom:8px; right:8px;
+    background:rgba(15,14,12,0.82); border:1px solid var(--border);
+    border-radius:12px; padding:2px 9px; font-size:11px; color:var(--text2);
+    backdrop-filter:blur(4px); pointer-events:none;
+  }
+  .group-id-pill {
+    position:absolute; top:8px; left:8px; background:var(--accent); color:#0f0e0c;
+    border-radius:4px; padding:2px 8px; font-size:11px; font-weight:700; pointer-events:none;
+  }
+  .group-listing-count {
+    position:absolute; top:8px; right:8px; background:rgba(126,184,154,0.9); color:#0a0a08;
+    border-radius:4px; padding:2px 8px; font-size:10px; font-weight:700; pointer-events:none;
+  }
+  .grouped-body { padding:13px 15px 12px; }
+  .grouped-title { font-family:'DM Serif Display',serif; font-size:17px; color:var(--text); }
+  .grouped-sub   { font-size:11px; color:var(--text3); margin-top:2px; }
+  .grouped-meta  { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; }
+  .grouped-price-range { text-align:right; }
+  .price-range-main { font-size:16px; font-weight:600; color:var(--accent); }
+  .price-range-sub  { font-size:10px; color:var(--text3); margin-top:2px; }
+  .grouped-specs { display:flex; gap:5px; flex-wrap:wrap; margin:6px 0 10px; }
+  .agency-rows { border-top:1px solid var(--border); }
+  .agency-row {
+    display:flex; align-items:center; gap:8px; padding:6px 0;
+    border-bottom:1px solid rgba(46,44,39,0.4); font-size:12px;
+  }
+  .agency-row:last-child { border-bottom:none; }
+  .agency-row-name  { flex:1; color:var(--text2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .agency-row-price { color:var(--accent); font-weight:600; white-space:nowrap; font-size:13px; }
+  .agency-row-btns  { display:flex; gap:4px; flex-shrink:0; }
+  .expand-more-btn {
+    width:100%; padding:7px; background:var(--surface2);
+    border:none; border-top:1px solid var(--border); color:var(--text3);
+    font-size:11px; cursor:pointer; font-family:'DM Sans',sans-serif; transition:color 0.15s;
+  }
+  .expand-more-btn:hover { color:var(--accent); }
+
+  /* FULLSCREEN GALLERY */
+  .gallery-overlay {
+    display:none; position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.97); flex-direction:column;
+  }
+  .gallery-overlay.open { display:flex; }
+  .gallery-main {
+    position:relative; flex:1; width:100%;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .gallery-img-wrap {
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    overflow:hidden; cursor:zoom-in; user-select:none;
+  }
+  .gallery-img-wrap.zoomed { cursor:zoom-out; }
+  .gallery-img {
+    max-width:100%; max-height:100%; object-fit:contain;
+    transform-origin:center; transition:transform(0.12s) ease;
+    pointer-events:none; display:block;
+  }
+  .gallery-nav {
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; border-radius:50%; width:50px; height:50px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:24px; z-index:10; user-select:none;
+    transition:background 0.15s; backdrop-filter:blur(4px);
+  }
+  .gallery-nav:hover { background:rgba(255,255,255,0.28); }
+  .gallery-nav.prev { left:16px; }
+  .gallery-nav.next { right:16px; }
+  .gallery-nav.disabled { opacity:0.15; pointer-events:none; }
+  .gallery-close {
+    position:absolute; top:14px; right:16px; z-index:15;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; border-radius:50%; width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; backdrop-filter:blur(4px); transition:background 0.15s;
+  }
+  .gallery-close:hover { background:rgba(255,255,255,0.28); }
+  .gallery-info {
+    padding:12px 20px 6px; display:flex; align-items:center;
+    justify-content:space-between; flex-wrap:wrap; gap:8px; width:100%;
+    padding-right:70px;
+  }
+  .gallery-counter { font-size:13px; color:rgba(255,255,255,0.5); }
+  .gallery-title   { font-family:'DM Serif Display',serif; font-size:16px; color:#fff; }
+  .gallery-agency  { font-size:12px; color:rgba(255,255,255,0.45); }
+  .gallery-open-btn {
+    background:var(--accent); color:#0f0e0c; border:none;
+    padding:6px 14px; border-radius:5px; font-size:12px; font-weight:700;
+    cursor:pointer; font-family:'DM Sans',sans-serif;
+  }
+  .gallery-thumbs {
+    display:flex; gap:5px; padding:8px 16px 14px;
+    overflow-x:auto; width:100%; box-sizing:border-box;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+  }
+  .gallery-thumb {
+    width:72px; height:50px; object-fit:cover; border-radius:4px;
+    cursor:pointer; flex-shrink:0; opacity:0.5;
+    border:2px solid transparent; transition:opacity 0.15s, border-color 0.15s;
+  }
+  .gallery-thumb.active { opacity:1; border-color:var(--accent); }
+  .gallery-thumb:hover { opacity:0.8; }
+  .gallery-zoom-hint {
+    position:absolute; bottom:68px; left:50%; transform:translateX(-50%);
+    background:rgba(0,0,0,0.55); color:rgba(255,255,255,0.45);
+    padding:4px 14px; border-radius:12px; font-size:11px;
+    pointer-events:none; transition:opacity 0.6s;
+  }
+
+  /* TOAST STYLE */
+  .toast {
+    position: fixed; bottom: 80px; right: 20px;
+    background: var(--surface2); border: 1px solid var(--accent);
+    color: var(--text); padding: 12px 24px; border-radius: 8px;
+    font-size: 13px; z-index: 3000; display: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  }
+  .toast.show { display: block; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+  /* UNDO/REDO */
+  .header-icon-btn {
+    background:var(--surface2); border:1px solid var(--border); color:var(--text2);
+    border-radius:6px; width:34px; height:34px; font-size:16px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all 0.15s;
+  }
+  .header-icon-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .header-icon-btn:disabled{opacity:0.3;cursor:default;}
+
+  /* GROUPED CARD FOOTER (replaces agency-rows on main page) */
+  .grouped-card-footer {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 13px 10px; border-top:1px solid var(--border); gap:8px;
+  }
+  .agency-summary {font-size:11px;color:var(--text3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .group-action-btns{display:flex;gap:6px;}
+  .grp-btn {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:5px 10px; border-radius:6px; font-size:12px; font-weight:500;
+    cursor:pointer; border:1px solid var(--border); background:var(--surface2);
+    color:var(--text2); transition:all 0.15s; font-family:'DM Sans',sans-serif;
+    white-space:nowrap;
+  }
+  .grp-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .grp-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(212,168,83,0.12);}
+  .grp-btn.open-all{background:var(--accent);color:#0f0e0c;border-color:var(--accent);}
+  .grp-btn.open-all:hover{opacity:0.85;}
+
+  /* ── LISTING OVERLAY ──────────────────────────────────────────────────── */
+  .listing-overlay {
+    display:none; position:fixed; inset:0; z-index:1500;
+    background:rgba(6,5,4,0.94); backdrop-filter:blur(10px);
+    align-items:stretch; justify-content:center;
+    padding:20px 20px 20px 20px; gap:16px; box-sizing:border-box;
+  }
+  .listing-overlay.open{display:flex;}
+
+  .lo-close {
+    position:fixed; top:14px; right:16px; z-index:1600;
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; border-radius:50%; width:40px; height:40px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:18px; backdrop-filter:blur(4px); transition:background 0.15s;
+  }
+  .lo-close:hover{background:rgba(255,255,255,0.3);}
+
+  /* FEATURED — fixed width, centered, scrollable */
+  .lo-featured {
+    flex:0 0 480px; width:480px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; overflow-y:auto; overflow-x:hidden;
+    max-height:calc(100vh - 40px);
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+    align-self:flex-start;
+  }
+  .lo-featured img.modal-img { width:100%; height:220px; object-fit:cover; border-radius:12px 12px 0 0; display:block; }
+  .lo-featured .modal-no-img { height:160px; border-radius:12px 12px 0 0; }
+  .lo-featured .modal-body { padding:16px 18px; }
+  .lo-featured .modal-title { font-family:'DM Serif Display',serif; font-size:21px; margin-bottom:2px; }
+  .lo-featured .modal-subtitle { color:var(--text2); font-size:12px; margin-bottom:12px; }
+  .lo-featured .modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+  .lo-featured .modal-field { background:var(--surface2); border:1px solid var(--border); border-radius:5px; padding:8px 10px; }
+  .lo-featured .modal-field-label { font-size:9px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text3); margin-bottom:2px; }
+  .lo-featured .modal-field-value { font-size:12px; color:var(--text); }
+  .lo-featured .modal-notes { background:rgba(212,168,83,0.08); border:1px solid rgba(212,168,83,0.2); border-radius:5px; padding:9px; margin-bottom:10px; font-size:12px; color:var(--text2); }
+  .lo-featured .modal-price { font-size:26px; font-weight:600; color:var(--accent); }
+  .lo-featured .modal-ppm { color:var(--text3); font-size:12px; }
+
+  /* RIGHT COLUMN — siblings carousel */
+  .lo-right {
+    flex:0 0 340px; width:340px;
+    display:flex; flex-direction:column; gap:10px;
+    max-height:calc(100vh - 40px); overflow:hidden;
+    align-self:flex-start;
+  }
+  .lo-carousel-header {
+    display:flex; align-items:center; justify-content:space-between;
+    flex-shrink:0; padding:0 2px;
+  }
+  .lo-carousel-title{font-size:12px;color:var(--text2);}
+  .lo-nav-btns{display:flex;gap:5px;}
+  .lo-nav-btn {
+    background:var(--surface2); border:1px solid var(--border); color:var(--text2);
+    border-radius:50%; width:28px; height:28px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:14px; transition:all 0.15s;
+  }
+  .lo-nav-btn:hover:not(.disabled){border-color:var(--accent);color:var(--accent);}
+  .lo-nav-btn.disabled{opacity:0.2;pointer-events:none;}
+
+  .lo-carousel {
+    display:flex; flex-direction:column; gap:8px;
+    overflow-y:auto; flex:1;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+    padding-right:3px;
+  }
+
+  /* Sibling mini-card = normal card style, compact */
+  .lo-sib-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:9px; overflow:hidden; cursor:pointer; flex-shrink:0;
+    transition:transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .lo-sib-card:hover{transform:translateY(-1px);border-color:rgba(212,168,83,0.5);box-shadow:0 4px 18px rgba(0,0,0,0.4);}
+  .lo-sib-card.active{border-color:var(--accent);}
+
+  .lo-sib-img-wrap{position:relative;height:130px;overflow:hidden;background:var(--surface2);}
+  .lo-sib-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s;}
+  .lo-sib-card:hover .lo-sib-img-wrap img{transform:scale(1.04);}
+  .lo-sib-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--text3);}
+
+  .lo-sib-body{padding:9px 11px 10px;}
+  .lo-sib-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+  .lo-sib-location{font-family:'DM Serif Display',serif;font-size:13px;color:var(--text);line-height:1.2;}
+  .lo-sib-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+  .lo-sib-price{font-size:14px;font-weight:600;color:var(--accent);white-space:nowrap;}
+  .lo-sib-ppm{font-size:10px;color:var(--text3);text-align:right;}
+  .lo-sib-specs{display:flex;gap:4px;flex-wrap:wrap;margin:5px 0 7px;}
+  .lo-sib-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:6px;}
+  .lo-sib-agency{font-size:10px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px;}
+  .lo-sib-btns{display:flex;gap:4px;}
+
+  @media(max-width:900px){
+    .listing-overlay.open{flex-direction:column;overflow-y:auto;align-items:stretch;}
+    .lo-featured{flex:none;width:100%;max-width:100%;align-self:auto;}
+    .lo-right{flex:none;width:100%;max-height:none;align-self:auto;}
+    .lo-carousel{flex-direction:row;overflow-x:auto;overflow-y:hidden;max-height:none;}
+    .lo-sib-card{width:200px;flex-shrink:0;}
+  }
+
+  @media (max-width: 640px) {
+    header, .platform-bar, .controls, .range-filters, .sort-row, .grid-container, .list-container, .upload-zone, .results-count, .show-deleted-wrap { padding-left: 16px; padding-right: 16px; }
+    .grid-container { grid-template-columns: 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+    #map-container { height: calc(100vh - 280px); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    🏡 House Hunter
+    <span>Αθήνα Βόρεια · Live από Supabase DB</span>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill"><strong id="stat-total">—</strong> αγγελίες</div>
+    <div class="stat-pill"><strong id="stat-active">—</strong> ενεργές</div>
+    <div class="stat-pill">avg <strong id="stat-avg">—</strong></div>
+    <div class="stat-pill">avg €/τ.μ. <strong id="stat-ppm">—</strong></div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="Αναίρεση (Ctrl+Z)" disabled>↩</button>
+    <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="Επανάληψη (Ctrl+Y)" disabled>↪</button>
+    <button class="refresh-btn" onclick="loadData()">⟳ Ανανέωση</button>
+  </div>
+</header>
+
+<div class="platform-bar" id="platform-bar">
+  <button class="platform-tab active" data-platform="all" onclick="setPlatform('all', this)">
+    Όλες οι πλατφόρμες
+  </button>
+</div>
+
+<div class="range-filters">
+  <span class="range-label">Φίλτρα:</span>
+  <div class="range-group">
+    <span>Τιμή</span>
+    <input type="number" id="minPrice" placeholder="min €" oninput="applyFilters()">
+    <span>—</span>
+    <input type="number" id="maxPrice" placeholder="max €" oninput="applyFilters()">
+  </div>
+  <div class="range-group">
+    <span>τ.μ.</span>
+    <input type="number" id="minSqm" placeholder="min" oninput="applyFilters()">
+    <span>—</span>
+    <input type="number" id="maxSqm" placeholder="max" oninput="applyFilters()">
+  </div>
+  <div class="range-group">
+    <span>Έτος</span>
+    <input type="number" id="minYear" placeholder="από" oninput="applyFilters()">
+    <span>—</span>
+    <input type="number" id="maxYear" placeholder="έως" oninput="applyFilters()">
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search" placeholder="Αναζήτηση περιοχής, τύπου, μεσίτη..." oninput="applyFilters()">
+  </div>
+  <select id="filterLocation" onchange="applyFilters()">
+    <option value="">Όλες οι περιοχές</option>
+  </select>
+  <select id="filterType" onchange="applyFilters()">
+    <option value="">Όλοι οι τύποι</option>
+  </select>
+  <select id="filterEnergy" onchange="applyFilters()">
+    <option value="">Ενεργειακή κλάση</option>
+    <option value="A">A+ / A++ / A</option>
+    <option value="B">B</option>
+    <option value="C">C</option>
+    <option value="D">D</option>
+    <option value="E">E ή χαμηλότερη</option>
+  </select>
+  <select id="filterHeating" onchange="applyFilters()">
+    <option value="">Θέρμανση</option>
+    <option value="αέριο">Φυσικό αέριο</option>
+    <option value="πετρέλαιο">Πετρέλαιο</option>
+    <option value="αντλία">Αντλία Θέρμανσης</option>
+  </select>
+  <div class="view-toggle">
+    <button class="view-btn active" id="gridBtn" onclick="setView('grid')">⊞ Grid</button>
+    <button class="view-btn" id="listBtn" onclick="setView('list')">≡ List</button>
+    <button class="view-btn" id="mapBtn" onclick="setView('map')">🗺 Χάρτης</button>
+  </div>
+</div>
+
+<div class="sort-row">
+  <span>Ταξινόμηση:</span>
+  <button class="sort-btn active" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
+  <button class="sort-btn" data-sort="price-desc" onclick="setSort(this,'price-desc')">Τιμή ↓</button>
+  <button class="sort-btn" data-sort="sqm-desc" onclick="setSort(this,'sqm-desc')">τ.μ. ↓</button>
+  <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">€/τ.μ. ↑</button>
+  <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">Νεότερα</button>
+  <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">Πρόσφατη ενημ.</button>
+</div>
+
+<div class="show-deleted-wrap">
+  <input type="checkbox" id="showDeleted" class="toggle-check" onchange="applyFilters()">
+  <label for="showDeleted">Εμφάνιση αγγελιών με X (διαγραμμένες/απόρριψη)</label>
+</div>
+
+<div class="upload-zone" id="dropzone" onclick="document.getElementById('csvInput').click()" 
+     ondragover="event.preventDefault();this.classList.add('drag')"
+     ondragleave="this.classList.remove('drag')"
+     ondrop="handleDrop(event)">
+  <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
+  <div class="upload-text">📂 Προσθήκη δεδομένων από άλλη πλατφόρμα</div>
+  <div class="upload-sub">Σύρε ή κλίκαρε για να ανεβάσεις CSV από XE, Nodaliste κ.λπ.</div>
+</div>
+
+<div class="results-count" id="resultsCount"></div>
+
+<div id="main-content">
+  <div class="loading">
+    <div class="loading-spinner"></div>
+    Φόρτωση δεδομένων από τη βάση...
+  </div>
+</div>
+
+<!-- COMPARE BAR -->
+<div class="compare-bar" id="compareBar">
+  <strong style="font-size:12px;color:var(--text2);white-space:nowrap">Σύγκριση:</strong>
+  <div class="compare-items" id="compareItems"></div>
+  <button class="compare-clear" onclick="clearCompare()">✕ Καθαρισμός</button>
+  <button class="compare-btn" onclick="openCompareModal()">Σύγκριση →</button>
+</div>
+
+<!-- NEW CLICK-TO-GROUP SELECTION BAR -->
+<div class="grouping-bar" id="groupingBar">
+  <div class="grouping-info">
+    <span style="font-size:16px">🔗</span>
+    <div>
+      <div style="font-weight:600;color:var(--accent)">Επιλέχθηκε αγγελία για Ένωση</div>
+      <div id="groupingBarDetails" style="font-size:11px;color:var(--text2)">—</div>
+    </div>
+  </div>
+  <button class="grouping-cancel" onclick="cancelGroupingSelection()">✕ Ακύρωση</button>
+</div>
+
+<div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<div class="compare-modal-overlay" id="compareModal" onclick="if(event.target===this)closeCompareModal()">
+  <div class="compare-modal" id="compareContent"></div>
+</div>
+
+<div class="gallery-overlay" id="galleryOverlay">
+  <button class="gallery-close" onclick="closeGallery()">✕</button>
+  <div class="gallery-info">
+    <div>
+      <div class="gallery-title" id="galleryTitle"></div>
+      <div class="gallery-agency" id="galleryAgency"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="gallery-counter" id="galleryCounter"></span>
+      <button class="gallery-open-btn" id="galleryOpenBtn">↗ Άνοιγμα</button>
+    </div>
+  </div>
+  <div class="gallery-main">
+    <div class="gallery-img-wrap" id="galleryImgWrap" onclick="toggleGalleryZoom(event)">
+      <img class="gallery-img" id="galleryImg" src="" alt="">
+    </div>
+    <div class="gallery-nav prev disabled" id="galleryPrev" onclick="galleryNav(-1)">‹</div>
+    <div class="gallery-nav next" id="galleryNext" onclick="galleryNav(1)">›</div>
+    <div class="gallery-zoom-hint" id="galleryZoomHint">🖱 Scroll για zoom · Click για zoom in/out</div>
+  </div>
+  <div class="gallery-thumbs" id="galleryThumbs"></div>
+</div>
+
+<!-- LISTING OVERLAY -->
+<div class="listing-overlay" id="listingOverlay" onclick="if(event.target===this)closeListingOverlay()">
+  <button class="lo-close" onclick="closeListingOverlay()">✕</button>
+  <div id="loFeatured" class="lo-featured"></div>
+  <div id="loRight" class="lo-right" style="display:none">
+    <div class="lo-carousel-header">
+      <span class="lo-carousel-title" id="loCarouselTitle"></span>
+      <div class="lo-nav-btns">
+        <div class="lo-nav-btn disabled" id="loNavPrev" onclick="loNavFeat(-1)">‹</div>
+        <div class="lo-nav-btn" id="loNavNext" onclick="loNavFeat(1)">›</div>
+      </div>
+    </div>
+    <div class="lo-carousel" id="loCarousel"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://ofvanbbujgcqhbiyihgy.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+const TABLE = 'listings';
+const sb = {
+  headers: () => ({
+    'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}`,
+    'Content-Type': 'application/json', 'Prefer': 'return=representation',
+  }),
+  async update(id, data) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${id}`,
+      { method:'PATCH', headers:sb.headers(), body:JSON.stringify(data) });
+    if (!r.ok) throw new Error(`DB ${r.status}`);
+  },
+};
+
+// ── STATE ───────────────────────────────────────────────────────────────
+let allListings    = [];
+let extraListings  = []; 
+let filtered       = [];
+let currentView    = 'grid';
+let currentSort    = 'price-asc';
+let currentPlatform = 'all';
+let favorites      = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
+let compareList    = [];
+let selectedGroupSource = null;
+
+// ── UNDO / REDO ───────────────────────────────────────────────────────────
+const ACTION_STACK=[], REDO_STACK=[], MAX_STACK=30;
+function pushAction(a){
+  ACTION_STACK.push(a); if(ACTION_STACK.length>MAX_STACK)ACTION_STACK.shift();
+  REDO_STACK.length=0; _upUndoRedo();
+}
+function _upUndoRedo(){
+  const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
+  if(u){u.disabled=!ACTION_STACK.length;u.title=ACTION_STACK.length?`Αναίρεση: ${ACTION_STACK[ACTION_STACK.length-1].label} (Ctrl+Z)`:'Αναίρεση (Ctrl+Z)';}
+  if(r){r.disabled=!REDO_STACK.length;r.title=REDO_STACK.length?`Επανάληψη: ${REDO_STACK[REDO_STACK.length-1].label} (Ctrl+Y)`:'Επανάληψη (Ctrl+Y)';}
+}
+async function undoAction(){if(!ACTION_STACK.length)return;const a=ACTION_STACK.pop();REDO_STACK.push(a);showToast(`↩ ${a.label}`);try{await a.undo();}catch(e){showToast('❌');}_upUndoRedo();}
+async function redoAction(){if(!REDO_STACK.length)return;const a=REDO_STACK.pop();ACTION_STACK.push(a);showToast(`↪ ${a.label}`);try{await a.redo();}catch(e){showToast('❌');}_upUndoRedo();}
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();undoAction();}
+  if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();redoAction();}
+});
+
+// ── MIDDLE CLICK INTERCEPTOR FOR BACKGROUND TABS ──────────────────────────
+function handleLinkClick(e, url) {
+  if (!url) return;
+  if (e.button === 1) { 
+    e.preventDefault();
+    const w = window.open(url, '_blank');
+    if (w) {
+      w.blur();
+      window.focus();
+    }
+  } else if (e.type === 'click' && e.button !== 2) {
+    window.open(url, '_blank');
+  }
+}
+
+// ── LOAD DATA ───────────────────────────────────────────────────────────
+async function loadData() {
+  document.querySelector('.refresh-btn').disabled = true;
+  document.getElementById('main-content').innerHTML = `
+    <div class="loading"><div class="loading-spinner"></div>Φόρτωση δεδομένων...</div>`;
+
+  const inSandbox = window.location.href === 'about:blank' ||
+                    window.location.hostname === '' ||
+                    window.location.protocol === 'blob:' ||
+                    (window.location.hostname && window.location.hostname.includes('claude'));
+
+  if (inSandbox) {
+    document.getElementById('main-content').innerHTML = `
+      <div class="empty" style="max-width:480px;margin:0 auto;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">📁</div>
+        <div style="font-size:16px;color:var(--text);font-weight:600;margin-bottom:10px">Άνοιξε το αρχείο στον browser σου</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
+          Το Supabase δεν επιτρέπει φόρτωση μέσα στον Claude viewer λόγω CORS.<br>
+          Κατέβασε το αρχείο και άνοιξέ το απευθείας στο Chrome/Firefox.
+        </div>
+      </div>`;
+    document.querySelector('.refresh-btn').disabled = false;
+    return;
+  }
+
+  await tryFetch();
+}
+
+async function tryFetch() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="loading"><div class="loading-spinner"></div>Φόρτωση δεδομένων από το Supabase...</div>`;
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc`, {
+      method: 'GET',
+      headers: sb.headers()
+    });
+    if (!resp.ok) throw new Error(`Σφάλμα Βάσης: ${resp.status} ${resp.statusText}`);
+    const data = await resp.json();
+    
+    allListings = data.map(item => ({
+      ...item,
+      _dbId: item.id,
+      price: parseFloat(item.price) || 0,
+      sqm: parseFloat(item.sqm) || 0,
+      year: parseInt(item.year) || 0,
+      pricePerSqm: parseFloat(item.price_per_sqm) || 0,
+      imageUrl: item.image_url,
+      agencyNr: item.agency_nr,
+      platformNr: item.platform_nr
+    }));
+
+    if (!allListings.length) {
+      document.getElementById('main-content').innerHTML = `
+        <div class="empty">📭 Η βάση δεδομένων είναι κενή.<br>
+        <small style="color:var(--text3)">Ανέβασε ένα αρχείο CSV παρακάτω για να εισάγεις δεδομένα.</small>
+        </div>`;
+    } else {
+      buildUI();
+    }
+  } catch(e) {
+    document.getElementById('main-content').innerHTML =
+      `<div class="empty">❌ ${e.message}<br>
+       <small style="color:var(--text3);margin-top:8px;display:block">
+         Ελέγξτε τα SUPABASE_URL και SUPABASE_ANON credentials στον κώδικα.
+       </small>
+       <button onclick="tryFetch()" style="margin-top:12px;background:var(--accent);color:#000;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600">⟳ Δοκίμασε ξανά</button>
+      </div>`;
+  }
+  document.querySelector('.refresh-btn').disabled = false;
+}
+
+// ── CSV PARSER ───────────────────────────────────────────────────────────
+function parseCSV(text, defaultPlatform) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/\s+/g,'_'));
+  
+  return lines.slice(1).map((line, i) => {
+    const vals = parseCSVLine(line);
+    const obj  = {};
+    headers.forEach((h, j) => obj[h] = (vals[j] || '').trim());
+
+    const get = (...keys) => { for (const k of keys) if (obj[k]) return obj[k]; return ''; };
+
+    const priceRaw = get('τιμή','price','τιμη');
+    const sqmRaw   = get('τ.μ._','τ.μ.','sqm','sqm_');
+    const yearRaw  = get('build','year','έτος','ετος');
+    const ppmRaw   = get('τιμή/τ.μ.','τιμη/τ.μ.','price_sqm','€/τ.μ.');
+
+    return {
+      id:         get('house_id','id') || String(i+1),
+      house_id:   get('house_id','id'),
+      location:   get('location','περιοχή','περιοχη'),
+      type:       get('type_of_house','τύπος_κατοικίας','type','τυπος'),
+      url:        get('url',' url'),
+      rooms:      get('rooms','υπνοδωμάτια','δωμάτια'),
+      baths:      get('μπανια','μπάνια','baths'),
+      sqm:        parseSqm(sqmRaw),
+      sqmRaw:     sqmRaw,
+      year:       parseInt(yearRaw) || 0,
+      price:      parsePrice(priceRaw),
+      priceRaw:   priceRaw,
+      pricePerSqm: parsePpm(ppmRaw),
+      platform:   get('platform','m41','πλατφόρμα') || defaultPlatform,
+      floor:      get('όροφος','floor','οροφος'),
+      lvl:        get('lvl'),
+      energy:     get('ενεργειακή_κλάση','energy','ενεργειακη_κλαση'),
+      heating:    get('θέρμανση','heating','θερμανση'),
+      notes:      get('extra_notes','notes','σημειώσεις'),
+      available:  get('διαθέσιμο_από_','available'),
+      agency:     get('μεσιτικό','agency','μεσιτικο'),
+      agencyNr:   get('agency_nr'),
+      deleted:    get('deleted').toUpperCase() === 'X',
+      imageUrl:   get('image_url','image','thumbnail'),
+      published:  get('δημοσίευση_αγγελίας','published'),
+      updated:    get('τελευταία_ενημέρωση','updated'),
+      platformNr: get('platform_nr'),
+    };
+  }).filter(h => h.location || h.url);
+}
+
+// ── LIVE DB GROUPING HANDLERS ─────────────────────────────────────────────
+async function ungroupListing(dbId) {
+  if(!dbId)return;
+  const h=allListings.find(x=>x._dbId===dbId);const prev=h?(h.house_id||'0'):'0';
+  try{
+    await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";
+    pushAction({label:`✂️ ${h?h.location:dbId}`,
+      undo:async()=>{await sb.update(dbId,{house_id:prev});if(h)h.house_id=prev;await tryFetch();},
+      redo:async()=>{await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";await tryFetch();}});
+    showToast("✂️ Αποσυνδέθηκε!");await tryFetch();
+  }catch(e){showToast("❌ Σφάλμα αποσύνδεσης");}
+}
+
+// Select a single item to initiate a quick grouping flow
+function selectListingForGrouping(url) {
+  const h = getByUrl(url);
+  if (!h) return;
+  selectedGroupSource = h;
+  
+  const bar = document.getElementById('groupingBar');
+  document.getElementById('groupingBarDetails').textContent = `${h.location} (${h.sqm} τ.μ.) — €${h.price.toLocaleString('el')} [${h.agency || 'Ιδιώτης'}]`;
+  bar.classList.add('open');
+  
+  showToast("🔗 Επιλέξτε τώρα μια άλλη αγγελία ή group για ένωση");
+  renderListings();
+}
+
+function cancelGroupingSelection() {
+  selectedGroupSource = null;
+  document.getElementById('groupingBar').classList.remove('open');
+  renderListings();
+}
+
+// Instantly join targeted group or listing
+async function executeQuickGroup(targetDbId, targetHouseId) {
+  if (!selectedGroupSource || !selectedGroupSource._dbId) return;
+  
+  let finalHouseId = (targetHouseId || '').trim();
+  
+  // Case A: Merging two single properties that don't have a house_id yet
+  if (!finalHouseId || finalHouseId === '0') {
+    finalHouseId = "group_" + Date.now();
+    try {
+      // Update the target listing first
+      await sb.update(targetDbId, { house_id: finalHouseId });
+    } catch(err) {
+      showToast("❌ Σφάλμα κατά τη δημιουργία Group");
+      return;
+    }
+  }
+  
+  // Update the source listing to match the final group ID
+  try {
+    await sb.update(selectedGroupSource._dbId, { house_id: finalHouseId });
+    showToast(`🔗 Επιτυχής ένωση στο Group #${finalHouseId}!`);
+    selectedGroupSource = null;
+    document.getElementById('groupingBar').classList.remove('open');
+    await tryFetch();
+  } catch(e) {
+    showToast("❌ Σφάλμα κατά την ένωση");
+  }
+}
+
+function parseCSVLine(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else { inQ = !inQ; } }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else cur += c;
+  }
+  result.push(cur);
+  return result;
+}
+
+function parsePrice(s) {
+  if (!s) return 0;
+  const m = s.replace(/[€\s,.]/g,'').match(/\d+/);
+  return m ? parseInt(m[0]) : 0;
+}
+function parseSqm(s) {
+  if (!s) return 0;
+  const m = s.replace(/τ\.μ\.|sqm/gi,'').replace(',','.').match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : 0;
+}
+function parsePpm(s) {
+  if (!s) return 0;
+  const m = s.replace(/[€\s,.]/g,'').match(/\d+/);
+  return m ? parseInt(m[0]) : 0;
+}
+
+// ── BUILD UI ─────────────────────────────────────────────────────────────
+function buildUI() {
+  const combined = [...allListings, ...extraListings];
+
+  const platforms = [...new Set(combined.map(h => h.platform).filter(Boolean))];
+  const bar = document.getElementById('platform-bar');
+  bar.innerHTML = `<button class="platform-tab ${currentPlatform==='all'?'active':''}" data-platform="all" onclick="setPlatform('all',this)">Όλες οι πλατφόρμες <span style="opacity:0.6">(${combined.length})</span></button>`;
+  platforms.forEach(p => {
+    const cnt = combined.filter(h => h.platform === p).length;
+    const tab = document.createElement('button');
+    tab.className = 'platform-tab' + (currentPlatform === p ? ' active' : '');
+    tab.setAttribute('data-platform', p);
+    tab.innerHTML = `<span class="platform-dot" style="background:${getPlatformColor(p)}"></span>${p} <span style="opacity:0.6">(${cnt})</span>`;
+    tab.onclick = function(){ setPlatform(p, this); };
+    bar.appendChild(tab);
+  });
+
+  const locations = [...new Set(combined.map(h => h.location).filter(Boolean))].sort();
+  const types = [...new Set(combined.map(h => h.type).filter(Boolean))].sort();
+  const locSel = document.getElementById('filterLocation');
+  const savedLoc = locSel.value;
+  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + locations.map(l => `<option>${l}</option>`).join('');
+  if (savedLoc) locSel.value = savedLoc;
+  const typSel = document.getElementById('filterType');
+  const savedTyp = typSel.value;
+  typSel.innerHTML = '<option value="">Όλοι οι τύποι</option>' + types.map(t => `<option>${t}</option>`).join('');
+  if (savedTyp) typSel.value = savedTyp;
+
+  const active = combined.filter(h => !h.deleted);
+  const prices = active.map(h => h.price).filter(p => p > 0);
+  const ppms   = active.map(h => {
+    if (h.pricePerSqm > 0) return h.pricePerSqm;
+    if (h.sqm > 0 && h.price > 0) return Math.round(h.price / h.sqm);
+    return 0;
+  }).filter(p => p > 0);
+  document.getElementById('stat-total').textContent  = combined.length;
+  document.getElementById('stat-active').textContent  = active.length;
+  document.getElementById('stat-avg').textContent     = prices.length ? '€'+Math.round(prices.reduce((a,b)=>a+b,0)/prices.length).toLocaleString('el') : '—';
+  document.getElementById('stat-ppm').textContent     = ppms.length   ? '€'+Math.round(ppms.reduce((a,b)=>a+b,0)/ppms.length).toLocaleString('el') : '—';
+
+  applyFilters();
+}
+
+function getPlatformColor(p) {
+  const map = { Spitogatos: '#5dade2', XE: '#58d68d', Nodaliste: '#ec7063', 'spiti.gr': '#e5a550' };
+  return map[p] || '#aab7b8';
+}
+
+// ── FILTERS & SORT ────────────────────────────────────────────────────────
+function applyFilters() {
+  const combined = [...allListings, ...extraListings];
+  const q        = document.getElementById('search').value.toLowerCase();
+  const loc      = document.getElementById('filterLocation').value;
+  const typ      = document.getElementById('filterType').value;
+  const energy   = document.getElementById('filterEnergy').value;
+  const heating  = document.getElementById('filterHeating').value;
+  const minP     = parseInt(document.getElementById('minPrice').value) || 0;
+  const maxP     = parseInt(document.getElementById('maxPrice').value) || Infinity;
+  const minS     = parseInt(document.getElementById('minSqm').value) || 0;
+  const maxS     = parseInt(document.getElementById('maxSqm').value) || Infinity;
+  const minY     = parseInt(document.getElementById('minYear').value) || 0;
+  const maxY     = parseInt(document.getElementById('maxYear').value) || Infinity;
+  const showDel  = document.getElementById('showDeleted').checked;
+
+  filtered = combined.filter(h => {
+    if (!showDel && h.deleted) return false;
+    if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
+    if (loc && h.location !== loc) return false;
+    if (typ && h.type !== typ) return false;
+    if (q && !`${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating}`.toLowerCase().includes(q)) return false;
+    if (h.price > 0 && (h.price < minP || h.price > maxP)) return false;
+    if (h.sqm > 0 && (h.sqm < minS || h.sqm > maxS)) return false;
+    if (h.year > 0 && (h.year < minY || h.year > maxY)) return false;
+    if (energy) {
+      const ec = h.energy || '';
+      if (energy === 'A' && !ec.match(/^Α[++]?:/)) return false;
+      if (energy === 'B' && !ec.startsWith('Β:')) return false;
+      if (energy === 'C' && !ec.startsWith('Γ:')) return false;
+      if (energy === 'D' && !ec.startsWith('Δ:')) return false;
+      if (energy === 'E' && !ec.match(/^[ΕΖΗ]:/)) return false;
+    }
+    if (heating && !h.heating.toLowerCase().includes(heating)) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    if (currentSort === 'price-asc')  return (a.price||Infinity) - (b.price||Infinity);
+    if (currentSort === 'price-desc') return (b.price||0) - (a.price||0);
+    if (currentSort === 'sqm-desc')   return (b.sqm||0) - (a.sqm||0);
+    if (currentSort === 'ppm-asc')    return (a.pricePerSqm||Infinity) - (b.pricePerSqm||Infinity);
+    if (currentSort === 'year-desc')  return (b.year||0) - (a.year||0);
+    if (currentSort === 'updated')    return (b.updated||'').localeCompare(a.updated||'');
+    return 0;
+  });
+
+  document.getElementById('resultsCount').textContent = `${filtered.length} αγγελίες εμφανίζονται`;
+  renderListings();
+}
+
+function setSort(el, sort) {
+  currentSort = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setPlatform(p, el) {
+  currentPlatform = p;
+  document.querySelectorAll('.platform-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('gridBtn').classList.toggle('active', v === 'grid');
+  document.getElementById('listBtn').classList.toggle('active', v === 'list');
+  document.getElementById('mapBtn').classList.toggle('active', v === 'map');
+  renderListings();
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+let leafletMap = null;
+let expandedGroups = new Set();
+
+function groupByHouseId(listings) {
+  const groups = new Map(), singles = [];
+  listings.forEach(h => {
+    const hid = (h.house_id||'').trim();
+    if (hid && hid !== '0') {
+      if (!groups.has(hid)) groups.set(hid, []);
+      groups.get(hid).push(h);
+    } else singles.push(h);
+  });
+  const groupCards = [];
+  groups.forEach((items, hid) => {
+    if(items.length < 2){singles.push(items[0]);return;}
+    const prices = items.map(h=>h.price).filter(p=>p>0);
+    const ref    = items.find(h=>h.imageUrl) || items[0];
+    const allImgs = items.flatMap(h => h.imageUrl ? [{url:h.imageUrl, listing:h}] : []);
+    groupCards.push({
+      _isGroup:true, houseId:hid, items, allImgs, ref,
+      location:ref.location, type:ref.type, sqmRaw:ref.sqm_raw || ref.sqmRaw,
+      year:ref.year, floor:ref.floor, lvl:ref.lvl,
+      energy:ref.energy, heating:ref.heating,
+      minPrice: prices.length ? Math.min(...prices) : 0,
+      maxPrice: prices.length ? Math.max(...prices) : 0,
+      count: items.length,
+      favorited: items.some(h=>h.favorited),
+      representativeDbId: ref._dbId
+    });
+  });
+  return { groupCards, singles };
+}
+
+function renderListings() {
+  const container = document.getElementById('main-content');
+  if (!filtered.length) { container.innerHTML = '<div class="empty">Δεν βρέθηκαν αγγελίες με αυτά τα φίλτρα.</div>'; return; }
+  if (currentView === 'map') {
+    container.innerHTML = `<div id="map-container"><div id="map"></div></div>`;
+    setTimeout(initMap, 50); return;
+  }
+  if (currentView === 'grid') {
+    const { groupCards, singles } = groupByHouseId(filtered);
+    const all = [...groupCards, ...singles];
+    document.getElementById('resultsCount').textContent =
+      `${all.length} κάρτες · ${groupCards.length} σπίτια · ${singles.length} μεμονωμένες`;
+    container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
+    return;
+  }
+  container.innerHTML = `<div class="list-container">${filtered.map(renderListItem).join('')}</div>`;
+}
+
+function renderGroupedCard(g) {
+  const priceStr = g.minPrice === g.maxPrice
+    ? (g.minPrice ? '€'+g.minPrice.toLocaleString('el') : '—')
+    : `€${g.minPrice.toLocaleString('el')} – €${g.maxPrice.toLocaleString('el')}`;
+  const photos = g.allImgs.slice(0, 5);
+  const stripHtml = photos.length
+    ? photos.map((p,i) => `<img class="photo-strip-img" src="${p.url}"
+        onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',${i})"
+        onerror="this.style.display='none'" loading="lazy">`).join('')
+    : `<div class="photo-strip-noimg">🏠</div>`;
+
+  const allFav    = g.items.every(h=>h.favorited);
+  const allHidden = g.items.every(h=>h.hidden);
+  const agencyNames = [...new Set(g.items.map(h=>h.agency||'Ιδιώτης'))].slice(0,3).join(' · ');
+
+  let connectHtml = '';
+  if (selectedGroupSource && selectedGroupSource.house_id !== g.houseId) {
+    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px"
+      onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
+  }
+
+  return `<div class="grouped-card${allFav?' favorited':''}"
+    onclick="openListingOverlay(null,'${g.houseId}',0)">
+    <div class="photo-strip">
+      ${stripHtml}
+      <div class="group-id-pill">#${g.houseId}</div>
+      <div class="group-listing-count">🏢 ${g.count}</div>
+      ${g.allImgs.length > 1 ? `<div class="photo-count-pill">📷 ${g.allImgs.length}</div>` : ''}
+    </div>
+    <div class="grouped-body">
+      <div class="grouped-meta">
+        <div>
+          <div class="grouped-title">${g.location||'—'}</div>
+          <div class="grouped-sub">${g.type||''} ${g.floor?'· '+g.floor:''} ${g.lvl&&Number(g.lvl)>1?'· '+g.lvl+' επίπ.':''}</div>
+        </div>
+        <div class="grouped-price-range">
+          <div class="price-range-main">${priceStr}</div>
+          <div class="price-range-sub">${g.count} αγγελίες</div>
+        </div>
+      </div>
+      <div class="grouped-specs">
+        ${g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:''}
+        ${g.year?`<span class="spec-tag">🏗 ${g.year}</span>`:''}
+        ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
+        ${g.heating&&g.heating.includes('αέριο')?`<span class="spec-tag">🔥 Αέριο</span>`:''}
+        ${g.heating&&g.heating.includes('Αντλία')?`<span class="spec-tag">♨️ Αντλία</span>`:''}
+      </div>
+      ${connectHtml}
+    </div>
+    <div class="grouped-card-footer">
+      <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
+      <div class="group-action-btns">
+        <span class="grp-btn${allFav?' active':''}"
+          onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
+          title="${allFav?'Αφαίρεση αγαπημένου':'Αγαπημένο για όλες'}">${allFav?'★':'☆'}</span>
+        <span class="grp-btn${allHidden?' active':''}"
+          onclick="event.stopPropagation();toggleGroupHide('${g.houseId}')"
+          title="${allHidden?'Εμφάνιση όλων':'Απόκρυψη όλων'}">${allHidden?'↩':'✕'}</span>
+        <span class="grp-btn open-all"
+          onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',0)"
+          title="Άνοιγμα">↗</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+
+function toggleExpandGroup(hid) {
+  if (expandedGroups.has(hid)) expandedGroups.delete(hid); else expandedGroups.add(hid);
+  renderListings();
+}
+
+// ── MAP ───────────────────────────────────────────────────────────────────
+const GEO = {
+  'Κηφισιά':      [38.0737, 23.8119], 'Μαρούσι':      [38.0565, 23.8000],
+  'Νέα Ερυθραία': [38.0997, 23.8253], 'Διόνυσος':     [38.1204, 23.8617],
+  'Μελίσσια':     [38.0440, 23.8350], 'Βριλήσσια':    [38.0318, 23.8419],
+  'Πολιτεία':     [38.0880, 23.8220], 'Νέα Πεντέλη':  [38.0490, 23.8640],
+  'Δροσιά':       [38.1320, 23.8760], 'Σταμάτα':      [38.1156, 23.8920],
+  'Άνοιξη':       [38.1050, 23.8800], 'Λυκόβρυση':    [38.0700, 23.7780],
+  'Πεύκη':        [38.0600, 23.7980], 'Ηράκλειο':     [38.0433, 23.7870],
+  'Αγία Παρασκευή': [37.9980, 23.8195], 'Χαλάνδρι':     [38.0215, 23.7987],
+  'Γέρακας':      [37.9972, 23.8742], 'Παλλήνη':      [37.9980, 23.8761],
+};
+
+function getCoords(location) {
+  if (!location) return null;
+  if (GEO[location]) return GEO[location].map(c => c + (Math.random()-0.5)*0.003);
+  for (const [k,v] of Object.entries(GEO)) {
+    if (location.includes(k) || k.includes(location)) return v.map(c => c + (Math.random()-0.5)*0.003);
+  }
+  return null;
+}
+
+function priceColor(price) {
+  if (!price) return '#888';
+  if (price < 300000) return '#5a9e78';
+  if (price < 400000) return '#c9a84c';
+  return '#c97b6a';
+}
+
+function initMap() {
+  if (leafletMap) { leafletMap.remove(); leafletMap = null; }
+  leafletMap = L.map('map', { center: [38.07, 23.82], zoom: 12, zoomControl: true });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap © CARTO', maxZoom: 19
+  }).addTo(leafletMap);
+
+  let placed = 0;
+  filtered.forEach(h => {
+    const coords = getCoords(h.location);
+    if (!coords) return;
+    placed++;
+
+    const color = priceColor(h.price);
+    const ppm = h.pricePerSqm || (h.sqm>0&&h.price>0 ? Math.round(h.price/h.sqm) : 0);
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="background:${color};color:#000;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);cursor:pointer;">${h.price ? '€'+Math.round(h.price/1000)+'k' : '?'}</div>`,
+      iconAnchor: [20, 12],
+    });
+
+    const marker = L.marker(coords, { icon }).addTo(leafletMap);
+
+    const popup = `<div class="map-popup">
+      ${h.imageUrl ? `<img src="${h.imageUrl}" onerror="this.style.display='none'">` : ''}
+      <div class="map-popup-loc">${h.location}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:4px">${h.type||''} · ${h.floor||''}</div>
+      <div class="map-popup-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
+      <div class="map-popup-specs">
+        ${(h.sqm_raw||h.sqmRaw)?'📐 '+(h.sqm_raw||h.sqmRaw):''} ${h.rooms?'· 🛏 '+h.rooms:''} ${h.year?'· 🏗 '+h.year:''}<br>
+        ${ppm?'€'+ppm+'/τ.μ. · ':''}${h.agency||''}
+      </div>
+      ${h.url?`<a class="map-popup-link" href="${h.url}" target="_blank">↗ Άνοιγμα</a>`:''}
+    </div>`;
+
+    marker.bindPopup(popup, { maxWidth: 260 });
+  });
+
+  const legend = L.control({ position: 'bottomleft' });
+  legend.onAdd = () => {
+    const div = L.DomUtil.create('div','map-legend');
+    div.innerHTML = `
+      <div style="font-weight:600;margin-bottom:6px;color:#e8e4dc">Τιμές</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#5a9e78"></div> &lt; €300k</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> €300k–400k</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#c97b6a"></div> &gt; €400k</div>
+      <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} αγγελίες στο χάρτη</div>`;
+    return div;
+  };
+  legend.addTo(leafletMap);
+}
+
+function energyClass(e) {
+  if (!e) return 'other';
+  if (e.startsWith('Α+:') || e.startsWith('Α++')) return 'Aplus2';
+  if (e.startsWith('Α+')) return 'Aplus';
+  if (e.startsWith('Α:')) return 'A';
+  if (e.startsWith('Β:')) return 'B';
+  if (e.startsWith('Γ:')) return 'C';
+  if (e.startsWith('Δ:')) return 'D';
+  if (e.startsWith('Ε:')) return 'E';
+  if (e.startsWith('Ζ:')) return 'Z';
+  if (e.startsWith('Η:')) return 'H';
+  return 'other';
+}
+function energyLabel(e) {
+  if (!e) return '—';
+  const m = e.match(/^[Α-Ωα-ω+]+/);
+  return m ? m[0] : e.slice(0,2);
+}
+
+function platformBadgeClass(p) {
+  if (!p) return 'p-other';
+  const low = p.toLowerCase();
+  if (low.includes('spitogatos')) return 'p-spitogatos';
+  if (low.includes('xe') || low.includes('χε')) return 'p-xe';
+  if (low.includes('nodaliste')) return 'p-nodaliste';
+  return 'p-other';
+}
+
+function renderCard(h) {
+  const isFav = h.favorited || favorites.has(h.url || h.platformNr);
+  const imgHtml = h.imageUrl
+    ? `<img src="${h.imageUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const ppm = h.pricePerSqm || (h.sqm > 0 && h.price > 0 ? Math.round(h.price/h.sqm) : 0);
+
+  // Grouping operation buttons dynamically rendered inside actions panel
+  let groupActionHtml = '';
+  if (h._dbId) {
+    if (selectedGroupSource) {
+      // Show join target button if another item is selected
+      if (selectedGroupSource._dbId !== h._dbId) {
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Ένωση εδώ">🔗</span>`;
+      }
+    } else {
+      // Default state: select entry point
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="Επιλογή για Ένωση" aria-label="Επιλογή για Ένωση">🔗</span>`;
+    }
+  }
+
+  return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}" onclick="openModal('${escJ(h.url)}')">
+    <div class="card-img-wrap" style="cursor:pointer"
+      onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
+      ${imgHtml}
+      <div class="no-img" ${h.imageUrl?'style="display:none"':''}>🏠</div>
+      <div class="card-badge">${h.type || '—'}</div>
+      <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
+      ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">#${h.house_id}</div>` : ''}
+      <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
+    </div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <div class="card-location">${h.location || '—'}</div>
+          <div class="card-type">${h.floor ? h.floor + (h.lvl ? ' · '+h.lvl+' επίπεδα' : '') : ''}</div>
+        </div>
+        <div>
+          <div class="card-price">${h.price ? '€'+h.price.toLocaleString('el') : '—'}</div>
+          <div class="price-sqm">${ppm ? '€'+ppm+'/τ.μ.' : ''}</div>
+        </div>
+      </div>
+      <div class="card-specs">
+        ${(h.sqm_raw||h.sqmRaw) ? `<span class="spec-tag">📐 ${h.sqm_raw||h.sqmRaw}</span>` : ''}
+        ${h.rooms ? `<span class="spec-tag">🛏 ${h.rooms}</span>` : ''}
+        ${h.year ? `<span class="spec-tag">🏗 ${h.year}</span>` : ''}
+        ${h.energy ? `<span class="spec-tag"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></span>` : ''}
+        ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">🔥 Αέριο</span>` : ''}
+        ${h.heating && h.heating.includes('Αντλία') ? `<span class="spec-tag">♨️ Αντλία</span>` : ''}
+      </div>
+      <div class="card-footer" style="flex-wrap: wrap;">
+        <span class="agency-name" title="${h.agency||''}">${h.agency || '—'}</span>
+        <div class="card-actions">
+          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Λεπτομέρειες">🔍</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Σύγκριση" aria-label="Σύγκριση">⊕</span>
+          ${groupActionHtml}
+          ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="Άνοιγμα link" aria-label="Άνοιγμα link">↗</a>` : ''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderListItem(h) {
+  const isFav = h.favorited || favorites.has(h.url || h.platformNr);
+  const ppm = h.pricePerSqm || (h.sqm > 0 && h.price > 0 ? Math.round(h.price/h.sqm) : 0);
+  
+  let groupActionHtml = '';
+  if (h._dbId) {
+    if (selectedGroupSource) {
+      if (selectedGroupSource._dbId !== h._dbId) {
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Ένωση εδώ">🔗</span>`;
+      }
+    } else {
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="Επιλογή για Ένωση" aria-label="Επιλογή για Ένωση">🔗</span>`;
+    }
+  }
+
+  return `<div class="list-item${h.deleted?' deleted':''}${isFav?' favorited':''}" onclick="openModal('${escJ(h.url)}')">
+    ${h.imageUrl 
+      ? `<img class="list-thumb" src="${h.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\\'list-no-img\\'>🏠</div>'">`
+      : `<div class="list-no-img">🏠</div>`}
+    <div class="list-main">
+      <div class="list-top">
+        <span class="list-location">${h.location||'—'}</span>
+        <span class="list-type">${h.type||''}</span>
+        ${h.energy ? `<span class="energy-badge e-${energyClass(h.energy)}" style="font-size:10px;padding:2px 6px">${energyLabel(h.energy)}</span>` : ''}
+        <span class="platform-badge ${platformBadgeClass(h.platform)}" style="font-size:10px;padding:2px 6px">${h.platform||''}</span>
+        ${h.house_id && h.house_id !== '0' ? `<span class="house-id-badge" style="position:static;margin-left:4px">#${h.house_id}</span>` : ''}
+      </div>
+      <div class="list-specs">
+        ${(h.sqm_raw||h.sqmRaw)?`<span class="list-spec">📐 ${h.sqm_raw||h.sqmRaw}</span>`:''}
+        ${h.rooms?`<span class="list-spec">🛏 ${h.rooms}</span>`:''}
+        ${h.year?`<span class="list-spec">🏗 ${h.year}</span>`:''}
+        ${h.floor?`<span class="list-spec">📍 ${h.floor}</span>`:''}
+        ${h.heating?`<span class="list-spec" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🔥 ${h.heating.slice(0,30)}</span>`:''}
+        <span class="list-spec" style="color:var(--text3)">${h.agency||''}</span>
+      </div>
+    </div>
+    <div class="list-right">
+      <div class="list-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
+      <div class="list-ppm">${ppm?'€'+ppm+'/τ.μ.':''}</div>
+      <div class="list-actions">
+        <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')" title="Αγαπημένο" aria-label="Αγαπημένο">${isFav?'★':'☆'}</span>
+        <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Σύγκριση" aria-label="Σύγκριση">⊕</span>
+        ${groupActionHtml}
+        ${h.url?`<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="Άνοιγμα link" aria-label="Άνοιγμα link">↗</a>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── MODAL DETAIL ──────────────────────────────────────────────────────────
+function getByUrl(url) {
+  return [...allListings, ...extraListings].find(h => h.url === url);
+}
+
+function openModal(url) {
+  const h = getByUrl(url); if (!h) return;
+  const ppm    = h.pricePerSqm || (h.sqm>0&&h.price>0 ? Math.round(h.price/h.sqm) : 0);
+  const isFav  = h.favorited || favorites.has(h.url||h.platformNr);
+  const isHid  = h.hidden || false;
+  const key    = h.url || h.platformNr;
+
+  document.getElementById('modalContent').innerHTML = `
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    ${h.imageUrl
+      ? `<img class="modal-img" src="${h.imageUrl}" onerror="this.outerHTML='<div class=\\'modal-no-img\\'>🏠</div>'">`
+      : '<div class="modal-no-img">🏠</div>'}
+    <div class="modal-body">
+      <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
+      <div class="modal-subtitle">${h.floor?h.floor+' ·':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
+
+      <div class="modal-price-row">
+        <div class="modal-price-left">
+          <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
+          ${ppm?`<div class="modal-ppm">€${ppm}/τ.μ.</div>`:''}
+        </div>
+        <div class="modal-action-btns">
+          ${h.url?`<span class="mab open-btn" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" title="Άνοιγμα αγγελίας">↗ Άνοιγμα</span>`:''}
+          <span class="mab fav-btn-m${isFav?' active':''}" id="modal-fav-btn"
+            onclick="modalToggleFav('${escJ(key)}')"
+            title="${isFav?'Αφαίρεση':'Αγαπημένο'}">
+            ${isFav?'★ Αγαπημένο':'☆ Αγαπημένο'}
+          </span>
+          <span class="mab hide-btn-m${isHid?' active':''}" id="modal-hide-btn"
+            onclick="modalToggleHide('${escJ(key)}')"
+            title="${isHid?'Επαναφορά':'Απόκρυψη'}">
+            ${isHid?'↩ Επαναφορά':'✕ Απόκρυψη'}
+          </span>
+          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="Σύγκριση">⊕ Σύγκριση</span>
+        </div>
+      </div>
+
+      <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Έτος κατασκευής</div><div class="modal-field-value">${h.year||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Θέρμανση</div><div class="modal-field-value">${h.heating||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Ενεργειακή κλάση</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:12px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">Όροφος / Επίπεδα</div><div class="modal-field-value">${h.floor||'—'} ${h.lvl?'· '+h.lvl+' επίπεδα':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">${h.agency||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Διαθέσιμο</div><div class="modal-field-value">${h.available||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">⭐️ ${h.personal_score || 0}/5</div></div>
+        <div class="modal-field"><div class="modal-field-label">Ημ. Επίσκεψης</div><div class="modal-field-value">${h.visit_date || '—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Κωδικός αγγελίας</div><div class="modal-field-value">${h.agencyNr||h.platformNr||'—'}</div></div>
+      </div>
+      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
+      ${h.personal_notes?`<div class="modal-notes" style="background:rgba(126,184,154,0.08);border-color:rgba(126,184,154,0.2)">📌 <strong>Προσωπικές Σημειώσεις:</strong> ${h.personal_notes}</div>`:''}
+    </div>`;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function modalToggleFav(key) {
+  const h=getByUrl(key);if(!h)return;
+  const prev=h.favorited;h.favorited=!prev;
+  if(h._dbId)sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});
+  else{if(h.favorited)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
+  const btn=document.getElementById('modal-fav-btn');
+  if(btn){btn.classList.toggle('active',h.favorited);btn.textContent=h.favorited?'★ Αγαπημένο':'☆ Αγαπημένο';}
+  pushAction({label:h.favorited?`★ ${h.location}`:`☆ ${h.location}`,
+    undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
+    redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
+  showToast(h.favorited?'★ Αγαπημένο':'☆ Αφαιρέθηκε');
+}
+
+function modalToggleHide(key) {
+  const h=getByUrl(key);if(!h)return;
+  const prev=h.hidden;h.hidden=!prev;
+  if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
+  const btn=document.getElementById('modal-hide-btn');
+  if(btn){btn.classList.toggle('active',h.hidden);btn.textContent=h.hidden?'↩ Επαναφορά':'✕ Απόκρυψη';}
+  pushAction({label:h.hidden?`✕ ${h.location}`:`↩ ${h.location}`,
+    undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
+    redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
+  showToast(h.hidden?'✕ Κρύφτηκε':'↩ Εμφανίζεται ξανά');
+  applyFilters();
+}
+
+function closeModal() { document.getElementById('detailModal').classList.remove('open'); }
+
+function toggleFav(key) {
+  const h=getByUrl(key);const prev=h?h.favorited:favorites.has(key);
+  if(h&&h._dbId){h.favorited=!prev;sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});}
+  else{if(prev)favorites.delete(key);else favorites.add(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
+  pushAction({label:(!prev?'★ ':' ☆ ')+(h?h.location:''),
+    undo:async()=>{if(h&&h._dbId){h.favorited=prev;await sb.update(h._dbId,{favorited:prev});}else{if(prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();},
+    redo:async()=>{if(h&&h._dbId){h.favorited=!prev;await sb.update(h._dbId,{favorited:!prev});}else{if(!prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();}});
+  showToast(!prev?'★ Αγαπημένο':'☆ Αφαιρέθηκε');
+  applyFilters();
+}
+
+// ── COMPARE ───────────────────────────────────────────────────────────────
+function addToCompare(url) {
+  const h = getByUrl(url); if (!h) return;
+  if (compareList.find(c => c.url === url)) { showToast('Ήδη στη λίστα σύγκρισης'); return; }
+  if (compareList.length >= 4) { showToast('Μέγιστο 4 αγγελίες για σύγκριση'); return; }
+  compareList.push(h);
+  renderCompareBar();
+  showToast('⊕ Προστέθηκε στη σύγκριση');
+}
+function removeFromCompare(url) { compareList = compareList.filter(h => h.url !== url); renderCompareBar(); }
+function clearCompare() { compareList = []; renderCompareBar(); }
+function renderCompareBar() {
+  document.getElementById('compareBar').classList.toggle('open', compareList.length > 0);
+  document.getElementById('compareItems').innerHTML = compareList.map(h =>
+    `<div class="compare-item">${h.location} · ${h.price?'€'+h.price.toLocaleString('el'):'—'} <span class="compare-remove" onclick="removeFromCompare('${escJ(h.url)}')">✕</span></div>`
+  ).join('');
+}
+function openCompareModal() {
+  if (!compareList.length) return;
+  const fields = [
+    ['Φωτογραφία','img'],['Τιμή','price'],['τ.μ.','sqmRaw'],['€/τ.μ.','pricePerSqm'],
+    ['Τύπος','type'],['Έτος','year'],['Θέρμανση','heating'],['Ενέργεια','energy'],
+    ['Δωμάτια','rooms'],['Όροφος','floor'],['Μεσιτικό','agency'],
+  ];
+  const prices = compareList.map(h=>h.price).filter(Boolean);
+  const ppms   = compareList.map(h=>h.pricePerSqm||(h.sqm>0&&h.price>0?Math.round(h.price/h.sqm):0)).filter(Boolean);
+  const minPrice = Math.min(...prices); const minPpm = Math.min(...ppms);
+
+  const cols = compareList.map(h => {
+    const ppm = h.pricePerSqm||(h.sqm>0&&h.price>0?Math.round(h.price/h.sqm):0);
+    return { ...h, _ppm: ppm };
+  });
+
+  let html = `<div class="compare-modal">
+    <button class="close-compare" onclick="closeCompareModal()">✕ Κλείσιμο</button>
+    <h2>📊 Σύγκριση ${compareList.length} αγγελιών</h2>
+    <div style="overflow-x:auto"><table class="compare-table">
+    <thead><tr><th>Χαρακτηριστικό</th>${cols.map(h=>`<th>${h.location}<br><small style="color:var(--text3)">${h.type||''}</small></th>`).join('')}</tr></thead>
+    <tbody>`;
+  fields.forEach(([label, key]) => {
+    html += `<tr><td>${label}</td>`;
+    cols.forEach(h => {
+      if (key === 'img') {
+        html += `<td>${h.imageUrl?`<img class="compare-img" src="${h.imageUrl}">`:'<div class="compare-no-img">🏠</div>'}</td>`;
+      } else if (key === 'price') {
+        const best = h.price === minPrice;
+        html += `<td class="${best?'best':''}">€${h.price?h.price.toLocaleString('el'):'—'}</td>`;
+      } else if (key === 'pricePerSqm') {
+        const ppm = h._ppm;
+        html += `<td class="${ppm&&ppm===minPpm?'best':''}">${ppm?'€'+ppm:''}</td>`;
+      } else if (key === 'energy') {
+        html += `<td><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></td>`;
+      } else if (key === 'sqmRaw') {
+        html += `<td>${h.sqm_raw || h.sqmRaw || '—'}</td>`;
+      } else {
+        html += `<td>${h[key]||'—'}</td>`;
+      }
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table></div></div>`;
+  document.getElementById('compareContent').innerHTML = html;
+  document.getElementById('compareModal').classList.add('open');
+}
+function closeCompareModal() { document.getElementById('compareModal').classList.remove('open'); }
+
+// ── CSV UPLOAD ───────────────────────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault(); document.getElementById('dropzone').classList.remove('drag');
+  const file = e.dataTransfer.files[0]; if (file) processFile(file);
+}
+function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(file); }
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const platformName = file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
+    const newEntries = parseCSV(ev.target.result, platformName);
+    extraListings = [...extraListings.filter(h => h.platform !== platformName), ...newEntries];
+    showToast(`✓ ${newEntries.length} αγγελίες προστέθηκαν προσωρινά`);
+    buildUI();
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escJ(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// ── FULLSCREEN GALLERY ────────────────────────────────────────────────────
+let galleryItems = [], galleryIdx = 0, galleryZoom = 1, _gallHintTimer = null;
+
+function openGallery(houseId, startIdx) {
+  const all = [...allListings, ...extraListings];
+  const items = all
+    .filter(h => (h.house_id||'').trim() === String(houseId) && h.imageUrl)
+    .map(h => ({ url: h.imageUrl, listing: h }));
+  if (!items.length) return;
+  galleryItems = items;
+  galleryIdx   = Math.min(startIdx||0, items.length-1);
+  galleryZoom  = 1;
+  document.getElementById('galleryOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _renderGalleryFrame();
+  _buildGalleryThumbs();
+  _showGalleryHint();
+}
+
+function closeGallery() {
+  document.getElementById('galleryOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  galleryZoom = 1;
+  const img = document.getElementById('galleryImg');
+  if (img) { img.style.transform='scale(1)'; }
+  document.getElementById('galleryImgWrap')?.classList.remove('zoomed');
+}
+
+function _renderGalleryFrame() {
+  const item = galleryItems[galleryIdx]; if (!item) return;
+  const h = item.listing;
+  const img = document.getElementById('galleryImg');
+  img.src = item.url;
+  img.style.transform = `scale(${galleryZoom})`;
+  document.getElementById('galleryTitle').textContent   = `${h.location||''} · ${h.type||''}`;
+  document.getElementById('galleryAgency').textContent  = h.agency || '';
+  document.getElementById('galleryCounter').textContent = `${galleryIdx+1} / ${galleryItems.length}`;
+  
+  const openBtn = document.getElementById('galleryOpenBtn');
+  if (openBtn && h.url) {
+    openBtn.onmousedown = (e) => handleLinkClick(e, h.url);
+    openBtn.onclick = (e) => handleLinkClick(e, h.url);
+  }
+
+  document.getElementById('galleryPrev').classList.toggle('disabled', galleryIdx === 0);
+  document.getElementById('galleryNext').classList.toggle('disabled', galleryIdx === galleryItems.length-1);
+  document.querySelectorAll('.gallery-thumb').forEach((t,i)=>t.classList.toggle('active',i===galleryIdx));
+  const active = document.querySelectorAll('.gallery-thumb')[galleryIdx];
+  active?.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+
+function _buildGalleryThumbs() {
+  document.getElementById('galleryThumbs').innerHTML = galleryItems.map((item,i)=>
+    `<img class="gallery-thumb${i===galleryIdx?' active':''}" src="${item.url}"
+      title="${item.listing.agency||''}"
+      onclick="galleryGoTo(${i})" onerror="this.style.display='none'" loading="lazy">`
+  ).join('');
+}
+
+function galleryGoTo(idx) {
+  galleryIdx = Math.max(0, Math.min(galleryItems.length-1, idx));
+  galleryZoom = 1;
+  const img = document.getElementById('galleryImg');
+  img.style.transform = 'scale(1)';
+  document.getElementById('galleryImgWrap').classList.remove('zoomed');
+  _renderGalleryFrame();
+}
+
+function galleryNav(dir) { galleryGoTo(galleryIdx + dir); }
+
+function toggleGalleryZoom(e) {
+  galleryZoom = galleryZoom > 1 ? 1 : 2.5;
+  document.getElementById('galleryImg').style.transform = `scale(${galleryZoom})`;
+  document.getElementById('galleryImgWrap').classList.toggle('zoomed', galleryZoom > 1);
+}
+
+function _showGalleryHint() {
+  const hint = document.getElementById('galleryZoomHint');
+  if (!hint) return;
+  hint.style.opacity = '1';
+  clearTimeout(_gallHintTimer);
+  _gallHintTimer = setTimeout(()=>{ hint.style.opacity='0'; }, 3200);
+}
+
+document.addEventListener('wheel', e => {
+  if (!document.getElementById('galleryOverlay')?.classList.contains('open')) return;
+  e.preventDefault();
+  galleryZoom = Math.min(5, Math.max(1, galleryZoom + (e.deltaY < 0 ? 0.15 : -0.15)));
+  document.getElementById('galleryImg').style.transform = `scale(${galleryZoom})`;
+  document.getElementById('galleryImgWrap').classList.toggle('zoomed', galleryZoom > 1);
+}, { passive: false });
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('galleryOverlay')?.classList.contains('open')) return;
+  if (e.key==='ArrowRight'||e.key==='ArrowDown') galleryNav(1);
+  if (e.key==='ArrowLeft' ||e.key==='ArrowUp')   galleryNav(-1);
+  if (e.key==='Escape') closeGallery();
+});
+
+
+// ── LISTING DETAIL OVERLAY ────────────────────────────────────────────────
+let _loSiblings=[], _loFeatIdx=0;
+
+function openListingOverlay(url, houseId, startIdx) {
+  if(url && !houseId) {
+    const h=getByUrl(url); if(!h){openModal(url);return;}
+    const hid=(h.house_id||'').trim();
+    if(hid&&hid!=='0'){
+      const sibs=[...allListings,...extraListings].filter(x=>(x.house_id||'').trim()===hid);
+      if(sibs.length>=2){const fi=Math.max(0,sibs.findIndex(x=>x.url===url));_openOvl(sibs,fi);return;}
+    }
+    _openOvl([h],0);
+  } else if(houseId) {
+    const sibs=[...allListings,...extraListings].filter(x=>(x.house_id||'').trim()===String(houseId));
+    if(!sibs.length)return;
+    _openOvl(sibs,(startIdx!==undefined&&startIdx<sibs.length)?startIdx:0);
+  }
+}
+
+function _openOvl(sibs,fi){
+  _loSiblings=sibs; _loFeatIdx=fi;
+  document.getElementById('listingOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  _renderOvl();
+}
+
+function _renderOvl(){
+  const h=_loSiblings[_loFeatIdx];
+  const rest=_loSiblings.filter((_,i)=>i!==_loFeatIdx);
+  document.getElementById('loFeatured').innerHTML=_featHTML(h);
+  const rEl=document.getElementById('loRight');
+  if(rest.length){
+    rEl.style.display='flex';
+    document.getElementById('loCarouselTitle').textContent=`Υπόλοιπες αγγελίες ${rest.length}`;
+    document.getElementById('loNavPrev').classList.toggle('disabled',_loFeatIdx===0);
+    document.getElementById('loNavNext').classList.toggle('disabled',_loFeatIdx===_loSiblings.length-1);
+    document.getElementById('loCarousel').innerHTML=rest.map((s,i)=>_sibHTML(s,i)).join('');
+  } else {
+    rEl.style.display='none';
+  }
+}
+
+function loNavFeat(dir){
+  const ni=_loFeatIdx+dir;
+  if(ni<0||ni>=_loSiblings.length)return;
+  _loFeatIdx=ni;_renderOvl();
+}
+function loSelectSibling(ri){
+  const idxs=_loSiblings.map((_,i)=>i).filter(i=>i!==_loFeatIdx);
+  _loFeatIdx=idxs[ri];_renderOvl();
+}
+function closeListingOverlay(){
+  document.getElementById('listingOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+function _featHTML(h){
+  const ppm=h.pricePerSqm||(h.sqm>0&&h.price>0?Math.round(h.price/h.sqm):0);
+  const isFav=h.favorited||favorites.has(h.url||h.platformNr);
+  const isHid=h.hidden||false; const key=h.url||h.platformNr;
+  return `
+    ${h.imageUrl
+      ? `<img class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
+          onclick="if(this._z){this.style.transform='';this.style.transformOrigin='';this._z=0}else{this.style.transform='scale(1.8)';this.style.transformOrigin='top center';this._z=1}"
+          onerror="this.outerHTML='<div class=\'modal-no-img\'>🏠</div>'">`
+      : '<div class="modal-no-img">🏠</div>'}
+    <div class="modal-body">
+      <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
+      <div class="modal-subtitle">${h.floor?h.floor+' · ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
+          ${ppm?`<div class="modal-ppm">€${ppm}/τ.μ.</div>`:''}
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${h.url?`<span class="modal-btn primary" style="cursor:pointer"
+            onmousedown="handleLinkClick(event,'${escJ(h.url)}')"
+            onclick="event.stopPropagation();handleLinkClick(event,'${escJ(h.url)}')">↗ Άνοιγμα</span>`:''}
+          <span class="modal-btn${isFav?' active':''}" id="lo-fav" style="cursor:pointer"
+            onclick="loToggleFav('${escJ(key)}')">${isFav?'★ Αγαπημένο':'☆ Αγαπημένο'}</span>
+          <span class="modal-btn${isHid?' active':''}" id="lo-hide" style="cursor:pointer;${isHid?'border-color:var(--red);color:var(--red)':''}"
+            onclick="loToggleHide('${escJ(key)}')">${isHid?'↩ Επαναφορά':'✕ Απόκρυψη'}</span>
+          <span class="modal-btn" style="cursor:pointer"
+            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">⊕ Σύγκριση</span>
+        </div>
+      </div>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Έτος κατασκευής</div><div class="modal-field-value">${h.year||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Θέρμανση</div><div class="modal-field-value">${h.heating||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Ενεργειακή κλάση</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:11px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">Όροφος / Επίπεδα</div><div class="modal-field-value">${h.floor||'—'} ${h.lvl?'· '+h.lvl+' επίπ.':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">${h.agency||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Διαθέσιμο</div><div class="modal-field-value">${h.available||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Κωδικός αγγελίας</div><div class="modal-field-value">${h.agencyNr||h.agency_nr||h.platformNr||'—'}</div></div>
+      </div>
+      ${h.notes?`<div class="modal-notes">📝 ${h.notes}</div>`:''}
+    </div>`;
+}
+
+function _sibHTML(s, ri) {
+  const ppm=s.pricePerSqm||(s.sqm>0&&s.price>0?Math.round(s.price/s.sqm):0);
+  const isFav=s.favorited||favorites.has(s.url||s.platformNr);
+  return `<div class="lo-sib-card" onclick="loSelectSibling(${ri})">
+    <div class="lo-sib-img-wrap">
+      ${s.imageUrl
+        ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>🏠</div>'">`
+        : `<div class="lo-sib-no-img">🏠</div>`}
+      <div class="card-badge" style="position:absolute;top:7px;left:7px;z-index:2">${s.type||'—'}</div>
+      <div class="platform-badge ${platformBadgeClass(s.platform)}" style="position:absolute;top:7px;right:7px;z-index:2">${s.platform||''}</div>
+    </div>
+    <div class="lo-sib-body">
+      <div class="lo-sib-top">
+        <div>
+          <div class="lo-sib-location">${s.location||'—'}</div>
+          <div class="lo-sib-sub">${s.floor?s.floor+(s.lvl?' · '+s.lvl+' επίπ.':''):''}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="lo-sib-price">${s.price?'€'+s.price.toLocaleString('el'):'—'}</div>
+          <div class="lo-sib-ppm">${ppm?'€'+ppm+'/τ.μ.':''}</div>
+        </div>
+      </div>
+      <div class="lo-sib-specs">
+        ${s.sqm_raw||s.sqmRaw?`<span class="spec-tag">📐 ${s.sqm_raw||s.sqmRaw}</span>`:''}
+        ${s.rooms?`<span class="spec-tag">🛏 ${s.rooms}</span>`:''}
+        ${s.year?`<span class="spec-tag">🏗 ${s.year}</span>`:''}
+        ${s.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(s.energy)}">${energyLabel(s.energy)}</span></span>`:''}
+      </div>
+      <div class="lo-sib-footer">
+        <span class="lo-sib-agency" title="${s.agency||''}">${s.agency||'—'}</span>
+        <div class="lo-sib-btns">
+          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="Αγαπημένο">${isFav?'★':'☆'}</span>
+          ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="Άνοιγμα">↗</span>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function loToggleFav(key){
+  const h=getByUrl(key);if(!h)return;
+  const prev=h.favorited;h.favorited=!prev;
+  if(h._dbId)sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});
+  else{if(h.favorited)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
+  pushAction({label:h.favorited?`★ ${h.location}`:`☆ ${h.location}`,
+    undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
+    redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
+  const b=document.getElementById('lo-fav');
+  if(b){b.textContent=h.favorited?'★ Αγαπημένο':'☆ Αγαπημένο';b.classList.toggle('active',h.favorited);}
+  showToast(h.favorited?'★ Αγαπημένο':'☆ Αφαιρέθηκε');
+}
+
+function loToggleHide(key){
+  const h=getByUrl(key);if(!h)return;
+  const prev=h.hidden;h.hidden=!prev;
+  if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
+  pushAction({label:h.hidden?`✕ ${h.location}`:`↩ ${h.location}`,
+    undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
+    redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
+  const b=document.getElementById('lo-hide');
+  if(b){b.textContent=h.hidden?'↩ Επαναφορά':'✕ Απόκρυψη';b.style.borderColor=h.hidden?'var(--red)':'';b.style.color=h.hidden?'var(--red)':'';}
+  showToast(h.hidden?'✕ Κρύφτηκε':'↩ Εμφανίζεται ξανά');
+  if(h.hidden)applyFilters();
+}
+
+// Group-level fav/hide
+async function toggleGroupFav(houseId){
+  const items=allListings.filter(h=>(h.house_id||'').trim()===String(houseId));if(!items.length)return;
+  const nv=!items.every(h=>h.favorited);
+  const prev=items.map(h=>({h,p:h.favorited}));
+  for(const {h} of prev){h.favorited=nv;if(h._dbId)sb.update(h._dbId,{favorited:nv}).catch(()=>{});}
+  pushAction({label:nv?`★ Group #${houseId}`:`☆ Group #${houseId}`,
+    undo:async()=>{for(const {h,p} of prev){h.favorited=p;if(h._dbId)await sb.update(h._dbId,{favorited:p});}renderListings();},
+    redo:async()=>{for(const {h} of prev){h.favorited=nv;if(h._dbId)await sb.update(h._dbId,{favorited:nv});}renderListings();}});
+  showToast(nv?'★ Αγαπημένο για όλες':'☆ Αφαιρέθηκε');renderListings();
+}
+
+async function toggleGroupHide(houseId){
+  const items=allListings.filter(h=>(h.house_id||'').trim()===String(houseId));if(!items.length)return;
+  const nv=!items.every(h=>h.hidden);
+  const prev=items.map(h=>({h,p:h.hidden}));
+  for(const {h} of prev){h.hidden=nv;if(h._dbId)sb.update(h._dbId,{hidden:nv}).catch(()=>{});}
+  pushAction({label:nv?`✕ Group #${houseId}`:`↩ Group #${houseId}`,
+    undo:async()=>{for(const {h,p} of prev){h.hidden=p;if(h._dbId)await sb.update(h._dbId,{hidden:p});}applyFilters();},
+    redo:async()=>{for(const {h} of prev){h.hidden=nv;if(h._dbId)await sb.update(h._dbId,{hidden:nv});}applyFilters();}});
+  showToast(nv?'✕ Κρύφτηκαν όλες':'↩ Εμφανίζονται ξανά');applyFilters();
+}
+
+// Keyboard nav
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('listingOverlay')?.classList.contains('open'))return;
+  if(e.key==='Escape')closeListingOverlay();
+  if(e.key==='ArrowRight')loNavFeat(1);
+  if(e.key==='ArrowLeft')loNavFeat(-1);
+});
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadData();
+setInterval(loadData, 5 * 60 * 1000);
+</script>
+</body>
+</html>
