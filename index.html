@@ -2194,10 +2194,23 @@ function _featHTML(h){
   const isHid=h.hidden||false; const key=h.url||h.platformNr;
   return `
     ${h.imageUrl
-      ? `<img class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
+      ? `<img id="lo-photo-preview" class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
           onclick="if(this._z){this.style.transform='';this.style.transformOrigin='';this._z=0}else{this.style.transform='scale(1.8)';this.style.transformOrigin='top center';this._z=1}"
-          onerror="this.outerHTML='<div class=\'modal-no-img\'>🏠</div>'">`
-      : '<div class="modal-no-img">🏠</div>'}
+          onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>🏠</div>'">`
+      : '<div class="modal-no-img" id="lo-photo-preview">🏠</div>'}
+    <div style="display:flex;gap:6px;align-items:center;padding:7px 12px 0;background:var(--surface)">
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap">📷 URL:</span>
+      <input id="lo-photo-input" type="text" value="${h.imageUrl||''}"
+        placeholder="https://... paste new image URL"
+        style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:5px;
+               padding:5px 9px;font-size:11px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"
+        onkeydown="if(event.key==='Enter')savePhotoUrl('${escJ(key)}')">
+      <button onclick="savePhotoUrl('${escJ(key)}')"
+        style="background:var(--accent);color:#0f0e0c;border:none;border-radius:5px;
+               padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;
+               font-family:'DM Sans',sans-serif;white-space:nowrap">💾 Αποθήκευση</button>
+    </div>
     <div class="modal-body">
       <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
       <div class="modal-subtitle">${h.floor?h.floor+' · ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
@@ -2330,6 +2343,36 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight')loNavFeat(1);
   if(e.key==='ArrowLeft')loNavFeat(-1);
 });
+
+// ── PHOTO URL EDIT ────────────────────────────────────────────────────────
+async function savePhotoUrl(key) {
+  const h = getByUrl(key); if (!h) return;
+  const input = document.getElementById('lo-photo-input');
+  if (!input) return;
+  const newUrl = input.value.trim();
+  if (!newUrl) return;
+  const prev = h.imageUrl;
+  h.imageUrl = newUrl;
+  // Update preview image instantly
+  const img = document.getElementById('lo-photo-preview');
+  if (img) { img.src = newUrl; }
+  // Save to DB
+  if (h._dbId) {
+    try {
+      await sb.update(h._dbId, { image_url: newUrl });
+      showToast('📷 Φωτογραφία ενημερώθηκε!');
+      pushAction({
+        label: `📷 Φωτογραφία: ${h.location}`,
+        undo: async () => { h.imageUrl=prev; if(h._dbId) await sb.update(h._dbId,{image_url:prev}); _renderOvl(); },
+        redo: async () => { h.imageUrl=newUrl; if(h._dbId) await sb.update(h._dbId,{image_url:newUrl}); _renderOvl(); },
+      });
+      // Re-render to update thumbnail on main grid too
+      renderListings();
+    } catch(e) { showToast('❌ Σφάλμα αποθήκευσης'); h.imageUrl = prev; }
+  } else {
+    showToast('📷 Ενημερώθηκε τοπικά (χωρίς σύνδεση DB)');
+  }
+}
 // ── INIT ──────────────────────────────────────────────────────────────────
 loadData();
 setInterval(loadData, 5 * 60 * 1000);
