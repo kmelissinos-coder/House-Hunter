@@ -904,6 +904,12 @@
     .lo-sib-card{width:200px;flex-shrink:0;}
   }
 
+  .change-badge {
+    position:absolute; top:8px; left:50%; transform:translateX(-50%);
+    background:rgba(201,120,106,0.95); color:#fff;
+    border-radius:4px; padding:2px 8px; font-size:10px; font-weight:700;
+    z-index:6; white-space:nowrap; pointer-events:none;
+  }
   @media (max-width: 640px) {
     header, .platform-bar, .controls, .range-filters, .sort-row, .grid-container, .list-container, .upload-zone, .results-count, .show-deleted-wrap { padding-left: 16px; padding-right: 16px; }
     .grid-container { grid-template-columns: 1fr; }
@@ -1755,6 +1761,7 @@ function renderCard(h) {
       <div class="card-badge">${h.type || '—'}</div>
       <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
       ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">#${h.house_id}</div>` : ''}
+      ${h.hasChanges ? `<div class="change-badge">🔄 Αλλαγή</div>` : ''}
       <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
     </div>
     <div class="card-body">
@@ -2013,12 +2020,123 @@ function handleDrop(e) {
 function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(file); }
 function processFile(file) {
   const reader = new FileReader();
-  reader.onload = ev => {
-    const platformName = file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');
-    const newEntries = parseCSV(ev.target.result, platformName);
-    extraListings = [...extraListings.filter(h => h.platform !== platformName), ...newEntries];
-    showToast(`✓ ${newEntries.length} αγγελίες προστέθηκαν προσωρινά`);
-    buildUI();
+  reader.onload = async ev => {
+    const rows = parseCSV(ev.target.result, 'Spitogatos');
+    if (!rows.length) { showToast('❌ Δεν βρέθηκαν εγγραφές'); return; }
+
+    // Show progress toast
+    const total = rows.filter(r => r.url).length;
+    showToast(`📥 Εισαγωγή ${total} αγγελιών στη βάση...`);
+
+    let added=0, updated=0, unchanged=0, errors=0;
+    const changes = []; // track what changed for summary
+
+    for (const h of rows) {
+      if (!h.url) continue;
+      try {
+        // 1. Check if listing already exists
+        const checkRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/listings?url=eq.${encodeURIComponent(h.url)}&select=id,price,image_url,updated`,
+          { headers: { ...sb.headers(), 'Prefer': 'return=representation' } }
+        );
+        const existing = await checkRes.json();
+
+        const payload = {
+          house_id: h.id||null, location: h.location, type: h.type, url: h.url,
+          rooms: h.rooms, baths: h.baths, sqm_raw: h.sqmRaw, sqm: h.sqm||null,
+          year: h.year||null, price: h.price||null, price_raw: h.priceRaw,
+          price_per_sqm: h.pricePerSqm||null, platform: h.platform,
+          floor: h.floor, lvl: h.lvl, energy: h.energy, heating: h.heating,
+          notes: h.notes, available: h.available, agency: h.agency,
+          agency_nr: h.agencyNr, platform_nr: h.platformNr,
+          image_url: h.imageUrl, published: h.published, updated: h.updated,
+        };
+
+        if (!existing || existing.length === 0) {
+          // New listing — insert
+          await fetch(`${SUPABASE_URL}/rest/v1/listings`, {
+            method: 'POST',
+            headers: { ...sb.headers(), 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ ...payload, deleted: false }),
+          });
+          added++;
+        } else {
+          // Existing — check what changed
+          const old = existing[0];
+          const priceChanged = old.price && h.price && Number(old.price) !== h.price;
+          const imgChanged   = h.imageUrl && old.image_url !== h.imageUrl;
+          const hasChange    = priceChanged || imgChanged;
+
+          if (hasChange) {
+            // Record change in history
+            const histEntry = {
+              listing_id:   old.id,
+              changed_at:   new Date().toISOString(),
+              old_price:    priceChanged ? Number(old.price) : null,
+              new_price:    priceChanged ? h.price : null,
+              old_image_url: imgChanged ? old.image_url : null,
+              new_image_url: imgChanged ? h.imageUrl : null,
+              change_type:  [priceChanged?'price':'', imgChanged?'image':''].filter(Boolean).join(','),
+            };
+            // Store history (fire and forget)
+            fetch(`${SUPABASE_URL}/rest/v1/listing_history`, {
+              method: 'POST',
+              headers: { ...sb.headers(), 'Prefer': 'return=minimal' },
+              body: JSON.stringify(histEntry),
+            }).catch(()=>{});
+
+            changes.push({
+              location: h.location,
+              priceChanged, oldPrice: Number(old.price), newPrice: h.price,
+              imgChanged,
+            });
+          }
+
+          // Always update non-user fields (price, image, dates etc)
+          // but NEVER overwrite user fields (hidden, favorited, personal_notes, house_id, personal_score)
+          await fetch(
+            `${SUPABASE_URL}/rest/v1/listings?id=eq.${old.id}`,
+            {
+              method: 'PATCH',
+              headers: { ...sb.headers(), 'Prefer': 'return=minimal' },
+              body: JSON.stringify({
+                price: payload.price, price_raw: payload.price_raw,
+                price_per_sqm: payload.price_per_sqm,
+                image_url: payload.image_url,
+                updated: payload.updated, available: payload.available,
+                energy: payload.energy, heating: payload.heating,
+                rooms: payload.rooms, baths: payload.baths,
+                floor: payload.floor, lvl: payload.lvl,
+                agency: payload.agency, agency_nr: payload.agency_nr,
+                has_changes: hasChange || undefined,
+              }),
+            }
+          );
+          hasChange ? updated++ : unchanged++;
+        }
+      } catch(e) { errors++; console.warn('Import error:', h.url, e); }
+    }
+
+    // Summary toast
+    const parts = [];
+    if (added)     parts.push(`✅ ${added} νέες`);
+    if (updated)   parts.push(`🔄 ${updated} ενημερώθηκαν`);
+    if (unchanged) parts.push(`— ${unchanged} αμετάβλητες`);
+    if (errors)    parts.push(`❌ ${errors} σφάλματα`);
+    showToast(parts.join(' · '), null, 6000);
+
+    // Show change summary if any
+    if (changes.length) {
+      console.log('Changes detected:', changes);
+      const priceChanges = changes.filter(c=>c.priceChanged);
+      if (priceChanges.length) {
+        setTimeout(()=>showToast(
+          `💰 ${priceChanges.length} αλλαγές τιμής — δες console για λεπτομέρειες`, null, 5000
+        ), 200);
+      }
+    }
+
+    await loadData(); // reload from DB
   };
   reader.readAsText(file, 'UTF-8');
 }
