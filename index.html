@@ -2018,10 +2018,58 @@ function handleDrop(e) {
   const file = e.dataTransfer.files[0]; if (file) processFile(file);
 }
 function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(file); }
+
+// ── THUMBNAIL FIX IMPORT ──────────────────────────────────────────────────
+async function processThumbnailFix(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) { showToast('❌ Κενό αρχείο'); return; }
+
+  // Parse header
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
+  const urlIdx = headers.findIndex(h => h === 'url');
+  const imgIdx = headers.findIndex(h => h === 'new_image_url');
+  if (urlIdx < 0 || imgIdx < 0) { showToast('❌ Λάθος format — χρειάζεται url + new_image_url'); return; }
+
+  const fixes = lines.slice(1).map(line => {
+    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
+    return { url: cols[urlIdx], imageUrl: cols[imgIdx] };
+  }).filter(f => f.url && f.imageUrl);
+
+  showToast(`📷 Ενημέρωση ${fixes.length} φωτογραφιών...`);
+  let updated = 0, errors = 0;
+
+  for (const fix of fixes) {
+    // Find in allListings
+    const h = allListings.find(x => x.url === fix.url);
+    if (!h) continue;
+    try {
+      await fetch(\`\${SUPABASE_URL}/rest/v1/listings?id=eq.\${h._dbId}\`, {
+        method: 'PATCH',
+        headers: { ...sb.headers(), 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ image_url: fix.imageUrl }),
+      });
+      h.imageUrl = fix.imageUrl;
+      updated++;
+    } catch(e) { errors++; }
+  }
+
+  showToast(\`✅ \${updated} φωτογραφίες ενημερώθηκαν\${errors?' · ❌ '+errors+' σφάλματα':''}\`, null, 5000);
+  renderListings();
+}
+
 function processFile(file) {
   const reader = new FileReader();
   reader.onload = async ev => {
-    const rows = parseCSV(ev.target.result, 'Spitogatos');
+    const text = ev.target.result;
+
+    // ── Detect thumbnail-fix CSV (has new_image_url column) ──────────────
+    const firstLine = text.split('\n')[0].toLowerCase();
+    if (firstLine.includes('new_image_url')) {
+      await processThumbnailFix(text);
+      return;
+    }
+
+    const rows = parseCSV(text, 'Spitogatos');
     if (!rows.length) { showToast('❌ Δεν βρέθηκαν εγγραφές'); return; }
 
     // Show progress toast
