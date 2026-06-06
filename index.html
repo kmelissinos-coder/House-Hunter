@@ -1925,6 +1925,7 @@ function openModal(url) {
             ${isHid?'↩ Επαναφορά':'✕ Απόκρυψη'}
           </span>
           <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="Σύγκριση">⊕ Σύγκριση</span>
+          ${h.deleted ? `<span class="mab" style="color:var(--accent2);border-color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" title="Δεν πουλήθηκε">↩ Δεν πουλήθηκε</span>` : ''}
         </div>
       </div>
 
@@ -2657,21 +2658,26 @@ function getSyncScript() {
   'for(var i=0;i<db.length;i++){\n' +
   '  var l=db[i];if(!l.url)continue;\n' +
   '  var isFav=favs.has(l.url),cur=l.deleted||"",upds={};\n' +
-  '  if(isFav){if(cur!=""&&cur!="X")upds.deleted=null;var ni=favs.get(l.url);if(ni&&ni!==l.image_url)upds.image_url=ni;}\n' +
+  '  if(isFav){upds.deleted=null;var ni=favs.get(l.url);if(ni&&ni!==l.image_url)upds.image_url=ni;}\n' +
   '  else if(cur!="X")upds.deleted="unfavorited";\n' +
   '  if(Object.keys(upds).length){await fetch(SB+"/rest/v1/listings?id=eq."+l.id,{method:"PATCH",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify(upds)});updated++;if(updated%20===0)log("  \u0395\u03bd\u03b7\u03bc."+updated+"...");}\n' +
   '}\n' +
-  'log("\u0388\u03bb\u03b5\u03b3\u03c7\u03bf\u03c2 sold (image probe)...","#7CB9E8");\n' +
-  'var toCheck=db.filter(function(l){return !favs.has(l.url)&&l.deleted!=="X"&&l.image_url;});\n' +
-  'for(var j=0;j<toCheck.length;j++){\n' +
-  '  var tl=toCheck[j];\n' +
-  '  var ok=await new Promise(function(res){var im=new Image();im.onload=function(){res(true);};im.onerror=function(){res(false);};im.src=tl.image_url+"?_t="+Date.now();setTimeout(function(){res(true);},4000);});\n' +
-  '  if(!ok){await fetch(SB+"/rest/v1/listings?id=eq."+tl.id,{method:"PATCH",headers:{"apikey":KEY,"Authorization":"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({deleted:"X"})});sold++;log("  Sold: "+(tl.url||"").split("/").pop(),"#FF6B6B");}\n' +
-  '}\n' +
-  'log("");log("\u2389 SYNC \u039f\u039b\u039f\u039a\u039b\u0397\u03a1\u03a9\u0398\u0397\u039a\u0395!","#4CAF50");\n' +
-  'log("  \u0395\u03bd\u03b7\u03bc\u03b5\u03c1\u03ce\u03b8\u03b7\u03ba\u03b1\u03bd: "+updated,"#4CAF50");log("  Sold: "+sold,"#FF6B6B");\n' +
+'log("");log("\u2389 SYNC \u039f\u039b\u039f\u039a\u039b\u0397\u03a1\u03a9\u0398\u0397\u039a\u0395!","#4CAF50");\n' +
+  'log("  \u0395\u03bd\u03b7\u03bc\u03b5\u03c1\u03ce\u03b8\u03b7\u03ba\u03b1\u03bd: "+updated,"#4CAF50");\n' +
   'log("  \u21b3 \u0391\u03bd\u03b1\u03bd\u03ad\u03c9\u03c3\u03b5 House Hunter","#D4A853");\n' +
   '})();';
+}
+
+async function unmarkSold(key) {
+  const h = getByUrl(key);
+  if (!h || !h._dbId) return;
+  const prev = h.deleted;
+  h.deleted = false;
+  h.unfavorited = false;
+  await sb.update(h._dbId, {deleted: null});
+  closeModal();
+  applyFilters();
+  showToast('↩ Επαναφέρθηκε ως ενεργό');
 }
 </script>
 </body>
