@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>House Hunter â ÎÎ¸Î®Î½Î± ÎÏÏÎµÎ¹Î±</title>
+<title>House Hunter Ã¢ÂÂ ÃÂÃÂ¸ÃÂ®ÃÂ½ÃÂ± ÃÂÃÂÃÂÃÂµÃÂ¹ÃÂ±</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
@@ -820,7 +820,7 @@
   .grp-btn.open-all{background:var(--accent);color:#0f0e0c;border-color:var(--accent);}
   .grp-btn.open-all:hover{opacity:0.85;}
 
-  /* ââ LISTING OVERLAY ââââââââââââââââââââââââââââââââââââââââââââââââââââ */
+  /* Ã¢ÂÂÃ¢ÂÂ LISTING OVERLAY Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ */
   .listing-overlay {
     display:none; position:fixed; inset:0; z-index:1500;
     background:rgba(6,5,4,0.94); backdrop-filter:blur(10px);
@@ -838,7 +838,7 @@
   }
   .lo-close:hover{background:rgba(255,255,255,0.3);}
 
-  /* FEATURED â fixed width, centered, scrollable */
+  /* FEATURED Ã¢ÂÂ fixed width, centered, scrollable */
   .lo-featured {
     flex:0 0 480px; width:480px;
     background:var(--surface); border:1px solid var(--border);
@@ -860,7 +860,7 @@
   .lo-featured .modal-price { font-size:26px; font-weight:600; color:var(--accent); }
   .lo-featured .modal-ppm { color:var(--text3); font-size:12px; }
 
-  /* RIGHT COLUMN â siblings carousel */
+  /* RIGHT COLUMN Ã¢ÂÂ siblings carousel */
   .lo-right {
     flex:0 0 340px; width:340px;
     display:flex; flex-direction:column; gap:10px;
@@ -940,75 +940,75 @@
 
 <header>
   <div class="logo">
-    ð¡ House Hunter
-    <span>ÎÎ¸Î®Î½Î± ÎÏÏÎµÎ¹Î± Â· Live Î±ÏÏ Supabase DB</span>
+    Ã°ÂÂÂ¡ House Hunter
+    <span>ÃÂÃÂ¸ÃÂ®ÃÂ½ÃÂ± ÃÂÃÂÃÂÃÂµÃÂ¹ÃÂ± ÃÂ· Live ÃÂ±ÃÂÃÂ Supabase DB</span>
   </div>
   <div class="header-stats">
-    <div class="stat-pill"><strong id="stat-total">â</strong> Î±Î³Î³ÎµÎ»Î¯ÎµÏ</div>
-    <div class="stat-pill"><strong id="stat-active">â</strong> ÎµÎ½ÎµÏÎ³Î­Ï</div>
-    <div class="stat-pill">avg <strong id="stat-avg">â</strong></div>
-    <div class="stat-pill">avg â¬/Ï.Î¼. <strong id="stat-ppm">â</strong></div>
+    <div class="stat-pill"><strong id="stat-total">Ã¢ÂÂ</strong> ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ</div>
+    <div class="stat-pill"><strong id="stat-active">Ã¢ÂÂ</strong> ÃÂµÃÂ½ÃÂµÃÂÃÂ³ÃÂ­ÃÂ</div>
+    <div class="stat-pill">avg <strong id="stat-avg">Ã¢ÂÂ</strong></div>
+    <div class="stat-pill">avg Ã¢ÂÂ¬/ÃÂ.ÃÂ¼. <strong id="stat-ppm">Ã¢ÂÂ</strong></div>
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
-    <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="ÎÎ½Î±Î¯ÏÎµÏÎ· (Ctrl+Z)" disabled>â©</button>
-    <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="ÎÏÎ±Î½Î¬Î»Î·ÏÎ· (Ctrl+Y)" disabled>âª</button>
+    <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="ÃÂÃÂ½ÃÂ±ÃÂ¯ÃÂÃÂµÃÂÃÂ· (Ctrl+Z)" disabled>Ã¢ÂÂ©</button>
+    <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="ÃÂÃÂÃÂ±ÃÂ½ÃÂ¬ÃÂ»ÃÂ·ÃÂÃÂ· (Ctrl+Y)" disabled>Ã¢ÂÂª</button>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="refresh-btn" onclick="loadData()">â³ ÎÎ½Î±Î½Î­ÏÏÎ·</button>
+    <button class="refresh-btn" onclick="loadData()">Ã¢ÂÂ³ ÃÂÃÂ½ÃÂ±ÃÂ½ÃÂ­ÃÂÃÂÃÂ·</button>
   </div>
 </header>
 
 <div class="platform-bar" id="platform-bar">
   <button class="platform-tab active" data-platform="all" onclick="setPlatform('all', this)">
-    ÎÎ»ÎµÏ Î¿Î¹ ÏÎ»Î±ÏÏÏÏÎ¼ÎµÏ
+    ÃÂÃÂ»ÃÂµÃÂ ÃÂ¿ÃÂ¹ ÃÂÃÂ»ÃÂ±ÃÂÃÂÃÂÃÂÃÂ¼ÃÂµÃÂ
   </button>
 </div>
 
 <div class="range-filters">
-  <span class="range-label">Î¦Î¯Î»ÏÏÎ±:</span>
+  <span class="range-label">ÃÂ¦ÃÂ¯ÃÂ»ÃÂÃÂÃÂ±:</span>
   <div class="range-group">
-    <span>Î¤Î¹Î¼Î®</span>
-    <input type="number" id="minPrice" placeholder="min â¬" oninput="applyFilters()">
-    <span>â</span>
-    <input type="number" id="maxPrice" placeholder="max â¬" oninput="applyFilters()">
+    <span>ÃÂ¤ÃÂ¹ÃÂ¼ÃÂ®</span>
+    <input type="number" id="minPrice" placeholder="min Ã¢ÂÂ¬" oninput="applyFilters()">
+    <span>Ã¢ÂÂ</span>
+    <input type="number" id="maxPrice" placeholder="max Ã¢ÂÂ¬" oninput="applyFilters()">
   </div>
   <div class="range-group">
-    <span>Ï.Î¼.</span>
+    <span>ÃÂ.ÃÂ¼.</span>
     <input type="number" id="minSqm" placeholder="min" oninput="applyFilters()">
-    <span>â</span>
+    <span>Ã¢ÂÂ</span>
     <input type="number" id="maxSqm" placeholder="max" oninput="applyFilters()">
   </div>
   <div class="range-group">
-    <span>ÎÏÎ¿Ï</span>
-    <input type="number" id="minYear" placeholder="Î±ÏÏ" oninput="applyFilters()">
-    <span>â</span>
-    <input type="number" id="maxYear" placeholder="Î­ÏÏ" oninput="applyFilters()">
+    <span>ÃÂÃÂÃÂ¿ÃÂ</span>
+    <input type="number" id="minYear" placeholder="ÃÂ±ÃÂÃÂ" oninput="applyFilters()">
+    <span>Ã¢ÂÂ</span>
+    <input type="number" id="maxYear" placeholder="ÃÂ­ÃÂÃÂ" oninput="applyFilters()">
   </div>
 </div>
 
 <div class="controls">
   <div class="search-wrap">
-    <span class="search-icon">ð</span>
-    <input type="text" id="search" placeholder="ÎÎ½Î±Î¶Î®ÏÎ·ÏÎ· ÏÎµÏÎ¹Î¿ÏÎ®Ï, ÏÏÏÎ¿Ï, Î¼ÎµÏÎ¯ÏÎ·..." oninput="applyFilters()">
+    <span class="search-icon">Ã°ÂÂÂ</span>
+    <input type="text" id="search" placeholder="ÃÂÃÂ½ÃÂ±ÃÂ¶ÃÂ®ÃÂÃÂ·ÃÂÃÂ· ÃÂÃÂµÃÂÃÂ¹ÃÂ¿ÃÂÃÂ®ÃÂ, ÃÂÃÂÃÂÃÂ¿ÃÂ, ÃÂ¼ÃÂµÃÂÃÂ¯ÃÂÃÂ·..." oninput="applyFilters()">
   </div>
   <select id="filterLocation" onchange="applyFilters()">
-    <option value="">ÎÎ»ÎµÏ Î¿Î¹ ÏÎµÏÎ¹Î¿ÏÎ­Ï</option>
+    <option value="">ÃÂÃÂ»ÃÂµÃÂ ÃÂ¿ÃÂ¹ ÃÂÃÂµÃÂÃÂ¹ÃÂ¿ÃÂÃÂ­ÃÂ</option>
   </select>
   <select id="filterType" onchange="applyFilters()">
-    <option value="">ÎÎ»Î¿Î¹ Î¿Î¹ ÏÏÏÎ¿Î¹</option>
+    <option value="">ÃÂÃÂ»ÃÂ¿ÃÂ¹ ÃÂ¿ÃÂ¹ ÃÂÃÂÃÂÃÂ¿ÃÂ¹</option>
   </select>
   <select id="filterEnergy" onchange="applyFilters()">
-    <option value="">ÎÎ½ÎµÏÎ³ÎµÎ¹Î±ÎºÎ® ÎºÎ»Î¬ÏÎ·</option>
+    <option value="">ÃÂÃÂ½ÃÂµÃÂÃÂ³ÃÂµÃÂ¹ÃÂ±ÃÂºÃÂ® ÃÂºÃÂ»ÃÂ¬ÃÂÃÂ·</option>
     <option value="A">A+ / A++ / A</option>
     <option value="B">B</option>
     <option value="C">C</option>
     <option value="D">D</option>
-    <option value="E">E Î® ÏÎ±Î¼Î·Î»ÏÏÎµÏÎ·</option>
+    <option value="E">E ÃÂ® ÃÂÃÂ±ÃÂ¼ÃÂ·ÃÂ»ÃÂÃÂÃÂµÃÂÃÂ·</option>
   </select>
   <select id="filterHeating" onchange="applyFilters()">
-    <option value="">ÎÎ­ÏÎ¼Î±Î½ÏÎ·</option>
-    <option value="Î±Î­ÏÎ¹Î¿">Î¦ÏÏÎ¹ÎºÏ Î±Î­ÏÎ¹Î¿</option>
-    <option value="ÏÎµÏÏÎ­Î»Î±Î¹Î¿">Î ÎµÏÏÎ­Î»Î±Î¹Î¿</option>
-    <option value="Î±Î½ÏÎ»Î¯Î±">ÎÎ½ÏÎ»Î¯Î± ÎÎ­ÏÎ¼Î±Î½ÏÎ·Ï</option>
+    <option value="">ÃÂÃÂ­ÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·</option>
+    <option value="ÃÂ±ÃÂ­ÃÂÃÂ¹ÃÂ¿">ÃÂ¦ÃÂÃÂÃÂ¹ÃÂºÃÂ ÃÂ±ÃÂ­ÃÂÃÂ¹ÃÂ¿</option>
+    <option value="ÃÂÃÂµÃÂÃÂÃÂ­ÃÂ»ÃÂ±ÃÂ¹ÃÂ¿">ÃÂ ÃÂµÃÂÃÂÃÂ­ÃÂ»ÃÂ±ÃÂ¹ÃÂ¿</option>
+    <option value="ÃÂ±ÃÂ½ÃÂÃÂ»ÃÂ¯ÃÂ±">ÃÂÃÂ½ÃÂÃÂ»ÃÂ¯ÃÂ± ÃÂÃÂ­ÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·ÃÂ</option>
   </select>
   <div class="upload-zone" id="dropzone"
        onclick="document.getElementById('csvInput').click()"
@@ -1017,29 +1017,29 @@
        ondrop="handleDrop(event)"
        style="flex:1;margin:0;padding:5px 12px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px">
     <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
-    <div class="upload-text" style="font-size:11px;white-space:nowrap">ð Î ÏÎ¿ÏÎ¸Î®ÎºÎ· Î´ÎµÎ´Î¿Î¼Î­Î½ÏÎ½ Î±ÏÏ Î¬Î»Î»Î· ÏÎ»Î±ÏÏÏÏÎ¼Î±</div>
-    <div class="upload-sub" style="font-size:10px;white-space:nowrap">Î£ÏÏÎµ Î® ÎºÎ»Î¯ÎºÎ±ÏÎµ Â· CSV Î±ÏÏ XE, Nodaliste Îº.Î»Ï.</div>
+    <div class="upload-text" style="font-size:11px;white-space:nowrap">Ã°ÂÂÂ ÃÂ ÃÂÃÂ¿ÃÂÃÂ¸ÃÂ®ÃÂºÃÂ· ÃÂ´ÃÂµÃÂ´ÃÂ¿ÃÂ¼ÃÂ­ÃÂ½ÃÂÃÂ½ ÃÂ±ÃÂÃÂ ÃÂ¬ÃÂ»ÃÂ»ÃÂ· ÃÂÃÂ»ÃÂ±ÃÂÃÂÃÂÃÂÃÂ¼ÃÂ±</div>
+    <div class="upload-sub" style="font-size:10px;white-space:nowrap">ÃÂ£ÃÂÃÂÃÂµ ÃÂ® ÃÂºÃÂ»ÃÂ¯ÃÂºÃÂ±ÃÂÃÂµ ÃÂ· CSV ÃÂ±ÃÂÃÂ XE, Nodaliste ÃÂº.ÃÂ»ÃÂ.</div>
   </div>
   <div class="view-toggle">
-    <button class="view-btn active" id="gridBtn" onclick="setView('grid')">â Grid</button>
-    <button class="view-btn" id="listBtn" onclick="setView('list')">â¡ List</button>
-    <button class="view-btn" id="mapBtn" onclick="setView('map')">ðº Î§Î¬ÏÏÎ·Ï</button>
+    <button class="view-btn active" id="gridBtn" onclick="setView('grid')">Ã¢ÂÂ Grid</button>
+    <button class="view-btn" id="listBtn" onclick="setView('list')">Ã¢ÂÂ¡ List</button>
+    <button class="view-btn" id="mapBtn" onclick="setView('map')">Ã°ÂÂÂº ÃÂ§ÃÂ¬ÃÂÃÂÃÂ·ÃÂ</button>
   </div>
 </div>
 
 <div class="sort-row">
-  <span>Î¤Î±Î¾Î¹Î½ÏÎ¼Î·ÏÎ·:</span>
-  <button class="sort-btn active" data-sort="price-asc" onclick="setSort(this,'price-asc')">Î¤Î¹Î¼Î® â</button>
-  <button class="sort-btn" data-sort="price-desc" onclick="setSort(this,'price-desc')">Î¤Î¹Î¼Î® â</button>
-  <button class="sort-btn" data-sort="sqm-desc" onclick="setSort(this,'sqm-desc')">Ï.Î¼. â</button>
-  <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">â¬/Ï.Î¼. â</button>
-  <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">ÎÎµÏÏÎµÏÎ±</button>
-  <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">Î ÏÏÏÏÎ±ÏÎ· ÎµÎ½Î·Î¼.</button>
+  <span>ÃÂ¤ÃÂ±ÃÂ¾ÃÂ¹ÃÂ½ÃÂÃÂ¼ÃÂ·ÃÂÃÂ·:</span>
+  <button class="sort-btn active" data-sort="price-asc" onclick="setSort(this,'price-asc')">ÃÂ¤ÃÂ¹ÃÂ¼ÃÂ® Ã¢ÂÂ</button>
+  <button class="sort-btn" data-sort="price-desc" onclick="setSort(this,'price-desc')">ÃÂ¤ÃÂ¹ÃÂ¼ÃÂ® Ã¢ÂÂ</button>
+  <button class="sort-btn" data-sort="sqm-desc" onclick="setSort(this,'sqm-desc')">ÃÂ.ÃÂ¼. Ã¢ÂÂ</button>
+  <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">Ã¢ÂÂ¬/ÃÂ.ÃÂ¼. Ã¢ÂÂ</button>
+  <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">ÃÂÃÂµÃÂÃÂÃÂµÃÂÃÂ±</button>
+  <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">ÃÂ ÃÂÃÂÃÂÃÂÃÂ±ÃÂÃÂ· ÃÂµÃÂ½ÃÂ·ÃÂ¼.</button>
 </div>
 
 <div class="show-deleted-wrap">
   <input type="checkbox" id="showDeleted" class="toggle-check" onchange="applyFilters()">
-  <label for="showDeleted">ÎÎ¼ÏÎ¬Î½Î¹ÏÎ· Î±Î³Î³ÎµÎ»Î¹ÏÎ½ Î¼Îµ X (Î´Î¹Î±Î³ÏÎ±Î¼Î¼Î­Î½ÎµÏ/Î±ÏÏÏÏÎ¹ÏÎ·)</label>
+  <label for="showDeleted">ÃÂÃÂ¼ÃÂÃÂ¬ÃÂ½ÃÂ¹ÃÂÃÂ· ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¹ÃÂÃÂ½ ÃÂ¼ÃÂµ X (ÃÂ´ÃÂ¹ÃÂ±ÃÂ³ÃÂÃÂ±ÃÂ¼ÃÂ¼ÃÂ­ÃÂ½ÃÂµÃÂ/ÃÂ±ÃÂÃÂÃÂÃÂÃÂ¹ÃÂÃÂ·)</label>
 </div>
 
 
@@ -1048,7 +1048,7 @@
 <div id="main-content">
   <div class="loading">
     <div class="loading-spinner"></div>
-    Î¦ÏÏÏÏÏÎ· Î´ÎµÎ´Î¿Î¼Î­Î½ÏÎ½ Î±ÏÏ ÏÎ· Î²Î¬ÏÎ·...
+    ÃÂ¦ÃÂÃÂÃÂÃÂÃÂÃÂ· ÃÂ´ÃÂµÃÂ´ÃÂ¿ÃÂ¼ÃÂ­ÃÂ½ÃÂÃÂ½ ÃÂ±ÃÂÃÂ ÃÂÃÂ· ÃÂ²ÃÂ¬ÃÂÃÂ·...
   </div>
 </div>
 
@@ -1073,22 +1073,22 @@
 
 <!-- COMPARE BAR -->
 <div class="compare-bar" id="compareBar">
-  <strong style="font-size:12px;color:var(--text2);white-space:nowrap">Î£ÏÎ³ÎºÏÎ¹ÏÎ·:</strong>
+  <strong style="font-size:12px;color:var(--text2);white-space:nowrap">ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·:</strong>
   <div class="compare-items" id="compareItems"></div>
-  <button class="compare-clear" onclick="clearCompare()">â ÎÎ±Î¸Î±ÏÎ¹ÏÎ¼ÏÏ</button>
-  <button class="compare-btn" onclick="openCompareModal()">Î£ÏÎ³ÎºÏÎ¹ÏÎ· â</button>
+  <button class="compare-clear" onclick="clearCompare()">Ã¢ÂÂ ÃÂÃÂ±ÃÂ¸ÃÂ±ÃÂÃÂ¹ÃÂÃÂ¼ÃÂÃÂ</button>
+  <button class="compare-btn" onclick="openCompareModal()">ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ· Ã¢ÂÂ</button>
 </div>
 
 <!-- NEW CLICK-TO-GROUP SELECTION BAR -->
 <div class="grouping-bar" id="groupingBar">
   <div class="grouping-info">
-    <span style="font-size:16px">ð</span>
+    <span style="font-size:16px">Ã°ÂÂÂ</span>
     <div>
-      <div style="font-weight:600;color:var(--accent)">ÎÏÎ¹Î»Î­ÏÎ¸Î·ÎºÎµ Î±Î³Î³ÎµÎ»Î¯Î± Î³Î¹Î± ÎÎ½ÏÏÎ·</div>
-      <div id="groupingBarDetails" style="font-size:11px;color:var(--text2)">â</div>
+      <div style="font-weight:600;color:var(--accent)">ÃÂÃÂÃÂ¹ÃÂ»ÃÂ­ÃÂÃÂ¸ÃÂ·ÃÂºÃÂµ ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂ± ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ½ÃÂÃÂÃÂ·</div>
+      <div id="groupingBarDetails" style="font-size:11px;color:var(--text2)">Ã¢ÂÂ</div>
     </div>
   </div>
-  <button class="grouping-cancel" onclick="cancelGroupingSelection()">â ÎÎºÏÏÏÏÎ·</button>
+  <button class="grouping-cancel" onclick="cancelGroupingSelection()">Ã¢ÂÂ ÃÂÃÂºÃÂÃÂÃÂÃÂÃÂ·</button>
 </div>
 
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
@@ -1100,7 +1100,7 @@
 </div>
 
 <div class="gallery-overlay" id="galleryOverlay">
-  <button class="gallery-close" onclick="closeGallery()">â</button>
+  <button class="gallery-close" onclick="closeGallery()">Ã¢ÂÂ</button>
   <div class="gallery-info">
     <div>
       <div class="gallery-title" id="galleryTitle"></div>
@@ -1108,30 +1108,30 @@
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <span class="gallery-counter" id="galleryCounter"></span>
-      <button class="gallery-open-btn" id="galleryOpenBtn">â ÎÎ½Î¿Î¹Î³Î¼Î±</button>
+      <button class="gallery-open-btn" id="galleryOpenBtn">Ã¢ÂÂ ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ±</button>
     </div>
   </div>
   <div class="gallery-main">
     <div class="gallery-img-wrap" id="galleryImgWrap" onclick="toggleGalleryZoom(event)">
       <img class="gallery-img" id="galleryImg" src="" alt="">
     </div>
-    <div class="gallery-nav prev disabled" id="galleryPrev" onclick="galleryNav(-1)">â¹</div>
-    <div class="gallery-nav next" id="galleryNext" onclick="galleryNav(1)">âº</div>
-    <div class="gallery-zoom-hint" id="galleryZoomHint">ð± Scroll Î³Î¹Î± zoom Â· Click Î³Î¹Î± zoom in/out</div>
+    <div class="gallery-nav prev disabled" id="galleryPrev" onclick="galleryNav(-1)">Ã¢ÂÂ¹</div>
+    <div class="gallery-nav next" id="galleryNext" onclick="galleryNav(1)">Ã¢ÂÂº</div>
+    <div class="gallery-zoom-hint" id="galleryZoomHint">Ã°ÂÂÂ± Scroll ÃÂ³ÃÂ¹ÃÂ± zoom ÃÂ· Click ÃÂ³ÃÂ¹ÃÂ± zoom in/out</div>
   </div>
   <div class="gallery-thumbs" id="galleryThumbs"></div>
 </div>
 
 <!-- LISTING OVERLAY -->
 <div class="listing-overlay" id="listingOverlay" onclick="if(event.target===this)closeListingOverlay()">
-  <button class="lo-close" onclick="closeListingOverlay()">â</button>
+  <button class="lo-close" onclick="closeListingOverlay()">Ã¢ÂÂ</button>
   <div id="loFeatured" class="lo-featured"></div>
   <div id="loRight" class="lo-right" style="display:none">
     <div class="lo-carousel-header">
       <span class="lo-carousel-title" id="loCarouselTitle"></span>
       <div class="lo-nav-btns">
-        <div class="lo-nav-btn disabled" id="loNavPrev" onclick="loNavFeat(-1)">â¹</div>
-        <div class="lo-nav-btn" id="loNavNext" onclick="loNavFeat(1)">âº</div>
+        <div class="lo-nav-btn disabled" id="loNavPrev" onclick="loNavFeat(-1)">Ã¢ÂÂ¹</div>
+        <div class="lo-nav-btn" id="loNavNext" onclick="loNavFeat(1)">Ã¢ÂÂº</div>
       </div>
     </div>
     <div class="lo-carousel" id="loCarousel"></div>
@@ -1141,7 +1141,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ââ CONFIG ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ CONFIG Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const SUPABASE_URL  = 'https://ofvanbbujgcqhbiyihgy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
 const TABLE = 'listings';
@@ -1157,7 +1157,7 @@ const sb = {
   },
 };
 
-// ââ STATE âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ STATE Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let allListings    = [];
 let extraListings  = []; 
 let filtered       = [];
@@ -1168,7 +1168,7 @@ let favorites      = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
 let compareList    = [];
 let selectedGroupSource = null;
 
-// ââ UNDO / REDO âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ UNDO / REDO Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const ACTION_STACK=[], REDO_STACK=[], MAX_STACK=30;
 function pushAction(a){
   ACTION_STACK.push(a); if(ACTION_STACK.length>MAX_STACK)ACTION_STACK.shift();
@@ -1176,17 +1176,17 @@ function pushAction(a){
 }
 function _upUndoRedo(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
-  if(u){u.disabled=!ACTION_STACK.length;u.title=ACTION_STACK.length?`ÎÎ½Î±Î¯ÏÎµÏÎ·: ${ACTION_STACK[ACTION_STACK.length-1].label} (Ctrl+Z)`:'ÎÎ½Î±Î¯ÏÎµÏÎ· (Ctrl+Z)';}
-  if(r){r.disabled=!REDO_STACK.length;r.title=REDO_STACK.length?`ÎÏÎ±Î½Î¬Î»Î·ÏÎ·: ${REDO_STACK[REDO_STACK.length-1].label} (Ctrl+Y)`:'ÎÏÎ±Î½Î¬Î»Î·ÏÎ· (Ctrl+Y)';}
+  if(u){u.disabled=!ACTION_STACK.length;u.title=ACTION_STACK.length?`ÃÂÃÂ½ÃÂ±ÃÂ¯ÃÂÃÂµÃÂÃÂ·: ${ACTION_STACK[ACTION_STACK.length-1].label} (Ctrl+Z)`:'ÃÂÃÂ½ÃÂ±ÃÂ¯ÃÂÃÂµÃÂÃÂ· (Ctrl+Z)';}
+  if(r){r.disabled=!REDO_STACK.length;r.title=REDO_STACK.length?`ÃÂÃÂÃÂ±ÃÂ½ÃÂ¬ÃÂ»ÃÂ·ÃÂÃÂ·: ${REDO_STACK[REDO_STACK.length-1].label} (Ctrl+Y)`:'ÃÂÃÂÃÂ±ÃÂ½ÃÂ¬ÃÂ»ÃÂ·ÃÂÃÂ· (Ctrl+Y)';}
 }
-async function undoAction(){if(!ACTION_STACK.length)return;const a=ACTION_STACK.pop();REDO_STACK.push(a);showToast(`â© ${a.label}`);try{await a.undo();}catch(e){showToast('â');}_upUndoRedo();}
-async function redoAction(){if(!REDO_STACK.length)return;const a=REDO_STACK.pop();ACTION_STACK.push(a);showToast(`âª ${a.label}`);try{await a.redo();}catch(e){showToast('â');}_upUndoRedo();}
+async function undoAction(){if(!ACTION_STACK.length)return;const a=ACTION_STACK.pop();REDO_STACK.push(a);showToast(`Ã¢ÂÂ© ${a.label}`);try{await a.undo();}catch(e){showToast('Ã¢ÂÂ');}_upUndoRedo();}
+async function redoAction(){if(!REDO_STACK.length)return;const a=REDO_STACK.pop();ACTION_STACK.push(a);showToast(`Ã¢ÂÂª ${a.label}`);try{await a.redo();}catch(e){showToast('Ã¢ÂÂ');}_upUndoRedo();}
 document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();undoAction();}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();redoAction();}
 });
 
-// ââ MIDDLE CLICK INTERCEPTOR FOR BACKGROUND TABS ââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ MIDDLE CLICK INTERCEPTOR FOR BACKGROUND TABS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function handleLinkClick(e, url) {
   if (!url) return;
   if (e.button === 1) { 
@@ -1201,11 +1201,11 @@ function handleLinkClick(e, url) {
   }
 }
 
-// ââ LOAD DATA âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ LOAD DATA Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function loadData() {
   document.querySelector('.refresh-btn').disabled = true;
   document.getElementById('main-content').innerHTML = `
-    <div class="loading"><div class="loading-spinner"></div>Î¦ÏÏÏÏÏÎ· Î´ÎµÎ´Î¿Î¼Î­Î½ÏÎ½...</div>`;
+    <div class="loading"><div class="loading-spinner"></div>ÃÂ¦ÃÂÃÂÃÂÃÂÃÂÃÂ· ÃÂ´ÃÂµÃÂ´ÃÂ¿ÃÂ¼ÃÂ­ÃÂ½ÃÂÃÂ½...</div>`;
 
   const inSandbox = window.location.href === 'about:blank' ||
                     window.location.hostname === '' ||
@@ -1215,11 +1215,11 @@ async function loadData() {
   if (inSandbox) {
     document.getElementById('main-content').innerHTML = `
       <div class="empty" style="max-width:480px;margin:0 auto;text-align:center">
-        <div style="font-size:48px;margin-bottom:16px">ð</div>
-        <div style="font-size:16px;color:var(--text);font-weight:600;margin-bottom:10px">ÎÎ½Î¿Î¹Î¾Îµ ÏÎ¿ Î±ÏÏÎµÎ¯Î¿ ÏÏÎ¿Î½ browser ÏÎ¿Ï</div>
+        <div style="font-size:48px;margin-bottom:16px">Ã°ÂÂÂ</div>
+        <div style="font-size:16px;color:var(--text);font-weight:600;margin-bottom:10px">ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ¾ÃÂµ ÃÂÃÂ¿ ÃÂ±ÃÂÃÂÃÂµÃÂ¯ÃÂ¿ ÃÂÃÂÃÂ¿ÃÂ½ browser ÃÂÃÂ¿ÃÂ</div>
         <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
-          Î¤Î¿ Supabase Î´ÎµÎ½ ÎµÏÎ¹ÏÏÎ­ÏÎµÎ¹ ÏÏÏÏÏÏÎ· Î¼Î­ÏÎ± ÏÏÎ¿Î½ Claude viewer Î»ÏÎ³Ï CORS.<br>
-          ÎÎ±ÏÎ­Î²Î±ÏÎµ ÏÎ¿ Î±ÏÏÎµÎ¯Î¿ ÎºÎ±Î¹ Î¬Î½Î¿Î¹Î¾Î­ ÏÎ¿ Î±ÏÎµÏÎ¸ÎµÎ¯Î±Ï ÏÏÎ¿ Chrome/Firefox.
+          ÃÂ¤ÃÂ¿ Supabase ÃÂ´ÃÂµÃÂ½ ÃÂµÃÂÃÂ¹ÃÂÃÂÃÂ­ÃÂÃÂµÃÂ¹ ÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· ÃÂ¼ÃÂ­ÃÂÃÂ± ÃÂÃÂÃÂ¿ÃÂ½ Claude viewer ÃÂ»ÃÂÃÂ³ÃÂ CORS.<br>
+          ÃÂÃÂ±ÃÂÃÂ­ÃÂ²ÃÂ±ÃÂÃÂµ ÃÂÃÂ¿ ÃÂ±ÃÂÃÂÃÂµÃÂ¯ÃÂ¿ ÃÂºÃÂ±ÃÂ¹ ÃÂ¬ÃÂ½ÃÂ¿ÃÂ¹ÃÂ¾ÃÂ­ ÃÂÃÂ¿ ÃÂ±ÃÂÃÂµÃÂÃÂ¸ÃÂµÃÂ¯ÃÂ±ÃÂ ÃÂÃÂÃÂ¿ Chrome/Firefox.
         </div>
       </div>`;
     document.querySelector('.refresh-btn').disabled = false;
@@ -1231,13 +1231,13 @@ async function loadData() {
 
 async function tryFetch() {
   document.getElementById('main-content').innerHTML = `
-    <div class="loading"><div class="loading-spinner"></div>Î¦ÏÏÏÏÏÎ· Î´ÎµÎ´Î¿Î¼Î­Î½ÏÎ½ Î±ÏÏ ÏÎ¿ Supabase...</div>`;
+    <div class="loading"><div class="loading-spinner"></div>ÃÂ¦ÃÂÃÂÃÂÃÂÃÂÃÂ· ÃÂ´ÃÂµÃÂ´ÃÂ¿ÃÂ¼ÃÂ­ÃÂ½ÃÂÃÂ½ ÃÂ±ÃÂÃÂ ÃÂÃÂ¿ Supabase...</div>`;
   try {
     const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc`, {
       method: 'GET',
       headers: sb.headers()
     });
-    if (!resp.ok) throw new Error(`Î£ÏÎ¬Î»Î¼Î± ÎÎ¬ÏÎ·Ï: ${resp.status} ${resp.statusText}`);
+    if (!resp.ok) throw new Error(`ÃÂ£ÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ± ÃÂÃÂ¬ÃÂÃÂ·ÃÂ: ${resp.status} ${resp.statusText}`);
     const data = await resp.json();
     
     allListings = data.map(item => ({
@@ -1254,25 +1254,25 @@ async function tryFetch() {
 
     if (!allListings.length) {
       document.getElementById('main-content').innerHTML = `
-        <div class="empty">ð­ Î Î²Î¬ÏÎ· Î´ÎµÎ´Î¿Î¼Î­Î½ÏÎ½ ÎµÎ¯Î½Î±Î¹ ÎºÎµÎ½Î®.<br>
-        <small style="color:var(--text3)">ÎÎ½Î­Î²Î±ÏÎµ Î­Î½Î± Î±ÏÏÎµÎ¯Î¿ CSV ÏÎ±ÏÎ±ÎºÎ¬ÏÏ Î³Î¹Î± Î½Î± ÎµÎ¹ÏÎ¬Î³ÎµÎ¹Ï Î´ÎµÎ´Î¿Î¼Î­Î½Î±.</small>
+        <div class="empty">Ã°ÂÂÂ­ ÃÂ ÃÂ²ÃÂ¬ÃÂÃÂ· ÃÂ´ÃÂµÃÂ´ÃÂ¿ÃÂ¼ÃÂ­ÃÂ½ÃÂÃÂ½ ÃÂµÃÂ¯ÃÂ½ÃÂ±ÃÂ¹ ÃÂºÃÂµÃÂ½ÃÂ®.<br>
+        <small style="color:var(--text3)">ÃÂÃÂ½ÃÂ­ÃÂ²ÃÂ±ÃÂÃÂµ ÃÂ­ÃÂ½ÃÂ± ÃÂ±ÃÂÃÂÃÂµÃÂ¯ÃÂ¿ CSV ÃÂÃÂ±ÃÂÃÂ±ÃÂºÃÂ¬ÃÂÃÂ ÃÂ³ÃÂ¹ÃÂ± ÃÂ½ÃÂ± ÃÂµÃÂ¹ÃÂÃÂ¬ÃÂ³ÃÂµÃÂ¹ÃÂ ÃÂ´ÃÂµÃÂ´ÃÂ¿ÃÂ¼ÃÂ­ÃÂ½ÃÂ±.</small>
         </div>`;
     } else {
       buildUI();
     }
   } catch(e) {
     document.getElementById('main-content').innerHTML =
-      `<div class="empty">â ${e.message}<br>
+      `<div class="empty">Ã¢ÂÂ ${e.message}<br>
        <small style="color:var(--text3);margin-top:8px;display:block">
-         ÎÎ»Î­Î³Î¾ÏÎµ ÏÎ± SUPABASE_URL ÎºÎ±Î¹ SUPABASE_ANON credentials ÏÏÎ¿Î½ ÎºÏÎ´Î¹ÎºÎ±.
+         ÃÂÃÂ»ÃÂ­ÃÂ³ÃÂ¾ÃÂÃÂµ ÃÂÃÂ± SUPABASE_URL ÃÂºÃÂ±ÃÂ¹ SUPABASE_ANON credentials ÃÂÃÂÃÂ¿ÃÂ½ ÃÂºÃÂÃÂ´ÃÂ¹ÃÂºÃÂ±.
        </small>
-       <button onclick="tryFetch()" style="margin-top:12px;background:var(--accent);color:#000;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600">â³ ÎÎ¿ÎºÎ¯Î¼Î±ÏÎµ Î¾Î±Î½Î¬</button>
+       <button onclick="tryFetch()" style="margin-top:12px;background:var(--accent);color:#000;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600">Ã¢ÂÂ³ ÃÂÃÂ¿ÃÂºÃÂ¯ÃÂ¼ÃÂ±ÃÂÃÂµ ÃÂ¾ÃÂ±ÃÂ½ÃÂ¬</button>
       </div>`;
   }
   document.querySelector('.refresh-btn').disabled = false;
 }
 
-// ââ CSV PARSER âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ CSV PARSER Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function parseCSV(text, defaultPlatform) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
@@ -1285,55 +1285,55 @@ function parseCSV(text, defaultPlatform) {
 
     const get = (...keys) => { for (const k of keys) if (obj[k]) return obj[k]; return ''; };
 
-    const priceRaw = get('ÏÎ¹Î¼Î®','price','ÏÎ¹Î¼Î·');
-    const sqmRaw   = get('Ï.Î¼._','Ï.Î¼.','sqm','sqm_');
-    const yearRaw  = get('build','year','Î­ÏÎ¿Ï','ÎµÏÎ¿Ï');
-    const ppmRaw   = get('ÏÎ¹Î¼Î®/Ï.Î¼.','ÏÎ¹Î¼Î·/Ï.Î¼.','price_sqm','â¬/Ï.Î¼.');
+    const priceRaw = get('ÃÂÃÂ¹ÃÂ¼ÃÂ®','price','ÃÂÃÂ¹ÃÂ¼ÃÂ·');
+    const sqmRaw   = get('ÃÂ.ÃÂ¼._','ÃÂ.ÃÂ¼.','sqm','sqm_');
+    const yearRaw  = get('build','year','ÃÂ­ÃÂÃÂ¿ÃÂ','ÃÂµÃÂÃÂ¿ÃÂ');
+    const ppmRaw   = get('ÃÂÃÂ¹ÃÂ¼ÃÂ®/ÃÂ.ÃÂ¼.','ÃÂÃÂ¹ÃÂ¼ÃÂ·/ÃÂ.ÃÂ¼.','price_sqm','Ã¢ÂÂ¬/ÃÂ.ÃÂ¼.');
 
     return {
       id:         get('house_id','id') || String(i+1),
       house_id:   get('house_id','id'),
-      location:   get('location','ÏÎµÏÎ¹Î¿ÏÎ®','ÏÎµÏÎ¹Î¿ÏÎ·'),
-      type:       get('type_of_house','ÏÏÏÎ¿Ï_ÎºÎ±ÏÎ¿Î¹ÎºÎ¯Î±Ï','type','ÏÏÏÎ¿Ï'),
+      location:   get('location','ÃÂÃÂµÃÂÃÂ¹ÃÂ¿ÃÂÃÂ®','ÃÂÃÂµÃÂÃÂ¹ÃÂ¿ÃÂÃÂ·'),
+      type:       get('type_of_house','ÃÂÃÂÃÂÃÂ¿ÃÂ_ÃÂºÃÂ±ÃÂÃÂ¿ÃÂ¹ÃÂºÃÂ¯ÃÂ±ÃÂ','type','ÃÂÃÂÃÂÃÂ¿ÃÂ'),
       url:        get('url',' url'),
-      rooms:      get('rooms','ÏÏÎ½Î¿Î´ÏÎ¼Î¬ÏÎ¹Î±','Î´ÏÎ¼Î¬ÏÎ¹Î±'),
-      baths:      get('Î¼ÏÎ±Î½Î¹Î±','Î¼ÏÎ¬Î½Î¹Î±','baths'),
+      rooms:      get('rooms','ÃÂÃÂÃÂ½ÃÂ¿ÃÂ´ÃÂÃÂ¼ÃÂ¬ÃÂÃÂ¹ÃÂ±','ÃÂ´ÃÂÃÂ¼ÃÂ¬ÃÂÃÂ¹ÃÂ±'),
+      baths:      get('ÃÂ¼ÃÂÃÂ±ÃÂ½ÃÂ¹ÃÂ±','ÃÂ¼ÃÂÃÂ¬ÃÂ½ÃÂ¹ÃÂ±','baths'),
       sqm:        parseSqm(sqmRaw),
       sqmRaw:     sqmRaw,
       year:       parseInt(yearRaw) || 0,
       price:      parsePrice(priceRaw),
       priceRaw:   priceRaw,
       pricePerSqm: parsePpm(ppmRaw),
-      platform:   get('platform','m41','ÏÎ»Î±ÏÏÏÏÎ¼Î±') || defaultPlatform,
-      floor:      get('ÏÏÎ¿ÏÎ¿Ï','floor','Î¿ÏÎ¿ÏÎ¿Ï'),
+      platform:   get('platform','m41','ÃÂÃÂ»ÃÂ±ÃÂÃÂÃÂÃÂÃÂ¼ÃÂ±') || defaultPlatform,
+      floor:      get('ÃÂÃÂÃÂ¿ÃÂÃÂ¿ÃÂ','floor','ÃÂ¿ÃÂÃÂ¿ÃÂÃÂ¿ÃÂ'),
       lvl:        get('lvl'),
-      energy:     get('ÎµÎ½ÎµÏÎ³ÎµÎ¹Î±ÎºÎ®_ÎºÎ»Î¬ÏÎ·','energy','ÎµÎ½ÎµÏÎ³ÎµÎ¹Î±ÎºÎ·_ÎºÎ»Î±ÏÎ·'),
-      heating:    get('Î¸Î­ÏÎ¼Î±Î½ÏÎ·','heating','Î¸ÎµÏÎ¼Î±Î½ÏÎ·'),
-      notes:      get('extra_notes','notes','ÏÎ·Î¼ÎµÎ¹ÏÏÎµÎ¹Ï'),
-      available:  get('Î´Î¹Î±Î¸Î­ÏÎ¹Î¼Î¿_Î±ÏÏ_','available'),
-      agency:     get('Î¼ÎµÏÎ¹ÏÎ¹ÎºÏ','agency','Î¼ÎµÏÎ¹ÏÎ¹ÎºÎ¿'),
+      energy:     get('ÃÂµÃÂ½ÃÂµÃÂÃÂ³ÃÂµÃÂ¹ÃÂ±ÃÂºÃÂ®_ÃÂºÃÂ»ÃÂ¬ÃÂÃÂ·','energy','ÃÂµÃÂ½ÃÂµÃÂÃÂ³ÃÂµÃÂ¹ÃÂ±ÃÂºÃÂ·_ÃÂºÃÂ»ÃÂ±ÃÂÃÂ·'),
+      heating:    get('ÃÂ¸ÃÂ­ÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·','heating','ÃÂ¸ÃÂµÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·'),
+      notes:      get('extra_notes','notes','ÃÂÃÂ·ÃÂ¼ÃÂµÃÂ¹ÃÂÃÂÃÂµÃÂ¹ÃÂ'),
+      available:  get('ÃÂ´ÃÂ¹ÃÂ±ÃÂ¸ÃÂ­ÃÂÃÂ¹ÃÂ¼ÃÂ¿_ÃÂ±ÃÂÃÂ_','available'),
+      agency:     get('ÃÂ¼ÃÂµÃÂÃÂ¹ÃÂÃÂ¹ÃÂºÃÂ','agency','ÃÂ¼ÃÂµÃÂÃÂ¹ÃÂÃÂ¹ÃÂºÃÂ¿'),
       agencyNr:   get('agency_nr'),
       deleted:    get('deleted').toUpperCase() === 'X',
       unfavorited: (get('deleted')||'').toLowerCase() === 'unfavorited',
       imageUrl:   get('image_url','image','thumbnail'),
-      published:  get('Î´Î·Î¼Î¿ÏÎ¯ÎµÏÏÎ·_Î±Î³Î³ÎµÎ»Î¯Î±Ï','published'),
-      updated:    get('ÏÎµÎ»ÎµÏÏÎ±Î¯Î±_ÎµÎ½Î·Î¼Î­ÏÏÏÎ·','updated'),
+      published:  get('ÃÂ´ÃÂ·ÃÂ¼ÃÂ¿ÃÂÃÂ¯ÃÂµÃÂÃÂÃÂ·_ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂ±ÃÂ','published'),
+      updated:    get('ÃÂÃÂµÃÂ»ÃÂµÃÂÃÂÃÂ±ÃÂ¯ÃÂ±_ÃÂµÃÂ½ÃÂ·ÃÂ¼ÃÂ­ÃÂÃÂÃÂÃÂ·','updated'),
       platformNr: get('platform_nr'),
     };
   }).filter(h => h.location || h.url);
 }
 
-// ââ LIVE DB GROUPING HANDLERS âââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ LIVE DB GROUPING HANDLERS Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function ungroupListing(dbId) {
   if(!dbId)return;
   const h=allListings.find(x=>x._dbId===dbId);const prev=h?(h.house_id||'0'):'0';
   try{
     await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";
-    pushAction({label:`âï¸ ${h?h.location:dbId}`,
+    pushAction({label:`Ã¢ÂÂÃ¯Â¸Â ${h?h.location:dbId}`,
       undo:async()=>{await sb.update(dbId,{house_id:prev});if(h)h.house_id=prev;await tryFetch();},
       redo:async()=>{await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";await tryFetch();}});
-    showToast("âï¸ ÎÏÎ¿ÏÏÎ½Î´Î­Î¸Î·ÎºÎµ!");await tryFetch();
-  }catch(e){showToast("â Î£ÏÎ¬Î»Î¼Î± Î±ÏÎ¿ÏÏÎ½Î´ÎµÏÎ·Ï");}
+    showToast("Ã¢ÂÂÃ¯Â¸Â ÃÂÃÂÃÂ¿ÃÂÃÂÃÂ½ÃÂ´ÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂµ!");await tryFetch();
+  }catch(e){showToast("Ã¢ÂÂ ÃÂ£ÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ± ÃÂ±ÃÂÃÂ¿ÃÂÃÂÃÂ½ÃÂ´ÃÂµÃÂÃÂ·ÃÂ");}
 }
 
 // Select a single item to initiate a quick grouping flow
@@ -1343,10 +1343,10 @@ function selectListingForGrouping(url) {
   selectedGroupSource = h;
   
   const bar = document.getElementById('groupingBar');
-  document.getElementById('groupingBarDetails').textContent = `${h.location} (${h.sqm} Ï.Î¼.) â â¬${h.price.toLocaleString('el')} [${h.agency || 'ÎÎ´Î¹ÏÏÎ·Ï'}]`;
+  document.getElementById('groupingBarDetails').textContent = `${h.location} (${h.sqm} ÃÂ.ÃÂ¼.) Ã¢ÂÂ Ã¢ÂÂ¬${h.price.toLocaleString('el')} [${h.agency || 'ÃÂÃÂ´ÃÂ¹ÃÂÃÂÃÂ·ÃÂ'}]`;
   bar.classList.add('open');
   
-  showToast("ð ÎÏÎ¹Î»Î­Î¾ÏÎµ ÏÏÏÎ± Î¼Î¹Î± Î¬Î»Î»Î· Î±Î³Î³ÎµÎ»Î¯Î± Î® group Î³Î¹Î± Î­Î½ÏÏÎ·");
+  showToast("Ã°ÂÂÂ ÃÂÃÂÃÂ¹ÃÂ»ÃÂ­ÃÂ¾ÃÂÃÂµ ÃÂÃÂÃÂÃÂ± ÃÂ¼ÃÂ¹ÃÂ± ÃÂ¬ÃÂ»ÃÂ»ÃÂ· ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂ± ÃÂ® group ÃÂ³ÃÂ¹ÃÂ± ÃÂ­ÃÂ½ÃÂÃÂÃÂ·");
   renderListings();
 }
 
@@ -1369,7 +1369,7 @@ async function executeQuickGroup(targetDbId, targetHouseId) {
       // Update the target listing first
       await sb.update(targetDbId, { house_id: finalHouseId });
     } catch(err) {
-      showToast("â Î£ÏÎ¬Î»Î¼Î± ÎºÎ±ÏÎ¬ ÏÎ· Î´Î·Î¼Î¹Î¿ÏÏÎ³Î¯Î± Group");
+      showToast("Ã¢ÂÂ ÃÂ£ÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ± ÃÂºÃÂ±ÃÂÃÂ¬ ÃÂÃÂ· ÃÂ´ÃÂ·ÃÂ¼ÃÂ¹ÃÂ¿ÃÂÃÂÃÂ³ÃÂ¯ÃÂ± Group");
       return;
     }
   }
@@ -1377,12 +1377,12 @@ async function executeQuickGroup(targetDbId, targetHouseId) {
   // Update the source listing to match the final group ID
   try {
     await sb.update(selectedGroupSource._dbId, { house_id: finalHouseId });
-    showToast(`ð ÎÏÎ¹ÏÏÏÎ®Ï Î­Î½ÏÏÎ· ÏÏÎ¿ Group #${finalHouseId}!`);
+    showToast(`Ã°ÂÂÂ ÃÂÃÂÃÂ¹ÃÂÃÂÃÂÃÂ®ÃÂ ÃÂ­ÃÂ½ÃÂÃÂÃÂ· ÃÂÃÂÃÂ¿ Group #${finalHouseId}!`);
     selectedGroupSource = null;
     document.getElementById('groupingBar').classList.remove('open');
     await tryFetch();
   } catch(e) {
-    showToast("â Î£ÏÎ¬Î»Î¼Î± ÎºÎ±ÏÎ¬ ÏÎ·Î½ Î­Î½ÏÏÎ·");
+    showToast("Ã¢ÂÂ ÃÂ£ÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ± ÃÂºÃÂ±ÃÂÃÂ¬ ÃÂÃÂ·ÃÂ½ ÃÂ­ÃÂ½ÃÂÃÂÃÂ·");
   }
 }
 
@@ -1400,27 +1400,27 @@ function parseCSVLine(line) {
 
 function parsePrice(s) {
   if (!s) return 0;
-  const m = s.replace(/[â¬\s,.]/g,'').match(/\d+/);
+  const m = s.replace(/[Ã¢ÂÂ¬\s,.]/g,'').match(/\d+/);
   return m ? parseInt(m[0]) : 0;
 }
 function parseSqm(s) {
   if (!s) return 0;
-  const m = s.replace(/Ï\.Î¼\.|sqm/gi,'').replace(',','.').match(/[\d.]+/);
+  const m = s.replace(/ÃÂ\.ÃÂ¼\.|sqm/gi,'').replace(',','.').match(/[\d.]+/);
   return m ? parseFloat(m[0]) : 0;
 }
 function parsePpm(s) {
   if (!s) return 0;
-  const m = s.replace(/[â¬\s,.]/g,'').match(/\d+/);
+  const m = s.replace(/[Ã¢ÂÂ¬\s,.]/g,'').match(/\d+/);
   return m ? parseInt(m[0]) : 0;
 }
 
-// ââ BUILD UI âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ BUILD UI Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function buildUI() {
   const combined = [...allListings, ...extraListings];
 
   const platforms = [...new Set(combined.map(h => h.platform).filter(Boolean))];
   const bar = document.getElementById('platform-bar');
-  bar.innerHTML = `<button class="platform-tab ${currentPlatform==='all'?'active':''}" data-platform="all" onclick="setPlatform('all',this)">ÎÎ»ÎµÏ Î¿Î¹ ÏÎ»Î±ÏÏÏÏÎ¼ÎµÏ <span style="opacity:0.6">(${combined.length})</span></button>`;
+  bar.innerHTML = `<button class="platform-tab ${currentPlatform==='all'?'active':''}" data-platform="all" onclick="setPlatform('all',this)">ÃÂÃÂ»ÃÂµÃÂ ÃÂ¿ÃÂ¹ ÃÂÃÂ»ÃÂ±ÃÂÃÂÃÂÃÂÃÂ¼ÃÂµÃÂ <span style="opacity:0.6">(${combined.length})</span></button>`;
   platforms.forEach(p => {
     const cnt = combined.filter(h => h.platform === p).length;
     const tab = document.createElement('button');
@@ -1435,11 +1435,11 @@ function buildUI() {
   const types = [...new Set(combined.map(h => h.type).filter(Boolean))].sort();
   const locSel = document.getElementById('filterLocation');
   const savedLoc = locSel.value;
-  locSel.innerHTML = '<option value="">ÎÎ»ÎµÏ Î¿Î¹ ÏÎµÏÎ¹Î¿ÏÎ­Ï</option>' + locations.map(l => `<option>${l}</option>`).join('');
+  locSel.innerHTML = '<option value="">ÃÂÃÂ»ÃÂµÃÂ ÃÂ¿ÃÂ¹ ÃÂÃÂµÃÂÃÂ¹ÃÂ¿ÃÂÃÂ­ÃÂ</option>' + locations.map(l => `<option>${l}</option>`).join('');
   if (savedLoc) locSel.value = savedLoc;
   const typSel = document.getElementById('filterType');
   const savedTyp = typSel.value;
-  typSel.innerHTML = '<option value="">ÎÎ»Î¿Î¹ Î¿Î¹ ÏÏÏÎ¿Î¹</option>' + types.map(t => `<option>${t}</option>`).join('');
+  typSel.innerHTML = '<option value="">ÃÂÃÂ»ÃÂ¿ÃÂ¹ ÃÂ¿ÃÂ¹ ÃÂÃÂÃÂÃÂ¿ÃÂ¹</option>' + types.map(t => `<option>${t}</option>`).join('');
   if (savedTyp) typSel.value = savedTyp;
 
   const active = combined.filter(h => !h.deleted);
@@ -1451,8 +1451,8 @@ function buildUI() {
   }).filter(p => p > 0);
   document.getElementById('stat-total').textContent  = combined.length;
   document.getElementById('stat-active').textContent  = active.length;
-  document.getElementById('stat-avg').textContent     = prices.length ? 'â¬'+Math.round(prices.reduce((a,b)=>a+b,0)/prices.length).toLocaleString('el') : 'â';
-  document.getElementById('stat-ppm').textContent     = ppms.length   ? 'â¬'+Math.round(ppms.reduce((a,b)=>a+b,0)/ppms.length).toLocaleString('el') : 'â';
+  document.getElementById('stat-avg').textContent     = prices.length ? 'Ã¢ÂÂ¬'+Math.round(prices.reduce((a,b)=>a+b,0)/prices.length).toLocaleString('el') : 'Ã¢ÂÂ';
+  document.getElementById('stat-ppm').textContent     = ppms.length   ? 'Ã¢ÂÂ¬'+Math.round(ppms.reduce((a,b)=>a+b,0)/ppms.length).toLocaleString('el') : 'Ã¢ÂÂ';
 
   applyFilters();
 }
@@ -1462,7 +1462,7 @@ function getPlatformColor(p) {
   return map[p] || '#aab7b8';
 }
 
-// ââ FILTERS & SORT ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ FILTERS & SORT Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function applyFilters() {
   const combined = [...allListings, ...extraListings];
   const q        = document.getElementById('search').value.toLowerCase();
@@ -1479,7 +1479,7 @@ function applyFilters() {
   const showDel  = document.getElementById('showDeleted').checked;
 
   filtered = combined.filter(h => {
-    if (h.unfavorited) return false;
+    if (h.unfavorited === true) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
     if (loc && h.location !== loc) return false;
     if (typ && h.type !== typ) return false;
@@ -1489,11 +1489,11 @@ function applyFilters() {
     if (h.year > 0 && (h.year < minY || h.year > maxY)) return false;
     if (energy) {
       const ec = h.energy || '';
-      if (energy === 'A' && !ec.match(/^Î[++]?:/)) return false;
-      if (energy === 'B' && !ec.startsWith('Î:')) return false;
-      if (energy === 'C' && !ec.startsWith('Î:')) return false;
-      if (energy === 'D' && !ec.startsWith('Î:')) return false;
-      if (energy === 'E' && !ec.match(/^[ÎÎÎ]:/)) return false;
+      if (energy === 'A' && !ec.match(/^ÃÂ[++]?:/)) return false;
+      if (energy === 'B' && !ec.startsWith('ÃÂ:')) return false;
+      if (energy === 'C' && !ec.startsWith('ÃÂ:')) return false;
+      if (energy === 'D' && !ec.startsWith('ÃÂ:')) return false;
+      if (energy === 'E' && !ec.match(/^[ÃÂÃÂÃÂ]:/)) return false;
     }
     if (heating && !h.heating.toLowerCase().includes(heating)) return false;
     return true;
@@ -1509,7 +1509,7 @@ function applyFilters() {
     return 0;
   });
 
-  document.getElementById('resultsCount').textContent = `${filtered.length} Î±Î³Î³ÎµÎ»Î¯ÎµÏ ÎµÎ¼ÏÎ±Î½Î¯Î¶Î¿Î½ÏÎ±Î¹`;
+  document.getElementById('resultsCount').textContent = `${filtered.length} ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ ÃÂµÃÂ¼ÃÂÃÂ±ÃÂ½ÃÂ¯ÃÂ¶ÃÂ¿ÃÂ½ÃÂÃÂ±ÃÂ¹`;
   renderListings();
 }
 
@@ -1535,7 +1535,7 @@ function setView(v) {
   renderListings();
 }
 
-// ââ RENDER ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ RENDER Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let leafletMap = null;
 let expandedGroups = new Set();
 
@@ -1571,7 +1571,7 @@ function groupByHouseId(listings) {
 
 function renderListings() {
   const container = document.getElementById('main-content');
-  if (!filtered.length) { container.innerHTML = '<div class="empty">ÎÎµÎ½ Î²ÏÎ­Î¸Î·ÎºÎ±Î½ Î±Î³Î³ÎµÎ»Î¯ÎµÏ Î¼Îµ Î±ÏÏÎ¬ ÏÎ± ÏÎ¯Î»ÏÏÎ±.</div>'; return; }
+  if (!filtered.length) { container.innerHTML = '<div class="empty">ÃÂÃÂµÃÂ½ ÃÂ²ÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂ±ÃÂ½ ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ ÃÂ¼ÃÂµ ÃÂ±ÃÂÃÂÃÂ¬ ÃÂÃÂ± ÃÂÃÂ¯ÃÂ»ÃÂÃÂÃÂ±.</div>'; return; }
   if (currentView === 'map') {
     container.innerHTML = `<div id="map-container"><div id="map"></div></div>`;
     setTimeout(initMap, 50); return;
@@ -1580,7 +1580,7 @@ function renderListings() {
     const { groupCards, singles } = groupByHouseId(filtered);
     const all = [...groupCards, ...singles];
     document.getElementById('resultsCount').textContent =
-      `${all.length} ÎºÎ¬ÏÏÎµÏ Â· ${groupCards.length} ÏÏÎ¯ÏÎ¹Î± Â· ${singles.length} Î¼ÎµÎ¼Î¿Î½ÏÎ¼Î­Î½ÎµÏ`;
+      `${all.length} ÃÂºÃÂ¬ÃÂÃÂÃÂµÃÂ ÃÂ· ${groupCards.length} ÃÂÃÂÃÂ¯ÃÂÃÂ¹ÃÂ± ÃÂ· ${singles.length} ÃÂ¼ÃÂµÃÂ¼ÃÂ¿ÃÂ½ÃÂÃÂ¼ÃÂ­ÃÂ½ÃÂµÃÂ`;
     container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
     renderRejectedSection();
     return;
@@ -1591,23 +1591,23 @@ function renderListings() {
 
 function renderGroupedCard(g) {
   const priceStr = g.minPrice === g.maxPrice
-    ? (g.minPrice ? 'â¬'+g.minPrice.toLocaleString('el') : 'â')
-    : `â¬${g.minPrice.toLocaleString('el')} â â¬${g.maxPrice.toLocaleString('el')}`;
+    ? (g.minPrice ? 'Ã¢ÂÂ¬'+g.minPrice.toLocaleString('el') : 'Ã¢ÂÂ')
+    : `Ã¢ÂÂ¬${g.minPrice.toLocaleString('el')} Ã¢ÂÂ Ã¢ÂÂ¬${g.maxPrice.toLocaleString('el')}`;
   const photos = g.allImgs.slice(0, 5);
   const stripHtml = photos.length
     ? photos.map((p,i) => `<img class="photo-strip-img" src="${p.url}"
         onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',${i})"
         onerror="this.style.display='none'" loading="lazy">`).join('')
-    : `<div class="photo-strip-noimg">ð </div>`;
+    : `<div class="photo-strip-noimg">Ã°ÂÂÂ </div>`;
 
   const allFav    = g.items.every(h=>h.favorited);
   const allHidden = g.items.every(h=>h.hidden);
-  const agencyNames = [...new Set(g.items.map(h=>h.agency||'ÎÎ´Î¹ÏÏÎ·Ï'))].slice(0,3).join(' Â· ');
+  const agencyNames = [...new Set(g.items.map(h=>h.agency||'ÃÂÃÂ´ÃÂ¹ÃÂÃÂÃÂ·ÃÂ'))].slice(0,3).join(' ÃÂ· ');
 
   let connectHtml = '';
   if (selectedGroupSource && selectedGroupSource.house_id !== g.houseId) {
     connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px"
-      onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">ð ÎÎ½ÏÏÎ· ÎµÎ´Ï</button>`;
+      onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">Ã°ÂÂÂ ÃÂÃÂ½ÃÂÃÂÃÂ· ÃÂµÃÂ´ÃÂ</button>`;
   }
 
   return `<div class="grouped-card${allFav?' favorited':''}"
@@ -1615,26 +1615,26 @@ function renderGroupedCard(g) {
     <div class="photo-strip">
       ${stripHtml}
       <div class="group-id-pill">#${g.houseId}</div>
-      <div class="group-listing-count">ð¢ ${g.count}</div>
-      ${g.allImgs.length > 1 ? `<div class="photo-count-pill">ð· ${g.allImgs.length}</div>` : ''}
+      <div class="group-listing-count">Ã°ÂÂÂ¢ ${g.count}</div>
+      ${g.allImgs.length > 1 ? `<div class="photo-count-pill">Ã°ÂÂÂ· ${g.allImgs.length}</div>` : ''}
     </div>
     <div class="grouped-body">
       <div class="grouped-meta">
         <div>
-          <div class="grouped-title">${g.location||'â'}</div>
-          <div class="grouped-sub">${g.type||''} ${g.floor?'Â· '+g.floor:''} ${g.lvl&&Number(g.lvl)>1?'Â· '+g.lvl+' ÎµÏÎ¯Ï.':''}</div>
+          <div class="grouped-title">${g.location||'Ã¢ÂÂ'}</div>
+          <div class="grouped-sub">${g.type||''} ${g.floor?'ÃÂ· '+g.floor:''} ${g.lvl&&Number(g.lvl)>1?'ÃÂ· '+g.lvl+' ÃÂµÃÂÃÂ¯ÃÂ.':''}</div>
         </div>
         <div class="grouped-price-range">
           <div class="price-range-main">${priceStr}</div>
-          <div class="price-range-sub">${g.count} Î±Î³Î³ÎµÎ»Î¯ÎµÏ</div>
+          <div class="price-range-sub">${g.count} ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ</div>
         </div>
       </div>
       <div class="grouped-specs">
-        ${g.sqmRaw?`<span class="spec-tag">ð ${g.sqmRaw}</span>`:''}
-        ${g.year?`<span class="spec-tag">ð ${g.year}</span>`:''}
+        ${g.sqmRaw?`<span class="spec-tag">Ã°ÂÂÂ ${g.sqmRaw}</span>`:''}
+        ${g.year?`<span class="spec-tag">Ã°ÂÂÂ ${g.year}</span>`:''}
         ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
-        ${g.heating&&g.heating.includes('Î±Î­ÏÎ¹Î¿')?`<span class="spec-tag">ð¥ ÎÎ­ÏÎ¹Î¿</span>`:''}
-        ${g.heating&&g.heating.includes('ÎÎ½ÏÎ»Î¯Î±')?`<span class="spec-tag">â¨ï¸ ÎÎ½ÏÎ»Î¯Î±</span>`:''}
+        ${g.heating&&g.heating.includes('ÃÂ±ÃÂ­ÃÂÃÂ¹ÃÂ¿')?`<span class="spec-tag">Ã°ÂÂÂ¥ ÃÂÃÂ­ÃÂÃÂ¹ÃÂ¿</span>`:''}
+        ${g.heating&&g.heating.includes('ÃÂÃÂ½ÃÂÃÂ»ÃÂ¯ÃÂ±')?`<span class="spec-tag">Ã¢ÂÂ¨Ã¯Â¸Â ÃÂÃÂ½ÃÂÃÂ»ÃÂ¯ÃÂ±</span>`:''}
       </div>
       ${connectHtml}
     </div>
@@ -1643,13 +1643,13 @@ function renderGroupedCard(g) {
       <div class="group-action-btns">
         <span class="grp-btn${allFav?' active':''}"
           onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
-          title="${allFav?'ÎÏÎ±Î¯ÏÎµÏÎ· Î±Î³Î±ÏÎ·Î¼Î­Î½Î¿Ï':'ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿ Î³Î¹Î± ÏÎ»ÎµÏ'}">${allFav?'â':'â'}</span>
+          title="${allFav?'ÃÂÃÂÃÂ±ÃÂ¯ÃÂÃÂµÃÂÃÂ· ÃÂ±ÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿ÃÂ':'ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿ ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ»ÃÂµÃÂ'}">${allFav?'Ã¢ÂÂ':'Ã¢ÂÂ'}</span>
         <span class="grp-btn${allHidden?' active':''}"
           onclick="event.stopPropagation();toggleGroupHide('${g.houseId}')"
-          title="${allHidden?'ÎÎ¼ÏÎ¬Î½Î¹ÏÎ· ÏÎ»ÏÎ½':'ÎÏÏÎºÏÏÏÎ· ÏÎ»ÏÎ½'}">${allHidden?'â©':'â'}</span>
+          title="${allHidden?'ÃÂÃÂ¼ÃÂÃÂ¬ÃÂ½ÃÂ¹ÃÂÃÂ· ÃÂÃÂ»ÃÂÃÂ½':'ÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ· ÃÂÃÂ»ÃÂÃÂ½'}">${allHidden?'Ã¢ÂÂ©':'Ã¢ÂÂ'}</span>
         <span class="grp-btn open-all"
           onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',0)"
-          title="ÎÎ½Î¿Î¹Î³Î¼Î±">â</span>
+          title="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ±">Ã¢ÂÂ</span>
       </div>
     </div>
   </div>`;
@@ -1661,17 +1661,17 @@ function toggleExpandGroup(hid) {
   renderListings();
 }
 
-// ââ MAP âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ MAP Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 const GEO = {
-  'ÎÎ·ÏÎ¹ÏÎ¹Î¬':      [38.0737, 23.8119], 'ÎÎ±ÏÎ¿ÏÏÎ¹':      [38.0565, 23.8000],
-  'ÎÎ­Î± ÎÏÏÎ¸ÏÎ±Î¯Î±': [38.0997, 23.8253], 'ÎÎ¹ÏÎ½ÏÏÎ¿Ï':     [38.1204, 23.8617],
-  'ÎÎµÎ»Î¯ÏÏÎ¹Î±':     [38.0440, 23.8350], 'ÎÏÎ¹Î»Î®ÏÏÎ¹Î±':    [38.0318, 23.8419],
-  'Î Î¿Î»Î¹ÏÎµÎ¯Î±':     [38.0880, 23.8220], 'ÎÎ­Î± Î ÎµÎ½ÏÎ­Î»Î·':  [38.0490, 23.8640],
-  'ÎÏÎ¿ÏÎ¹Î¬':       [38.1320, 23.8760], 'Î£ÏÎ±Î¼Î¬ÏÎ±':      [38.1156, 23.8920],
-  'ÎÎ½Î¿Î¹Î¾Î·':       [38.1050, 23.8800], 'ÎÏÎºÏÎ²ÏÏÏÎ·':    [38.0700, 23.7780],
-  'Î ÎµÏÎºÎ·':        [38.0600, 23.7980], 'ÎÏÎ¬ÎºÎ»ÎµÎ¹Î¿':     [38.0433, 23.7870],
-  'ÎÎ³Î¯Î± Î Î±ÏÎ±ÏÎºÎµÏÎ®': [37.9980, 23.8195], 'Î§Î±Î»Î¬Î½Î´ÏÎ¹':     [38.0215, 23.7987],
-  'ÎÎ­ÏÎ±ÎºÎ±Ï':      [37.9972, 23.8742], 'Î Î±Î»Î»Î®Î½Î·':      [37.9980, 23.8761],
+  'ÃÂÃÂ·ÃÂÃÂ¹ÃÂÃÂ¹ÃÂ¬':      [38.0737, 23.8119], 'ÃÂÃÂ±ÃÂÃÂ¿ÃÂÃÂÃÂ¹':      [38.0565, 23.8000],
+  'ÃÂÃÂ­ÃÂ± ÃÂÃÂÃÂÃÂ¸ÃÂÃÂ±ÃÂ¯ÃÂ±': [38.0997, 23.8253], 'ÃÂÃÂ¹ÃÂÃÂ½ÃÂÃÂÃÂ¿ÃÂ':     [38.1204, 23.8617],
+  'ÃÂÃÂµÃÂ»ÃÂ¯ÃÂÃÂÃÂ¹ÃÂ±':     [38.0440, 23.8350], 'ÃÂÃÂÃÂ¹ÃÂ»ÃÂ®ÃÂÃÂÃÂ¹ÃÂ±':    [38.0318, 23.8419],
+  'ÃÂ ÃÂ¿ÃÂ»ÃÂ¹ÃÂÃÂµÃÂ¯ÃÂ±':     [38.0880, 23.8220], 'ÃÂÃÂ­ÃÂ± ÃÂ ÃÂµÃÂ½ÃÂÃÂ­ÃÂ»ÃÂ·':  [38.0490, 23.8640],
+  'ÃÂÃÂÃÂ¿ÃÂÃÂ¹ÃÂ¬':       [38.1320, 23.8760], 'ÃÂ£ÃÂÃÂ±ÃÂ¼ÃÂ¬ÃÂÃÂ±':      [38.1156, 23.8920],
+  'ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ¾ÃÂ·':       [38.1050, 23.8800], 'ÃÂÃÂÃÂºÃÂÃÂ²ÃÂÃÂÃÂÃÂ·':    [38.0700, 23.7780],
+  'ÃÂ ÃÂµÃÂÃÂºÃÂ·':        [38.0600, 23.7980], 'ÃÂÃÂÃÂ¬ÃÂºÃÂ»ÃÂµÃÂ¹ÃÂ¿':     [38.0433, 23.7870],
+  'ÃÂÃÂ³ÃÂ¯ÃÂ± ÃÂ ÃÂ±ÃÂÃÂ±ÃÂÃÂºÃÂµÃÂÃÂ®': [37.9980, 23.8195], 'ÃÂ§ÃÂ±ÃÂ»ÃÂ¬ÃÂ½ÃÂ´ÃÂÃÂ¹':     [38.0215, 23.7987],
+  'ÃÂÃÂ­ÃÂÃÂ±ÃÂºÃÂ±ÃÂ':      [37.9972, 23.8742], 'ÃÂ ÃÂ±ÃÂ»ÃÂ»ÃÂ®ÃÂ½ÃÂ·':      [37.9980, 23.8761],
 };
 
 function getCoords(location) {
@@ -1695,7 +1695,7 @@ function initMap() {
   leafletMap = L.map('map', { center: [38.07, 23.82], zoom: 12, zoomControl: true });
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: 'Â© OpenStreetMap Â© CARTO', maxZoom: 19
+    attribution: 'ÃÂ© OpenStreetMap ÃÂ© CARTO', maxZoom: 19
   }).addTo(leafletMap);
 
   let placed = 0;
@@ -1709,7 +1709,7 @@ function initMap() {
 
     const icon = L.divIcon({
       className: '',
-      html: `<div style="background:${color};color:#000;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);cursor:pointer;">${h.price ? 'â¬'+Math.round(h.price/1000)+'k' : '?'}</div>`,
+      html: `<div style="background:${color};color:#000;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid rgba(255,255,255,0.2);cursor:pointer;">${h.price ? 'Ã¢ÂÂ¬'+Math.round(h.price/1000)+'k' : '?'}</div>`,
       iconAnchor: [20, 12],
     });
 
@@ -1718,13 +1718,13 @@ function initMap() {
     const popup = `<div class="map-popup">
       ${h.imageUrl ? `<img src="${h.imageUrl}" onerror="this.style.display='none'">` : ''}
       <div class="map-popup-loc">${h.location}</div>
-      <div style="font-size:11px;color:#888;margin-bottom:4px">${h.type||''} Â· ${h.floor||''}</div>
-      <div class="map-popup-price">${h.price?'â¬'+h.price.toLocaleString('el'):'â'}</div>
+      <div style="font-size:11px;color:#888;margin-bottom:4px">${h.type||''} ÃÂ· ${h.floor||''}</div>
+      <div class="map-popup-price">${h.price?'Ã¢ÂÂ¬'+h.price.toLocaleString('el'):'Ã¢ÂÂ'}</div>
       <div class="map-popup-specs">
-        ${(h.sqm_raw||h.sqmRaw)?'ð '+(h.sqm_raw||h.sqmRaw):''} ${h.rooms?'Â· ð '+h.rooms:''} ${h.year?'Â· ð '+h.year:''}<br>
-        ${ppm?'â¬'+ppm+'/Ï.Î¼. Â· ':''}${h.agency||''}
+        ${(h.sqm_raw||h.sqmRaw)?'Ã°ÂÂÂ '+(h.sqm_raw||h.sqmRaw):''} ${h.rooms?'ÃÂ· Ã°ÂÂÂ '+h.rooms:''} ${h.year?'ÃÂ· Ã°ÂÂÂ '+h.year:''}<br>
+        ${ppm?'Ã¢ÂÂ¬'+ppm+'/ÃÂ.ÃÂ¼. ÃÂ· ':''}${h.agency||''}
       </div>
-      ${h.url?`<a class="map-popup-link" href="${h.url}" target="_blank">â ÎÎ½Î¿Î¹Î³Î¼Î±</a>`:''}
+      ${h.url?`<a class="map-popup-link" href="${h.url}" target="_blank">Ã¢ÂÂ ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ±</a>`:''}
     </div>`;
 
     marker.bindPopup(popup, { maxWidth: 260 });
@@ -1734,11 +1734,11 @@ function initMap() {
   legend.onAdd = () => {
     const div = L.DomUtil.create('div','map-legend');
     div.innerHTML = `
-      <div style="font-weight:600;margin-bottom:6px;color:#e8e4dc">Î¤Î¹Î¼Î­Ï</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#5a9e78"></div> &lt; â¬300k</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> â¬300kâ400k</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#c97b6a"></div> &gt; â¬400k</div>
-      <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} Î±Î³Î³ÎµÎ»Î¯ÎµÏ ÏÏÎ¿ ÏÎ¬ÏÏÎ·</div>`;
+      <div style="font-weight:600;margin-bottom:6px;color:#e8e4dc">ÃÂ¤ÃÂ¹ÃÂ¼ÃÂ­ÃÂ</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#5a9e78"></div> &lt; Ã¢ÂÂ¬300k</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> Ã¢ÂÂ¬300kÃ¢ÂÂ400k</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#c97b6a"></div> &gt; Ã¢ÂÂ¬400k</div>
+      <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ ÃÂÃÂÃÂ¿ ÃÂÃÂ¬ÃÂÃÂÃÂ·</div>`;
     return div;
   };
   legend.addTo(leafletMap);
@@ -1746,20 +1746,20 @@ function initMap() {
 
 function energyClass(e) {
   if (!e) return 'other';
-  if (e.startsWith('Î+:') || e.startsWith('Î++')) return 'Aplus2';
-  if (e.startsWith('Î+')) return 'Aplus';
-  if (e.startsWith('Î:')) return 'A';
-  if (e.startsWith('Î:')) return 'B';
-  if (e.startsWith('Î:')) return 'C';
-  if (e.startsWith('Î:')) return 'D';
-  if (e.startsWith('Î:')) return 'E';
-  if (e.startsWith('Î:')) return 'Z';
-  if (e.startsWith('Î:')) return 'H';
+  if (e.startsWith('ÃÂ+:') || e.startsWith('ÃÂ++')) return 'Aplus2';
+  if (e.startsWith('ÃÂ+')) return 'Aplus';
+  if (e.startsWith('ÃÂ:')) return 'A';
+  if (e.startsWith('ÃÂ:')) return 'B';
+  if (e.startsWith('ÃÂ:')) return 'C';
+  if (e.startsWith('ÃÂ:')) return 'D';
+  if (e.startsWith('ÃÂ:')) return 'E';
+  if (e.startsWith('ÃÂ:')) return 'Z';
+  if (e.startsWith('ÃÂ:')) return 'H';
   return 'other';
 }
 function energyLabel(e) {
-  if (!e) return 'â';
-  const m = e.match(/^[Î-Î©Î±-Ï+]+/);
+  if (!e) return 'Ã¢ÂÂ';
+  const m = e.match(/^[ÃÂ-ÃÂ©ÃÂ±-ÃÂ+]+/);
   return m ? m[0] : e.slice(0,2);
 }
 
@@ -1767,7 +1767,7 @@ function platformBadgeClass(p) {
   if (!p) return 'p-other';
   const low = p.toLowerCase();
   if (low.includes('spitogatos')) return 'p-spitogatos';
-  if (low.includes('xe') || low.includes('ÏÎµ')) return 'p-xe';
+  if (low.includes('xe') || low.includes('ÃÂÃÂµ')) return 'p-xe';
   if (low.includes('nodaliste')) return 'p-nodaliste';
   return 'p-other';
 }
@@ -1785,11 +1785,11 @@ function renderCard(h) {
     if (selectedGroupSource) {
       // Show join target button if another item is selected
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="ÎÎ½ÏÏÎ· ÎµÎ´Ï" aria-label="ÎÎ½ÏÏÎ· ÎµÎ´Ï">ð</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="ÃÂÃÂ½ÃÂÃÂÃÂ· ÃÂµÃÂ´ÃÂ" aria-label="ÃÂÃÂ½ÃÂÃÂÃÂ· ÃÂµÃÂ´ÃÂ">Ã°ÂÂÂ</span>`;
       }
     } else {
       // Default state: select entry point
-      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="ÎÏÎ¹Î»Î¿Î³Î® Î³Î¹Î± ÎÎ½ÏÏÎ·" aria-label="ÎÏÎ¹Î»Î¿Î³Î® Î³Î¹Î± ÎÎ½ÏÏÎ·">ð</span>`;
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="ÃÂÃÂÃÂ¹ÃÂ»ÃÂ¿ÃÂ³ÃÂ® ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ½ÃÂÃÂÃÂ·" aria-label="ÃÂÃÂÃÂ¹ÃÂ»ÃÂ¿ÃÂ³ÃÂ® ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ½ÃÂÃÂÃÂ·">Ã°ÂÂÂ</span>`;
     }
   }
 
@@ -1797,40 +1797,40 @@ function renderCard(h) {
     <div class="card-img-wrap" style="cursor:pointer"
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
-      ${h.deleted ? '<div class="sold-overlay"><div class="sold-badge">ΠΩΛΗΘΗΚΕ</div></div>' : ''}
-      <div class="no-img" ${h.imageUrl?'style="display:none"':''}>ð </div>
-      <div class="card-badge">${h.type || 'â'}</div>
-      <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'â'}</div>
+      ${h.deleted ? '<div class="sold-overlay"><div class="sold-badge">Î Î©ÎÎÎÎÎÎ</div></div>' : ''}
+      <div class="no-img" ${h.imageUrl?'style="display:none"':''}>Ã°ÂÂÂ </div>
+      <div class="card-badge">${h.type || 'Ã¢ÂÂ'}</div>
+      <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'Ã¢ÂÂ'}</div>
       ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">#${h.house_id}</div>` : ''}
-      ${h.hasChanges ? `<div class="change-badge">ð ÎÎ»Î»Î±Î³Î®</div>` : ''}
-      <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'â':'â'}</div>
+      ${h.hasChanges ? `<div class="change-badge">Ã°ÂÂÂ ÃÂÃÂ»ÃÂ»ÃÂ±ÃÂ³ÃÂ®</div>` : ''}
+      <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'Ã¢ÂÂ':'Ã¢ÂÂ'}</div>
     </div>
     <div class="card-body">
       <div class="card-top">
         <div>
-          <div class="card-location">${h.location || 'â'}</div>
-          <div class="card-type">${h.floor ? h.floor + (h.lvl ? ' Â· '+h.lvl+' ÎµÏÎ¯ÏÎµÎ´Î±' : '') : ''}</div>
+          <div class="card-location">${h.location || 'Ã¢ÂÂ'}</div>
+          <div class="card-type">${h.floor ? h.floor + (h.lvl ? ' ÃÂ· '+h.lvl+' ÃÂµÃÂÃÂ¯ÃÂÃÂµÃÂ´ÃÂ±' : '') : ''}</div>
         </div>
         <div>
-          <div class="card-price">${h.price ? 'â¬'+h.price.toLocaleString('el') : 'â'}</div>
-          <div class="price-sqm">${ppm ? 'â¬'+ppm+'/Ï.Î¼.' : ''}</div>
+          <div class="card-price">${h.price ? 'Ã¢ÂÂ¬'+h.price.toLocaleString('el') : 'Ã¢ÂÂ'}</div>
+          <div class="price-sqm">${ppm ? 'Ã¢ÂÂ¬'+ppm+'/ÃÂ.ÃÂ¼.' : ''}</div>
         </div>
       </div>
       <div class="card-specs">
-        ${(h.sqm_raw||h.sqmRaw) ? `<span class="spec-tag">ð ${h.sqm_raw||h.sqmRaw}</span>` : ''}
-        ${h.rooms ? `<span class="spec-tag">ð ${h.rooms}</span>` : ''}
-        ${h.year ? `<span class="spec-tag">ð ${h.year}</span>` : ''}
+        ${(h.sqm_raw||h.sqmRaw) ? `<span class="spec-tag">Ã°ÂÂÂ ${h.sqm_raw||h.sqmRaw}</span>` : ''}
+        ${h.rooms ? `<span class="spec-tag">Ã°ÂÂÂ ${h.rooms}</span>` : ''}
+        ${h.year ? `<span class="spec-tag">Ã°ÂÂÂ ${h.year}</span>` : ''}
         ${h.energy ? `<span class="spec-tag"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></span>` : ''}
-        ${h.heating && h.heating.includes('Î±Î­ÏÎ¹Î¿') ? `<span class="spec-tag">ð¥ ÎÎ­ÏÎ¹Î¿</span>` : ''}
-        ${h.heating && h.heating.includes('ÎÎ½ÏÎ»Î¯Î±') ? `<span class="spec-tag">â¨ï¸ ÎÎ½ÏÎ»Î¯Î±</span>` : ''}
+        ${h.heating && h.heating.includes('ÃÂ±ÃÂ­ÃÂÃÂ¹ÃÂ¿') ? `<span class="spec-tag">Ã°ÂÂÂ¥ ÃÂÃÂ­ÃÂÃÂ¹ÃÂ¿</span>` : ''}
+        ${h.heating && h.heating.includes('ÃÂÃÂ½ÃÂÃÂ»ÃÂ¯ÃÂ±') ? `<span class="spec-tag">Ã¢ÂÂ¨Ã¯Â¸Â ÃÂÃÂ½ÃÂÃÂ»ÃÂ¯ÃÂ±</span>` : ''}
       </div>
       <div class="card-footer" style="flex-wrap: wrap;">
-        <span class="agency-name" title="${h.agency||''}">${h.agency || 'â'}</span>
+        <span class="agency-name" title="${h.agency||''}">${h.agency || 'Ã¢ÂÂ'}</span>
         <div class="card-actions">
-          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="ÎÎµÏÏÎ¿Î¼Î­ÏÎµÎ¹ÎµÏ" aria-label="ÎÎµÏÏÎ¿Î¼Î­ÏÎµÎ¹ÎµÏ">ð</span>
-          <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Î£ÏÎ³ÎºÏÎ¹ÏÎ·" aria-label="Î£ÏÎ³ÎºÏÎ¹ÏÎ·">â</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="ÃÂÃÂµÃÂÃÂÃÂ¿ÃÂ¼ÃÂ­ÃÂÃÂµÃÂ¹ÃÂµÃÂ" aria-label="ÃÂÃÂµÃÂÃÂÃÂ¿ÃÂ¼ÃÂ­ÃÂÃÂµÃÂ¹ÃÂµÃÂ">Ã°ÂÂÂ</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·" aria-label="ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·">Ã¢ÂÂ</span>
           ${groupActionHtml}
-          ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="ÎÎ½Î¿Î¹Î³Î¼Î± link" aria-label="ÎÎ½Î¿Î¹Î³Î¼Î± link">â</a>` : ''}
+          ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ± link" aria-label="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ± link">Ã¢ÂÂ</a>` : ''}
         </div>
       </div>
     </div>
@@ -1845,48 +1845,48 @@ function renderListItem(h) {
   if (h._dbId) {
     if (selectedGroupSource) {
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="ÎÎ½ÏÏÎ· ÎµÎ´Ï" aria-label="ÎÎ½ÏÏÎ· ÎµÎ´Ï">ð</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="ÃÂÃÂ½ÃÂÃÂÃÂ· ÃÂµÃÂ´ÃÂ" aria-label="ÃÂÃÂ½ÃÂÃÂÃÂ· ÃÂµÃÂ´ÃÂ">Ã°ÂÂÂ</span>`;
       }
     } else {
-      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="ÎÏÎ¹Î»Î¿Î³Î® Î³Î¹Î± ÎÎ½ÏÏÎ·" aria-label="ÎÏÎ¹Î»Î¿Î³Î® Î³Î¹Î± ÎÎ½ÏÏÎ·">ð</span>`;
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="ÃÂÃÂÃÂ¹ÃÂ»ÃÂ¿ÃÂ³ÃÂ® ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ½ÃÂÃÂÃÂ·" aria-label="ÃÂÃÂÃÂ¹ÃÂ»ÃÂ¿ÃÂ³ÃÂ® ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ½ÃÂÃÂÃÂ·">Ã°ÂÂÂ</span>`;
     }
   }
 
   return `<div class="list-item${h.deleted?' deleted':''}${isFav?' favorited':''}" onclick="openModal('${escJ(h.url)}')">
     ${h.imageUrl 
-      ? `<img class="list-thumb" src="${h.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\\'list-no-img\\'>ð </div>'">`
-      : `<div class="list-no-img">ð </div>`}
+      ? `<img class="list-thumb" src="${h.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\\'list-no-img\\'>Ã°ÂÂÂ </div>'">`
+      : `<div class="list-no-img">Ã°ÂÂÂ </div>`}
     <div class="list-main">
       <div class="list-top">
-        <span class="list-location">${h.location||'â'}</span>
+        <span class="list-location">${h.location||'Ã¢ÂÂ'}</span>
         <span class="list-type">${h.type||''}</span>
         ${h.energy ? `<span class="energy-badge e-${energyClass(h.energy)}" style="font-size:10px;padding:2px 6px">${energyLabel(h.energy)}</span>` : ''}
         <span class="platform-badge ${platformBadgeClass(h.platform)}" style="font-size:10px;padding:2px 6px">${h.platform||''}</span>
         ${h.house_id && h.house_id !== '0' ? `<span class="house-id-badge" style="position:static;margin-left:4px">#${h.house_id}</span>` : ''}
       </div>
       <div class="list-specs">
-        ${(h.sqm_raw||h.sqmRaw)?`<span class="list-spec">ð ${h.sqm_raw||h.sqmRaw}</span>`:''}
-        ${h.rooms?`<span class="list-spec">ð ${h.rooms}</span>`:''}
-        ${h.year?`<span class="list-spec">ð ${h.year}</span>`:''}
-        ${h.floor?`<span class="list-spec">ð ${h.floor}</span>`:''}
-        ${h.heating?`<span class="list-spec" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">ð¥ ${h.heating.slice(0,30)}</span>`:''}
+        ${(h.sqm_raw||h.sqmRaw)?`<span class="list-spec">Ã°ÂÂÂ ${h.sqm_raw||h.sqmRaw}</span>`:''}
+        ${h.rooms?`<span class="list-spec">Ã°ÂÂÂ ${h.rooms}</span>`:''}
+        ${h.year?`<span class="list-spec">Ã°ÂÂÂ ${h.year}</span>`:''}
+        ${h.floor?`<span class="list-spec">Ã°ÂÂÂ ${h.floor}</span>`:''}
+        ${h.heating?`<span class="list-spec" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Ã°ÂÂÂ¥ ${h.heating.slice(0,30)}</span>`:''}
         <span class="list-spec" style="color:var(--text3)">${h.agency||''}</span>
       </div>
     </div>
     <div class="list-right">
-      <div class="list-price">${h.price?'â¬'+h.price.toLocaleString('el'):'â'}</div>
-      <div class="list-ppm">${ppm?'â¬'+ppm+'/Ï.Î¼.':''}</div>
+      <div class="list-price">${h.price?'Ã¢ÂÂ¬'+h.price.toLocaleString('el'):'Ã¢ÂÂ'}</div>
+      <div class="list-ppm">${ppm?'Ã¢ÂÂ¬'+ppm+'/ÃÂ.ÃÂ¼.':''}</div>
       <div class="list-actions">
-        <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')" title="ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿" aria-label="ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿">${isFav?'â':'â'}</span>
-        <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Î£ÏÎ³ÎºÏÎ¹ÏÎ·" aria-label="Î£ÏÎ³ÎºÏÎ¹ÏÎ·">â</span>
+        <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')" title="ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿" aria-label="ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿">${isFav?'Ã¢ÂÂ':'Ã¢ÂÂ'}</span>
+        <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·" aria-label="ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·">Ã¢ÂÂ</span>
         ${groupActionHtml}
-        ${h.url?`<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="ÎÎ½Î¿Î¹Î³Î¼Î± link" aria-label="ÎÎ½Î¿Î¹Î³Î¼Î± link">â</a>`:''}
+        ${h.url?`<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ± link" aria-label="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ± link">Ã¢ÂÂ</a>`:''}
       </div>
     </div>
   </div>`;
 }
 
-// ââ MODAL DETAIL ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ MODAL DETAIL Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function getByUrl(url) {
   return [...allListings, ...extraListings].find(h => h.url === url);
 }
@@ -1899,51 +1899,51 @@ function openModal(url) {
   const key    = h.url || h.platformNr;
 
   document.getElementById('modalContent').innerHTML = `
-    <button class="modal-close" onclick="closeModal()">â</button>
+    <button class="modal-close" onclick="closeModal()">Ã¢ÂÂ</button>
     ${h.imageUrl
-      ? `<img class="modal-img" src="${h.imageUrl}" onerror="this.outerHTML='<div class=\\'modal-no-img\\'>ð </div>'">`
-      : '<div class="modal-no-img">ð </div>'}
+      ? `<img class="modal-img" src="${h.imageUrl}" onerror="this.outerHTML='<div class=\\'modal-no-img\\'>Ã°ÂÂÂ </div>'">`
+      : '<div class="modal-no-img">Ã°ÂÂÂ </div>'}
     <div class="modal-body">
-      <div class="modal-title">${h.location||'â'} <span style="color:var(--text2);font-size:16px">Â· ${h.type||''}</span></div>
-      <div class="modal-subtitle">${h.floor?h.floor+' Â·':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'Â· #'+h.house_id:''}</div>
+      <div class="modal-title">${h.location||'Ã¢ÂÂ'} <span style="color:var(--text2);font-size:16px">ÃÂ· ${h.type||''}</span></div>
+      <div class="modal-subtitle">${h.floor?h.floor+' ÃÂ·':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'ÃÂ· #'+h.house_id:''}</div>
 
       <div class="modal-price-row">
         <div class="modal-price-left">
-          <div class="modal-price">${h.price?'â¬'+h.price.toLocaleString('el'):'â'}</div>
-          ${ppm?`<div class="modal-ppm">â¬${ppm}/Ï.Î¼.</div>`:''}
+          <div class="modal-price">${h.price?'Ã¢ÂÂ¬'+h.price.toLocaleString('el'):'Ã¢ÂÂ'}</div>
+          ${ppm?`<div class="modal-ppm">Ã¢ÂÂ¬${ppm}/ÃÂ.ÃÂ¼.</div>`:''}
         </div>
         <div class="modal-action-btns">
-          ${h.url?`<span class="mab open-btn" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" title="ÎÎ½Î¿Î¹Î³Î¼Î± Î±Î³Î³ÎµÎ»Î¯Î±Ï">â ÎÎ½Î¿Î¹Î³Î¼Î±</span>`:''}
+          ${h.url?`<span class="mab open-btn" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" title="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ± ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂ±ÃÂ">Ã¢ÂÂ ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ±</span>`:''}
           <span class="mab fav-btn-m${isFav?' active':''}" id="modal-fav-btn"
             onclick="modalToggleFav('${escJ(key)}')"
-            title="${isFav?'ÎÏÎ±Î¯ÏÎµÏÎ·':'ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿'}">
-            ${isFav?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿'}
+            title="${isFav?'ÃÂÃÂÃÂ±ÃÂ¯ÃÂÃÂµÃÂÃÂ·':'ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿'}">
+            ${isFav?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿'}
           </span>
           <span class="mab hide-btn-m${isHid?' active':''}" id="modal-hide-btn"
             onclick="modalToggleHide('${escJ(key)}')"
-            title="${isHid?'ÎÏÎ±Î½Î±ÏÎ¿ÏÎ¬':'ÎÏÏÎºÏÏÏÎ·'}">
-            ${isHid?'â© ÎÏÎ±Î½Î±ÏÎ¿ÏÎ¬':'â ÎÏÏÎºÏÏÏÎ·'}
+            title="${isHid?'ÃÂÃÂÃÂ±ÃÂ½ÃÂ±ÃÂÃÂ¿ÃÂÃÂ¬':'ÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ·'}">
+            ${isHid?'Ã¢ÂÂ© ÃÂÃÂÃÂ±ÃÂ½ÃÂ±ÃÂÃÂ¿ÃÂÃÂ¬':'Ã¢ÂÂ ÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ·'}
           </span>
-          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="Î£ÏÎ³ÎºÏÎ¹ÏÎ·">â Î£ÏÎ³ÎºÏÎ¹ÏÎ·</span>
+          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·">Ã¢ÂÂ ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·</span>
         </div>
       </div>
 
       <div class="modal-grid">
-        <div class="modal-field"><div class="modal-field-label">Î¤ÎµÏÏÎ±Î³ÏÎ½Î¹ÎºÎ¬</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ¼Î¬ÏÎ¹Î±</div><div class="modal-field-value">${h.rooms||'â'} ${h.baths?'Â· '+h.baths+' Î¼Ï':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ¿Ï ÎºÎ±ÏÎ±ÏÎºÎµÏÎ®Ï</div><div class="modal-field-value">${h.year||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ­ÏÎ¼Î±Î½ÏÎ·</div><div class="modal-field-value">${h.heating||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ½ÎµÏÎ³ÎµÎ¹Î±ÎºÎ® ÎºÎ»Î¬ÏÎ·</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:12px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ¿ÏÎ¿Ï / ÎÏÎ¯ÏÎµÎ´Î±</div><div class="modal-field-value">${h.floor||'â'} ${h.lvl?'Â· '+h.lvl+' ÎµÏÎ¯ÏÎµÎ´Î±':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎµÏÎ¹ÏÎ¹ÎºÏ</div><div class="modal-field-value">${h.agency||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Î¤ÎµÎ»ÎµÏÏÎ±Î¯Î± ÎµÎ½Î·Î¼.</div><div class="modal-field-value">${h.updated||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ¹Î±Î¸Î­ÏÎ¹Î¼Î¿</div><div class="modal-field-value">${h.available||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Î ÏÎ¿ÏÏÏÎ¹ÎºÏ Î£ÎºÎ¿Ï</div><div class="modal-field-value">â­ï¸ ${h.personal_score || 0}/5</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ¼. ÎÏÎ¯ÏÎºÎµÏÎ·Ï</div><div class="modal-field-value">${h.visit_date || 'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ´Î¹ÎºÏÏ Î±Î³Î³ÎµÎ»Î¯Î±Ï</div><div class="modal-field-value">${h.agencyNr||h.platformNr||'â'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂ¤ÃÂµÃÂÃÂÃÂ±ÃÂ³ÃÂÃÂ½ÃÂ¹ÃÂºÃÂ¬</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ¼ÃÂ¬ÃÂÃÂ¹ÃÂ±</div><div class="modal-field-value">${h.rooms||'Ã¢ÂÂ'} ${h.baths?'ÃÂ· '+h.baths+' ÃÂ¼ÃÂ':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ¿ÃÂ ÃÂºÃÂ±ÃÂÃÂ±ÃÂÃÂºÃÂµÃÂÃÂ®ÃÂ</div><div class="modal-field-value">${h.year||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ­ÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·</div><div class="modal-field-value">${h.heating||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ½ÃÂµÃÂÃÂ³ÃÂµÃÂ¹ÃÂ±ÃÂºÃÂ® ÃÂºÃÂ»ÃÂ¬ÃÂÃÂ·</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:12px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ¿ÃÂÃÂ¿ÃÂ / ÃÂÃÂÃÂ¯ÃÂÃÂµÃÂ´ÃÂ±</div><div class="modal-field-value">${h.floor||'Ã¢ÂÂ'} ${h.lvl?'ÃÂ· '+h.lvl+' ÃÂµÃÂÃÂ¯ÃÂÃÂµÃÂ´ÃÂ±':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂµÃÂÃÂ¹ÃÂÃÂ¹ÃÂºÃÂ</div><div class="modal-field-value">${h.agency||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂ¤ÃÂµÃÂ»ÃÂµÃÂÃÂÃÂ±ÃÂ¯ÃÂ± ÃÂµÃÂ½ÃÂ·ÃÂ¼.</div><div class="modal-field-value">${h.updated||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ¹ÃÂ±ÃÂ¸ÃÂ­ÃÂÃÂ¹ÃÂ¼ÃÂ¿</div><div class="modal-field-value">${h.available||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂ ÃÂÃÂ¿ÃÂÃÂÃÂÃÂ¹ÃÂºÃÂ ÃÂ£ÃÂºÃÂ¿ÃÂ</div><div class="modal-field-value">Ã¢Â­ÂÃ¯Â¸Â ${h.personal_score || 0}/5</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ¼. ÃÂÃÂÃÂ¯ÃÂÃÂºÃÂµÃÂÃÂ·ÃÂ</div><div class="modal-field-value">${h.visit_date || 'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ´ÃÂ¹ÃÂºÃÂÃÂ ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂ±ÃÂ</div><div class="modal-field-value">${h.agencyNr||h.platformNr||'Ã¢ÂÂ'}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">ð <strong>Î£Î·Î¼ÎµÎ¹ÏÏÎµÎ¹Ï Î Î»Î±ÏÏÏÏÎ¼Î±Ï:</strong> ${h.notes}</div>`:''}
-      ${h.personal_notes?`<div class="modal-notes" style="background:rgba(126,184,154,0.08);border-color:rgba(126,184,154,0.2)">ð <strong>Î ÏÎ¿ÏÏÏÎ¹ÎºÎ­Ï Î£Î·Î¼ÎµÎ¹ÏÏÎµÎ¹Ï:</strong> ${h.personal_notes}</div>`:''}
+      ${h.notes?`<div class="modal-notes">Ã°ÂÂÂ <strong>ÃÂ£ÃÂ·ÃÂ¼ÃÂµÃÂ¹ÃÂÃÂÃÂµÃÂ¹ÃÂ ÃÂ ÃÂ»ÃÂ±ÃÂÃÂÃÂÃÂÃÂ¼ÃÂ±ÃÂ:</strong> ${h.notes}</div>`:''}
+      ${h.personal_notes?`<div class="modal-notes" style="background:rgba(126,184,154,0.08);border-color:rgba(126,184,154,0.2)">Ã°ÂÂÂ <strong>ÃÂ ÃÂÃÂ¿ÃÂÃÂÃÂÃÂ¹ÃÂºÃÂ­ÃÂ ÃÂ£ÃÂ·ÃÂ¼ÃÂµÃÂ¹ÃÂÃÂÃÂµÃÂ¹ÃÂ:</strong> ${h.personal_notes}</div>`:''}
     </div>`;
   document.getElementById('detailModal').classList.add('open');
 }
@@ -1954,11 +1954,11 @@ function modalToggleFav(key) {
   if(h._dbId)sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});
   else{if(h.favorited)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
   const btn=document.getElementById('modal-fav-btn');
-  if(btn){btn.classList.toggle('active',h.favorited);btn.textContent=h.favorited?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿';}
-  pushAction({label:h.favorited?`â ${h.location}`:`â ${h.location}`,
+  if(btn){btn.classList.toggle('active',h.favorited);btn.textContent=h.favorited?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿';}
+  pushAction({label:h.favorited?`Ã¢ÂÂ ${h.location}`:`Ã¢ÂÂ ${h.location}`,
     undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
     redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
-  showToast(h.favorited?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÏÎ±Î¹ÏÎ­Î¸Î·ÎºÎµ');
+  showToast(h.favorited?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂÃÂ±ÃÂ¹ÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂµ');
 }
 
 function modalToggleHide(key) {
@@ -1966,11 +1966,11 @@ function modalToggleHide(key) {
   const prev=h.hidden;h.hidden=!prev;
   if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
   const btn=document.getElementById('modal-hide-btn');
-  if(btn){btn.classList.toggle('active',h.hidden);btn.textContent=h.hidden?'â© ÎÏÎ±Î½Î±ÏÎ¿ÏÎ¬':'â ÎÏÏÎºÏÏÏÎ·';}
-  pushAction({label:h.hidden?`â ${h.location}`:`â© ${h.location}`,
+  if(btn){btn.classList.toggle('active',h.hidden);btn.textContent=h.hidden?'Ã¢ÂÂ© ÃÂÃÂÃÂ±ÃÂ½ÃÂ±ÃÂÃÂ¿ÃÂÃÂ¬':'Ã¢ÂÂ ÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ·';}
+  pushAction({label:h.hidden?`Ã¢ÂÂ ${h.location}`:`Ã¢ÂÂ© ${h.location}`,
     undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
     redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
-  showToast(h.hidden?'â ÎÏÏÏÏÎ·ÎºÎµ':'â© ÎÎ¼ÏÎ±Î½Î¯Î¶ÎµÏÎ±Î¹ Î¾Î±Î½Î¬');
+  showToast(h.hidden?'Ã¢ÂÂ ÃÂÃÂÃÂÃÂÃÂÃÂ·ÃÂºÃÂµ':'Ã¢ÂÂ© ÃÂÃÂ¼ÃÂÃÂ±ÃÂ½ÃÂ¯ÃÂ¶ÃÂµÃÂÃÂ±ÃÂ¹ ÃÂ¾ÃÂ±ÃÂ½ÃÂ¬');
   applyFilters();
 }
 
@@ -1980,36 +1980,36 @@ function toggleFav(key) {
   const h=getByUrl(key);const prev=h?h.favorited:favorites.has(key);
   if(h&&h._dbId){h.favorited=!prev;sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});}
   else{if(prev)favorites.delete(key);else favorites.add(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
-  pushAction({label:(!prev?'â ':' â ')+(h?h.location:''),
+  pushAction({label:(!prev?'Ã¢ÂÂ ':' Ã¢ÂÂ ')+(h?h.location:''),
     undo:async()=>{if(h&&h._dbId){h.favorited=prev;await sb.update(h._dbId,{favorited:prev});}else{if(prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();},
     redo:async()=>{if(h&&h._dbId){h.favorited=!prev;await sb.update(h._dbId,{favorited:!prev});}else{if(!prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();}});
-  showToast(!prev?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÏÎ±Î¹ÏÎ­Î¸Î·ÎºÎµ');
+  showToast(!prev?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂÃÂ±ÃÂ¹ÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂµ');
   applyFilters();
 }
 
-// ââ COMPARE âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ COMPARE Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function addToCompare(url) {
   const h = getByUrl(url); if (!h) return;
-  if (compareList.find(c => c.url === url)) { showToast('ÎÎ´Î· ÏÏÎ· Î»Î¯ÏÏÎ± ÏÏÎ³ÎºÏÎ¹ÏÎ·Ï'); return; }
-  if (compareList.length >= 4) { showToast('ÎÎ­Î³Î¹ÏÏÎ¿ 4 Î±Î³Î³ÎµÎ»Î¯ÎµÏ Î³Î¹Î± ÏÏÎ³ÎºÏÎ¹ÏÎ·'); return; }
+  if (compareList.find(c => c.url === url)) { showToast('ÃÂÃÂ´ÃÂ· ÃÂÃÂÃÂ· ÃÂ»ÃÂ¯ÃÂÃÂÃÂ± ÃÂÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·ÃÂ'); return; }
+  if (compareList.length >= 4) { showToast('ÃÂÃÂ­ÃÂ³ÃÂ¹ÃÂÃÂÃÂ¿ 4 ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·'); return; }
   compareList.push(h);
   renderCompareBar();
-  showToast('â Î ÏÎ¿ÏÏÎ­Î¸Î·ÎºÎµ ÏÏÎ· ÏÏÎ³ÎºÏÎ¹ÏÎ·');
+  showToast('Ã¢ÂÂ ÃÂ ÃÂÃÂ¿ÃÂÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂµ ÃÂÃÂÃÂ· ÃÂÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·');
 }
 function removeFromCompare(url) { compareList = compareList.filter(h => h.url !== url); renderCompareBar(); }
 function clearCompare() { compareList = []; renderCompareBar(); }
 function renderCompareBar() {
   document.getElementById('compareBar').classList.toggle('open', compareList.length > 0);
   document.getElementById('compareItems').innerHTML = compareList.map(h =>
-    `<div class="compare-item">${h.location} Â· ${h.price?'â¬'+h.price.toLocaleString('el'):'â'} <span class="compare-remove" onclick="removeFromCompare('${escJ(h.url)}')">â</span></div>`
+    `<div class="compare-item">${h.location} ÃÂ· ${h.price?'Ã¢ÂÂ¬'+h.price.toLocaleString('el'):'Ã¢ÂÂ'} <span class="compare-remove" onclick="removeFromCompare('${escJ(h.url)}')">Ã¢ÂÂ</span></div>`
   ).join('');
 }
 function openCompareModal() {
   if (!compareList.length) return;
   const fields = [
-    ['Î¦ÏÏÎ¿Î³ÏÎ±ÏÎ¯Î±','img'],['Î¤Î¹Î¼Î®','price'],['Ï.Î¼.','sqmRaw'],['â¬/Ï.Î¼.','pricePerSqm'],
-    ['Î¤ÏÏÎ¿Ï','type'],['ÎÏÎ¿Ï','year'],['ÎÎ­ÏÎ¼Î±Î½ÏÎ·','heating'],['ÎÎ½Î­ÏÎ³ÎµÎ¹Î±','energy'],
-    ['ÎÏÎ¼Î¬ÏÎ¹Î±','rooms'],['ÎÏÎ¿ÏÎ¿Ï','floor'],['ÎÎµÏÎ¹ÏÎ¹ÎºÏ','agency'],
+    ['ÃÂ¦ÃÂÃÂÃÂ¿ÃÂ³ÃÂÃÂ±ÃÂÃÂ¯ÃÂ±','img'],['ÃÂ¤ÃÂ¹ÃÂ¼ÃÂ®','price'],['ÃÂ.ÃÂ¼.','sqmRaw'],['Ã¢ÂÂ¬/ÃÂ.ÃÂ¼.','pricePerSqm'],
+    ['ÃÂ¤ÃÂÃÂÃÂ¿ÃÂ','type'],['ÃÂÃÂÃÂ¿ÃÂ','year'],['ÃÂÃÂ­ÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·','heating'],['ÃÂÃÂ½ÃÂ­ÃÂÃÂ³ÃÂµÃÂ¹ÃÂ±','energy'],
+    ['ÃÂÃÂÃÂ¼ÃÂ¬ÃÂÃÂ¹ÃÂ±','rooms'],['ÃÂÃÂÃÂ¿ÃÂÃÂ¿ÃÂ','floor'],['ÃÂÃÂµÃÂÃÂ¹ÃÂÃÂ¹ÃÂºÃÂ','agency'],
   ];
   const prices = compareList.map(h=>h.price).filter(Boolean);
   const ppms   = compareList.map(h=>h.pricePerSqm||(h.sqm>0&&h.price>0?Math.round(h.price/h.sqm):0)).filter(Boolean);
@@ -2021,28 +2021,28 @@ function openCompareModal() {
   });
 
   let html = `<div class="compare-modal">
-    <button class="close-compare" onclick="closeCompareModal()">â ÎÎ»ÎµÎ¯ÏÎ¹Î¼Î¿</button>
-    <h2>ð Î£ÏÎ³ÎºÏÎ¹ÏÎ· ${compareList.length} Î±Î³Î³ÎµÎ»Î¹ÏÎ½</h2>
+    <button class="close-compare" onclick="closeCompareModal()">Ã¢ÂÂ ÃÂÃÂ»ÃÂµÃÂ¯ÃÂÃÂ¹ÃÂ¼ÃÂ¿</button>
+    <h2>Ã°ÂÂÂ ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ· ${compareList.length} ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¹ÃÂÃÂ½</h2>
     <div style="overflow-x:auto"><table class="compare-table">
-    <thead><tr><th>Î§Î±ÏÎ±ÎºÏÎ·ÏÎ¹ÏÏÎ¹ÎºÏ</th>${cols.map(h=>`<th>${h.location}<br><small style="color:var(--text3)">${h.type||''}</small></th>`).join('')}</tr></thead>
+    <thead><tr><th>ÃÂ§ÃÂ±ÃÂÃÂ±ÃÂºÃÂÃÂ·ÃÂÃÂ¹ÃÂÃÂÃÂ¹ÃÂºÃÂ</th>${cols.map(h=>`<th>${h.location}<br><small style="color:var(--text3)">${h.type||''}</small></th>`).join('')}</tr></thead>
     <tbody>`;
   fields.forEach(([label, key]) => {
     html += `<tr><td>${label}</td>`;
     cols.forEach(h => {
       if (key === 'img') {
-        html += `<td>${h.imageUrl?`<img class="compare-img" src="${h.imageUrl}">`:'<div class="compare-no-img">ð </div>'}</td>`;
+        html += `<td>${h.imageUrl?`<img class="compare-img" src="${h.imageUrl}">`:'<div class="compare-no-img">Ã°ÂÂÂ </div>'}</td>`;
       } else if (key === 'price') {
         const best = h.price === minPrice;
-        html += `<td class="${best?'best':''}">â¬${h.price?h.price.toLocaleString('el'):'â'}</td>`;
+        html += `<td class="${best?'best':''}">Ã¢ÂÂ¬${h.price?h.price.toLocaleString('el'):'Ã¢ÂÂ'}</td>`;
       } else if (key === 'pricePerSqm') {
         const ppm = h._ppm;
-        html += `<td class="${ppm&&ppm===minPpm?'best':''}">${ppm?'â¬'+ppm:''}</td>`;
+        html += `<td class="${ppm&&ppm===minPpm?'best':''}">${ppm?'Ã¢ÂÂ¬'+ppm:''}</td>`;
       } else if (key === 'energy') {
         html += `<td><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></td>`;
       } else if (key === 'sqmRaw') {
-        html += `<td>${h.sqm_raw || h.sqmRaw || 'â'}</td>`;
+        html += `<td>${h.sqm_raw || h.sqmRaw || 'Ã¢ÂÂ'}</td>`;
       } else {
-        html += `<td>${h[key]||'â'}</td>`;
+        html += `<td>${h[key]||'Ã¢ÂÂ'}</td>`;
       }
     });
     html += `</tr>`;
@@ -2053,30 +2053,30 @@ function openCompareModal() {
 }
 function closeCompareModal() { document.getElementById('compareModal').classList.remove('open'); }
 
-// ââ CSV UPLOAD âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ CSV UPLOAD Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function handleDrop(e) {
   e.preventDefault(); document.getElementById('dropzone').classList.remove('drag');
   const file = e.dataTransfer.files[0]; if (file) processFile(file);
 }
 function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(file); }
 
-// ââ THUMBNAIL FIX IMPORT ââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ THUMBNAIL FIX IMPORT Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function processThumbnailFix(text) {
   const lines = text.trim().split('\n');
-  if (lines.length < 2) { showToast('â ÎÎµÎ½Ï Î±ÏÏÎµÎ¯Î¿'); return; }
+  if (lines.length < 2) { showToast('Ã¢ÂÂ ÃÂÃÂµÃÂ½ÃÂ ÃÂ±ÃÂÃÂÃÂµÃÂ¯ÃÂ¿'); return; }
 
   // Parse header
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
   const urlIdx = headers.findIndex(h => h === 'url');
   const imgIdx = headers.findIndex(h => h === 'new_image_url');
-  if (urlIdx < 0 || imgIdx < 0) { showToast('â ÎÎ¬Î¸Î¿Ï format â ÏÏÎµÎ¹Î¬Î¶ÎµÏÎ±Î¹ url + new_image_url'); return; }
+  if (urlIdx < 0 || imgIdx < 0) { showToast('Ã¢ÂÂ ÃÂÃÂ¬ÃÂ¸ÃÂ¿ÃÂ format Ã¢ÂÂ ÃÂÃÂÃÂµÃÂ¹ÃÂ¬ÃÂ¶ÃÂµÃÂÃÂ±ÃÂ¹ url + new_image_url'); return; }
 
   const fixes = lines.slice(1).map(line => {
     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
     return { url: cols[urlIdx], imageUrl: cols[imgIdx] };
   }).filter(f => f.url && f.imageUrl);
 
-  showToast(`ð· ÎÎ½Î·Î¼Î­ÏÏÏÎ· ${fixes.length} ÏÏÏÎ¿Î³ÏÎ±ÏÎ¹ÏÎ½...`);
+  showToast(`Ã°ÂÂÂ· ÃÂÃÂ½ÃÂ·ÃÂ¼ÃÂ­ÃÂÃÂÃÂÃÂ· ${fixes.length} ÃÂÃÂÃÂÃÂ¿ÃÂ³ÃÂÃÂ±ÃÂÃÂ¹ÃÂÃÂ½...`);
   let updated = 0, errors = 0;
 
   for (const fix of fixes) {
@@ -2094,7 +2094,7 @@ async function processThumbnailFix(text) {
     } catch(e) { errors++; }
   }
 
-  showToast(`â ${updated} ÏÏÏÎ¿Î³ÏÎ±ÏÎ¯ÎµÏ ÎµÎ½Î·Î¼ÎµÏÏÎ¸Î·ÎºÎ±Î½${errors?' Â· â '+errors+' ÏÏÎ¬Î»Î¼Î±ÏÎ±':''}`, null, 5000);
+  showToast(`Ã¢ÂÂ ${updated} ÃÂÃÂÃÂÃÂ¿ÃÂ³ÃÂÃÂ±ÃÂÃÂ¯ÃÂµÃÂ ÃÂµÃÂ½ÃÂ·ÃÂ¼ÃÂµÃÂÃÂÃÂ¸ÃÂ·ÃÂºÃÂ±ÃÂ½${errors?' ÃÂ· Ã¢ÂÂ '+errors+' ÃÂÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ±ÃÂÃÂ±':''}`, null, 5000);
   renderListings();
 }
 
@@ -2103,7 +2103,7 @@ function processFile(file) {
   reader.onload = async ev => {
     const text = ev.target.result;
 
-    // ââ Detect thumbnail-fix CSV (has new_image_url column) ââââââââââââââ
+    // Ã¢ÂÂÃ¢ÂÂ Detect thumbnail-fix CSV (has new_image_url column) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
     const firstLine = text.split('\n')[0].toLowerCase();
     if (firstLine.includes('new_image_url')) {
       await processThumbnailFix(text);
@@ -2111,11 +2111,11 @@ function processFile(file) {
     }
 
     const rows = parseCSV(text, 'Spitogatos');
-    if (!rows.length) { showToast('â ÎÎµÎ½ Î²ÏÎ­Î¸Î·ÎºÎ±Î½ ÎµÎ³Î³ÏÎ±ÏÎ­Ï'); return; }
+    if (!rows.length) { showToast('Ã¢ÂÂ ÃÂÃÂµÃÂ½ ÃÂ²ÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂ±ÃÂ½ ÃÂµÃÂ³ÃÂ³ÃÂÃÂ±ÃÂÃÂ­ÃÂ'); return; }
 
     // Show progress toast
     const total = rows.filter(r => r.url).length;
-    showToast(`ð¥ ÎÎ¹ÏÎ±Î³ÏÎ³Î® ${total} Î±Î³Î³ÎµÎ»Î¹ÏÎ½ ÏÏÎ· Î²Î¬ÏÎ·...`);
+    showToast(`Ã°ÂÂÂ¥ ÃÂÃÂ¹ÃÂÃÂ±ÃÂ³ÃÂÃÂ³ÃÂ® ${total} ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¹ÃÂÃÂ½ ÃÂÃÂÃÂ· ÃÂ²ÃÂ¬ÃÂÃÂ·...`);
 
     let added=0, updated=0, unchanged=0, errors=0;
     const changes = []; // track what changed for summary
@@ -2142,7 +2142,7 @@ function processFile(file) {
         };
 
         if (!existing || existing.length === 0) {
-          // New listing â insert
+          // New listing Ã¢ÂÂ insert
           await fetch(`${SUPABASE_URL}/rest/v1/listings`, {
             method: 'POST',
             headers: { ...sb.headers(), 'Prefer': 'return=minimal' },
@@ -2150,7 +2150,7 @@ function processFile(file) {
           });
           added++;
         } else {
-          // Existing â check what changed
+          // Existing Ã¢ÂÂ check what changed
           const old = existing[0];
           const priceChanged = old.price && h.price && Number(old.price) !== h.price;
           const imgChanged   = h.imageUrl && old.image_url !== h.imageUrl;
@@ -2208,11 +2208,11 @@ function processFile(file) {
 
     // Summary toast
     const parts = [];
-    if (added)     parts.push(`â ${added} Î½Î­ÎµÏ`);
-    if (updated)   parts.push(`ð ${updated} ÎµÎ½Î·Î¼ÎµÏÏÎ¸Î·ÎºÎ±Î½`);
-    if (unchanged) parts.push(`â ${unchanged} Î±Î¼ÎµÏÎ¬Î²Î»Î·ÏÎµÏ`);
-    if (errors)    parts.push(`â ${errors} ÏÏÎ¬Î»Î¼Î±ÏÎ±`);
-    showToast(parts.join(' Â· '), null, 6000);
+    if (added)     parts.push(`Ã¢ÂÂ ${added} ÃÂ½ÃÂ­ÃÂµÃÂ`);
+    if (updated)   parts.push(`Ã°ÂÂÂ ${updated} ÃÂµÃÂ½ÃÂ·ÃÂ¼ÃÂµÃÂÃÂÃÂ¸ÃÂ·ÃÂºÃÂ±ÃÂ½`);
+    if (unchanged) parts.push(`Ã¢ÂÂ ${unchanged} ÃÂ±ÃÂ¼ÃÂµÃÂÃÂ¬ÃÂ²ÃÂ»ÃÂ·ÃÂÃÂµÃÂ`);
+    if (errors)    parts.push(`Ã¢ÂÂ ${errors} ÃÂÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ±ÃÂÃÂ±`);
+    showToast(parts.join(' ÃÂ· '), null, 6000);
 
     // Show change summary if any
     if (changes.length) {
@@ -2220,7 +2220,7 @@ function processFile(file) {
       const priceChanges = changes.filter(c=>c.priceChanged);
       if (priceChanges.length) {
         setTimeout(()=>showToast(
-          `ð° ${priceChanges.length} Î±Î»Î»Î±Î³Î­Ï ÏÎ¹Î¼Î®Ï â Î´ÎµÏ console Î³Î¹Î± Î»ÎµÏÏÎ¿Î¼Î­ÏÎµÎ¹ÎµÏ`, null, 5000
+          `Ã°ÂÂÂ° ${priceChanges.length} ÃÂ±ÃÂ»ÃÂ»ÃÂ±ÃÂ³ÃÂ­ÃÂ ÃÂÃÂ¹ÃÂ¼ÃÂ®ÃÂ Ã¢ÂÂ ÃÂ´ÃÂµÃÂ console ÃÂ³ÃÂ¹ÃÂ± ÃÂ»ÃÂµÃÂÃÂÃÂ¿ÃÂ¼ÃÂ­ÃÂÃÂµÃÂ¹ÃÂµÃÂ`, null, 5000
         ), 200);
       }
     }
@@ -2230,7 +2230,7 @@ function processFile(file) {
   reader.readAsText(file, 'UTF-8');
 }
 
-// ââ TOAST âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ TOAST Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -2239,7 +2239,7 @@ function showToast(msg) {
 
 function escJ(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-// ââ FULLSCREEN GALLERY ââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ FULLSCREEN GALLERY Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let galleryItems = [], galleryIdx = 0, galleryZoom = 1, _gallHintTimer = null;
 
 function openGallery(houseId, startIdx) {
@@ -2273,7 +2273,7 @@ function _renderGalleryFrame() {
   const img = document.getElementById('galleryImg');
   img.src = item.url;
   img.style.transform = `scale(${galleryZoom})`;
-  document.getElementById('galleryTitle').textContent   = `${h.location||''} Â· ${h.type||''}`;
+  document.getElementById('galleryTitle').textContent   = `${h.location||''} ÃÂ· ${h.type||''}`;
   document.getElementById('galleryAgency').textContent  = h.agency || '';
   document.getElementById('galleryCounter').textContent = `${galleryIdx+1} / ${galleryItems.length}`;
   
@@ -2339,7 +2339,7 @@ document.addEventListener('keydown', e => {
 });
 
 
-// ââ LISTING DETAIL OVERLAY ââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ LISTING DETAIL OVERLAY Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let _loSiblings=[], _loFeatIdx=0;
 
 function openListingOverlay(url, houseId, startIdx) {
@@ -2372,7 +2372,7 @@ function _renderOvl(){
   const rEl=document.getElementById('loRight');
   if(rest.length){
     rEl.style.display='flex';
-    document.getElementById('loCarouselTitle').textContent=`Î¥ÏÏÎ»Î¿Î¹ÏÎµÏ Î±Î³Î³ÎµÎ»Î¯ÎµÏ ${rest.length}`;
+    document.getElementById('loCarouselTitle').textContent=`ÃÂ¥ÃÂÃÂÃÂ»ÃÂ¿ÃÂ¹ÃÂÃÂµÃÂ ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂµÃÂ ${rest.length}`;
     document.getElementById('loNavPrev').classList.toggle('disabled',_loFeatIdx===0);
     document.getElementById('loNavNext').classList.toggle('disabled',_loFeatIdx===_loSiblings.length-1);
     document.getElementById('loCarousel').innerHTML=rest.map((s,i)=>_sibHTML(s,i)).join('');
@@ -2403,10 +2403,10 @@ function _featHTML(h){
     ${h.imageUrl
       ? `<img id="lo-photo-preview" class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
           onclick="if(this._z){this.style.transform='';this.style.transformOrigin='';this._z=0}else{this.style.transform='scale(1.8)';this.style.transformOrigin='top center';this._z=1}"
-          onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>ð </div>'">`
-      : '<div class="modal-no-img" id="lo-photo-preview">ð </div>'}
+          onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>Ã°ÂÂÂ </div>'">`
+      : '<div class="modal-no-img" id="lo-photo-preview">Ã°ÂÂÂ </div>'}
     <div style="display:flex;gap:6px;align-items:center;padding:7px 12px 0;background:var(--surface)">
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap">ð· URL:</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap">Ã°ÂÂÂ· URL:</span>
       <input id="lo-photo-input" type="text" value="${h.imageUrl||''}"
         placeholder="https://... paste new image URL"
         style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:5px;
@@ -2416,41 +2416,41 @@ function _featHTML(h){
       <button onclick="savePhotoUrl('${escJ(key)}')"
         style="background:var(--accent);color:#0f0e0c;border:none;border-radius:5px;
                padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;
-               font-family:'DM Sans',sans-serif;white-space:nowrap">ð¾ ÎÏÎ¿Î¸Î®ÎºÎµÏÏÎ·</button>
+               font-family:'DM Sans',sans-serif;white-space:nowrap">Ã°ÂÂÂ¾ ÃÂÃÂÃÂ¿ÃÂ¸ÃÂ®ÃÂºÃÂµÃÂÃÂÃÂ·</button>
     </div>
     <div class="modal-body">
-      <div class="modal-title">${h.location||'â'} <span style="color:var(--text2);font-size:16px">Â· ${h.type||''}</span></div>
-      <div class="modal-subtitle">${h.floor?h.floor+' Â· ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'Â· #'+h.house_id:''}</div>
+      <div class="modal-title">${h.location||'Ã¢ÂÂ'} <span style="color:var(--text2);font-size:16px">ÃÂ· ${h.type||''}</span></div>
+      <div class="modal-subtitle">${h.floor?h.floor+' ÃÂ· ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'ÃÂ· #'+h.house_id:''}</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <div style="display:flex;align-items:baseline;gap:8px">
-          <div class="modal-price">${h.price?'â¬'+h.price.toLocaleString('el'):'â'}</div>
-          ${ppm?`<div class="modal-ppm">â¬${ppm}/Ï.Î¼.</div>`:''}
+          <div class="modal-price">${h.price?'Ã¢ÂÂ¬'+h.price.toLocaleString('el'):'Ã¢ÂÂ'}</div>
+          ${ppm?`<div class="modal-ppm">Ã¢ÂÂ¬${ppm}/ÃÂ.ÃÂ¼.</div>`:''}
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
           ${h.url?`<span class="modal-btn primary" style="cursor:pointer"
             onmousedown="handleLinkClick(event,'${escJ(h.url)}')"
-            onclick="event.stopPropagation();handleLinkClick(event,'${escJ(h.url)}')">â ÎÎ½Î¿Î¹Î³Î¼Î±</span>`:''}
+            onclick="event.stopPropagation();handleLinkClick(event,'${escJ(h.url)}')">Ã¢ÂÂ ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ±</span>`:''}
           <span class="modal-btn${isFav?' active':''}" id="lo-fav" style="cursor:pointer"
-            onclick="loToggleFav('${escJ(key)}')">${isFav?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿'}</span>
+            onclick="loToggleFav('${escJ(key)}')">${isFav?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿'}</span>
           <span class="modal-btn${isHid?' active':''}" id="lo-hide" style="cursor:pointer;${isHid?'border-color:var(--red);color:var(--red)':''}"
-            onclick="loToggleHide('${escJ(key)}')">${isHid?'â© ÎÏÎ±Î½Î±ÏÎ¿ÏÎ¬':'â ÎÏÏÎºÏÏÏÎ·'}</span>
+            onclick="loToggleHide('${escJ(key)}')">${isHid?'Ã¢ÂÂ© ÃÂÃÂÃÂ±ÃÂ½ÃÂ±ÃÂÃÂ¿ÃÂÃÂ¬':'Ã¢ÂÂ ÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ·'}</span>
           <span class="modal-btn" style="cursor:pointer"
-            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">â Î£ÏÎ³ÎºÏÎ¹ÏÎ·</span>
+            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">Ã¢ÂÂ ÃÂ£ÃÂÃÂ³ÃÂºÃÂÃÂ¹ÃÂÃÂ·</span>
         </div>
       </div>
       <div class="modal-grid">
-        <div class="modal-field"><div class="modal-field-label">Î¤ÎµÏÏÎ±Î³ÏÎ½Î¹ÎºÎ¬</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ¼Î¬ÏÎ¹Î±</div><div class="modal-field-value">${h.rooms||'â'} ${h.baths?'Â· '+h.baths+' Î¼Ï':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ¿Ï ÎºÎ±ÏÎ±ÏÎºÎµÏÎ®Ï</div><div class="modal-field-value">${h.year||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ­ÏÎ¼Î±Î½ÏÎ·</div><div class="modal-field-value">${h.heating||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ½ÎµÏÎ³ÎµÎ¹Î±ÎºÎ® ÎºÎ»Î¬ÏÎ·</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:11px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ¿ÏÎ¿Ï / ÎÏÎ¯ÏÎµÎ´Î±</div><div class="modal-field-value">${h.floor||'â'} ${h.lvl?'Â· '+h.lvl+' ÎµÏÎ¯Ï.':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎµÏÎ¹ÏÎ¹ÎºÏ</div><div class="modal-field-value">${h.agency||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Î¤ÎµÎ»ÎµÏÏÎ±Î¯Î± ÎµÎ½Î·Î¼.</div><div class="modal-field-value">${h.updated||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÎ¹Î±Î¸Î­ÏÎ¹Î¼Î¿</div><div class="modal-field-value">${h.available||'â'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">ÎÏÎ´Î¹ÎºÏÏ Î±Î³Î³ÎµÎ»Î¯Î±Ï</div><div class="modal-field-value">${h.agencyNr||h.agency_nr||h.platformNr||'â'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂ¤ÃÂµÃÂÃÂÃÂ±ÃÂ³ÃÂÃÂ½ÃÂ¹ÃÂºÃÂ¬</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ¼ÃÂ¬ÃÂÃÂ¹ÃÂ±</div><div class="modal-field-value">${h.rooms||'Ã¢ÂÂ'} ${h.baths?'ÃÂ· '+h.baths+' ÃÂ¼ÃÂ':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ¿ÃÂ ÃÂºÃÂ±ÃÂÃÂ±ÃÂÃÂºÃÂµÃÂÃÂ®ÃÂ</div><div class="modal-field-value">${h.year||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ­ÃÂÃÂ¼ÃÂ±ÃÂ½ÃÂÃÂ·</div><div class="modal-field-value">${h.heating||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ½ÃÂµÃÂÃÂ³ÃÂµÃÂ¹ÃÂ±ÃÂºÃÂ® ÃÂºÃÂ»ÃÂ¬ÃÂÃÂ·</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:11px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ¿ÃÂÃÂ¿ÃÂ / ÃÂÃÂÃÂ¯ÃÂÃÂµÃÂ´ÃÂ±</div><div class="modal-field-value">${h.floor||'Ã¢ÂÂ'} ${h.lvl?'ÃÂ· '+h.lvl+' ÃÂµÃÂÃÂ¯ÃÂ.':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂµÃÂÃÂ¹ÃÂÃÂ¹ÃÂºÃÂ</div><div class="modal-field-value">${h.agency||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂ¤ÃÂµÃÂ»ÃÂµÃÂÃÂÃÂ±ÃÂ¯ÃÂ± ÃÂµÃÂ½ÃÂ·ÃÂ¼.</div><div class="modal-field-value">${h.updated||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂ¹ÃÂ±ÃÂ¸ÃÂ­ÃÂÃÂ¹ÃÂ¼ÃÂ¿</div><div class="modal-field-value">${h.available||'Ã¢ÂÂ'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">ÃÂÃÂÃÂ´ÃÂ¹ÃÂºÃÂÃÂ ÃÂ±ÃÂ³ÃÂ³ÃÂµÃÂ»ÃÂ¯ÃÂ±ÃÂ</div><div class="modal-field-value">${h.agencyNr||h.agency_nr||h.platformNr||'Ã¢ÂÂ'}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">ð ${h.notes}</div>`:''}
+      ${h.notes?`<div class="modal-notes">Ã°ÂÂÂ ${h.notes}</div>`:''}
     </div>`;
 }
 
@@ -2460,34 +2460,34 @@ function _sibHTML(s, ri) {
   return `<div class="lo-sib-card" onclick="loSelectSibling(${ri})">
     <div class="lo-sib-img-wrap">
       ${s.imageUrl
-        ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>ð </div>'">`
-        : `<div class="lo-sib-no-img">ð </div>`}
-      <div class="card-badge" style="position:absolute;top:7px;left:7px;z-index:2">${s.type||'â'}</div>
+        ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>Ã°ÂÂÂ </div>'">`
+        : `<div class="lo-sib-no-img">Ã°ÂÂÂ </div>`}
+      <div class="card-badge" style="position:absolute;top:7px;left:7px;z-index:2">${s.type||'Ã¢ÂÂ'}</div>
       <div class="platform-badge ${platformBadgeClass(s.platform)}" style="position:absolute;top:7px;right:7px;z-index:2">${s.platform||''}</div>
     </div>
     <div class="lo-sib-body">
       <div class="lo-sib-top">
         <div>
-          <div class="lo-sib-location">${s.location||'â'}</div>
-          <div class="lo-sib-sub">${s.floor?s.floor+(s.lvl?' Â· '+s.lvl+' ÎµÏÎ¯Ï.':''):''}</div>
+          <div class="lo-sib-location">${s.location||'Ã¢ÂÂ'}</div>
+          <div class="lo-sib-sub">${s.floor?s.floor+(s.lvl?' ÃÂ· '+s.lvl+' ÃÂµÃÂÃÂ¯ÃÂ.':''):''}</div>
         </div>
         <div style="text-align:right">
-          <div class="lo-sib-price">${s.price?'â¬'+s.price.toLocaleString('el'):'â'}</div>
-          <div class="lo-sib-ppm">${ppm?'â¬'+ppm+'/Ï.Î¼.':''}</div>
+          <div class="lo-sib-price">${s.price?'Ã¢ÂÂ¬'+s.price.toLocaleString('el'):'Ã¢ÂÂ'}</div>
+          <div class="lo-sib-ppm">${ppm?'Ã¢ÂÂ¬'+ppm+'/ÃÂ.ÃÂ¼.':''}</div>
         </div>
       </div>
       <div class="lo-sib-specs">
-        ${s.sqm_raw||s.sqmRaw?`<span class="spec-tag">ð ${s.sqm_raw||s.sqmRaw}</span>`:''}
-        ${s.rooms?`<span class="spec-tag">ð ${s.rooms}</span>`:''}
-        ${s.year?`<span class="spec-tag">ð ${s.year}</span>`:''}
+        ${s.sqm_raw||s.sqmRaw?`<span class="spec-tag">Ã°ÂÂÂ ${s.sqm_raw||s.sqmRaw}</span>`:''}
+        ${s.rooms?`<span class="spec-tag">Ã°ÂÂÂ ${s.rooms}</span>`:''}
+        ${s.year?`<span class="spec-tag">Ã°ÂÂÂ ${s.year}</span>`:''}
         ${s.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(s.energy)}">${energyLabel(s.energy)}</span></span>`:''}
       </div>
       <div class="lo-sib-footer">
-        <span class="lo-sib-agency" title="${s.agency||''}">${s.agency||'â'}</span>
+        <span class="lo-sib-agency" title="${s.agency||''}">${s.agency||'Ã¢ÂÂ'}</span>
         <div class="lo-sib-btns">
-          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿">${isFav?'â':'â'}</span>
-          ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="ÎÎ½Î¿Î¹Î³Î¼Î±">â</span>`:''}
-          ${s._dbId?`<span class="action-btn icon-only" onclick="event.stopPropagation();ungroupListing('${s._dbId}')" title="âï¸ ÎÏÎ¿ÏÏÎ½Î´ÎµÏÎ· Î±ÏÏ group" style="color:var(--red);border-color:var(--red)">âï¸</span>`:''}
+          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿">${isFav?'Ã¢ÂÂ':'Ã¢ÂÂ'}</span>
+          ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="ÃÂÃÂ½ÃÂ¿ÃÂ¹ÃÂ³ÃÂ¼ÃÂ±">Ã¢ÂÂ</span>`:''}
+          ${s._dbId?`<span class="action-btn icon-only" onclick="event.stopPropagation();ungroupListing('${s._dbId}')" title="Ã¢ÂÂÃ¯Â¸Â ÃÂÃÂÃÂ¿ÃÂÃÂÃÂ½ÃÂ´ÃÂµÃÂÃÂ· ÃÂ±ÃÂÃÂ group" style="color:var(--red);border-color:var(--red)">Ã¢ÂÂÃ¯Â¸Â</span>`:''}
         </div>
       </div>
     </div>
@@ -2499,24 +2499,24 @@ function loToggleFav(key){
   const prev=h.favorited;h.favorited=!prev;
   if(h._dbId)sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});
   else{if(h.favorited)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
-  pushAction({label:h.favorited?`â ${h.location}`:`â ${h.location}`,
+  pushAction({label:h.favorited?`Ã¢ÂÂ ${h.location}`:`Ã¢ÂÂ ${h.location}`,
     undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
     redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
   const b=document.getElementById('lo-fav');
-  if(b){b.textContent=h.favorited?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿';b.classList.toggle('active',h.favorited);}
-  showToast(h.favorited?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿':'â ÎÏÎ±Î¹ÏÎ­Î¸Î·ÎºÎµ');
+  if(b){b.textContent=h.favorited?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿';b.classList.toggle('active',h.favorited);}
+  showToast(h.favorited?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿':'Ã¢ÂÂ ÃÂÃÂÃÂ±ÃÂ¹ÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂµ');
 }
 
 function loToggleHide(key){
   const h=getByUrl(key);if(!h)return;
   const prev=h.hidden;h.hidden=!prev;
   if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
-  pushAction({label:h.hidden?`â ${h.location}`:`â© ${h.location}`,
+  pushAction({label:h.hidden?`Ã¢ÂÂ ${h.location}`:`Ã¢ÂÂ© ${h.location}`,
     undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
     redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
   const b=document.getElementById('lo-hide');
-  if(b){b.textContent=h.hidden?'â© ÎÏÎ±Î½Î±ÏÎ¿ÏÎ¬':'â ÎÏÏÎºÏÏÏÎ·';b.style.borderColor=h.hidden?'var(--red)':'';b.style.color=h.hidden?'var(--red)':'';}
-  showToast(h.hidden?'â ÎÏÏÏÏÎ·ÎºÎµ':'â© ÎÎ¼ÏÎ±Î½Î¯Î¶ÎµÏÎ±Î¹ Î¾Î±Î½Î¬');
+  if(b){b.textContent=h.hidden?'Ã¢ÂÂ© ÃÂÃÂÃÂ±ÃÂ½ÃÂ±ÃÂÃÂ¿ÃÂÃÂ¬':'Ã¢ÂÂ ÃÂÃÂÃÂÃÂºÃÂÃÂÃÂÃÂ·';b.style.borderColor=h.hidden?'var(--red)':'';b.style.color=h.hidden?'var(--red)':'';}
+  showToast(h.hidden?'Ã¢ÂÂ ÃÂÃÂÃÂÃÂÃÂÃÂ·ÃÂºÃÂµ':'Ã¢ÂÂ© ÃÂÃÂ¼ÃÂÃÂ±ÃÂ½ÃÂ¯ÃÂ¶ÃÂµÃÂÃÂ±ÃÂ¹ ÃÂ¾ÃÂ±ÃÂ½ÃÂ¬');
   if(h.hidden)applyFilters();
 }
 
@@ -2526,10 +2526,10 @@ async function toggleGroupFav(houseId){
   const nv=!items.every(h=>h.favorited);
   const prev=items.map(h=>({h,p:h.favorited}));
   for(const {h} of prev){h.favorited=nv;if(h._dbId)sb.update(h._dbId,{favorited:nv}).catch(()=>{});}
-  pushAction({label:nv?`â Group #${houseId}`:`â Group #${houseId}`,
+  pushAction({label:nv?`Ã¢ÂÂ Group #${houseId}`:`Ã¢ÂÂ Group #${houseId}`,
     undo:async()=>{for(const {h,p} of prev){h.favorited=p;if(h._dbId)await sb.update(h._dbId,{favorited:p});}renderListings();},
     redo:async()=>{for(const {h} of prev){h.favorited=nv;if(h._dbId)await sb.update(h._dbId,{favorited:nv});}renderListings();}});
-  showToast(nv?'â ÎÎ³Î±ÏÎ·Î¼Î­Î½Î¿ Î³Î¹Î± ÏÎ»ÎµÏ':'â ÎÏÎ±Î¹ÏÎ­Î¸Î·ÎºÎµ');renderListings();
+  showToast(nv?'Ã¢ÂÂ ÃÂÃÂ³ÃÂ±ÃÂÃÂ·ÃÂ¼ÃÂ­ÃÂ½ÃÂ¿ ÃÂ³ÃÂ¹ÃÂ± ÃÂÃÂ»ÃÂµÃÂ':'Ã¢ÂÂ ÃÂÃÂÃÂ±ÃÂ¹ÃÂÃÂ­ÃÂ¸ÃÂ·ÃÂºÃÂµ');renderListings();
 }
 
 async function toggleGroupHide(houseId){
@@ -2537,10 +2537,10 @@ async function toggleGroupHide(houseId){
   const nv=!items.every(h=>h.hidden);
   const prev=items.map(h=>({h,p:h.hidden}));
   for(const {h} of prev){h.hidden=nv;if(h._dbId)sb.update(h._dbId,{hidden:nv}).catch(()=>{});}
-  pushAction({label:nv?`â Group #${houseId}`:`â© Group #${houseId}`,
+  pushAction({label:nv?`Ã¢ÂÂ Group #${houseId}`:`Ã¢ÂÂ© Group #${houseId}`,
     undo:async()=>{for(const {h,p} of prev){h.hidden=p;if(h._dbId)await sb.update(h._dbId,{hidden:p});}applyFilters();},
     redo:async()=>{for(const {h} of prev){h.hidden=nv;if(h._dbId)await sb.update(h._dbId,{hidden:nv});}applyFilters();}});
-  showToast(nv?'â ÎÏÏÏÏÎ·ÎºÎ±Î½ ÏÎ»ÎµÏ':'â© ÎÎ¼ÏÎ±Î½Î¯Î¶Î¿Î½ÏÎ±Î¹ Î¾Î±Î½Î¬');applyFilters();
+  showToast(nv?'Ã¢ÂÂ ÃÂÃÂÃÂÃÂÃÂÃÂ·ÃÂºÃÂ±ÃÂ½ ÃÂÃÂ»ÃÂµÃÂ':'Ã¢ÂÂ© ÃÂÃÂ¼ÃÂÃÂ±ÃÂ½ÃÂ¯ÃÂ¶ÃÂ¿ÃÂ½ÃÂÃÂ±ÃÂ¹ ÃÂ¾ÃÂ±ÃÂ½ÃÂ¬');applyFilters();
 }
 
 // Keyboard nav
@@ -2551,7 +2551,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft')loNavFeat(-1);
 });
 
-// ââ PHOTO URL EDIT ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ PHOTO URL EDIT Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 async function savePhotoUrl(key) {
   const h = getByUrl(key); if (!h) return;
   const input = document.getElementById('lo-photo-input');
@@ -2567,26 +2567,27 @@ async function savePhotoUrl(key) {
   if (h._dbId) {
     try {
       await sb.update(h._dbId, { image_url: newUrl });
-      showToast('ð· Î¦ÏÏÎ¿Î³ÏÎ±ÏÎ¯Î± ÎµÎ½Î·Î¼ÎµÏÏÎ¸Î·ÎºÎµ!');
+      showToast('Ã°ÂÂÂ· ÃÂ¦ÃÂÃÂÃÂ¿ÃÂ³ÃÂÃÂ±ÃÂÃÂ¯ÃÂ± ÃÂµÃÂ½ÃÂ·ÃÂ¼ÃÂµÃÂÃÂÃÂ¸ÃÂ·ÃÂºÃÂµ!');
       pushAction({
-        label: `ð· Î¦ÏÏÎ¿Î³ÏÎ±ÏÎ¯Î±: ${h.location}`,
+        label: `Ã°ÂÂÂ· ÃÂ¦ÃÂÃÂÃÂ¿ÃÂ³ÃÂÃÂ±ÃÂÃÂ¯ÃÂ±: ${h.location}`,
         undo: async () => { h.imageUrl=prev; if(h._dbId) await sb.update(h._dbId,{image_url:prev}); _renderOvl(); },
         redo: async () => { h.imageUrl=newUrl; if(h._dbId) await sb.update(h._dbId,{image_url:newUrl}); _renderOvl(); },
       });
       // Re-render to update thumbnail on main grid too
       renderListings();
-    } catch(e) { showToast('â Î£ÏÎ¬Î»Î¼Î± Î±ÏÎ¿Î¸Î®ÎºÎµÏÏÎ·Ï'); h.imageUrl = prev; }
+    } catch(e) { showToast('Ã¢ÂÂ ÃÂ£ÃÂÃÂ¬ÃÂ»ÃÂ¼ÃÂ± ÃÂ±ÃÂÃÂ¿ÃÂ¸ÃÂ®ÃÂºÃÂµÃÂÃÂÃÂ·ÃÂ'); h.imageUrl = prev; }
   } else {
-    showToast('ð· ÎÎ½Î·Î¼ÎµÏÏÎ¸Î·ÎºÎµ ÏÎ¿ÏÎ¹ÎºÎ¬ (ÏÏÏÎ¯Ï ÏÏÎ½Î´ÎµÏÎ· DB)');
+    showToast('Ã°ÂÂÂ· ÃÂÃÂ½ÃÂ·ÃÂ¼ÃÂµÃÂÃÂÃÂ¸ÃÂ·ÃÂºÃÂµ ÃÂÃÂ¿ÃÂÃÂ¹ÃÂºÃÂ¬ (ÃÂÃÂÃÂÃÂ¯ÃÂ ÃÂÃÂÃÂ½ÃÂ´ÃÂµÃÂÃÂ· DB)');
   }
 }
-// ââ INIT ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// Ã¢ÂÂÃ¢ÂÂ INIT Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 loadData();
 setInterval(loadData, 5 * 60 * 1000);
 
 
 // ===== REJECTED SECTION =====
 function renderRejectedSection() {
+  if (typeof combined === 'undefined' || !Array.isArray(combined)) return;
   const rejList = combined.filter(function(h) { return h.unfavorited; });
   const sec = document.getElementById('rejected-section');
   const body = document.getElementById('rejected-body');
