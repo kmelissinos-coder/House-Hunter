@@ -2437,6 +2437,7 @@ function _featHTML(h){
             onclick="loToggleHide('${escJ(key)}')">${isHid?'↩ Επαναφορά':'✕ Απόκρυψη'}</span>
           <span class="modal-btn" style="cursor:pointer"
             onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">⊕ Σύγκριση</span>
+          ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >↩ Δεν πουλήθηκε</span>` : ''}
         </div>
       </div>
       <div class="modal-grid">
