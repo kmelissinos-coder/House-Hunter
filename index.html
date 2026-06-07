@@ -2480,7 +2480,7 @@ function _featHTML(h){
 function _sibHTML(s, ri) {
   const ppm=s.pricePerSqm||(s.sqm>0&&s.price>0?Math.round(s.price/s.sqm):0);
   const isFav=s.favorited||favorites.has(s.url||s.platformNr);
-  return `<div class="lo-sib-card${ri===_loFeatIdx?' lo-sib-active':''}" onclick="loSelectSibling(${ri}">
+  return `<div class="lo-sib-card${ri===_loFeatIdx?' lo-sib-active':''}" onclick="loSelectSibling(${ri})">
     <div class="lo-sib-img-wrap">
       ${s.imageUrl
         ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>🏠</div>'">`
