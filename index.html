@@ -2465,9 +2465,15 @@ function _featHTML(h){
         <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">${h.agency||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Διαθέσιμο</div><div class="modal-field-value">${h.available||'—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Κωδικός αγγελίας</div><div class="modal-field-value">${h.agencyNr||h.agency_nr||h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Αγγελίας</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Μεσίτη</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">📝 ${h.notes}</div>`:''}
+      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
+      <div style="margin-top:8px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⭐ Αξιολόγηση</div>
+        <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'★':'☆'}</span>`).join('')}</div>
+      </div>
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
     </div>`;
 }
 
