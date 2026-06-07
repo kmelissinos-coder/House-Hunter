@@ -964,11 +964,11 @@
     <div class="stat-pill">avg <strong id="stat-avg"></strong></div>
     <div class="stat-pill">avg �/�.�. <strong id="stat-ppm"></strong></div>
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
-    <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="������÷ (Ctrl+Z)" disabled>�</button>
-    <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="�������ȷ (Ctrl+Y)" disabled>�</button>
+    <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="������� (Ctrl+Z)" disabled>�</button>
+    <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="�������7 (Ctrl+Y)" disabled>�</button>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="refresh-btn" onclick="loadData()">� ������÷</button>
+    <button class="refresh-btn" onclick="loadData()">� �������</button>
   </div>
 </header>
 
@@ -993,7 +993,7 @@
     <input type="number" id="maxSqm" placeholder="max" oninput="applyFilters()">
   </div>
   <div class="range-group">
-    <span>�Ŀ�</span>
+    <span>�?�</span>
     <input type="number" id="minYear" placeholder="���" oninput="applyFilters()">
     <span></span>
     <input type="number" id="maxYear" placeholder="���" oninput="applyFilters()">
@@ -1003,27 +1003,27 @@
 <div class="controls">
   <div class="search-wrap">
     <span class="search-icon">=</span>
-    <input type="text" id="search" placeholder="�����ķ÷ �����Ǯ�, �����, ��ïķ..." oninput="applyFilters()">
+    <input type="text" id="search" placeholder="�����7� �������, �����, ���7..." oninput="applyFilters()">
   </div>
   <select id="filterLocation" onchange="applyFilters()">
-    <option value="">���� �� �����ǭ�</option>
+    <option value="">���� �� �������</option>
   </select>
   <select id="filterType" onchange="applyFilters()">
     <option value="">���� �� �����</option>
   </select>
   <select id="filterEnergy" onchange="applyFilters()">
-    <option value="">���������� ���÷</option>
+    <option value="">���������� ����</option>
     <option value="A">A+ / A++ / A</option>
     <option value="B">B</option>
     <option value="C">C</option>
     <option value="D">D</option>
-    <option value="E">E � Ǳ����ĵ��</option>
+    <option value="E">E � �����5��</option>
   </select>
   <select id="filterHeating" onchange="applyFilters()">
-    <option value="">������÷</option>
-    <option value="�����">��ù�� �����</option>
+    <option value="">�������</option>
+    <option value="�����">����� �����</option>
     <option value="���������">���������</option>
-    <option value="��Ļ��">��Ļ�� ������÷�</option>
+    <option value="��;��">��;�� ��������</option>
   </select>
   <div class="upload-zone" id="dropzone"
        onclick="document.getElementById('csvInput').click()"
@@ -1032,29 +1032,29 @@
        ondrop="handleDrop(event)"
        style="flex:1;margin:0;padding:5px 12px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px">
     <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
-    <div class="upload-text" style="font-size:11px;white-space:nowrap">=� ���ø��� �������ɽ ��� ���� ���������</div>
+    <div class="upload-text" style="font-size:11px;white-space:nowrap">=� ������� �������} ��� ���� ���������</div>
     <div class="upload-sub" style="font-size:10px;white-space:nowrap">���� � ������� � CSV ��� XE, Nodaliste �.��.</div>
   </div>
   <div class="view-toggle">
     <button class="view-btn active" id="gridBtn" onclick="setView('grid')">� Grid</button>
     <button class="view-btn" id="listBtn" onclick="setView('list')">a List</button>
-    <button class="view-btn" id="mapBtn" onclick="setView('map')">=� ���ķ�</button>
+    <button class="view-btn" id="mapBtn" onclick="setView('map')">=� ���7�</button>
   </div>
 </div>
 
 <div class="sort-row">
-  <span>�����̼�÷:</span>
+  <span>�����<��:</span>
   <button class="sort-btn active" data-sort="price-asc" onclick="setSort(this,'price-asc')">���� �</button>
   <button class="sort-btn" data-sort="price-desc" onclick="setSort(this,'price-desc')">���� �</button>
   <button class="sort-btn" data-sort="sqm-desc" onclick="setSort(this,'sqm-desc')">�.�. �</button>
   <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">�/�.�. �</button>
-  <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">���ĵ��</button>
-  <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">����Ʊķ ����.</button>
+  <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">���5��</button>
+  <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">�����7 ����.</button>
 </div>
 
 <div class="show-deleted-wrap">
   <input type="checkbox" id="showDeleted" class="toggle-check" onchange="applyFilters()">
-  <label for="showDeleted">��Ƭ��÷ ������ν �� X (������������/������ȷ)</label>
+  <label for="showDeleted">������ ������� �� X (������������/������7)</label>
 </div>
 
 
@@ -1063,7 +1063,7 @@
 <div id="main-content">
   <div class="loading">
     <div class="loading-spinner"></div>
-    �����÷ �������ɽ ��� ķ ��÷...
+    ������ �������} ��� 7 ���...
   </div>
 </div>
 
@@ -1088,10 +1088,10 @@
 
 <!-- COMPARE BAR -->
 <div class="compare-bar" id="compareBar">
-  <strong style="font-size:12px;color:var(--text2);white-space:nowrap">�ͳ���÷:</strong>
+  <strong style="font-size:12px;color:var(--text2);white-space:nowrap">�s����:</strong>
   <div class="compare-items" id="compareItems"></div>
-  <button class="compare-clear" onclick="clearCompare()"> ������ü��</button>
-  <button class="compare-btn" onclick="openCompareModal()">�ͳ���÷ �</button>
+  <button class="compare-clear" onclick="clearCompare()"> ���������</button>
+  <button class="compare-btn" onclick="openCompareModal()">�s���� �</button>
 </div>
 
 <!-- NEW CLICK-TO-GROUP SELECTION BAR -->
@@ -1099,11 +1099,11 @@
   <div class="grouping-info">
     <span style="font-size:16px">=</span>
     <div>
-      <div style="font-weight:600;color:var(--accent)">�����Ǹ��� ������� ��� ���÷</div>
+      <div style="font-weight:600;color:var(--accent)">��������� ������� ��� ����</div>
       <div id="groupingBarDetails" style="font-size:11px;color:var(--text2)"></div>
     </div>
   </div>
-  <button class="grouping-cancel" onclick="cancelGroupingSelection()"> �����÷</button>
+  <button class="grouping-cancel" onclick="cancelGroupingSelection()"> ������</button>
 </div>
 
 <div class="modal-overlay" id="detailModal" onclick="if(event.target===this)closeModal()">
@@ -1193,8 +1193,8 @@ function pushAction(a){
 }
 function _upUndoRedo(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
-  if(u){u.disabled=!ACTION_STACK.length;u.title=ACTION_STACK.length?`������÷: ${ACTION_STACK[ACTION_STACK.length-1].label} (Ctrl+Z)`:'������÷ (Ctrl+Z)';}
-  if(r){r.disabled=!REDO_STACK.length;r.title=REDO_STACK.length?`�������ȷ: ${REDO_STACK[REDO_STACK.length-1].label} (Ctrl+Y)`:'�������ȷ (Ctrl+Y)';}
+  if(u){u.disabled=!ACTION_STACK.length;u.title=ACTION_STACK.length?`�������: ${ACTION_STACK[ACTION_STACK.length-1].label} (Ctrl+Z)`:'������� (Ctrl+Z)';}
+  if(r){r.disabled=!REDO_STACK.length;r.title=REDO_STACK.length?`�������7: ${REDO_STACK[REDO_STACK.length-1].label} (Ctrl+Y)`:'�������7 (Ctrl+Y)';}
 }
 async function undoAction(){if(!ACTION_STACK.length)return;const a=ACTION_STACK.pop();REDO_STACK.push(a);showToast(`� ${a.label}`);try{await a.undo();}catch(e){showToast('L');}_upUndoRedo();}
 async function redoAction(){if(!REDO_STACK.length)return;const a=REDO_STACK.pop();ACTION_STACK.push(a);showToast(`� ${a.label}`);try{await a.redo();}catch(e){showToast('L');}_upUndoRedo();}
@@ -1223,7 +1223,7 @@ async function loadData() {
   document.querySelector('.refresh-btn').disabled = true;
   window._savedScroll = window.scrollY;
   document.getElementById('main-content').innerHTML = `
-    <div class="loading"><div class="loading-spinner"></div>�����÷ �������ɽ...</div>`;
+    <div class="loading"><div class="loading-spinner"></div>������ �������}...</div>`;
 
   const inSandbox = window.location.href === 'about:blank' ||
                     window.location.hostname === '' ||
@@ -1234,10 +1234,10 @@ async function loadData() {
     document.getElementById('main-content').innerHTML = `
       <div class="empty" style="max-width:480px;margin:0 auto;text-align:center">
         <div style="font-size:48px;margin-bottom:16px">=�</div>
-        <div style="font-size:16px;color:var(--text);font-weight:600;margin-bottom:10px">������ Ŀ ��ǵ�� �Ŀ� browser ÿ�</div>
+        <div style="font-size:16px;color:var(--text);font-weight:600;margin-bottom:10px">������ ? ����� �?� browser ��</div>
         <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">
-          �� Supabase ��� ��������� �����÷ ��ñ �Ŀ� Claude viewer �̳� CORS.<br>
-          ��ĭ��õ Ŀ ��ǵ�� ��� ������ Ŀ ���Ÿ���� �Ŀ Chrome/Firefox.
+          �� Supabase ��� ��������� ������ ��� �?� Claude viewer �3� CORS.<br>
+          ��-��� ? ����� ��� ������ ? ���x���� �? Chrome/Firefox.
         </div>
       </div>`;
     document.querySelector('.refresh-btn').disabled = false;
@@ -1249,13 +1249,13 @@ async function loadData() {
 
 async function tryFetch() {
   document.getElementById('main-content').innerHTML = `
-    <div class="loading"><div class="loading-spinner"></div>�����÷ �������ɽ ��� Ŀ Supabase...</div>`;
+    <div class="loading"><div class="loading-spinner"></div>������ �������} ��� ? Supabase...</div>`;
   try {
     const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc`, {
       method: 'GET',
       headers: sb.headers()
     });
-    if (!resp.ok) throw new Error(`�Ƭ��� ��÷�: ${resp.status} ${resp.statusText}`);
+    if (!resp.ok) throw new Error(`����� ����: ${resp.status} ${resp.statusText}`);
     const data = await resp.json();
     
     allListings = data.map(item => ({
@@ -1272,8 +1272,8 @@ async function tryFetch() {
 
     if (!allListings.length) {
       document.getElementById('main-content').innerHTML = `
-        <div class="empty">=� � ��÷ �������ɽ ����� ����.<br>
-        <small style="color:var(--text3)">�����õ ��� ��ǵ�� CSV �������� ��� �� ��ì���� ��������.</small>
+        <div class="empty">=� � ��� �������} ����� ����.<br>
+        <small style="color:var(--text3)">������ ��� ����� CSV �������� ��� �� ������� ��������.</small>
         </div>`;
     } else {
       buildUI();
@@ -1282,9 +1282,9 @@ async function tryFetch() {
     document.getElementById('main-content').innerHTML =
       `<div class="empty">L ${e.message}<br>
        <small style="color:var(--text3);margin-top:8px;display:block">
-         �����ĵ ı SUPABASE_URL ��� SUPABASE_ANON credentials �Ŀ� �δ���.
+         �����5 1 SUPABASE_URL ��� SUPABASE_ANON credentials �?� �����.
        </small>
-       <button onclick="tryFetch()" style="margin-top:12px;background:var(--accent);color:#000;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600">� ������õ ����</button>
+       <button onclick="tryFetch()" style="margin-top:12px;background:var(--accent);color:#000;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600">� ������� ����</button>
       </div>`;
   }
   document.querySelector('.refresh-btn').disabled = false;
@@ -1303,18 +1303,18 @@ function parseCSV(text, defaultPlatform) {
 
     const get = (...keys) => { for (const k of keys) if (obj[k]) return obj[k]; return ''; };
 
-    const priceRaw = get('Ĺ��','price','Ĺ��');
+    const priceRaw = get('9��','price','9��');
     const sqmRaw   = get('�.�._','�.�.','sqm','sqm_');
-    const yearRaw  = get('build','year','�Ŀ�','�Ŀ�');
-    const ppmRaw   = get('Ĺ��/�.�.','Ĺ��/�.�.','price_sqm','�/�.�.');
+    const yearRaw  = get('build','year','�?�','�?�');
+    const ppmRaw   = get('9��/�.�.','9��/�.�.','price_sqm','�/�.�.');
 
     return {
       id:         get('house_id','id') || String(i+1),
       house_id:   get('house_id','id'),
-      location:   get('location','�����Ǯ','�����Ƿ'),
-      type:       get('type_of_house','�����_��Ŀ�����','type','�����'),
+      location:   get('location','������','������'),
+      type:       get('type_of_house','�����_��?�����','type','�����'),
       url:        get('url',' url'),
-      rooms:      get('rooms','�����ɼ�Ĺ�','�ɼ�Ĺ�'),
+      rooms:      get('rooms','�����|�9�','�|�9�'),
       baths:      get('������','������','baths'),
       sqm:        parseSqm(sqmRaw),
       sqmRaw:     sqmRaw,
@@ -1323,19 +1323,19 @@ function parseCSV(text, defaultPlatform) {
       priceRaw:   priceRaw,
       pricePerSqm: parsePpm(ppmRaw),
       platform:   get('platform','m41','���������') || defaultPlatform,
-      floor:      get('���ƿ�','floor','���ƿ�'),
+      floor:      get('�����','floor','�����'),
       lvl:        get('lvl'),
-      energy:     get('����������_���÷','energy','����������_���÷'),
-      heating:    get('������÷','heating','������÷'),
-      notes:      get('extra_notes','notes','÷����õ��'),
-      available:  get('�����ù��_���_','available'),
-      agency:     get('��ùĹ��','agency','��ùĹ��'),
+      energy:     get('����������_����','energy','����������_����'),
+      heating:    get('�������','heating','�������'),
+      notes:      get('extra_notes','notes','��������'),
+      available:  get('��������_���_','available'),
+      agency:     get('���9��','agency','���9��'),
       agencyNr:   get('agency_nr'),
       deleted:    (() => { const _v = get('deleted'); return _v === true || String(_v).toUpperCase() === 'X'; })(),
       unfavorited: (() => { const _v = get('deleted'); return _v === false; })(),
       imageUrl:   get('image_url','image','thumbnail'),
-      published:  get('����ï��÷_��������','published'),
-      updated:    get('ĵ���ı��_�������÷','updated'),
+      published:  get('��������_��������','published'),
+      updated:    get('5���1��_��������','updated'),
       platformNr: get('platform_nr'),
     };
   }).filter(h => h.location || h.url);
@@ -1359,7 +1359,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
   let finalHid = (targetHouseId||'').trim();
   if (!finalHid || finalHid==='0') {
     finalHid = "group_" + Date.now();
-    try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("Σφάλμα"); return; }
+    try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("�Ƭ���"); return; }
     if(th) th.house_id=finalHid;
   }
   for(const id of [...multiSelectedIds]){
@@ -1371,7 +1371,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
     }catch(e){console.error("link err",id,e);}
   }
   multiSelectMode=false; multiSelectedIds.clear(); selectedGroupSource=null;
-  showToast("✓ Συνδέθηκαν!"); renderListings(); tryFetch();
+  showToast(" �Ž�������!"); renderListings(); tryFetch();
 }
 
 //    LIVE DB GROUPING HANDLERS                                              
@@ -1383,8 +1383,8 @@ async function ungroupListing(dbId) {
     pushAction({label:` ${h?h.location:dbId}`,
       undo:async()=>{await sb.update(dbId,{house_id:prev});if(h)h.house_id=prev;await tryFetch();},
       redo:async()=>{await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";await tryFetch();}});
-    showToast(" ����Ž������!");renderListings();tryFetch();
-  }catch(e){showToast("L �Ƭ��� ����ͽ��÷�");}
+    showToast(" ����}������!");renderListings();tryFetch();
+  }catch(e){showToast("L ����� ����}����");}
 }
 
 // Select a single item to initiate a quick grouping flow
@@ -1394,10 +1394,10 @@ function selectListingForGrouping(url) {
   selectedGroupSource = h;
   
   const bar = document.getElementById('groupingBar');
-  document.getElementById('groupingBarDetails').textContent = `${h.location} (${h.sqm} �.�.)  �${h.price.toLocaleString('el')} [${h.agency || '����ķ�'}]`;
+  document.getElementById('groupingBarDetails').textContent = `${h.location} (${h.sqm} �.�.)  �${h.price.toLocaleString('el')} [${h.agency || '����7�'}]`;
   bar.classList.add('open');
   
-  showToast("= ������ĵ ���� ��� ���� ������� � group ��� ���÷");
+  showToast("= ������5 ���� ��� ���� ������� � group ��� ����");
   renderListings();
 }
 
@@ -1420,7 +1420,7 @@ async function executeQuickGroup(targetDbId, targetHouseId) {
       // Update the target listing first
       await sb.update(targetDbId, { house_id: finalHouseId });
     } catch(err) {
-      showToast("L �Ƭ��� ��Ĭ ķ ���������� Group");
+      showToast("L ����� ��, 7 ���������� Group");
       return;
     }
   }
@@ -1428,12 +1428,12 @@ async function executeQuickGroup(targetDbId, targetHouseId) {
   // Update the source listing to match the final group ID
   try {
     await sb.update(selectedGroupSource._dbId, { house_id: finalHouseId });
-    showToast(`= �����Ǯ� ���÷ �Ŀ Group #${finalHouseId}!`);
+    showToast(`= ������� ���� �? Group #${finalHouseId}!`);
     selectedGroupSource = null;
     document.getElementById('groupingBar').classList.remove('open');
     await tryFetch();
   } catch(e) {
-    showToast("L �Ƭ��� ��Ĭ ķ� ���÷");
+    showToast("L ����� ��, 7� ����");
   }
 }
 
@@ -1486,7 +1486,7 @@ function buildUI() {
   const types = [...new Set(combined.map(h => h.type).filter(Boolean))].sort();
   const locSel = document.getElementById('filterLocation');
   const savedLoc = locSel.value;
-  locSel.innerHTML = '<option value="">���� �� �����ǭ�</option>' + locations.map(l => `<option>${l}</option>`).join('');
+  locSel.innerHTML = '<option value="">���� �� �������</option>' + locations.map(l => `<option>${l}</option>`).join('');
   if (savedLoc) locSel.value = savedLoc;
   const typSel = document.getElementById('filterType');
   const savedTyp = typSel.value;
@@ -1561,7 +1561,7 @@ function applyFilters() {
     return 0;
   });
 
-  document.getElementById('resultsCount').textContent = `${filtered.length} �������� ��Ʊ�����ı�`;
+  document.getElementById('resultsCount').textContent = `${filtered.length} �������� ��������1�`;
   renderListings();
 }
 
@@ -1630,13 +1630,13 @@ function renderListings() {
       document.body.appendChild(b);}
     if(multiSelectMode){
       b.style.display="flex";
-      b.innerHTML='<span style="color:var(--accent2);font-weight:600">☰ '+multiSelectedIds.size+' επιλεγμένα — κλικ → για σύνδεση</span>'+
-        '<button onclick="toggleMultiSelect()" style="background:var(--border);border:none;color:var(--text1);padding:5px 12px;border-radius:8px;cursor:pointer">✕ Ακύρωση</button>';}
+      b.innerHTML='<span style="color:var(--accent2);font-weight:600">0 '+multiSelectedIds.size+' ����������  ���� � ��� �ͽ��÷</span>'+
+        '<button onclick="toggleMultiSelect()" style="background:var(--border);border:none;color:var(--text1);padding:5px 12px;border-radius:8px;cursor:pointer"> �����÷</button>';}
     else if(b) b.style.display="none";
   })();
 
   const container = document.getElementById('main-content');
-  if (!filtered.length) { container.innerHTML = '<div class="empty">��� �������� �������� �� ��Ĭ ı Ư����.</div>'; return; }
+  if (!filtered.length) { container.innerHTML = '<div class="empty">��� �������� �������� �� ��, 1 �����.</div>'; return; }
   if (currentView === 'map') {
     container.innerHTML = `<div id="map-container"><div id="map"></div></div>`;
     setTimeout(initMap, 50); return;
@@ -1645,7 +1645,7 @@ function renderListings() {
     const { groupCards, singles } = groupByHouseId(filtered);
     const all = [...groupCards, ...singles];
     document.getElementById('resultsCount').textContent =
-      `${all.length} ���ĵ� � ${groupCards.length} ���Ĺ� � ${singles.length} �����ɼ����`;
+      `${all.length} ���5� � ${groupCards.length} ���9� � ${singles.length} �����|����`;
     container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
   if(window._savedScroll!==undefined){setTimeout(()=>{window.scrollTo(0,window._savedScroll);window._savedScroll=undefined;},30);}
     renderRejectedSection();
@@ -1669,14 +1669,14 @@ function renderGroupedCard(g) {
 
   const allFav    = g.items.every(h=>h.favorited);
   const allHidden = g.items.every(h=>h.hidden);
-  const agencyNames = [...new Set(g.items.map(h=>h.agency||'����ķ�'))].slice(0,3).join(' � ');
+  const agencyNames = [...new Set(g.items.map(h=>h.agency||'����7�'))].slice(0,3).join(' � ');
 
   let connectHtml = '';
   if (multiSelectMode) {
-    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">→ Σύνδεση εδώ</button>`;
+    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">� �ͽ��÷ ���</button>`;
   } else if (selectedGroupSource && selectedGroupSource.house_id !== g.houseId) {
     connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px"
-      onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">= ���÷ ���</button>`;
+      onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">= ���� ���</button>`;
   }
 
   return `<div class="grouped-card${allFav?' favorited':''}"
@@ -1703,7 +1703,7 @@ function renderGroupedCard(g) {
         ${g.year?`<span class="spec-tag"><� ${g.year}</span>`:''}
         ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
         ${g.heating&&g.heating.includes('�����')?`<span class="spec-tag">=% �����</span>`:''}
-        ${g.heating&&g.heating.includes('��Ļ��')?`<span class="spec-tag">h ��Ļ��</span>`:''}
+        ${g.heating&&g.heating.includes('��;��')?`<span class="spec-tag">h ��;��</span>`:''}
       </div>
       ${connectHtml}
     </div>
@@ -1712,10 +1712,10 @@ function renderGroupedCard(g) {
       <div class="group-action-btns">
         <span class="grp-btn${allFav?' active':''}"
           onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
-          title="${allFav?'�Ʊ���÷ ����������':'��������� ��� ̻��'}">${allFav?'':''}</span>
+          title="${allFav?'������ ����������':'��������� ��� ;��'}">${allFav?'':''}</span>
         <span class="grp-btn${allHidden?' active':''}"
           onclick="event.stopPropagation();toggleGroupHide('${g.houseId}')"
-          title="${allHidden?'��Ƭ��÷ ̻ɽ':'��̺��ȷ ̻ɽ'}">${allHidden?'�':''}</span>
+          title="${allHidden?'������ ;}':'��:��7 ;}'}">${allHidden?'�':''}</span>
         <span class="grp-btn open-all"
           onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',0)"
           title="�������">�</span>
@@ -1732,14 +1732,14 @@ function toggleExpandGroup(hid) {
 
 //    MAP                                                                    
 const GEO = {
-  '��ƹù�':      [38.0737, 23.8119], '�����ù':      [38.0565, 23.8000],
-  '��� ��Ÿ����': [38.0997, 23.8253], '��̽�ÿ�':     [38.1204, 23.8617],
-  '�����ù�':     [38.0440, 23.8350], '������ù�':    [38.0318, 23.8419],
-  '����ĵ��':     [38.0880, 23.8220], '��� ���ĭ��':  [38.0490, 23.8640],
-  '���ù�':       [38.1320, 23.8760], '�ı��ı':      [38.1156, 23.8920],
-  '������':       [38.1050, 23.8800], '�ź̲��÷':    [38.0700, 23.7780],
-  '��ͺ�':        [38.0600, 23.7980], '��������':     [38.0433, 23.7870],
-  '���� ����ú�Ů': [37.9980, 23.8195], '��������':     [38.0215, 23.7987],
+  '�����':      [38.0737, 23.8119], '������':      [38.0565, 23.8000],
+  '��� ��x����': [38.0997, 23.8253], '��=���':     [38.1204, 23.8617],
+  '�������':     [38.0440, 23.8350], '��������':    [38.0318, 23.8419],
+  '����5��':     [38.0880, 23.8220], '��� ���-��':  [38.0490, 23.8640],
+  '�����':       [38.1320, 23.8760], '�1��1':      [38.1156, 23.8920],
+  '������':       [38.1050, 23.8800], '�z2���':    [38.0700, 23.7780],
+  '��z�':        [38.0600, 23.7980], '��������':     [38.0433, 23.7870],
+  '���� ������n': [37.9980, 23.8195], '��������':     [38.0215, 23.7987],
   '�������':      [37.9972, 23.8742], '�������':      [37.9980, 23.8761],
 };
 
@@ -1808,7 +1808,7 @@ function initMap() {
       <div class="map-legend-item"><div class="map-dot" style="background:#5a9e78"></div> &lt; �300k</div>
       <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> �300k400k</div>
       <div class="map-legend-item"><div class="map-dot" style="background:#c97b6a"></div> &gt; �400k</div>
-      <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} �������� �Ŀ Ǭ�ķ</div>`;
+      <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} �������� �? ��7</div>`;
     return div;
   };
   legend.addTo(leafletMap);
@@ -1837,7 +1837,7 @@ function platformBadgeClass(p) {
   if (!p) return 'p-other';
   const low = p.toLowerCase();
   if (low.includes('spitogatos')) return 'p-spitogatos';
-  if (low.includes('xe') || low.includes('ǵ')) return 'p-xe';
+  if (low.includes('xe') || low.includes('�')) return 'p-xe';
   if (low.includes('nodaliste')) return 'p-nodaliste';
   return 'p-other';
 }
@@ -1855,11 +1855,11 @@ function renderCard(h) {
     if (selectedGroupSource) {
       // Show join target button if another item is selected
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="���÷ ���" aria-label="���÷ ���">=</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="���� ���" aria-label="���� ���">=</span>`;
       }
     } else {
       // Default state: select entry point
-      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="������� ��� ���÷" aria-label="������� ��� ���÷">=</span>`;
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="������� ��� ����" aria-label="������� ��� ����">=</span>`;
     }
   }
 
@@ -1891,13 +1891,13 @@ function renderCard(h) {
         ${h.year ? `<span class="spec-tag"><� ${h.year}</span>` : ''}
         ${h.energy ? `<span class="spec-tag"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></span>` : ''}
         ${h.heating && h.heating.includes('�����') ? `<span class="spec-tag">=% �����</span>` : ''}
-        ${h.heating && h.heating.includes('��Ļ��') ? `<span class="spec-tag">h ��Ļ��</span>` : ''}
+        ${h.heating && h.heating.includes('��;��') ? `<span class="spec-tag">h ��;��</span>` : ''}
       </div>
       <div class="card-footer" style="flex-wrap: wrap;">
         <span class="agency-name" title="${h.agency||''}">${h.agency || ''}</span>
         <div class="card-actions">
-          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="���Ŀ�������" aria-label="���Ŀ�������">=</span>
-          <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="�ͳ���÷" aria-label="�ͳ���÷">�</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="���?�������" aria-label="���?�������">=</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="�s����" aria-label="�s����">�</span>
           ${groupActionHtml}
           ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="������� link" aria-label="������� link">�</a>` : ''}
         </div>
@@ -1915,16 +1915,16 @@ function renderListItem(h) {
     if (multiSelectMode) {
       const msc = multiSelectedIds.has(h._dbId);
       groupActionHtml =
-        '<span class="action-btn icon-only' + (msc ? ' ms-active' : '') + '" onclick="event.stopPropagation();toggleMsSelect(\'' + h._dbId + '\')" title="Επιλογή" aria-label="Επιλογή">' + (msc ? '☑' : '☐') + '</span>' +
-        '<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo(\'' + h._dbId + '\',\'' + (h.house_id||'0') + '\')" title="Σύνδεση εδώ">→</span>';
+        '<span class="action-btn icon-only' + (msc ? ' ms-active' : '') + '" onclick="event.stopPropagation();toggleMsSelect(\'' + h._dbId + '\')" title="�������" aria-label="�������">' + (msc ? '' : '') + '</span>' +
+        '<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo(\'' + h._dbId + '\',\'' + (h.house_id||'0') + '\')" title="�ͽ��÷ ���">�</span>';
     } else if (selectedGroupSource) {
       // Show join target button
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Σύνδεση εδώ" aria-label="Σύνδεση εδώ">→</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="�ͽ��÷ ���" aria-label="�ͽ��÷ ���">�</span>`;
       }
     } else {
       // Default: enter multi-select mode
-      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();toggleMultiSelect()" title="Ομαδοποίηση / Σύνδεση" aria-label="Ομαδοποίηση">☰</span>`;
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();toggleMultiSelect()" title="���������÷ / �ͽ��÷" aria-label="���������÷">0</span>`;
     }
   }
 
@@ -1954,7 +1954,7 @@ function renderListItem(h) {
       <div class="list-ppm">${ppm?'�'+ppm+'/�.�.':''}</div>
       <div class="list-actions">
         <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')" title="���������" aria-label="���������">${isFav?'':''}</span>
-        <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="�ͳ���÷" aria-label="�ͳ���÷">�</span>
+        <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="�s����" aria-label="�s����">�</span>
         ${groupActionHtml}
         ${h.url?`<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="������� link" aria-label="������� link">�</a>`:''}
       </div>
@@ -1992,36 +1992,36 @@ function openModal(url) {
           ${h.url?`<span class="mab open-btn" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" title="������� ��������">� �������</span>`:''}
           <span class="mab fav-btn-m${isFav?' active':''}" id="modal-fav-btn"
             onclick="modalToggleFav('${escJ(key)}')"
-            title="${isFav?'�Ʊ���÷':'���������'}">
+            title="${isFav?'������':'���������'}">
             ${isFav?' ���������':' ���������'}
           </span>
           <span class="mab hide-btn-m${isHid?' active':''}" id="modal-hide-btn"
             onclick="modalToggleHide('${escJ(key)}')"
-            title="${isHid?'�����ƿ��':'��̺��ȷ'}">
-            ${isHid?'� �����ƿ��':' ��̺��ȷ'}
+            title="${isHid?'��������':'��:��7'}">
+            ${isHid?'� ��������':' ��:��7'}
           </span>
-          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="�ͳ���÷">� �ͳ���÷</span>
-          ${h.deleted ? `<span class="mab" style="color:var(--accent2);border-color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" title="��� ��Ż�����">� ��� ��Ż�����</span>` : ''}
+          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="�s����">� �s����</span>
+          ${h.deleted ? `<span class="mab" style="color:var(--accent2);border-color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" title="��� ��{�����">� ��� ��{�����</span>` : ''}
         </div>
       </div>
 
       <div class="modal-grid">
-        <div class="modal-field"><div class="modal-field-label">������ɽ���</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�ɼ�Ĺ�</div><div class="modal-field-value">${h.rooms||''} ${h.baths?'� '+h.baths+' ��':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�Ŀ� ��ıú�Ů�</div><div class="modal-field-value">${h.year||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">������÷</div><div class="modal-field-value">${h.heating||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">���������� ���÷</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:12px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
-        <div class="modal-field"><div class="modal-field-label">���ƿ� / �������</div><div class="modal-field-value">${h.floor||''} ${h.lvl?'� '+h.lvl+' �������':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">��ùĹ��</div><div class="modal-field-value">${h.agency||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�����ı�� ����.</div><div class="modal-field-value">${h.updated||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�����ù��</div><div class="modal-field-value">${h.available||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">������}���</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�|�9�</div><div class="modal-field-value">${h.rooms||''} ${h.baths?'� '+h.baths+' ��':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�?� ��1��n�</div><div class="modal-field-value">${h.year||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�������</div><div class="modal-field-value">${h.heating||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">���������� ����</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:12px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">����� / �������</div><div class="modal-field-value">${h.floor||''} ${h.lvl?'� '+h.lvl+' �������':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">���9��</div><div class="modal-field-value">${h.agency||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�����1�� ����.</div><div class="modal-field-value">${h.updated||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">��������</div><div class="modal-field-value">${h.available||''}</div></div>
         <div class="modal-field"><div class="modal-field-label">��������� ����</div><div class="modal-field-value">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:24px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.2)'};margin:0 2px;transition:color 0.15s;" onmouseover="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=j<${i}?'#d4a853':'rgba(255,255,255,0.2)')" onmouseout="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=(${h.personal_score}||0)>j?'#d4a853':'rgba(255,255,255,0.2)')">${(h.personal_score||0)>=i?'':''}</span>`).join('')}</div></div>
-        <div class="modal-field"><div class="modal-field-label">��. ���ú�ȷ�</div><div class="modal-field-value">${h.visit_date || ''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">��. �����7�</div><div class="modal-field-value">${h.visit_date || ''}</div></div>
         <div class="modal-field"><div class="modal-field-label">��. ��������</div><div class="modal-field-value">${h.platformNr||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">��. ��ïķ</div><div class="modal-field-value">${h.agencyNr||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">��. ���7</div><div class="modal-field-value">${h.agencyNr||''}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">=� <strong>������õ�� ����������:</strong> ${h.notes}</div>`:''}
-      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">=� ���������� ������õ��</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">=� ��������÷</button></div>
+      ${h.notes?`<div class="modal-notes">=� <strong>��������� ����������:</strong> ${h.notes}</div>`:''}
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">=� ���������� ���������</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">=� ���������</button></div>
     </div>`;
   document.getElementById('detailModal').classList.add('open');
 }
@@ -2036,7 +2036,7 @@ function modalToggleFav(key) {
   pushAction({label:h.favorited?` ${h.location}`:` ${h.location}`,
     undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
     redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
-  showToast(h.favorited?' ���������':' �Ʊ�������');
+  showToast(h.favorited?' ���������':' ���������');
 }
 
 function modalToggleHide(key) {
@@ -2044,11 +2044,11 @@ function modalToggleHide(key) {
   const prev=h.hidden;h.hidden=!prev;
   if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
   const btn=document.getElementById('modal-hide-btn');
-  if(btn){btn.classList.toggle('active',h.hidden);btn.textContent=h.hidden?'� �����ƿ��':' ��̺��ȷ';}
+  if(btn){btn.classList.toggle('active',h.hidden);btn.textContent=h.hidden?'� ��������':' ��:��7';}
   pushAction({label:h.hidden?` ${h.location}`:`� ${h.location}`,
     undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
     redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
-  showToast(h.hidden?' ����ķ��':'� ��Ʊ����ı� ����');
+  showToast(h.hidden?' ����7��':'� �������1� ����');
   applyFilters();
 }
 
@@ -2061,18 +2061,18 @@ function toggleFav(key) {
   pushAction({label:(!prev?' ':'  ')+(h?h.location:''),
     undo:async()=>{if(h&&h._dbId){h.favorited=prev;await sb.update(h._dbId,{favorited:prev});}else{if(prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();},
     redo:async()=>{if(h&&h._dbId){h.favorited=!prev;await sb.update(h._dbId,{favorited:!prev});}else{if(!prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();}});
-  showToast(!prev?' ���������':' �Ʊ�������');
+  showToast(!prev?' ���������':' ���������');
   applyFilters();
 }
 
 //    COMPARE                                                                
 function addToCompare(url) {
   const h = getByUrl(url); if (!h) return;
-  if (compareList.find(c => c.url === url)) { showToast('��� �ķ ���ı �ͳ���÷�'); return; }
-  if (compareList.length >= 4) { showToast('�����Ŀ 4 �������� ��� �ͳ���÷'); return; }
+  if (compareList.find(c => c.url === url)) { showToast('��� �7 ���1 �s�����'); return; }
+  if (compareList.length >= 4) { showToast('�����? 4 �������� ��� �s����'); return; }
   compareList.push(h);
   renderCompareBar();
-  showToast('� ����ĭ���� �ķ �ͳ���÷');
+  showToast('� ����-���� �7 �s����');
 }
 function removeFromCompare(url) { compareList = compareList.filter(h => h.url !== url); renderCompareBar(); }
 function clearCompare() { compareList = []; renderCompareBar(); }
@@ -2085,9 +2085,9 @@ function renderCompareBar() {
 function openCompareModal() {
   if (!compareList.length) return;
   const fields = [
-    ['��Ŀ���Ư�','img'],['����','price'],['�.�.','sqmRaw'],['�/�.�.','pricePerSqm'],
-    ['�����','type'],['�Ŀ�','year'],['������÷','heating'],['��������','energy'],
-    ['�ɼ�Ĺ�','rooms'],['���ƿ�','floor'],['��ùĹ��','agency'],
+    ['��?�����','img'],['����','price'],['�.�.','sqmRaw'],['�/�.�.','pricePerSqm'],
+    ['�����','type'],['�?�','year'],['�������','heating'],['��������','energy'],
+    ['�|�9�','rooms'],['�����','floor'],['���9��','agency'],
   ];
   const prices = compareList.map(h=>h.price).filter(Boolean);
   const ppms   = compareList.map(h=>h.pricePerSqm||(h.sqm>0&&h.price>0?Math.round(h.price/h.sqm):0)).filter(Boolean);
@@ -2099,10 +2099,10 @@ function openCompareModal() {
   });
 
   let html = `<div class="compare-modal">
-    <button class="close-compare" onclick="closeCompareModal()"> ����ù��</button>
-    <h2>=� �ͳ���÷ ${compareList.length} ������ν</h2>
+    <button class="close-compare" onclick="closeCompareModal()"> �������</button>
+    <h2>=� �s���� ${compareList.length} �������</h2>
     <div style="overflow-x:auto"><table class="compare-table">
-    <thead><tr><th>�����ķ���Ĺ��</th>${cols.map(h=>`<th>${h.location}<br><small style="color:var(--text3)">${h.type||''}</small></th>`).join('')}</tr></thead>
+    <thead><tr><th>�����7���9��</th>${cols.map(h=>`<th>${h.location}<br><small style="color:var(--text3)">${h.type||''}</small></th>`).join('')}</tr></thead>
     <tbody>`;
   fields.forEach(([label, key]) => {
     html += `<tr><td>${label}</td>`;
@@ -2141,20 +2141,20 @@ function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(fi
 //    THUMBNAIL FIX IMPORT                                                   
 async function processThumbnailFix(text) {
   const lines = text.trim().split('\n');
-  if (lines.length < 2) { showToast('L ���� ��ǵ��'); return; }
+  if (lines.length < 2) { showToast('L ���� �����'); return; }
 
   // Parse header
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
   const urlIdx = headers.findIndex(h => h === 'url');
   const imgIdx = headers.findIndex(h => h === 'new_image_url');
-  if (urlIdx < 0 || imgIdx < 0) { showToast('L ����� format  �������ı� url + new_image_url'); return; }
+  if (urlIdx < 0 || imgIdx < 0) { showToast('L ����� format  �������1� url + new_image_url'); return; }
 
   const fixes = lines.slice(1).map(line => {
     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
     return { url: cols[urlIdx], imageUrl: cols[imgIdx] };
   }).filter(f => f.url && f.imageUrl);
 
-  showToast(`=� �������÷ ${fixes.length} ��Ŀ���ƹν...`);
+  showToast(`=� �������� ${fixes.length} ��?�����...`);
   let updated = 0, errors = 0;
 
   for (const fix of fixes) {
@@ -2172,7 +2172,7 @@ async function processThumbnailFix(text) {
     } catch(e) { errors++; }
   }
 
-  showToast(` ${updated} ��Ŀ���Ư�� ������θ����${errors?' � L '+errors+' �Ƭ���ı':''}`, null, 5000);
+  showToast(` ${updated} ��?������ �����������${errors?' � L '+errors+' �����1':''}`, null, 5000);
   renderListings();
 }
 
@@ -2189,11 +2189,11 @@ function processFile(file) {
     }
 
     const rows = parseCSV(text, 'Spitogatos');
-    if (!rows.length) { showToast('L ��� �������� �����ƭ�'); return; }
+    if (!rows.length) { showToast('L ��� �������� �������'); return; }
 
     // Show progress toast
     const total = rows.filter(r => r.url).length;
-    showToast(`=� ��ñ�ɳ� ${total} ������ν �ķ ��÷...`);
+    showToast(`=� ����s� ${total} ������� �7 ���...`);
 
     let added=0, updated=0, unchanged=0, errors=0;
     const changes = []; // track what changed for summary
@@ -2287,9 +2287,9 @@ function processFile(file) {
     // Summary toast
     const parts = [];
     if (added)     parts.push(` ${added} ����`);
-    if (updated)   parts.push(`= ${updated} ������θ����`);
-    if (unchanged) parts.push(` ${unchanged} ���Ĭ���ĵ�`);
-    if (errors)    parts.push(`L ${errors} �Ƭ���ı`);
+    if (updated)   parts.push(`= ${updated} �����������`);
+    if (unchanged) parts.push(` ${unchanged} ���,���5�`);
+    if (errors)    parts.push(`L ${errors} �����1`);
     showToast(parts.join(' � '), null, 6000);
 
     // Show change summary if any
@@ -2298,7 +2298,7 @@ function processFile(file) {
       const priceChanges = changes.filter(c=>c.priceChanged);
       if (priceChanges.length) {
         setTimeout(()=>showToast(
-          `=� ${priceChanges.length} ������� Ĺ���  ��� console ��� ���Ŀ�������`, null, 5000
+          `=� ${priceChanges.length} ������� 9���  ��� console ��� ���?�������`, null, 5000
         ), 200);
       }
     }
@@ -2450,7 +2450,7 @@ function _renderOvl(){
   const rEl=document.getElementById('loRight');
   if(rest.length){
     rEl.style.display='flex';
-    document.getElementById('loCarouselTitle').textContent=`��̻����� �������� ${rest.length}`;
+    document.getElementById('loCarouselTitle').textContent=`��;����� �������� ${rest.length}`;
     document.getElementById('loNavPrev').classList.toggle('disabled',_loFeatIdx===0);
     document.getElementById('loNavNext').classList.toggle('disabled',_loFeatIdx===_loSiblings.length-1);
     document.getElementById('loCarousel').innerHTML=rest.map((s,i)=>_sibHTML(s,i)).join('');
@@ -2493,7 +2493,7 @@ function _featHTML(h){
       <button onclick="savePhotoUrl('${escJ(key)}')"
         style="background:var(--accent);color:#0f0e0c;border:none;border-radius:5px;
                padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;
-               font-family:'DM Sans',sans-serif;white-space:nowrap">=� ��������÷</button>
+               font-family:'DM Sans',sans-serif;white-space:nowrap">=� ���������</button>
     </div>
     <div class="modal-body">
       <div class="modal-title">${h.location||''} <span style="color:var(--text2);font-size:16px">� ${h.type||''}</span></div>
@@ -2510,31 +2510,31 @@ function _featHTML(h){
           <span class="modal-btn${isFav?' active':''}" id="lo-fav" style="cursor:pointer"
             onclick="loToggleFav('${escJ(key)}')">${isFav?' ���������':' ���������'}</span>
           <span class="modal-btn${isHid?' active':''}" id="lo-hide" style="cursor:pointer;${isHid?'border-color:var(--red);color:var(--red)':''}"
-            onclick="loToggleHide('${escJ(key)}')">${isHid?'� �����ƿ��':' ��̺��ȷ'}</span>
+            onclick="loToggleHide('${escJ(key)}')">${isHid?'� ��������':' ��:��7'}</span>
           <span class="modal-btn" style="cursor:pointer"
-            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">� �ͳ���÷</span>
-          ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >� ��� ��Ż�����</span>` : ''}
+            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">� �s����</span>
+          ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >� ��� ��{�����</span>` : ''}
         </div>
       </div>
       <div class="modal-grid">
-        <div class="modal-field"><div class="modal-field-label">������ɽ���</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�ɼ�Ĺ�</div><div class="modal-field-value">${h.rooms||''} ${h.baths?'� '+h.baths+' ��':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�Ŀ� ��ıú�Ů�</div><div class="modal-field-value">${h.year||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">������÷</div><div class="modal-field-value">${h.heating||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">���������� ���÷</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:11px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
-        <div class="modal-field"><div class="modal-field-label">���ƿ� / �������</div><div class="modal-field-value">${h.floor||''} ${h.lvl?'� '+h.lvl+' ����.':''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">��ùĹ��</div><div class="modal-field-value">${h.agency||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�����ı�� ����.</div><div class="modal-field-value">${h.updated||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">�����ù��</div><div class="modal-field-value">${h.available||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">������}���</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�|�9�</div><div class="modal-field-value">${h.rooms||''} ${h.baths?'� '+h.baths+' ��':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�?� ��1��n�</div><div class="modal-field-value">${h.year||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�������</div><div class="modal-field-value">${h.heating||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">���������� ����</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:11px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">����� / �������</div><div class="modal-field-value">${h.floor||''} ${h.lvl?'� '+h.lvl+' ����.':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">���9��</div><div class="modal-field-value">${h.agency||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">�����1�� ����.</div><div class="modal-field-value">${h.updated||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">��������</div><div class="modal-field-value">${h.available||''}</div></div>
         <div class="modal-field"><div class="modal-field-label">��. ��������</div><div class="modal-field-value">${h.platformNr||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">��. ��ïķ</div><div class="modal-field-value">${h.agencyNr||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">��. ���7</div><div class="modal-field-value">${h.agencyNr||''}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">=� <strong>������õ�� ����������:</strong> ${h.notes}</div>`:''}
+      ${h.notes?`<div class="modal-notes">=� <strong>��������� ����������:</strong> ${h.notes}</div>`:''}
       <div style="margin-top:8px">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">P �����̳�÷</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">P �����3��</div>
         <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'':''}</span>`).join('')}</div>
       </div>
-      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">=� ���������� ������õ��</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">=� ��������÷</button></div>
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">=� ���������� ���������</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">=� ���������</button></div>
     </div>`;
 }
 
@@ -2571,7 +2571,7 @@ function _sibHTML(s, ri) {
         <div class="lo-sib-btns">
           <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="���������">${isFav?'':''}</span>
           ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="�������">�</span>`:''}
-          ${s._dbId?`<span class="action-btn icon-only" onclick="event.stopPropagation();ungroupListing('${s._dbId}')" title=" ����ͽ��÷ ��� group" style="color:var(--red);border-color:var(--red)"></span>`:''}
+          ${s._dbId?`<span class="action-btn icon-only" onclick="event.stopPropagation();ungroupListing('${s._dbId}')" title=" ����}��� ��� group" style="color:var(--red);border-color:var(--red)"></span>`:''}
         </div>
       </div>
     </div>
@@ -2588,7 +2588,7 @@ function loToggleFav(key){
     redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
   const b=document.getElementById('lo-fav');
   if(b){b.textContent=h.favorited?' ���������':' ���������';b.classList.toggle('active',h.favorited);}
-  showToast(h.favorited?' ���������':' �Ʊ�������');
+  showToast(h.favorited?' ���������':' ���������');
 }
 
 function loToggleHide(key){
@@ -2599,8 +2599,8 @@ function loToggleHide(key){
     undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
     redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
   const b=document.getElementById('lo-hide');
-  if(b){b.textContent=h.hidden?'� �����ƿ��':' ��̺��ȷ';b.style.borderColor=h.hidden?'var(--red)':'';b.style.color=h.hidden?'var(--red)':'';}
-  showToast(h.hidden?' ����ķ��':'� ��Ʊ����ı� ����');
+  if(b){b.textContent=h.hidden?'� ��������':' ��:��7';b.style.borderColor=h.hidden?'var(--red)':'';b.style.color=h.hidden?'var(--red)':'';}
+  showToast(h.hidden?' ����7��':'� �������1� ����');
   if(h.hidden)applyFilters();
 }
 
@@ -2613,7 +2613,7 @@ async function toggleGroupFav(houseId){
   pushAction({label:nv?` Group #${houseId}`:` Group #${houseId}`,
     undo:async()=>{for(const {h,p} of prev){h.favorited=p;if(h._dbId)await sb.update(h._dbId,{favorited:p});}renderListings();},
     redo:async()=>{for(const {h} of prev){h.favorited=nv;if(h._dbId)await sb.update(h._dbId,{favorited:nv});}renderListings();}});
-  showToast(nv?' ��������� ��� ̻��':' �Ʊ�������');renderListings();
+  showToast(nv?' ��������� ��� ;��':' ���������');renderListings();
 }
 
 async function toggleGroupHide(houseId){
@@ -2624,7 +2624,7 @@ async function toggleGroupHide(houseId){
   pushAction({label:nv?` Group #${houseId}`:`� Group #${houseId}`,
     undo:async()=>{for(const {h,p} of prev){h.hidden=p;if(h._dbId)await sb.update(h._dbId,{hidden:p});}applyFilters();},
     redo:async()=>{for(const {h} of prev){h.hidden=nv;if(h._dbId)await sb.update(h._dbId,{hidden:nv});}applyFilters();}});
-  showToast(nv?' ����ķ��� ̻��':'� ��Ʊ�����ı� ����');applyFilters();
+  showToast(nv?' ����7��� ;��':'� ��������1� ����');applyFilters();
 }
 
 // Keyboard nav
@@ -2651,17 +2651,17 @@ async function savePhotoUrl(key) {
   if (h._dbId) {
     try {
       await sb.update(h._dbId, { image_url: newUrl });
-      showToast('=� ��Ŀ���Ư� ������θ���!');
+      showToast('=� ��?����� ����������!');
       pushAction({
-        label: `=� ��Ŀ���Ư�: ${h.location}`,
+        label: `=� ��?�����: ${h.location}`,
         undo: async () => { h.imageUrl=prev; if(h._dbId) await sb.update(h._dbId,{image_url:prev}); _renderOvl(); },
         redo: async () => { h.imageUrl=newUrl; if(h._dbId) await sb.update(h._dbId,{image_url:newUrl}); _renderOvl(); },
       });
       // Re-render to update thumbnail on main grid too
       renderListings();
-    } catch(e) { showToast('L �Ƭ��� ��������÷�'); h.imageUrl = prev; }
+    } catch(e) { showToast('L ����� ����������'); h.imageUrl = prev; }
   } else {
-    showToast('=� ������θ��� Ŀ���� (����� �ͽ��÷ DB)');
+    showToast('=� ���������� ?���� (����� �}��� DB)');
   }
 }
 //    INIT                                                                   
@@ -2760,7 +2760,7 @@ async function unmarkSold(key) {
   await sb.update(h._dbId, {deleted: null});
   closeModal();
   applyFilters();
-  showToast('� �����ƭ����� �� ������');
+  showToast('� ����������� �� ������');
 }
 </script>
 
@@ -2839,8 +2839,9 @@ function saveNotes(id){
   const val=ta.value;
   const rec=allListings.find(x=>x.id===id);
   if(rec)rec.personal_notes=val;
-  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent=' ��������ķ��';setTimeout(()=>btn.textContent='=� ��������÷',1500);}});
+  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent=' ��������7��';setTimeout(()=>btn.textContent='=� ���������',1500);}});
 }
 </script>
 </body>
 </html>
+<!-- build: 1780867944512 -->
