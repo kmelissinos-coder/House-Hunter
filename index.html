@@ -2692,7 +2692,7 @@ async function unmarkSold(key) {
 }
 </script>
 
-<div id="imgLightbox" onclick="if(event.target===this)closeLightbox()">
+<div id="imgLightbox" onclick="if(event.target===this)closeLightbox()" onwheel="_lbScrollNav(event)">
   <button id="lbClose" onclick="closeLightbox()"></button>
   <span id="lbCounter"></span>
   <img id="lbImg" src="" alt="" onclick="lbToggleZoom(event)">
@@ -2751,7 +2751,6 @@ function _lbScrollNav(e){
   _lbUpdateCounter();
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
-document.addEventListener('wheel',_lbScrollNav,{passive:false});
 </script>
 </body>
 </html>
