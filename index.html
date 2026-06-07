@@ -281,8 +281,8 @@
     position: absolute; top: 10px; left: 10px;
     background: rgba(15,14,12,0.85);
     border: 1px solid var(--border);
-    padding: 3px 9px; border-radius: 4px;
-    font-size: 11px; color: var(--text2);
+    padding: 5px 12px; border-radius: 4px;
+    font-size: 14px; color: var(--text2);
     backdrop-filter: blur(4px);
   }
   .platform-badge {
@@ -673,16 +673,16 @@
   .photo-count-pill {
     position:absolute; bottom:8px; right:8px;
     background:rgba(15,14,12,0.82); border:1px solid var(--border);
-    border-radius:12px; padding:2px 9px; font-size:11px; color:var(--text2);
+    border-radius:12px; padding:4px 12px; font-size:13px; color:var(--text2);
     backdrop-filter:blur(4px); pointer-events:none;
   }
   .group-id-pill {
     position:absolute; top:8px; left:8px; background:var(--accent); color:#0f0e0c;
-    border-radius:4px; padding:2px 8px; font-size:11px; font-weight:700; pointer-events:none;
+    border-radius:4px; padding:4px 12px; font-size:14px; font-weight:700; pointer-events:none;
   }
   .group-listing-count {
     position:absolute; top:8px; right:8px; background:rgba(126,184,154,0.9); color:#0a0a08;
-    border-radius:4px; padding:2px 8px; font-size:10px; font-weight:700; pointer-events:none;
+    border-radius:4px; padding:4px 12px; font-size:13px; font-weight:700; pointer-events:none;
   }
   .grouped-body { padding:13px 15px 12px; }
   .grouped-title { font-family:'DM Serif Display',serif; font-size:17px; color:var(--text); }
@@ -944,6 +944,10 @@
 #lbClose{position:absolute;top:14px;right:18px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:26px;line-height:1;cursor:pointer;padding:3px 10px;border-radius:6px;z-index:10;}
 #lbCounter{position:absolute;top:18px;left:20px;color:#fff;font-size:13px;opacity:0.6;pointer-events:none;}
 #lbHint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#fff;font-size:11px;opacity:0.35;pointer-events:none;white-space:nowrap;}
+
+  .lo-sib-active { border-color: var(--accent) !important; box-shadow: 0 0 0 2px rgba(212,168,83,0.35) !important; }
+  .lo-sib-active .lo-sib-info { background: rgba(212,168,83,0.08); }
+  .map-popup-count { display:inline-block; background:var(--accent); color:#0f0e0c; border-radius:4px; padding:1px 7px; font-size:11px; font-weight:700; margin-left:4px; }
 </style>
 </head>
 <body>
@@ -1710,7 +1714,8 @@ function initMap() {
   }).addTo(leafletMap);
 
   let placed = 0;
-  filtered.forEach(h => {
+  const {groupCards:_mg,singles:_ms}=groupByHouseId(filtered);
+  const _mapItems=[..._mg.map(g=>Object.assign({},g[0],{_mapCount:g.length,_mapGroup:g})),..._ms.map(h=>Object.assign({},h,{_mapCount:1,_mapGroup:[h]}))];  _mapItems.forEach(h => {
     const coords = getCoords(h.location);
     if (!coords) return;
     placed++;
@@ -1949,12 +1954,13 @@ function openModal(url) {
         <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">${h.agency||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Διαθέσιμο</div><div class="modal-field-value">${h.available||'—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">⭐️ ${h.personal_score || 0}/5</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:24px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.2)'};margin:0 2px;transition:color 0.15s;" onmouseover="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=j<${i}?'#d4a853':'rgba(255,255,255,0.2)')" onmouseout="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=(${h.personal_score}||0)>j?'#d4a853':'rgba(255,255,255,0.2)')">${(h.personal_score||0)>=i?'★':'☆'}</span>`).join('')}</div></div>
         <div class="modal-field"><div class="modal-field-label">Ημ. Επίσκεψης</div><div class="modal-field-value">${h.visit_date || '—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Κωδικός αγγελίας</div><div class="modal-field-value">${h.agencyNr||h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Αγγελίας</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Μεσίτη</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
-      ${h.personal_notes?`<div class="modal-notes" style="background:rgba(126,184,154,0.08);border-color:rgba(126,184,154,0.2)">📌 <strong>Προσωπικές Σημειώσεις:</strong> ${h.personal_notes}</div>`:''}
+      `<div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>`
     </div>`;
   document.getElementById('detailModal').classList.add('open');
 }
@@ -2378,7 +2384,7 @@ function _openOvl(sibs,fi){
 
 function _renderOvl(){
   const h=_loSiblings[_loFeatIdx];
-  const rest=_loSiblings.filter((_,i)=>i!==_loFeatIdx);
+  const rest=[..._loSiblings];
   document.getElementById('loFeatured').innerHTML=_featHTML(h);
   const rEl=document.getElementById('loRight');
   if(rest.length){
@@ -2398,8 +2404,7 @@ function loNavFeat(dir){
   _loFeatIdx=ni;_renderOvl();
 }
 function loSelectSibling(ri){
-  const idxs=_loSiblings.map((_,i)=>i).filter(i=>i!==_loFeatIdx);
-  _loFeatIdx=idxs[ri];_renderOvl();
+  _loFeatIdx=ri;_renderOvl();
 }
 function closeListingOverlay(){
   document.getElementById('listingOverlay').classList.remove('open');
@@ -2469,7 +2474,7 @@ function _featHTML(h){
 function _sibHTML(s, ri) {
   const ppm=s.pricePerSqm||(s.sqm>0&&s.price>0?Math.round(s.price/s.sqm):0);
   const isFav=s.favorited||favorites.has(s.url||s.platformNr);
-  return `<div class="lo-sib-card" onclick="loSelectSibling(${ri})">
+  return `<div class="lo-sib-card${ri===_loFeatIdx?' lo-sib-active':''}" onclick="loSelectSibling(${ri}">
     <div class="lo-sib-img-wrap">
       ${s.imageUrl
         ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>🏠</div>'">`
@@ -2751,6 +2756,24 @@ function _lbScrollNav(e){
   _lbUpdateCounter();
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+</script>
+<script>
+function setRating(e,id,score){
+  e.stopPropagation();
+  const rec=allListings.find(x=>x.id===id);
+  if(rec)rec.personal_score=score;
+  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_score:score})});
+  const stars=e.currentTarget.parentNode.querySelectorAll('span[data-star]');
+  stars.forEach((s,j)=>{s.textContent=j<score?'★':'☆';s.style.color=j<score?'#d4a853':'rgba(255,255,255,0.2)';});
+}
+function saveNotes(id){
+  const ta=document.getElementById('loNotesTA');
+  if(!ta)return;
+  const val=ta.value;
+  const rec=allListings.find(x=>x.id===id);
+  if(rec)rec.personal_notes=val;
+  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
+}
 </script>
 </body>
 </html>
