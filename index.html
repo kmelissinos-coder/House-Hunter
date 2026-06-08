@@ -1998,7 +1998,7 @@ function buildModalCarousel(h) {
     + '<div class="car-counter">1/' + imgs.length + '</div>'
     : '';
   return '<div class="modal-carousel"><img id="modal-car-img" class="modal-img" src="' + imgs[0]
-    + '" style="cursor:pointer" onclick="openPhotoLightbox(this.src)" onerror="this.style.opacity='0'">'
+    + '" style="cursor:pointer" onclick="openPhotoLightbox(this.src)" onerror="this.style.opacity=0">'
     + nav + '</div>';
 }
 function carNav(dir) {
@@ -2006,7 +2006,7 @@ function carNav(dir) {
   if (!imgs.length) return;
   window._carouselIdx = (window._carouselIdx + dir + imgs.length) % imgs.length;
   const img = document.getElementById('modal-car-img');
-  if (img) { img.style.opacity='0'; img.src = imgs[window._carouselIdx]; img.onload=()=>img.style.opacity='1'; }
+  if (img) { img.style.opacity=0; img.src = imgs[window._carouselIdx]; img.onload=()=>img.style.opacity=1; }
   const ctr = document.querySelector('.car-counter');
   if (ctr) ctr.textContent = (window._carouselIdx + 1) + '/' + imgs.length;
 }
@@ -2439,7 +2439,7 @@ function _showGalleryHint() {
   if (!hint) return;
   hint.style.opacity = '1';
   clearTimeout(_gallHintTimer);
-  _gallHintTimer = setTimeout(()=>{ hint.style.opacity='0'; }, 3200);
+  _gallHintTimer = setTimeout(()=>{ hint.style.opacity=0; }, 3200);
 }
 
 document.addEventListener('wheel', e => {
