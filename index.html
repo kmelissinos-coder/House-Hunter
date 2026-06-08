@@ -840,7 +840,7 @@
   .grp-btn.open-all{background:var(--accent);color:#0f0e0c;border-color:var(--accent);}
   .grp-btn.open-all:hover{opacity:0.85;}
 
-  /*    LISTING OVERLAY                                                      */
+  /* ── LISTING OVERLAY                                                      */
   .listing-overlay {
     display:none; position:fixed; inset:0; z-index:1500;
     background:rgba(6,5,4,0.94); backdrop-filter:blur(10px);
@@ -1174,7 +1174,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-//    CONFIG                                                               
+// ── CONFIG                                                               
 const SUPABASE_URL  = 'https://ofvanbbujgcqhbiyihgy.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
 const TABLE = 'listings';
@@ -1190,7 +1190,7 @@ const sb = {
   },
 };
 
-//    STATE                                                                
+// ── STATE                                                                
 let allListings    = [];
 let extraListings  = []; 
 let filtered       = [];
@@ -1203,7 +1203,7 @@ let selectedGroupSource = null;
 let multiSelectMode = false;
 let multiSelectedIds = new Set();
 
-//    UNDO / REDO                                                            
+// ── UNDO / REDO                                                            
 const ACTION_STACK=[], REDO_STACK=[], MAX_STACK=30;
 function pushAction(a){
   ACTION_STACK.push(a); if(ACTION_STACK.length>MAX_STACK)ACTION_STACK.shift();
@@ -1221,7 +1221,7 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();redoAction();}
 });
 
-//    MIDDLE CLICK INTERCEPTOR FOR BACKGROUND TABS                           
+// ── MIDDLE CLICK INTERCEPTOR FOR BACKGROUND TABS ──────────────────────────
 function handleLinkClick(e, url) {
   if (!url) return;
   if (e.button === 1) { 
@@ -1236,7 +1236,7 @@ function handleLinkClick(e, url) {
   }
 }
 
-//    LOAD DATA                                                            
+// ── LOAD DATA                                                            
 async function loadData() {
   document.querySelector('.refresh-btn').disabled = true;
   window._savedScroll = window.scrollY;
@@ -1308,7 +1308,7 @@ async function tryFetch() {
   document.querySelector('.refresh-btn').disabled = false;
 }
 
-//    CSV PARSER                                                            
+// ── CSV PARSER                                                            
 function parseCSV(text, defaultPlatform) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) return [];
@@ -1392,7 +1392,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
   showToast(" �}�������!"); renderListings(); tryFetch();
 }
 
-//    LIVE DB GROUPING HANDLERS                                              
+// ── LIVE DB GROUPING HANDLERS ─────────────────────────────────────────────
 async function ungroupListing(dbId) {
   if(!dbId)return;
   const h=allListings.find(x=>x._dbId===dbId);const prev=h?(h.house_id||'0'):'0';
@@ -1483,7 +1483,7 @@ function parsePpm(s) {
   return m ? parseInt(m[0]) : 0;
 }
 
-//    BUILD UI                                                              
+// ── BUILD UI                                                              
 function buildUI() {
   const combined = [...allListings, ...extraListings];
 
@@ -1531,7 +1531,7 @@ function getPlatformColor(p) {
   return map[p] || '#aab7b8';
 }
 
-//    FILTERS & SORT                                                         
+// ── FILTERS & SORT                                                         
 function applyFilters() {
   const combined = [...allListings, ...extraListings];
   const q        = document.getElementById('search').value.toLowerCase();
@@ -1605,7 +1605,7 @@ function setView(v) {
   renderListings();
 }
 
-//    RENDER                                                                 
+// ── RENDER                                                                 
 let leafletMap = null;
 let expandedGroups = new Set();
 
@@ -1980,7 +1980,7 @@ function renderListItem(h) {
   </div>`;
 }
 
-//    MODAL DETAIL                                                           
+// ── MODAL DETAIL                                                           
 function getByUrl(url) {
   return [...allListings, ...extraListings].find(h => h.url === url);
 }
@@ -2106,7 +2106,7 @@ function toggleFav(key) {
   applyFilters();
 }
 
-//    COMPARE                                                                
+// ── COMPARE                                                                
 function addToCompare(url) {
   const h = getByUrl(url); if (!h) return;
   if (compareList.find(c => c.url === url)) { showToast('��� �7 ���1 �s�����'); return; }
@@ -2172,14 +2172,14 @@ function openCompareModal() {
 }
 function closeCompareModal() { document.getElementById('compareModal').classList.remove('open'); }
 
-//    CSV UPLOAD                                                            
+// ── CSV UPLOAD                                                            
 function handleDrop(e) {
   e.preventDefault(); document.getElementById('dropzone').classList.remove('drag');
   const file = e.dataTransfer.files[0]; if (file) processFile(file);
 }
 function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(file); }
 
-//    THUMBNAIL FIX IMPORT                                                   
+// ── THUMBNAIL FIX IMPORT                                                   
 async function processThumbnailFix(text) {
   const lines = text.trim().split('\n');
   if (lines.length < 2) { showToast('L ���� �����'); return; }
@@ -2222,7 +2222,7 @@ function processFile(file) {
   reader.onload = async ev => {
     const text = ev.target.result;
 
-    //    Detect thumbnail-fix CSV (has new_image_url column)               
+    // ── Detect thumbnail-fix CSV (has new_image_url column) ──────────────
     const firstLine = text.split('\n')[0].toLowerCase();
     if (firstLine.includes('new_image_url')) {
       await processThumbnailFix(text);
@@ -2349,7 +2349,7 @@ function processFile(file) {
   reader.readAsText(file, 'UTF-8');
 }
 
-//    TOAST                                                                  
+// ── TOAST                                                                  
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -2358,7 +2358,7 @@ function showToast(msg) {
 
 function escJ(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-//    FULLSCREEN GALLERY                                                     
+// ── FULLSCREEN GALLERY                                                     
 let galleryItems = [], galleryIdx = 0, galleryZoom = 1, _gallHintTimer = null;
 
 function openGallery(houseId, startIdx) {
@@ -2458,7 +2458,7 @@ document.addEventListener('keydown', e => {
 });
 
 
-//    LISTING DETAIL OVERLAY                                                 
+// ── LISTING DETAIL OVERLAY                                                 
 let _loSiblings=[], _loFeatIdx=0;
 
 function openListingOverlay(url, houseId, startIdx) {
@@ -2676,7 +2676,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft')loNavFeat(-1);
 });
 
-//    PHOTO URL EDIT                                                         
+// ── PHOTO URL EDIT                                                         
 async function savePhotoUrl(key) {
   const h = getByUrl(key); if (!h) return;
   const input = document.getElementById('lo-photo-input');
