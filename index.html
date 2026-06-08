@@ -457,6 +457,24 @@
   .modal-img { width: 100%; height: 260px; object-fit: cover; border-radius: 13px 13px 0 0; display: block; }
   .modal-no-img { width: 100%; height: 180px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--text3); border-radius: 13px 13px 0 0; }
   .modal-body { padding: 24px; }
+  .modal-carousel { position: relative; line-height: 0; }
+  .car-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.55); color: #fff; border: none;
+    font-size: 40px; line-height: 1; padding: 0 14px; cursor: pointer;
+    z-index: 2; border-radius: 4px; transition: background 0.15s;
+    user-select: none;
+  }
+  .car-btn:hover { background: rgba(0,0,0,0.85); }
+  .car-prev { left: 6px; }
+  .car-next { right: 6px; }
+  .car-counter {
+    position: absolute; bottom: 10px; right: 10px;
+    background: rgba(0,0,0,0.62); color: #fff; font-size: 12px;
+    padding: 3px 9px; border-radius: 10px; line-height: 1.4;
+    pointer-events: none;
+  }
+  .modal-img { transition: opacity 0.15s; }
   .modal-close {
     position: absolute; top: 14px; right: 14px;
     background: rgba(15,14,12,0.8); border: 1px solid var(--border);
@@ -1359,7 +1377,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
   let finalHid = (targetHouseId||'').trim();
   if (!finalHid || finalHid==='0') {
     finalHid = "group_" + Date.now();
-    try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("�Ƭ���"); return; }
+    try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("�����"); return; }
     if(th) th.house_id=finalHid;
   }
   for(const id of [...multiSelectedIds]){
@@ -1371,7 +1389,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
     }catch(e){console.error("link err",id,e);}
   }
   multiSelectMode=false; multiSelectedIds.clear(); selectedGroupSource=null;
-  showToast(" �Ž�������!"); renderListings(); tryFetch();
+  showToast(" �}�������!"); renderListings(); tryFetch();
 }
 
 //    LIVE DB GROUPING HANDLERS                                              
@@ -1630,8 +1648,8 @@ function renderListings() {
       document.body.appendChild(b);}
     if(multiSelectMode){
       b.style.display="flex";
-      b.innerHTML='<span style="color:var(--accent2);font-weight:600">0 '+multiSelectedIds.size+' ����������  ���� � ��� �ͽ��÷</span>'+
-        '<button onclick="toggleMultiSelect()" style="background:var(--border);border:none;color:var(--text1);padding:5px 12px;border-radius:8px;cursor:pointer"> �����÷</button>';}
+      b.innerHTML='<span style="color:var(--accent2);font-weight:600">0 '+multiSelectedIds.size+' ����������  ���� � ��� �}���</span>'+
+        '<button onclick="toggleMultiSelect()" style="background:var(--border);border:none;color:var(--text1);padding:5px 12px;border-radius:8px;cursor:pointer"> ������</button>';}
     else if(b) b.style.display="none";
   })();
 
@@ -1673,7 +1691,7 @@ function renderGroupedCard(g) {
 
   let connectHtml = '';
   if (multiSelectMode) {
-    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">� �ͽ��÷ ���</button>`;
+    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">� �}��� ���</button>`;
   } else if (selectedGroupSource && selectedGroupSource.house_id !== g.houseId) {
     connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px"
       onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">= ���� ���</button>`;
@@ -1916,15 +1934,15 @@ function renderListItem(h) {
       const msc = multiSelectedIds.has(h._dbId);
       groupActionHtml =
         '<span class="action-btn icon-only' + (msc ? ' ms-active' : '') + '" onclick="event.stopPropagation();toggleMsSelect(\'' + h._dbId + '\')" title="�������" aria-label="�������">' + (msc ? '' : '') + '</span>' +
-        '<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo(\'' + h._dbId + '\',\'' + (h.house_id||'0') + '\')" title="�ͽ��÷ ���">�</span>';
+        '<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo(\'' + h._dbId + '\',\'' + (h.house_id||'0') + '\')" title="�}��� ���">�</span>';
     } else if (selectedGroupSource) {
       // Show join target button
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="�ͽ��÷ ���" aria-label="�ͽ��÷ ���">�</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="�}��� ���" aria-label="�}��� ���">�</span>`;
       }
     } else {
       // Default: enter multi-select mode
-      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();toggleMultiSelect()" title="���������÷ / �ͽ��÷" aria-label="���������÷">0</span>`;
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();toggleMultiSelect()" title="���������� / �}���" aria-label="����������">0</span>`;
     }
   }
 
@@ -1967,6 +1985,31 @@ function getByUrl(url) {
   return [...allListings, ...extraListings].find(h => h.url === url);
 }
 
+function buildModalCarousel(h) {
+  let imgs = [];
+  try { if (h.extra_images) imgs = JSON.parse(h.extra_images); } catch(e) {}
+  if (!imgs.length && h.imageUrl) imgs = [h.imageUrl];
+  if (!imgs.length) return '<div class="modal-no-img">&#128247;</div>';
+  window._carouselImgs = imgs;
+  window._carouselIdx  = 0;
+  const nav = imgs.length > 1
+    ? '<button class="car-btn car-prev" onclick="carNav(-1)">&#8249;</button>'
+    + '<button class="car-btn car-next" onclick="carNav(1)">&#8250;</button>'
+    + '<div class="car-counter">1/' + imgs.length + '</div>'
+    : '';
+  return '<div class="modal-carousel"><img id="modal-car-img" class="modal-img" src="' + imgs[0]
+    + '" style="cursor:pointer" onclick="openPhotoLightbox(this.src)" onerror="this.style.opacity='0'">'
+    + nav + '</div>';
+}
+function carNav(dir) {
+  const imgs = window._carouselImgs || [];
+  if (!imgs.length) return;
+  window._carouselIdx = (window._carouselIdx + dir + imgs.length) % imgs.length;
+  const img = document.getElementById('modal-car-img');
+  if (img) { img.style.opacity='0'; img.src = imgs[window._carouselIdx]; img.onload=()=>img.style.opacity='1'; }
+  const ctr = document.querySelector('.car-counter');
+  if (ctr) ctr.textContent = (window._carouselIdx + 1) + '/' + imgs.length;
+}
 function openModal(url) {
   const h = getByUrl(url); if (!h) return;
   const ppm    = h.pricePerSqm || (h.sqm>0&&h.price>0 ? Math.round(h.price/h.sqm) : 0);
@@ -1976,9 +2019,7 @@ function openModal(url) {
 
   document.getElementById('modalContent').innerHTML = `
     <button class="modal-close" onclick="closeModal()"></button>
-    ${h.imageUrl
-      ? `<img class="modal-img" src="${h.imageUrl}" style="cursor:pointer" onclick="openPhotoLightbox(this.src)" onerror="this.outerHTML='<div class=\\'modal-no-img\\'><�</div>'">`
-      : '<div class="modal-no-img"><�</div>'}
+    ${buildModalCarousel(h)}
     <div class="modal-body">
       <div class="modal-title">${h.location||''} <span style="color:var(--text2);font-size:16px">� ${h.type||''}</span></div>
       <div class="modal-subtitle">${h.floor?h.floor+' �':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'� #'+h.house_id:''}</div>
