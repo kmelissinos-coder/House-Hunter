@@ -1987,7 +1987,7 @@ function getByUrl(url) {
 
 function buildModalCarousel(h) {
   let imgs = [];
-  try { if (h.extra_images) imgs = JSON.parse(h.extra_images); } catch(e) {}
+  try { if (h.extra_images) { const p = JSON.parse(h.extra_images); if (Array.isArray(p)) imgs = p; } } catch(e) {}
   if (!imgs.length && h.imageUrl) imgs = [h.imageUrl];
   if (!imgs.length) return '<div class="modal-no-img">&#128247;</div>';
   window._carouselImgs = imgs;
