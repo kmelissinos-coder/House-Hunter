@@ -858,7 +858,7 @@
   }
   .lo-close:hover{background:rgba(255,255,255,0.3);}
 
-  /* FEATURED  fixed width, centered, scrollable */
+  /* FEATURED — fixed width, centered, scrollable */
   .lo-featured {
     flex:0 0 480px; width:480px;
     background:var(--surface); border:1px solid var(--border);
@@ -880,7 +880,7 @@
   .lo-featured .modal-price { font-size:26px; font-weight:600; color:var(--accent); }
   .lo-featured .modal-ppm { color:var(--text3); font-size:12px; }
 
-  /* RIGHT COLUMN  siblings carousel */
+  /* RIGHT COLUMN — siblings carousel */
   .lo-right {
     flex:0 0 340px; width:340px;
     display:flex; flex-direction:column; gap:10px;
@@ -979,7 +979,7 @@
   <div class="header-stats">
     <div class="stat-pill"><strong id="stat-total">—</strong> αγγελίες</div>
     <div class="stat-pill"><strong id="stat-active">—</strong> ενεργές</div>
-    <div class="stat-pill">avg €/τ.μ. <strong id="stat-ppm">—</strong></div></div>
+    <div class="stat-pill">avg <strong id="stat-avg">—</strong></div></div>
     <div class="stat-pill">avg €/τ.μ. <strong id="stat-ppm">—</strong></div>
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
     <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="Αναίρεση (Ctrl+Z)" disabled>↩</button>
@@ -1001,13 +1001,13 @@
   <div class="range-group">
     <span>Τιμή</span>
     <input type="number" id="minPrice" placeholder="min €" oninput="applyFilters()">
-    <span></span>
+    <span>—</span>
     <input type="number" id="maxPrice" placeholder="max €" oninput="applyFilters()">
   </div>
   <div class="range-group">
     <spanτ.μ.</span>
     <input type="number" id="minSqm" placeholder="min" oninput="applyFilters()">
-    <span></span>
+    <span>—</span>
     <input type="number" id="maxSqm" placeholder="max" oninput="applyFilters()">
   </div>
   <div class="range-group">
@@ -1051,6 +1051,63 @@
        style="flex:1;margin:0;padding:5px 12px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px">
     <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
     <div class="upload-text" style="font-size:11px;white-space:nowrap">📂 Προσθήκη δεδομένων από άλλη πλατφόρμα</div>
+    <div class="upload-sub" style="font-size:10px;white-space:nowrap">Σύρε ή κλίκαρε · CSV από XE, Nodaliste κ.λπ.</div>
+  </div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="gridBtn" onclick="setView('grid')">⊞ Grid</button>
+    <button class="view-btn" id="listBtn" onclick="setView('list')">a List</button>
+    <button class="view-btn" id="mapBtn" onclick="setView('map')">🗺 Χάρτης</button>
+  </div>
+</div>
+
+<div class="sort-row">
+  <span>Ταξινόμηση:</span>
+  <button class="sort-btn active" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
+  <button class="sort-btn" data-sort="price-desc" onclick="setSort(this,'price-desc')">Τιμή ↓</button>
+  <button class="sort-btn" data-sort="sqm-desc" onclick="setSort(this,'sqm-desc')">τ.μ. ↓</button>
+  <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">€/τ.μ. ↑</button>
+  <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">Νεότερα</button>
+  <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">Πρόσφατη ενημ.</button>
+</div>
+
+<div class="show-deleted-wrap">
+  <input type="checkbox" id="showDeleted" class="toggle-check" onchange="applyFilters()">
+  <label for="showDeleted">Εμφάνιση αγγελιών με X (διαγραμμένες/απόρριψη)</label>
+</div>
+
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 40px 0"><div class="results-count" id="resultsCount"></div><button class="sync-btn" onclick="openSyncModal()">&#128260; Sync</button></div>
+
+<div id="main-content">
+  <div class="loading">
+    <div class="loading-spinner"></div>
+    Φόρτωση δεδομένων από τη βάση...
+  </div>
+</div>
+
+<div class="rejected-section" id="rejected-section" style="display:none">
+  <div class="rejected-header" onclick="toggleRejected()">
+    <span class="rejected-arrow" id="rejArrow">&#9658;</span>
+    <span>&#913;&#960;&#959;&#961;&#961;&#953;&#966;&#952;&#941;&#957;&#964;&#945; / &#924;&#951; &#913;&#947;&#945;&#960;&#951;&#956;&#941;&#957;&#945;</span>
+    <span id="rejCount" style="color:var(--text3);font-weight:400"></span>
+  </div>
+  <div id="rejected-body"></div>
+</div>
+
+<div class="sync-modal-overlay" id="syncModal">
+  <div class="sync-modal-box">
+    <h3>&#128260; Sync &#956;&#949; Spitogatos</h3>
+    <div class="sync-steps">1. &#928;&#942;&#947;&#945;&#953;&#957;&#949; &#963;&#964;&#959; <b>Spitogatos &rarr; &#913;&#947;&#945;&#960;&#951;&#956;&#941;&#957;&#945;</b><br>2. &#902;&#957;&#959;&#953;&#958;&#949; &#964;&#959; Console (<b>F12</b> &rarr; Console)<br>3. Paste &#964;&#959; script &#954;&#945;&#953; Enter<br>4. &#928;&#949;&#961;&#943;&#956;&#949;&#957;&#949; ~3 &#955;&#949;&#960;&#964;&#940; &#949;&#974;&#962; &#957;&#945; &#964;&#949;&#955;&#949;&#953;&#974;&#963;&#949;&#953;<br>5. &#913;&#957;&#945;&#957;&#941;&#969;&#963;&#949; &#964;&#959; House Hunter</div>
+    <div class="sync-script-preview" id="syncScriptPreview">...</div>
+    <button class="sync-copy-btn" onclick="copySyncScript()">&#128203; Copy Sync Script</button>
+    <button class="sync-close-btn" onclick="closeSyncModal()">&#10006; &#922;&#955;&#949;&#943;&#963;&#953;&#956;&#959;</button>
+  </div>
+</div>
+
+<!-- COMPARE BAR -->
+<div class="compare-bar" id="compareBar">
+  <strong style="font-size:12px;color:var(--text2);white-space:nowrap">Σύγκριση:</strong>
+  <div class="compare-items" id="compareItems"></div>
   <button class="compare-clear" onclick="clearCompare()">✕ Καθαρισμός</button>
   <button class="compare-btn" onclick="openCompareModal()">Σύγκριση →</button>
 </div>
@@ -1058,10 +1115,10 @@
 <!-- NEW CLICK-TO-GROUP SELECTION BAR -->
 <div class="grouping-bar" id="groupingBar">
   <div class="grouping-info">
-    <span style="font-size:16px">=</span>
+    <span style="font-size:16px">🔗</span>
     <div>
       <div style="font-weight:600;color:var(--accent)">Επιλέχθηκε αγγελία για Ένωση</div>
-      <div id="groupingBarDetails" style="font-size:11px;color:var(--text2)"></div>
+      <div id="groupingBarDetails" style="font-size:11px;color:var(--text2)">—</div>
     </div>
   </div>
   <button class="grouping-cancel" onclick="cancelGroupingSelection()">✕ Ακύρωση</button>
@@ -1100,7 +1157,7 @@
 
 <!-- LISTING OVERLAY -->
 <div class="listing-overlay" id="listingOverlay" onclick="if(event.target===this)closeListingOverlay()">
-  <button class="lo-close" onclick="closeListingOverlay()"></button>
+  <button class="lo-close" onclick="closeListingOverlay()">✕</button>
   <div id="loFeatured" class="lo-featured"></div>
   <div id="loRight" class="lo-right" style="display:none">
     <div class="lo-carousel-header">
@@ -1322,7 +1379,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
   let finalHid = (targetHouseId||'').trim();
   if (!finalHid || finalHid==='0') {
     finalHid = "group_" + Date.now();
-    try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("�����"); return; }
+    try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("Σφάλμα"); return; }
     if(th) th.house_id=finalHid;
   }
   for(const id of [...multiSelectedIds]){
@@ -1334,7 +1391,7 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
     }catch(e){console.error("link err",id,e);}
   }
   multiSelectMode=false; multiSelectedIds.clear(); selectedGroupSource=null;
-  showToast(" �}�������!"); renderListings(); tryFetch();
+  showToast("✓ Συνδέθηκαν!"); renderListings(); tryFetch();
 }
 
 //    LIVE DB GROUPING HANDLERS ─────────────────────────────────────────────
@@ -1343,11 +1400,11 @@ async function ungroupListing(dbId) {
   const h=allListings.find(x=>x._dbId===dbId);const prev=h?(h.house_id||'0'):'0';
   try{
     await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";
-    pushAction({label:` ${h?h.location:dbId}`,
+    pushAction({label:`✂️ ${h?h.location:dbId}`,
       undo:async()=>{await sb.update(dbId,{house_id:prev});if(h)h.house_id=prev;await tryFetch();},
       redo:async()=>{await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";await tryFetch();}});
-    showToast(" ����}������!");renderListings();tryFetch();
-  }catch(e){showToast("L ����� ����}����");}
+    showToast("✂️ Αποσυνδέθηκε!");await tryFetch();
+  }catch(e){showToast("❌ Σφάλμα αποσύνδεσης");}
 }
 
 // Select a single item to initiate a quick grouping flow
@@ -1465,8 +1522,8 @@ function buildUI() {
   }).filter(p => p > 0);
   document.getElementById('stat-total').textContent  = combined.length;
   document.getElementById('stat-active').textContent  = active.length;
-  document.getElementById('stat-avg').textContent     = prices.length ? '€'+Math.round(prices.reduce((a,b)=>a+b,0)/prices.length).toLocaleString('el') : '';
-  document.getElementById('stat-ppm').textContent     = ppms.length   ? '€'+Math.round(ppms.reduce((a,b)=>a+b,0)/ppms.length).toLocaleString('el') : '';
+  document.getElementById('stat-avg').textContent     = prices.length ? '€'+Math.round(prices.reduce((a,b)=>a+b,0)/prices.length).toLocaleString('el') : '—';
+  document.getElementById('stat-ppm').textContent     = ppms.length   ? '€'+Math.round(ppms.reduce((a,b)=>a+b,0)/ppms.length).toLocaleString('el') : '—';
 
   applyFilters();
 }
@@ -1593,8 +1650,8 @@ function renderListings() {
       document.body.appendChild(b);}
     if(multiSelectMode){
       b.style.display="flex";
-      b.innerHTML='<span style="color:var(--accent2);font-weight:600">0 '+multiSelectedIds.size+' ����������  ���� � ��� �}���</span>'+
-        '<button onclick="toggleMultiSelect()" style="background:var(--border);border:none;color:var(--text1);padding:5px 12px;border-radius:8px;cursor:pointer"> ������</button>';}
+      b.innerHTML='<span style="color:var(--accent2);font-weight:600">🔗 '+multiSelectedIds.size+' επιλεγμένα — κλικ σε κάρτες για σύνδεση</span>'+
+        '<button onclick="toggleMultiSelect()" style="background:var(--border);border:none;color:var(--text1);padding:5px 12px;border-radius:8px;cursor:pointer">✕ Ακύρωση</button>';}
     else if(b) b.style.display="none";
   })();
 
@@ -1628,15 +1685,15 @@ function renderGroupedCard(g) {
     ? photos.map((p,i) => `<img class="photo-strip-img" src="${p.url}"
         onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',${i})"
         onerror="this.style.display='none'" loading="lazy">`).join('')
-    : `<div class="photo-strip-noimg"><�</div>`;
+    : `<div class="photo-strip-noimg">🏠</div>`;
 
   const allFav    = g.items.every(h=>h.favorited);
   const allHidden = g.items.every(h=>h.hidden);
-  const agencyNames = [...new Set(g.items.map(h=>h.agency||'����7�'))].slice(0,3).join(' · ');
+  const agencyNames = [...new Set(g.items.map(h=>h.agency||'Ιδιώτης'))].slice(0,3).join(' · ');
 
   let connectHtml = '';
   if (multiSelectMode) {
-    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">� �}��� ���</button>`;
+    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">→ Σύνδεση εδώ</button>`;
   } else if (selectedGroupSource && selectedGroupSource.house_id !== g.houseId) {
     connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px"
       onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
@@ -1653,7 +1710,7 @@ function renderGroupedCard(g) {
     <div class="grouped-body">
       <div class="grouped-meta">
         <div>
-          <div class="grouped-title">${g.location||''}</div>
+          <div class="grouped-title">${g.location||'—'}</div>
           <div class="grouped-sub">${g.type||''} ${g.floor?'· '+g.floor:''} ${g.lvl&&Number(g.lvl)>1?'· '+g.lvl+' επίπ.':''}</div>
         </div>
         <div class="grouped-price-range">
@@ -1666,7 +1723,7 @@ function renderGroupedCard(g) {
         ${g.year?`<span class="spec-tag">🏗 ${g.year}</span>`:''}
         ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
         ${g.heating&&g.heating.includes('αέριο')?`<span class="spec-tag">🔥 Αέριο</span>`:''}
-        ${g.heating&&g.heating.includes('Αντλία')?`<span class="spec-tag">h ��;��</span>`:''}
+        ${g.heating&&g.heating.includes('Αντλία')?`<span class="spec-tag">♨️ Αντλία</span>`:''}
       </div>
       ${connectHtml}
     </div>
@@ -1675,13 +1732,13 @@ function renderGroupedCard(g) {
       <div class="group-action-btns">
         <span class="grp-btn${allFav?' active':''}"
           onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
-          title="${allFav?'Αφαίρεση ����������':'��������� ��� ;��'}">${allFav?'':''}</span>
+          title="${allFav?'Αφαίρεση αγαπημένου':'Αγαπημένο για όλες'}">${allFav?'★':'☆'}</span>
         <span class="grp-btn${allHidden?' active':''}"
           onclick="event.stopPropagation();toggleGroupHide('${g.houseId}')"
-          title="${allHidden?'������ ;}':'��:��7 ;}'}">${allHidden?'↩':''}</span>
+          title="${allHidden?'Εμφάνιση όλων':'Απόκρυψη όλων'}">${allHidden?'↩':'✕'}</span>
         <span class="grp-btn open-all"
           onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',0)"
-          title="Άνοιγμα">�</span>
+          title="Άνοιγμα">↗</span>
       </div>
     </div>
   </div>`;
@@ -1752,7 +1809,7 @@ function initMap() {
       ${h.imageUrl ? `<img src="${h.imageUrl}" onerror="this.style.display='none'">` : ''}
       <div class="map-popup-loc">${h.location}</div>
       <div style="font-size:11px;color:#888;margin-bottom:4px">${h.type||''} · ${h.floor||''}</div>
-      <div class="map-popup-price">${h.price?'€'+h.price.toLocaleString('el'):''}</div>
+      <div class="map-popup-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
       <div class="map-popup-specs">
         ${(h.sqm_raw||h.sqmRaw)?'📐 '+(h.sqm_raw||h.sqmRaw):''} ${h.rooms?'· 🛏 '+h.rooms:''} ${h.year?'· 🏗 '+h.year:''}<br>
         ${ppm?'€'+ppm+'/τ.μ. · ':''}${h.agency||''}
@@ -1769,7 +1826,7 @@ function initMap() {
     div.innerHTML = `
       <div style="font-weight:600;margin-bottom:6px;color:#e8e4dc">Τιμές</div>
       <div class="map-legend-item"><div class="map-dot" style="background:#5a9e78"></div> &lt; €300k</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> €300k400k</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> €300k–400k</div>
       <div class="map-legend-item"><div class="map-dot" style="background:#c97b6a"></div> &gt; €400k</div>
       <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} αγγελίες στο χάρτη</div>`;
     return div;
@@ -1791,7 +1848,7 @@ function energyClass(e) {
   return 'other';
 }
 function energyLabel(e) {
-  if (!e) return '';
+  if (!e) return '—';
   const m = e.match(/^[Α-Ωα-ω+]+/);
   return m ? m[0] : e.slice(0,2);
 }
@@ -1818,7 +1875,11 @@ function renderCard(h) {
     if (selectedGroupSource) {
       // Show join target button if another item is selected
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Επιλογή για Ένωση">🔗</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Ένωση εδώ">🔗</span>`;
+      }
+    } else {
+      // Default state: select entry point
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="Επιλογή για Ένωση" aria-label="Επιλογή για Ένωση">🔗</span>`;
     }
   }
 
@@ -1827,20 +1888,20 @@ function renderCard(h) {
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
       <div class="no-img" ${h.imageUrl?'style="display:none"':''}>🏠</div>
-      <div class="card-badge">${h.type || ''}</div>
-      <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||''}</div>
+      <div class="card-badge">${h.type || '—'}</div>
+      <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
       ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">#${h.house_id}</div>` : ''}
-      ${h.hasChanges ? `<div class="change-badge">= ������</div>` : ''}
-      <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'':''}</div>
+      ${h.hasChanges ? `<div class="change-badge">🔄 Αλλαγή</div>` : ''}
+      <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
     </div>
     <div class="card-body">
       <div class="card-top">
         <div>
-          <div class="card-location">${h.location || ''}</div>
+          <div class="card-location">${h.location || '—'}</div>
           <div class="card-type">${h.floor ? h.floor + (h.lvl ? ' · '+h.lvl+' επίπεδα' : '') : ''}</div>
         </div>
         <div>
-          <div class="card-price">${h.price ? '€'+h.price.toLocaleString('el') : ''}</div>
+          <div class="card-price">${h.price ? '€'+h.price.toLocaleString('el') : '—'}</div>
           <div class="price-sqm">${ppm ? '€'+ppm+'/τ.μ.' : ''}</div>
         </div>
       </div>
@@ -1849,12 +1910,14 @@ function renderCard(h) {
         ${h.rooms ? `<span class="spec-tag">🛏 ${h.rooms}</span>` : ''}
         ${h.year ? `<span class="spec-tag">🏗 ${h.year}</span>` : ''}
         ${h.energy ? `<span class="spec-tag"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></span>` : ''}
+        ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">🔥 Αέριο</span>` : ''}
         ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">♨️ Αντλία</span>` : ''}
       </div>
       <div class="card-footer" style="flex-wrap: wrap;">
-        <span class="agency-name" title="${h.agency||''}">${h.agency || ''}</span>
+        <span class="agency-name" title="${h.agency||''}">${h.agency || '—'}</span>
         <div class="card-actions">
-          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Σύγκριση">⊕</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Λεπτομέρειες">🔍</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Σύγκριση">⊕</span>
           ${groupActionHtml}
           ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="Άνοιγμα link" aria-label="Άνοιγμα link">↗</a>` : ''}
         </div>
@@ -1872,12 +1935,16 @@ function renderListItem(h) {
     if (multiSelectMode) {
       const msc = multiSelectedIds.has(h._dbId);
       groupActionHtml =
-        '<span class="action-btn icon-only' + (msc ? ' ms-active' : '') + '" onclick="event.stopPropagation();toggleMsSelect(\'' + h._dbId + '\')" title="Λεπτομέρειες" aria-label="�������">' + (msc ? '' : '') + '</span>' +
-        '<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo(\'' + h._dbId + '\',\'' + (h.house_id||'0') + '\')" title="�}��� ���">�</span>';
+        '<span class="action-btn icon-only' + (msc ? ' ms-active' : '') + '" onclick="event.stopPropagation();toggleMsSelect(\'' + h._dbId + '\')" title="Επιλογή" aria-label="Επιλογή">' + (msc ? '☑' : '☐') + '</span>' +
+        '<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo(\'' + h._dbId + '\',\'' + (h.house_id||'0') + '\')" title="Σύνδεση εδώ">→</span>';
     } else if (selectedGroupSource) {
       // Show join target button
       if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Επιλογή για Ένωση">🔗</span>`;
+        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Σύνδεση εδώ" aria-label="Σύνδεση εδώ">→</span>`;
+      }
+    } else {
+      // Default: enter multi-select mode
+      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();toggleMultiSelect()" title="Ομαδοποίηση / Σύνδεση" aria-label="Ομαδοποίηση">☰</span>`;
     }
   }
 
@@ -1887,7 +1954,7 @@ function renderListItem(h) {
       : `<div class="list-no-img">🏠</div>`}
     <div class="list-main">
       <div class="list-top">
-        <span class="list-location">${h.location||''}</span>
+        <span class="list-location">${h.location||'—'}</span>
         <span class="list-type">${h.type||''}</span>
         ${h.energy ? `<span class="energy-badge e-${energyClass(h.energy)}" style="font-size:10px;padding:2px 6px">${energyLabel(h.energy)}</span>` : ''}
         <span class="platform-badge ${platformBadgeClass(h.platform)}" style="font-size:10px;padding:2px 6px">${h.platform||''}</span>
@@ -1903,10 +1970,11 @@ function renderListItem(h) {
       </div>
     </div>
     <div class="list-right">
-      <div class="list-price">${h.price?'€'+h.price.toLocaleString('el'):''}</div>
+      <div class="list-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
       <div class="list-ppm">${ppm?'€'+ppm+'/τ.μ.':''}</div>
       <div class="list-actions">
-        <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')" title="Αγαπημένο" aria-label="Σύγκριση">⊕</span>
+        <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')" title="Αγαπημένο" aria-label="Αγαπημένο">${isFav?'★':'☆'}</span>
+        <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Σύγκριση" aria-label="Σύγκριση">⊕</span>
         ${groupActionHtml}
         ${h.url?`<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="Άνοιγμα link" aria-label="Άνοιγμα link">↗</a>`:''}
       </div>
@@ -1914,7 +1982,7 @@ function renderListItem(h) {
   </div>`;
 }
 
-//    MODAL DETAIL ──────────────────────────────────────────────────────────
+//    MODAL DETAIL                                                           
 function getByUrl(url) {
   return [...allListings, ...extraListings].find(h => h.url === url);
 }
@@ -1952,15 +2020,15 @@ function openModal(url) {
   const key    = h.url || h.platformNr;
 
   document.getElementById('modalContent').innerHTML = `
-    <button class="modal-close" onclick="closeModal()"></button>
+    <button class="modal-close" onclick="closeModal()">✕</button>
     ${buildModalCarousel(h)}
     <div class="modal-body">
-      <div class="modal-title">${h.location||''} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
+      <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
       <div class="modal-subtitle">${h.floor?h.floor+' ·':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
 
       <div class="modal-price-row">
         <div class="modal-price-left">
-          <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):''}</div>
+          <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
           ${ppm?`<div class="modal-ppm">€${ppm}/τ.μ.</div>`:''}
         </div>
         <div class="modal-action-btns">
@@ -1975,21 +2043,21 @@ function openModal(url) {
             title="${isHid?'Επαναφορά':'Απόκρυψη'}">
             ${isHid?'↩ Επαναφορά':'✕ Απόκρυψη'}
           </span>
-          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="�s����">� �s����</span>
-          ${h.deleted ? `<span class="mab" style="color:var(--accent2);border-color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" title="��� ��{�����">� ��� ��{�����</span>` : ''}
+          <span class="mab" onclick="addToCompare('${escJ(h.url)}');closeModal()" title="Σύγκριση">⊕ Σύγκριση</span>
+          ${h.deleted ? `<span class="mab" style="color:var(--accent2);border-color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" title="Δεν πουλήθηκε">↩ Δεν πουλήθηκε</span>` : ''}
         </div>
       </div>
 
       <div class="modal-grid">
-        <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.available||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:24px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.2)'};margin:0 2px;transition:color 0.15s;" onmouseover="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=j<${i}?'#d4a853':'rgba(255,255,255,0.2)')" onmouseout="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=(${h.personal_score}||0)>j?'#d4a853':'rgba(255,255,255,0.2)')">${(h.personal_score||0)>=i?'':''}</span>`).join('')}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.visit_date || ''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.platformNr||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.agencyNr||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.available||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:24px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.2)'};margin:0 2px;transition:color 0.15s;" onmouseover="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=j<${i}?'#d4a853':'rgba(255,255,255,0.2)')" onmouseout="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=(${h.personal_score}||0)>j?'#d4a853':'rgba(255,255,255,0.2)')">${(h.personal_score||0)>=i?'★':'☆'}</span>`).join('')}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.visit_date || '—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις ����������:</strong> ${h.notes}</div>`:''}
-      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">=� ���������� ���������</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">=� ���������</button></div>
+      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
     </div>`;
   document.getElementById('detailModal').classList.add('open');
 }
@@ -2001,7 +2069,7 @@ function modalToggleFav(key) {
   else{if(h.favorited)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
   const btn=document.getElementById('modal-fav-btn');
   if(btn){btn.classList.toggle('active',h.favorited);btn.textContent=h.favorited?'★ Αγαπημένο':'☆ Αγαπημένο';}
-  pushAction({label:h.favorited?` ${h.location}`:` ${h.location}`,
+  pushAction({label:h.favorited?`★ ${h.location}`:`☆ ${h.location}`,
     undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
     redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
   showToast(h.favorited?'★ Αγαπημένο':'☆ Αφαιρέθηκε');
@@ -2013,7 +2081,7 @@ function modalToggleHide(key) {
   if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
   const btn=document.getElementById('modal-hide-btn');
   if(btn){btn.classList.toggle('active',h.hidden);btn.textContent=h.hidden?'↩ Επαναφορά':'✕ Απόκρυψη';}
-  pushAction({label:h.hidden?` ${h.location}`:`☆ ${h.location}`,
+  pushAction({label:h.hidden?`✕ ${h.location}`:`☆ ${h.location}`,
     undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
     redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
   showToast(h.hidden?'✕ Κρύφτηκε':'↩ Εμφανίζεται ξανά');
@@ -2026,7 +2094,7 @@ function toggleFav(key) {
   const h=getByUrl(key);const prev=h?h.favorited:favorites.has(key);
   if(h&&h._dbId){h.favorited=!prev;sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});}
   else{if(prev)favorites.delete(key);else favorites.add(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
-  pushAction({label:(!prev?' ':'  ')+(h?h.location:''),
+  pushAction({label:(!prev?'★ ':' ☆ ')+(h?h.location:''),
     undo:async()=>{if(h&&h._dbId){h.favorited=prev;await sb.update(h._dbId,{favorited:prev});}else{if(prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();},
     redo:async()=>{if(h&&h._dbId){h.favorited=!prev;await sb.update(h._dbId,{favorited:!prev});}else{if(!prev)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}applyFilters();}});
   showToast(!prev?'★ Αγαπημένο':'☆ Αφαιρέθηκε');
@@ -2047,7 +2115,7 @@ function clearCompare() { compareList = []; renderCompareBar(); }
 function renderCompareBar() {
   document.getElementById('compareBar').classList.toggle('open', compareList.length > 0);
   document.getElementById('compareItems').innerHTML = compareList.map(h =>
-    `<div class="compare-item">${h.location} · ${h.price?'€'+h.price.toLocaleString('el'):''} <span class="compare-remove" onclick="removeFromCompare('${escJ(h.url)}')"></span></div>`
+    `<div class="compare-item">${h.location} · ${h.price?'€'+h.price.toLocaleString('el'):'—'} <span class="compare-remove" onclick="removeFromCompare('${escJ(h.url)}')">✕</span></div>`
   ).join('');
 }
 function openCompareModal() {
@@ -2079,16 +2147,16 @@ function openCompareModal() {
         html += `<td>${h.imageUrl?`<img class="compare-img" src="${h.imageUrl}">`:'<div class="compare-no-img">🏠</div>'}</td>`;
       } else if (key === 'price') {
         const best = h.price === minPrice;
-        html += `<td class="${best?'best':''}">€${h.price?h.price.toLocaleString('el'):''}</td>`;
+        html += `<td class="${best?'best':''}">€${h.price?h.price.toLocaleString('el'):'—'}</td>`;
       } else if (key === 'pricePerSqm') {
         const ppm = h._ppm;
         html += `<td class="${ppm&&ppm===minPpm?'best':''}">${ppm?'€'+ppm:''}</td>`;
       } else if (key === 'energy') {
         html += `<td><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></td>`;
       } else if (key === 'sqmRaw') {
-        html += `<td>${h.sqm_raw || h.sqmRaw || ''}</td>`;
+        html += `<td>${h.sqm_raw || h.sqmRaw || '—'}</td>`;
       } else {
-        html += `<td>${h[key]||''}</td>`;
+        html += `<td>${h[key]||'—'}</td>`;
       }
     });
     html += `</tr>`;
@@ -2109,20 +2177,20 @@ function handleCSV(e) { const file = e.target.files[0]; if (file) processFile(fi
 //    THUMBNAIL FIX IMPORT ──────────────────────────────────────────────────
 async function processThumbnailFix(text) {
   const lines = text.trim().split('\n');
-  if (lines.length < 2) { showToast('L ���� �����'); return; }
+  if (lines.length < 2) { showToast('❌ Κενό αρχείο'); return; }
 
   // Parse header
   const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g,'').toLowerCase());
   const urlIdx = headers.findIndex(h => h === 'url');
   const imgIdx = headers.findIndex(h => h === 'new_image_url');
-  if (urlIdx < 0 || imgIdx < 0) { showToast('L ����� format  �������1� url + new_image_url'); return; }
+  if (urlIdx < 0 || imgIdx < 0) { showToast('❌ Λάθος format — χρειάζεται url + new_image_url'); return; }
 
   const fixes = lines.slice(1).map(line => {
     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g,''));
     return { url: cols[urlIdx], imageUrl: cols[imgIdx] };
   }).filter(f => f.url && f.imageUrl);
 
-  showToast(`=� �������� ${fixes.length} ��?�����...`);
+  showToast(`📷 Ενημέρωση ${fixes.length} φωτογραφιών...`);
   let updated = 0, errors = 0;
 
   for (const fix of fixes) {
@@ -2140,7 +2208,7 @@ async function processThumbnailFix(text) {
     } catch(e) { errors++; }
   }
 
-  showToast(` ${updated} ��?������ �����������${errors?' � L '+errors+' �����1':''}`, null, 5000);
+  showToast(`✅ ${updated} φωτογραφίες ενημερώθηκαν${errors?' · ❌ '+errors+' σφάλματα':''}`, null, 5000);
   renderListings();
 }
 
@@ -2157,11 +2225,11 @@ function processFile(file) {
     }
 
     const rows = parseCSV(text, 'Spitogatos');
-    if (!rows.length) { showToast('L ��� �������� �������'); return; }
+    if (!rows.length) { showToast('❌ Δεν βρέθηκαν εγγραφές'); return; }
 
     // Show progress toast
     const total = rows.filter(r => r.url).length;
-    showToast(`=� ����s� ${total} ������� �7 ���...`);
+    showToast(`📥 Εισαγωγή ${total} αγγελιών στη βάση...`);
 
     let added=0, updated=0, unchanged=0, errors=0;
     const changes = []; // track what changed for summary
@@ -2188,7 +2256,7 @@ function processFile(file) {
         };
 
         if (!existing || existing.length === 0) {
-          // New listing  insert
+          // New listing — insert
           await fetch(`${SUPABASE_URL}/rest/v1/listings`, {
             method: 'POST',
             headers: { ...sb.headers(), 'Prefer': 'return=minimal' },
@@ -2196,7 +2264,7 @@ function processFile(file) {
           });
           added++;
         } else {
-          // Existing  check what changed
+          // Existing — check what changed
           const old = existing[0];
           const priceChanged = old.price && h.price && Number(old.price) !== h.price;
           const imgChanged   = h.imageUrl && old.image_url !== h.imageUrl;
@@ -2254,10 +2322,10 @@ function processFile(file) {
 
     // Summary toast
     const parts = [];
-    if (added)     parts.push(` ${added} νέες`);
-    if (updated)   parts.push(`= ${updated} ενημερώθηκαν`);
-    if (unchanged) parts.push(` ${unchanged} ���,���5�`);
-    if (errors)    parts.push(`L ${errors} �����1`);
+    if (added)     parts.push(`✅ ${added} νέες`);
+    if (updated)   parts.push(`🔄 ${updated} ενημερώθηκαν`);
+    if (unchanged) parts.push(`— ${unchanged} αμετάβλητες`);
+    if (errors)    parts.push(`❌ ${errors} σφάλματα`);
     showToast(parts.join(' · '), null, 6000);
 
     // Show change summary if any
@@ -2266,7 +2334,7 @@ function processFile(file) {
       const priceChanges = changes.filter(c=>c.priceChanged);
       if (priceChanges.length) {
         setTimeout(()=>showToast(
-          `=� ${priceChanges.length} ������� 9���  ��� console ��� ���?�������`, null, 5000
+          `💰 ${priceChanges.length} αλλαγές τιμής — δες console για λεπτομέρειες`, null, 5000
         ), 200);
       }
     }
@@ -2418,7 +2486,7 @@ function _renderOvl(){
   const rEl=document.getElementById('loRight');
   if(rest.length){
     rEl.style.display='flex';
-    document.getElementById('loCarouselTitle').textContent=`��;����� �������� ${rest.length}`;
+    document.getElementById('loCarouselTitle').textContent=`Υπόλοιπες αγγελίες ${rest.length}`;
     document.getElementById('loNavPrev').classList.toggle('disabled',_loFeatIdx===0);
     document.getElementById('loNavNext').classList.toggle('disabled',_loFeatIdx===_loSiblings.length-1);
     document.getElementById('loCarousel').innerHTML=rest.map((s,i)=>_sibHTML(s,i)).join('');
@@ -2448,10 +2516,10 @@ function _featHTML(h){
     ${h.imageUrl
       ? `<img id="lo-photo-preview" class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
           onclick="openPhotoLightbox(this.src)"
-          onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'><�</div>'">`
-      : '<div class="modal-no-img" id="lo-photo-preview"><�</div>'}
+          onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>🏠</div>'">`
+      : '<div class="modal-no-img" id="lo-photo-preview">🏠</div>'}
     <div style="display:flex;gap:6px;align-items:center;padding:7px 12px 0;background:var(--surface)">
-      <span style="font-size:11px;color:var(--text3);white-space:nowrap">=� URL:</span>
+      <span style="font-size:11px;color:var(--text3);white-space:nowrap">📷 URL:</span>
       <input id="lo-photo-input" type="text" value="${h.imageUrl||''}"
         placeholder="https://... paste new image URL"
         style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:5px;
@@ -2461,14 +2529,14 @@ function _featHTML(h){
       <button onclick="savePhotoUrl('${escJ(key)}')"
         style="background:var(--accent);color:#0f0e0c;border:none;border-radius:5px;
                padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;
-               font-family:'DM Sans',sans-serif;white-space:nowrap">=� ���������</button>
+               font-family:'DM Sans',sans-serif;white-space:nowrap">💾 Αποθήκευση</button>
     </div>
     <div class="modal-body">
-      <div class="modal-title">${h.location||''} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
+      <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
       <div class="modal-subtitle">${h.floor?h.floor+' · ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <div style="display:flex;align-items:baseline;gap:8px">
-          <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):''}</div>
+          <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
           ${ppm?`<div class="modal-ppm">€${ppm}/τ.μ.</div>`:''}
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
@@ -2480,22 +2548,22 @@ function _featHTML(h){
           <span class="modal-btn${isHid?' active':''}" id="lo-hide" style="cursor:pointer;${isHid?'border-color:var(--red);color:var(--red)':''}"
             onclick="loToggleHide('${escJ(key)}')">${isHid?'↩ Επαναφορά':'✕ Απόκρυψη'}</span>
           <span class="modal-btn" style="cursor:pointer"
-            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">� �s����</span>
-          ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >� ��� ��{�����</span>` : ''}
+            onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">⊕ Σύγκριση</span>
+          ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >↩ Δεν πουλήθηκε</span>` : ''}
         </div>
       </div>
       <div class="modal-grid">
-        <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.available||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.platformNr||''}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.agencyNr||''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.available||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις ����������:</strong> ${h.notes}</div>`:''}
+      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
       <div style="margin-top:8px">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">P �����3��</div>
-        <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'':''}</span>`).join('')}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⭐ Αξιολόγηση</div>
+        <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'★':'☆'}</span>`).join('')}</div>
       </div>
-      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">=� ���������� ���������</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">=� ���������</button></div>
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
     </div>`;
 }
 
@@ -2507,17 +2575,17 @@ function _sibHTML(s, ri) {
       ${s.imageUrl
         ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>🏠</div>'">`
         : `<div class="lo-sib-no-img">🏠</div>`}
-      <div class="card-badge" style="position:absolute;top:7px;left:7px;z-index:2">${s.type||''}</div>
+      <div class="card-badge" style="position:absolute;top:7px;left:7px;z-index:2">${s.type||'—'}</div>
       <div class="platform-badge ${platformBadgeClass(s.platform)}" style="position:absolute;top:7px;right:7px;z-index:2">${s.platform||''}</div>
     </div>
     <div class="lo-sib-body">
       <div class="lo-sib-top">
         <div>
-          <div class="lo-sib-location">${s.location||''}</div>
+          <div class="lo-sib-location">${s.location||'—'}</div>
           <div class="lo-sib-sub">${s.floor?s.floor+(s.lvl?' · '+s.lvl+' επίπ.':''):''}</div>
         </div>
         <div style="text-align:right">
-          <div class="lo-sib-price">${s.price?'€'+s.price.toLocaleString('el'):''}</div>
+          <div class="lo-sib-price">${s.price?'€'+s.price.toLocaleString('el'):'—'}</div>
           <div class="lo-sib-ppm">${ppm?'€'+ppm+'/τ.μ.':''}</div>
         </div>
       </div>
@@ -2528,9 +2596,9 @@ function _sibHTML(s, ri) {
         ${s.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(s.energy)}">${energyLabel(s.energy)}</span></span>`:''}
       </div>
       <div class="lo-sib-footer">
-        <span class="lo-sib-agency" title="${s.agency||''}">${s.agency||''}</span>
+        <span class="lo-sib-agency" title="${s.agency||''}">${s.agency||'—'}</span>
         <div class="lo-sib-btns">
-          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="Αγαπημένο">${isFav?'':''}</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="Αγαπημένο">${isFav?'★':'☆'}</span>
           ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="Άνοιγμα">↗</span>`:''}
         </div>
       </div>
@@ -2543,19 +2611,19 @@ function loToggleFav(key){
   const prev=h.favorited;h.favorited=!prev;
   if(h._dbId)sb.update(h._dbId,{favorited:h.favorited}).catch(()=>{});
   else{if(h.favorited)favorites.add(key);else favorites.delete(key);localStorage.setItem('favs',JSON.stringify([...favorites]));}
-  pushAction({label:h.favorited?` ${h.location}`:` ${h.location}`,
+  pushAction({label:h.favorited?`★ ${h.location}`:`☆ ${h.location}`,
     undo:async()=>{h.favorited=prev;if(h._dbId)await sb.update(h._dbId,{favorited:prev});renderListings();},
     redo:async()=>{h.favorited=!prev;if(h._dbId)await sb.update(h._dbId,{favorited:!prev});renderListings();}});
   const b=document.getElementById('lo-fav');
   if(b){b.textContent=h.favorited?'★ Αγαπημένο':'☆ Αγαπημένο';b.classList.toggle('active',h.favorited);}
-  showToast(h.favorited?' ���������':' ���������');
+  showToast(h.favorited?'★ Αγαπημένο':'☆ Αφαιρέθηκε');
 }
 
 function loToggleHide(key){
   const h=getByUrl(key);if(!h)return;
   const prev=h.hidden;h.hidden=!prev;
   if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
-  pushAction({label:h.hidden?` ${h.location}`:`☆ ${h.location}`,
+  pushAction({label:h.hidden?`✕ ${h.location}`:`☆ ${h.location}`,
     undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
     redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
   const b=document.getElementById('lo-hide');
@@ -2570,10 +2638,10 @@ async function toggleGroupFav(houseId){
   const nv=!items.every(h=>h.favorited);
   const prev=items.map(h=>({h,p:h.favorited}));
   for(const {h} of prev){h.favorited=nv;if(h._dbId)sb.update(h._dbId,{favorited:nv}).catch(()=>{});}
-  pushAction({label:nv?` Group #${houseId}`:` Group #${houseId}`,
+  pushAction({label:nv?`★ Group #${houseId}`:`☆ Group #${houseId}`,
     undo:async()=>{for(const {h,p} of prev){h.favorited=p;if(h._dbId)await sb.update(h._dbId,{favorited:p});}renderListings();},
     redo:async()=>{for(const {h} of prev){h.favorited=nv;if(h._dbId)await sb.update(h._dbId,{favorited:nv});}renderListings();}});
-  showToast(nv?' ��������� ��� ;��':' ���������');renderListings();
+  showToast(nv?'★ Αγαπημένο για όλες':'☆ Αφαιρέθηκε');renderListings();
 }
 
 async function toggleGroupHide(houseId){
@@ -2581,10 +2649,10 @@ async function toggleGroupHide(houseId){
   const nv=!items.every(h=>h.hidden);
   const prev=items.map(h=>({h,p:h.hidden}));
   for(const {h} of prev){h.hidden=nv;if(h._dbId)sb.update(h._dbId,{hidden:nv}).catch(()=>{});}
-  pushAction({label:nv?` Group #${houseId}`:`☆ Group #${houseId}`,
+  pushAction({label:nv?`★ Group #${houseId}`:`☆ Group #${houseId}`,
     undo:async()=>{for(const {h,p} of prev){h.hidden=p;if(h._dbId)await sb.update(h._dbId,{hidden:p});}applyFilters();},
     redo:async()=>{for(const {h} of prev){h.hidden=nv;if(h._dbId)await sb.update(h._dbId,{hidden:nv});}applyFilters();}});
-  showToast(nv?' ����7��� ;��':'� ��������1� ����');applyFilters();
+  showToast(nv?'✕ Κρύφτηκαν όλες':'↩ Εμφανίζονται ξανά');applyFilters();
 }
 
 // Keyboard nav
@@ -2611,17 +2679,17 @@ async function savePhotoUrl(key) {
   if (h._dbId) {
     try {
       await sb.update(h._dbId, { image_url: newUrl });
-      showToast('=� ��?����� ����������!');
+      showToast('📷 Φωτογραφία ενημερώθηκε!');
       pushAction({
-        label: `=� ��?�����: ${h.location}`,
+        label: `📷 Φωτογραφία: ${h.location}`,
         undo: async () => { h.imageUrl=prev; if(h._dbId) await sb.update(h._dbId,{image_url:prev}); _renderOvl(); },
         redo: async () => { h.imageUrl=newUrl; if(h._dbId) await sb.update(h._dbId,{image_url:newUrl}); _renderOvl(); },
       });
       // Re-render to update thumbnail on main grid too
       renderListings();
-    } catch(e) { showToast('L ����� ����������'); h.imageUrl = prev; }
+    } catch(e) { showToast('❌ Σφάλμα ενημέρωσης'); h.imageUrl = prev; }
   } else {
-    showToast('=� ���������� ?���� (����� �}��� DB)');
+    showToast('📷 Άλλαξε μόνο τοπικά (δεν υπάρχει στη DB)');
   }
 }
 //    INIT                                                                   
@@ -2720,7 +2788,7 @@ async function unmarkSold(key) {
   await sb.update(h._dbId, {deleted: null});
   closeModal();
   applyFilters();
-  showToast('⊕ ����������� �� ������');
+  showToast('↩ Επαναφέρθηκε ως ενεργό');
 }
 </script>
 
@@ -2791,7 +2859,7 @@ function setRating(e,id,score){
   if(rec)rec.personal_score=score;
   fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_score:score})});
   const stars=e.currentTarget.parentNode.querySelectorAll('span[data-star]');
-  stars.forEach((s,j)=>{s.textContent=j<score?'':'';s.style.color=j<score?'#d4a853':'rgba(255,255,255,0.2)';});
+  stars.forEach((s,j)=>{s.textContent=j<score?'★':'☆';s.style.color=j<score?'#d4a853':'rgba(255,255,255,0.2)';});
 }
 function saveNotes(id){
   const ta=document.getElementById('loNotesTA');
@@ -2799,7 +2867,7 @@ function saveNotes(id){
   const val=ta.value;
   const rec=allListings.find(x=>x.id===id);
   if(rec)rec.personal_notes=val;
-  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent=' ��������7��';setTimeout(()=>btn.textContent='=� ���������',1500);}});
+  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
 </script>
 </body>
