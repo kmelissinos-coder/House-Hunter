@@ -2658,6 +2658,9 @@ function _featHTML(h){
           onclick="openListingGallery('${escJ(h.url)}')"
           onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>🏠</div>'">`
       : '<div class="modal-no-img" id="lo-photo-preview">🏠</div>'}
+    ${(function(){ let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){} if(!Array.isArray(ex)) ex=[];
+      const th=ex.filter(u=>u&&u!==h.imageUrl).slice(0,4);
+      return th.length?`<div style="display:flex;gap:6px;margin-top:6px">${th.map((u,ix)=>`<img src="${escA(u)}" loading="lazy" onclick="event.stopPropagation();openListingGallery('${escJ(h.url)}',${ix+1})" style="flex:1;min-width:0;height:84px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border)" onerror="this.style.display='none'"/>`).join('')}</div>`:'';})()}
     ${_houseGroup(h).length>1?`<button onclick="event.stopPropagation();openHouseGallery('${escJ(h.url)}')" style="width:100%;margin:8px 0 2px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#101010;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:13px;cursor:pointer;">📸 Όλες οι φωτογραφίες από όλα τα μεσιτικά (${_houseGroup(h).length} αγγελίες)</button>`:''}
     <div style="display:flex;gap:6px;align-items:center;padding:7px 12px 0;background:var(--surface)">
       <span style="font-size:11px;color:var(--text3);white-space:nowrap">📷 URL:</span>
