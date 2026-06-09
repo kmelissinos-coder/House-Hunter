@@ -2438,6 +2438,33 @@ async function saveAddress(key){
   }catch(e){ showToast('⚠ Σφάλμα αποθήκευσης'); }
 }
 
+function _houseGroup(h){
+  const hid=String(h.house_id||'').trim();
+  if(!hid) return [h];
+  const all=[...allListings,...extraListings];
+  const g=all.filter(x=>String(x.house_id||'').trim()===hid);
+  return g.length?g:[h];
+}
+function openHouseGallery(key){
+  const all=[...allListings,...extraListings];
+  const h=all.find(x=>x.url===key); if(!h) return;
+  const g=_houseGroup(h).slice().sort((a,b)=>(a.url===key?-1:0)-(b.url===key?-1:0));
+  const seen={}; const items=[];
+  g.forEach(l=>{
+    let ex=[]; try{ ex=JSON.parse(l.extra_images||'[]'); }catch(e){}
+    if(!Array.isArray(ex)) ex=[];
+    [l.imageUrl,...ex].forEach(u=>{ if(u&&!seen[u]){ seen[u]=1; items.push({url:u,listing:l}); } });
+  });
+  if(!items.length){ showToast('⚠ Δεν υπάρχουν φωτογραφίες'); return; }
+  galleryItems=items;
+  galleryIdx=0; galleryZoom=1; galleryPanX=0; galleryPanY=0;
+  document.getElementById('galleryOverlay').classList.add('open');
+  _initGalleryControls();
+  document.body.style.overflow='hidden';
+  _renderGalleryFrame();
+  _buildGalleryThumbs();
+}
+
 function openListingGallery(key, startIdx) {
   const all = [...allListings, ...extraListings];
   const h = all.find(x => x.url === key);
@@ -2636,6 +2663,7 @@ function _featHTML(h){
           onclick="openListingGallery('${escJ(h.url)}')"
           onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>🏠</div>'">`
       : '<div class="modal-no-img" id="lo-photo-preview">🏠</div>'}
+    ${_houseGroup(h).length>1?`<button onclick="event.stopPropagation();openHouseGallery('${escJ(h.url)}')" style="width:100%;margin:8px 0 2px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#101010;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:13px;cursor:pointer;">📸 Όλες οι φωτογραφίες από όλα τα μεσιτικά (${_houseGroup(h).length} αγγελίες)</button>`:''}
     <div style="display:flex;gap:6px;align-items:center;padding:7px 12px 0;background:var(--surface)">
       <span style="font-size:11px;color:var(--text3);white-space:nowrap">📷 URL:</span>
       <input id="lo-photo-input" type="text" value="${h.imageUrl||''}"
