@@ -2057,12 +2057,19 @@ function openModal(url) {
       </div>
 
       <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Έτος κατασκευής</div><div class="modal-field-value">${h.year||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Θέρμανση</div><div class="modal-field-value">${h.heating||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Ενεργειακή Τάξη</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:12px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">Όροφος / Επίπεδα</div><div class="modal-field-value">${h.floor||'—'} ${h.lvl?'· '+h.lvl+' επίπεδα':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">${h.agency||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.available||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:24px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.2)'};margin:0 2px;transition:color 0.15s;" onmouseover="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=j<${i}?'#d4a853':'rgba(255,255,255,0.2)')" onmouseout="this.parentNode.querySelectorAll('span').forEach((s,j)=>s.style.color=(${h.personal_score}||0)>j?'#d4a853':'rgba(255,255,255,0.2)')">${(h.personal_score||0)>=i?'★':'☆'}</span>`).join('')}</div></div>
         <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.visit_date || '—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Αγγελίας</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Μεσιτικού</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
       <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
@@ -2389,6 +2396,24 @@ function closeGallery() {
   document.getElementById('galleryImgWrap')?.classList.remove('zoomed');
 }
 
+function openListingGallery(key, startIdx) {
+  const all = [...allListings, ...extraListings];
+  const h = all.find(x => x.url === key);
+  if (!h) return;
+  let extras = [];
+  try { extras = JSON.parse(h.extra_images || '[]'); } catch(e) {}
+  if (!Array.isArray(extras)) extras = [];
+  const seen = {};
+  const urls = [h.imageUrl, ...extras].filter(u => u && !seen[u] && (seen[u] = 1));
+  if (!urls.length) return;
+  galleryItems = urls.map(u => ({ url: u, listing: h }));
+  galleryIdx   = Math.min(startIdx || 0, galleryItems.length - 1);
+  galleryZoom  = 1;
+  document.getElementById('galleryOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  _renderGalleryFrame();
+}
+
 function _renderGalleryFrame() {
   const item = galleryItems[galleryIdx]; if (!item) return;
   const h = item.listing;
@@ -2523,7 +2548,7 @@ function _featHTML(h){
   return `
     ${h.imageUrl
       ? `<img id="lo-photo-preview" class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
-          onclick="openPhotoLightbox(this.src)"
+          onclick="openListingGallery('${escJ(h.url)}')"
           onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>🏠</div>'">`
       : '<div class="modal-no-img" id="lo-photo-preview">🏠</div>'}
     <div style="display:flex;gap:6px;align-items:center;padding:7px 12px 0;background:var(--surface)">
@@ -2561,10 +2586,17 @@ function _featHTML(h){
         </div>
       </div>
       <div class="modal-grid">
+        <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Έτος κατασκευής</div><div class="modal-field-value">${h.year||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Θέρμανση</div><div class="modal-field-value">${h.heating||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Ενεργειακή Τάξη</div><div class="modal-field-value"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span> <span style="font-size:11px;color:var(--text3)">${(h.energy||'').replace(/^[^:]+:\s*/,'')}</span></div></div>
+        <div class="modal-field"><div class="modal-field-label">Όροφος / Επίπεδα</div><div class="modal-field-value">${h.floor||'—'} ${h.lvl?'· '+h.lvl+' επίπ.':''}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">${h.agency||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Τελευταία ενημ.</div><div class="modal-field-value">${h.updated||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.available||'—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
-        <div class="modal-field"><div class="modal-field-label">Προσωπικό Σκορ</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Αγγελίας</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
+        <div class="modal-field"><div class="modal-field-label">Αρ. Μεσιτικού</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
       <div style="margin-top:8px">
@@ -2608,6 +2640,7 @@ function _sibHTML(s, ri) {
         <div class="lo-sib-btns">
           <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFav('${escJ(s.url||s.platformNr)}')" title="Αγαπημένο">${isFav?'★':'☆'}</span>
           ${s.url?`<span class="action-btn icon-only" onmousedown="handleLinkClick(event,'${escJ(s.url)}')" onclick="event.stopPropagation();handleLinkClick(event,'${escJ(s.url)}')" title="Άνοιγμα">↗</span>`:''}
+          ${s._dbId?`<span class="action-btn icon-only" onclick="event.stopPropagation();ungroupListing('${s._dbId}')" title="✂️ Αποσύνδεση από group" style="color:var(--red);border-color:var(--red)">✂️</span>`:''}
         </div>
       </div>
     </div>
