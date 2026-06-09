@@ -1516,7 +1516,13 @@ function buildUI() {
     const tab = document.createElement('button');
     tab.className = 'platform-tab' + (currentPlatform === p ? ' active' : '');
     tab.setAttribute('data-platform', p);
-    tab.style.background = getPlatformColor(p); tab.style.color = '#101010'; tab.style.fontWeight = '700'; tab.style.opacity = (currentPlatform === 'all' || currentPlatform === p) ? '1' : '0.45'; tab.style.border = currentPlatform === p ? '2px solid #fff' : '2px solid transparent';
+    const _pc = getPlatformColor(p); const _sel = currentPlatform === p;
+    tab.style.background = _sel ? _pc : 'transparent';
+    tab.style.border = '1.5px solid ' + _pc;
+    tab.style.color = _sel ? '#101010' : _pc;
+    tab.style.fontWeight = _sel ? '800' : '600';
+    tab.style.boxShadow = _sel ? '0 0 12px ' + _pc + '66' : 'none';
+    tab.style.opacity = '1';
     tab.innerHTML = `${p} <span style="opacity:0.6">(${cnt})</span>`;
     tab.onclick = function(){ setPlatform(p, this); };
     bar.appendChild(tab);
