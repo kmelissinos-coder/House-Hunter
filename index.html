@@ -2412,6 +2412,7 @@ function openListingGallery(key, startIdx) {
   document.getElementById('galleryOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   _renderGalleryFrame();
+  _buildGalleryThumbs();
 }
 
 function _renderGalleryFrame() {
