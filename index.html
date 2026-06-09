@@ -1284,7 +1284,7 @@ async function tryFetch() {
       price: parseFloat(item.price) || 0,
       sqm: parseFloat(item.sqm) || 0,
       year: parseInt(item.year) || 0,
-      pricePerSqm: parseFloat(item.price_per_sqm) || 0,
+      pricePerSqm: fixPpm(parseFloat(item.price_per_sqm) || 0, parseFloat(item.price) || 0, parseFloat(item.sqm) || 0),
       imageUrl: item.image_url,
       agencyNr: item.agency_nr,
       platformNr: item.platform_nr
@@ -1481,8 +1481,16 @@ function parseSqm(s) {
 }
 function parsePpm(s) {
   if (!s) return 0;
-  const m = s.replace(/[€\s,.]/g,'').match(/\d+/);
-  return m ? parseInt(m[0]) : 0;
+  const t = String(s).replace(/[€\s]/g,'').replace(/\./g,'').replace(',','.');
+  const v = parseFloat(t);
+  return isNaN(v) ? 0 : Math.round(v);
+}
+
+function fixPpm(pps, price, sqm) {
+  if (price > 0 && sqm > 0) return Math.round(price / sqm);
+  let v = pps;
+  while (v > 9000) v = v / 10;
+  return Math.round(v);
 }
 
 //    BUILD UI ─────────────────────────────────────────────────────────────
