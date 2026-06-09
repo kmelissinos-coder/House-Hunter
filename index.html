@@ -1824,7 +1824,8 @@ function initMap() {
   let placed = 0;
   const {groupCards:_mg,singles:_ms}=groupByHouseId(filtered);
   const _mapItems=[..._mg.map(g=>Object.assign({},g[0],{_mapCount:g.length,_mapGroup:g})),..._ms.map(h=>Object.assign({},h,{_mapCount:1,_mapGroup:[h]}))];  _mapItems.forEach(h => {
-    const _conf = (h._mapGroup||[h]).find(x => x.address_lat && x.address_lng);
+    const _grp = Array.isArray(h._mapGroup) ? h._mapGroup : [h];
+    const _conf = _grp.find(x => x && x.address_lat && x.address_lng);
     const coords = _conf ? [parseFloat(_conf.address_lat), parseFloat(_conf.address_lng)] : getCoords(h.location);
     if (!coords) return;
     placed++;
