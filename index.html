@@ -1971,7 +1971,7 @@ function initMap() {
 
     const marker = L.marker(coords, { icon }).addTo(leafletMap);
 
-    const popup = `<div class="map-popup">
+    const popup = `<div class="map-popup"><a href="${location.pathname}?open=${encodeURIComponent(h.url)}" onclick="event.preventDefault()" style="all:unset;display:block;cursor:pointer" title="Μεσαίο κλικ: άνοιγμα σε νέα καρτέλα">
       ${h.imageUrl ? `<img src="${h.imageUrl}" onerror="this.style.display='none'">` : ''}
       <div class="map-popup-loc">${h.location}</div>
       <div style="font-size:11px;color:#888;margin-bottom:4px">${h.type||''} · ${h.floor||''}</div>
@@ -1983,7 +1983,7 @@ function initMap() {
       ${h.url?`<a class="map-popup-link" href="${h.url}" target="_blank">↗ Άνοιγμα</a>`:''}
     </div>`;
 
-    marker.bindPopup(popup, { maxWidth: 260 });
+    marker.bindPopup(popup + '</a>', { maxWidth: 260 });
   });
 
   const legend = L.control({ position: 'bottomleft' });
