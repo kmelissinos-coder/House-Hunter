@@ -2584,7 +2584,7 @@ async function saveAddress(key){
     if(lat==null) showToast('⚠ Δεν βρέθηκε στον χάρτη — αποθηκεύεται μόνο το κείμενο');
   }
   try{
-    const resp=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({address:addr||null,address_lat:lat,address_lng:lng})});
+    const resp=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({address:addr||null,address_lat:lat,address_lng:lng})});
     if(!resp.ok){ showToast('⚠ Λείπουν οι στήλες address στη βάση — τρέξε το add_address_columns.sql'); return; }
     h.address=addr; h.address_lat=lat; h.address_lng=lng;
     showToast(lat!=null?'✓ Αποθηκεύτηκε & μπήκε στον χάρτη':'✓ Αποθηκεύτηκε');
@@ -2628,7 +2628,7 @@ async function setCoverImage(key, ix){
   const seen={}; const urls=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
   const u=urls[ix]; if(!u){ showToast('⚠ Δεν βρέθηκε η φωτογραφία'); return; }
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:u})});
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:u})});
     if(!r.ok){ showToast('⚠ Σφάλμα αποθήκευσης'); return; }
     h.imageUrl=u; h.image_url=u;
     showToast('✓ Ορίστηκε ως εξώφυλλο');
@@ -2707,7 +2707,7 @@ async function _drainEnrichQueue(){
   if(_enrichDraining) return; _enrichDraining=true;
   while(_enrichQueue.length){
     const p=_enrichQueue.shift();
-    try{ await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${p.id}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(p.out)}); }catch(e){}
+    try{ await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${p.id}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(p.out)}); }catch(e){}
     await new Promise(r=>setTimeout(r,150));
   }
   _enrichDraining=false;
@@ -2737,7 +2737,7 @@ async function setCoverFromGallery(){
   if(!it||!it.listing||!it.listing._dbId){ showToast('⚠ Δεν βρέθηκε η αγγελία'); return; }
   const h=it.listing;
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:it.url})});
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:it.url})});
     if(!r.ok){ showToast('⚠ Σφάλμα αποθήκευσης'); return; }
     h.imageUrl=it.url; h.image_url=it.url;
     showToast('✓ Ορίστηκε ως εξώφυλλο');
@@ -2971,7 +2971,7 @@ function closeListingOverlay(){
     const hp=document.getElementById('loPriceHist');
     if(hp&&h._dbId){
       try{
-        const r=await fetch(`${SUPABASE_URL}/rest/v1/price_history?listing_id=eq.${h._dbId}&order=changed_at.asc&select=old_price,new_price,changed_at`,{headers:sb.headers});
+        const r=await fetch(`${SUPABASE_URL}/rest/v1/price_history?listing_id=eq.${h._dbId}&order=changed_at.asc&select=old_price,new_price,changed_at`,{headers:sb.headers()});
         if(r.ok){
           const rows=await r.json();
           if(rows.length){
