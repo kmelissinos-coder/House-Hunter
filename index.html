@@ -2641,8 +2641,14 @@ async function hhDrop(e,key){
   if(A.hid&&B.hid&&A.hid===B.hid){ showToast('Ήδη στο ίδιο σπίτι'); return; }
   const hid=B.hid||A.hid||('group_'+Date.now());
   const members=[...new Set([...A.items,...B.items])];
+  const prev=members.map(m=>({m, hid:m.house_id}));
   for(const m of members){ m.house_id=hid; if(m._dbId){ try{ await sb.update(m._dbId,{house_id:hid}); }catch(_){} } }
-  showToast('🔗 Συνδέθηκαν σε ένα σπίτι ('+members.length+' αγγελίες)');
+  pushAction({
+    label:'🔗 Σύνδεση '+members.length+' αγγελιών',
+    undo:async()=>{ for(const p of prev){ p.m.house_id=p.hid; if(p.m._dbId){ try{ await sb.update(p.m._dbId,{house_id:p.hid}); }catch(_){} } } applyFilters(); },
+    redo:async()=>{ for(const m of members){ m.house_id=hid; if(m._dbId){ try{ await sb.update(m._dbId,{house_id:hid}); }catch(_){} } } applyFilters(); }
+  });
+  showToast('🔗 Συνδέθηκαν σε ένα σπίτι ('+members.length+' αγγελίες) — ↩ για αναίρεση');
   applyFilters();
 }
 
@@ -2664,10 +2670,16 @@ async function setGroupRating(e,hid,score){
   if(e&&e.stopPropagation) e.stopPropagation();
   const all=[...allListings,...extraListings];
   const members=all.filter(x=>String(x.house_id||'').trim()===String(hid));
+  const prev=members.map(m=>({m, sc:m.personal_score}));
   for(const m of members){
     m.personal_score=score;
     if(m._dbId){ try{ await sb.update(m._dbId,{personal_score:score}); }catch(_){} }
   }
+  pushAction({
+    label:'★ Σκορ σπιτιού',
+    undo:async()=>{ for(const p of prev){ p.m.personal_score=p.sc; if(p.m._dbId){ try{ await sb.update(p.m._dbId,{personal_score:p.sc}); }catch(_){} } } applyFilters(); },
+    redo:async()=>{ for(const m of members){ m.personal_score=score; if(m._dbId){ try{ await sb.update(m._dbId,{personal_score:score}); }catch(_){} } } applyFilters(); }
+  });
   showToast('★ '+score+'/5 για όλο το σπίτι');
   applyFilters();
 }
