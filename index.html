@@ -1044,6 +1044,14 @@
     display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; align-content: start; padding: 4px; }
   #galleryThumbs img { width: 100% !important; height: 165px !important; object-fit: cover; border-radius: 8px; }
   #galleryNext { right: 500px !important; }
+
+  /* ── sibling nav buttons ─────────────────────── */
+  .lo-nav-btn { width: 42px !important; height: 42px !important; border-radius: 10px !important;
+    display: flex !important; align-items: center; justify-content: center;
+    font-size: 24px !important; font-weight: 700; color: var(--accent) !important;
+    border: 1.5px solid var(--accent) !important; background: transparent !important; cursor: pointer; }
+  .lo-nav-btn:hover { background: var(--accent) !important; color: #101010 !important; }
+  .lo-nav-btn.disabled { opacity: 0.25; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -1082,7 +1090,7 @@
     <input type="number" id="maxPrice" placeholder="max €" oninput="applyFilters()">
   </div>
   <div class="range-group">
-    <spanτ.μ.</span>
+    <span>τ.μ.</span>
     <input type="number" id="minSqm" placeholder="min" oninput="applyFilters()">
     <span>—</span>
     <input type="number" id="maxSqm" placeholder="max" oninput="applyFilters()">
@@ -1243,8 +1251,8 @@
     <div class="lo-carousel-header">
       <span class="lo-carousel-title" id="loCarouselTitle"></span>
       <div class="lo-nav-btns">
-        <div class="lo-nav-btn disabled" id="loNavPrev" onclick="loNavFeat(-1)">9</div>
-        <div class="lo-nav-btn" id="loNavNext" onclick="loNavFeat(1)">:</div>
+        <div class="lo-nav-btn disabled" id="loNavPrev" onclick="loNavFeat(-1)">‹</div>
+        <div class="lo-nav-btn" id="loNavNext" onclick="loNavFeat(1)">›</div>
       </div>
     </div>
     <div class="lo-carousel" id="loCarousel"></div>
@@ -2759,6 +2767,8 @@ function _initGalleryControls() {
     _applyGalleryT();
   });
   wrap.addEventListener('dragstart', e => e.preventDefault());
+  const ov=document.getElementById('galleryOverlay');
+  if(ov&&!ov._hhBg){ ov._hhBg=true; ov.addEventListener('click', e => { if(e.target===ov||e.target===wrap) closeGallery(); }); }
 }
 let _gallerySortToken = 0;
 function _sortGalleryByRes() {
