@@ -1558,7 +1558,7 @@ function buildUI() {
   const types = [...new Set(combined.map(h => h.type).filter(Boolean))].sort();
   const locSel = document.getElementById('filterLocation');
   const savedLoc = locSel.value;
-  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + (function(){ const {groupCards:_gg, singles:_ss} = groupByHouseId(combined.filter(h=>!h.deleted)); const _hc={}; _gg.forEach(g=>{const L=(g[0].location||'').trim(); if(L)_hc[L]=(_hc[L]||0)+1;}); _ss.forEach(h=>{const L=(h.location||'').trim(); if(L)_hc[L]=(_hc[L]||0)+1;}); return locations.map(l => `<option value="${l}">${l}${_hc[l]?' ('+_hc[l]+')':''}</option>`).join(''); })();
+  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + (function(){ const _main=s=>String(s||'').split('(')[0].trim(); const {groupCards:_gg, singles:_ss} = groupByHouseId(combined.filter(h=>!h.deleted)); const _hc={}; _gg.forEach(g=>{const L=_main(g[0].location); if(L)_hc[L]=(_hc[L]||0)+1;}); _ss.forEach(h=>{const L=_main(h.location); if(L)_hc[L]=(_hc[L]||0)+1;}); const mains=[...new Set(locations.map(_main).filter(Boolean))].sort(); return mains.map(l => `<option value="${l}">${l}${_hc[l]?' ('+_hc[l]+')':''}</option>`).join(''); })();
   if (savedLoc) locSel.value = savedLoc;
   const typSel = document.getElementById('filterType');
   const savedTyp = typSel.value;
@@ -1605,7 +1605,7 @@ function applyFilters() {
     if (h.unfavorited === true) return false;
     if (!showDel && h.deleted) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
-    if (loc && h.location !== loc) return false;
+    if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
     if (q && !`${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating}`.toLowerCase().includes(q)) return false;
     if (h.price > 0 && (h.price < minP || h.price > maxP)) return false;
