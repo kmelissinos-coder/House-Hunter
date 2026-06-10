@@ -1008,6 +1008,19 @@
   .agency-name, .lo-sib-agency, .agency-summary { color: #ffffff !important; font-weight: 700 !important; }
 
   .card.hh-drop, .grouped-card.hh-drop { outline: 3px dashed var(--accent) !important; outline-offset: 2px; }
+
+  /* ── bigger close button on open card ────────── */
+  .lo-close { width: 52px !important; height: 52px !important; font-size: 28px !important;
+    display: flex !important; align-items: center; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.25) !important; border-radius: 12px !important; }
+
+  /* ── linking glow ────────────────────────────── */
+  .card.ms-picked, .grouped-card.ms-picked { box-shadow: 0 0 0 2px var(--accent), 0 0 16px rgba(230,180,80,0.55) !important; }
+  .card.ms-origin, .grouped-card.ms-origin { animation: msGlow 1.6s ease-in-out infinite; }
+  @keyframes msGlow {
+    0%,100% { box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(230,180,80,0.5); }
+    50%     { box-shadow: 0 0 0 3px var(--accent), 0 0 30px rgba(230,180,80,1); }
+  }
 </style>
 </head>
 <body>
@@ -1183,6 +1196,7 @@
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <span class="gallery-counter" id="galleryCounter"></span>
+      <button class="gallery-open-btn" onclick="setCoverFromGallery()" title="Κάνε αυτή τη φωτογραφία εξώφυλλο της κάρτας">🖼 Εξώφυλλο</button>
       <button class="gallery-open-btn" id="galleryOpenBtn">↗ Άνοιγμα</button>
     </div>
   </div>
@@ -1789,7 +1803,7 @@ function renderGroupedCard(g) {
       onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
   }
 
-  return `<div class="grouped-card${allFav?' favorited':''}" draggable="true" ondragstart="hhDragStart(event,'g:${escJ(String(g.houseId))}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'g:${escJ(String(g.houseId))}')"
+  return `<div class="grouped-card${allFav?' favorited':''}${g.items.some(x=>multiSelectedIds.has(x._dbId))?' ms-picked':''}${(selectedGroupSource&&g.items.some(x=>x.url===selectedGroupSource.url))?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(g.items[0].url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'g:${escJ(String(g.houseId))}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'g:${escJ(String(g.houseId))}')"
     onclick="openListingOverlay(null,'${g.houseId}',0)">
     <div class="photo-strip">
       ${stripHtml}
@@ -1989,7 +2003,7 @@ function renderCard(h) {
     }
   }
 
-  return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
+  return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}${(typeof msc!=='undefined'&&msc)?' ms-picked':''}${(selectedGroupSource&&selectedGroupSource.url===h.url)?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(h.url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
     <div class="card-img-wrap" style="cursor:pointer"
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
@@ -2652,6 +2666,20 @@ function enrichFromDescription(h){
   return Object.keys(out).length?out:null;
 }
 
+async function setCoverFromGallery(){
+  const it=galleryItems&&galleryItems[galleryIdx];
+  if(!it||!it.listing||!it.listing._dbId){ showToast('⚠ Δεν βρέθηκε η αγγελία'); return; }
+  const h=it.listing;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:it.url})});
+    if(!r.ok){ showToast('⚠ Σφάλμα αποθήκευσης'); return; }
+    h.imageUrl=it.url; h.image_url=it.url;
+    showToast('✓ Ορίστηκε ως εξώφυλλο');
+    applyFilters();
+    if(document.getElementById('listingOverlay').classList.contains('open')&&typeof _renderOvl==='function') _renderOvl();
+  }catch(e){ showToast('⚠ Σφάλμα'); }
+}
+
 function openListingGallery(key, startIdx) {
   const all = [...allListings, ...extraListings];
   const h = all.find(x => x.url === key);
@@ -3113,6 +3141,7 @@ function _restoreUI() {
     applyFilters();
     if (_uiSt.view && _uiSt.view !== 'grid') setView(_uiSt.view);
     if (typeof _uiSt.scroll === 'number' && _uiSt.scroll > 0) setTimeout(() => window.scrollTo(0, _uiSt.scroll), 150);
+    try{ const op=new URLSearchParams(location.search).get('open'); if(op) setTimeout(()=>{ try{ openListingOverlay(op); }catch(e){} }, 350); }catch(e){}
   } catch(e) {}
 }
 
