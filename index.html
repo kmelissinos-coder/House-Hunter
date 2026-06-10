@@ -1021,6 +1021,29 @@
     0%,100% { box-shadow: 0 0 0 3px var(--accent), 0 0 12px rgba(230,180,80,0.5); }
     50%     { box-shadow: 0 0 0 3px var(--accent), 0 0 30px rgba(230,180,80,1); }
   }
+
+  /* ── numbered minis + featured number ────────── */
+  .lo-sib-card { position: relative; }
+  .lo-sib-num { position: absolute; top: 8px; left: 8px; z-index: 6; background: var(--accent); color: #101010;
+    font-weight: 800; font-size: 15px; border-radius: 8px; padding: 2px 9px; }
+  .lo-featured { position: relative; }
+  .lo-feat-num { position: absolute; top: 10px; right: 12px; z-index: 7; background: var(--accent); color: #101010;
+    font-weight: 800; font-size: 22px; border-radius: 10px; padding: 4px 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.5); }
+  /* ── card photo arrows ───────────────────────── */
+  .card-img-wrap, .lo-sib-img-wrap { position: relative; }
+  .card-nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 50px;
+    display: flex; align-items: center; justify-content: center; font-size: 24px; color: #fff;
+    background: rgba(0,0,0,0.45); border-radius: 8px; cursor: pointer; opacity: 0; transition: opacity .15s; z-index: 5; user-select: none; }
+  .card-nav-arrow.left { left: 6px; } .card-nav-arrow.right { right: 6px; }
+  .card-img-wrap:hover .card-nav-arrow, .lo-sib-img-wrap:hover .card-nav-arrow { opacity: 1; }
+  /* ── gallery: image left, big thumbs right ───── */
+  #galleryImgWrap { position: fixed !important; left: 80px !important; right: 500px !important; top: 60px !important; bottom: 20px !important;
+    width: auto !important; height: auto !important; display: flex !important; align-items: center; justify-content: center; }
+  #galleryThumbs { position: fixed !important; right: 14px !important; top: 64px !important; bottom: 14px !important; left: auto !important;
+    width: 470px !important; height: auto !important; max-height: none !important;
+    display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; align-content: start; padding: 4px; }
+  #galleryThumbs img { width: 100% !important; height: 165px !important; object-fit: cover; border-radius: 8px; }
+  #galleryNext { right: 500px !important; }
 </style>
 </head>
 <body>
@@ -2004,9 +2027,10 @@ function renderCard(h) {
   }
 
   return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}${(typeof msc!=='undefined'&&msc)?' ms-picked':''}${(selectedGroupSource&&selectedGroupSource.url===h.url)?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(h.url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
-    <div class="card-img-wrap" style="cursor:pointer"
+    <div class="card-img-wrap" style="cursor:pointer" data-nav="1"
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
+      <span class="card-nav-arrow left" onclick="cardPhotoNav(event,'${escJ(h.url)}',-1)">‹</span><span class="card-nav-arrow right" onclick="cardPhotoNav(event,'${escJ(h.url)}',1)">›</span>
       <div class="no-img" ${h.imageUrl?'style="display:none"':''}>🏠</div>
       <div class="card-badge">${h.type || '—'}</div>
       <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
@@ -2680,6 +2704,20 @@ async function setCoverFromGallery(){
   }catch(e){ showToast('⚠ Σφάλμα'); }
 }
 
+function cardPhotoNav(e,key,dir){
+  e.stopPropagation(); e.preventDefault();
+  const all=[...allListings,...extraListings];
+  const h=all.find(x=>x.url===key); if(!h) return;
+  let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(_){ }
+  if(!Array.isArray(ex)) ex=[];
+  const seen={}; const urls=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
+  if(urls.length<2) return;
+  h._photoIdx=((h._photoIdx||0)+dir+urls.length)%urls.length;
+  const wrap=e.currentTarget.parentElement;
+  const img=wrap?wrap.querySelector('img'):null;
+  if(img) img.src=urls[h._photoIdx];
+}
+
 function openListingGallery(key, startIdx) {
   const all = [...allListings, ...extraListings];
   const h = all.find(x => x.url === key);
@@ -2844,10 +2882,11 @@ function _openOvl(sibs,fi){
 
 function _renderOvl(){
   const h=_loSiblings[_loFeatIdx];
-  const rest=_loSiblings.filter((x,i)=>i!==_loFeatIdx);
+  const rest=[..._loSiblings];
   document.getElementById('loFeatured').innerHTML=_featHTML(h);
+  document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
   const rEl=document.getElementById('loRight');
-  if(rest.length){
+  if(_loSiblings.length>1){
     rEl.style.display='flex';
     document.getElementById('loCarouselTitle').textContent=`Υπόλοιπες αγγελίες ${rest.length}`;
     document.getElementById('loNavPrev').classList.toggle('disabled',_loFeatIdx===0);
@@ -2979,7 +3018,9 @@ function _sibHTML(s, ri) {
   const ppm=s.pricePerSqm||(s.sqm>0&&s.price>0?Math.round(s.price/s.sqm):0);
   const isFav=s.favorited||favorites.has(s.url||s.platformNr);
   return `<div class="lo-sib-card${ri===_loFeatIdx?' lo-sib-active':''}" onclick="loSelectSibling(${ri})">
+    <div class="lo-sib-num">${ri+1}</div>
     <div class="lo-sib-img-wrap">
+      <span class="card-nav-arrow left" onclick="cardPhotoNav(event,'${escJ(s.url)}',-1)">‹</span><span class="card-nav-arrow right" onclick="cardPhotoNav(event,'${escJ(s.url)}',1)">›</span>
       ${s.imageUrl
         ? `<img src="${s.imageUrl}" loading="lazy" onerror="this.outerHTML='<div class=\'lo-sib-no-img\'>🏠</div>'">`
         : `<div class="lo-sib-no-img">🏠</div>`}
@@ -3300,6 +3341,7 @@ function _lbScrollNav(e){
   var img=document.getElementById('lbImg');
   img.src=h.imageUrl;img.style.transform='';img.classList.remove('lb-zoomed');
   document.getElementById('loFeatured').innerHTML=_featHTML(h);
+  document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
   _lbUpdateCounter();
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
