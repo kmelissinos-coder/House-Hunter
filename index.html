@@ -2496,6 +2496,7 @@ function openHouseGallery(key){
   document.body.style.overflow='hidden';
   _renderGalleryFrame();
   _buildGalleryThumbs();
+  _sortGalleryByRes();
 }
 
 function openListingGallery(key, startIdx) {
@@ -2517,6 +2518,7 @@ function openListingGallery(key, startIdx) {
   document.body.style.overflow = 'hidden';
   _renderGalleryFrame();
   _buildGalleryThumbs();
+  _sortGalleryByRes();
 }
 
 let galleryPanX = 0, galleryPanY = 0;
@@ -2539,6 +2541,30 @@ function _initGalleryControls() {
   });
   wrap.addEventListener('dragstart', e => e.preventDefault());
 }
+let _gallerySortToken = 0;
+function _sortGalleryByRes() {
+  const token = ++_gallerySortToken;
+  const items = galleryItems;
+  if (!items || items.length < 2) return;
+  const subset = items.slice(0, 120);
+  let pending = subset.length;
+  subset.forEach(it => {
+    const im = new Image();
+    im.onload = () => { it._res = im.naturalWidth * im.naturalHeight; if (--pending === 0) done(); };
+    im.onerror = () => { it._res = 0; if (--pending === 0) done(); };
+    im.src = it.url;
+  });
+  function done() {
+    if (token !== _gallerySortToken) return;
+    if (!document.getElementById('galleryOverlay').classList.contains('open')) return;
+    const cur = galleryItems[galleryIdx];
+    galleryItems = items.slice().sort((a, b) => (b._res || 0) - (a._res || 0));
+    galleryIdx = Math.max(0, galleryItems.indexOf(cur));
+    _renderGalleryFrame();
+    _buildGalleryThumbs();
+  }
+}
+
 function _renderGalleryFrame() {
   const item = galleryItems[galleryIdx]; if (!item) return;
   const h = item.listing;
