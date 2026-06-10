@@ -2790,14 +2790,21 @@ function _initGalleryControls() {
   if (!wrap || wrap._hhCtl) return;
   wrap._hhCtl = true;
   wrap.addEventListener('click', e => {
-    if (e.target.id !== 'galleryImg') return;
-    galleryZoom = galleryZoom > 1 ? 1 : 2.2;
-    galleryPanX = 0; galleryPanY = 0;
-    _applyGalleryT();
+    const img = document.getElementById('galleryImg');
+    if (!img) return;
+    const r = img.getBoundingClientRect();
+    const onImg = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    if (onImg) {
+      galleryZoom = galleryZoom > 1 ? 1 : 2.2;
+      galleryPanX = 0; galleryPanY = 0;
+      _applyGalleryT();
+    } else {
+      closeGallery();
+    }
   });
   wrap.addEventListener('dragstart', e => e.preventDefault());
   const ov=document.getElementById('galleryOverlay');
-  if(ov&&!ov._hhBg){ ov._hhBg=true; ov.addEventListener('click', e => { if(e.target===ov||e.target===wrap) closeGallery(); }); }
+  if(ov&&!ov._hhBg){ ov._hhBg=true; ov.addEventListener('click', e => { if(e.target===ov) closeGallery(); }); }
 }
 let _gallerySortToken = 0;
 function _sortGalleryByRes() {
