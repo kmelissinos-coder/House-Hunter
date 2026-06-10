@@ -996,6 +996,13 @@
   .lo-featured .modal-img { height: 460px !important; }
   .lo-photos { order: 3; width: 330px; max-height: 92vh; overflow-y: auto; padding: 14px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+
+  /* ── header tidy + single-line bar ───────────── */
+  header { justify-content: flex-start !important; gap: 10px !important; }
+  header > div:last-child { margin-left: auto !important; }
+  .header-stats { gap: 8px !important; }
+  .platform-bar { display: inline-flex !important; vertical-align: middle; }
+  .range-filters { display: inline-flex !important; vertical-align: middle; }
 </style>
 </head>
 <body>
@@ -1535,12 +1542,12 @@ function buildUI() {
     const tab = document.createElement('button');
     tab.className = 'platform-tab' + (currentPlatform === p ? ' active' : '');
     tab.setAttribute('data-platform', p);
-    const _pc = getPlatformColor(p); const _sel = currentPlatform === p;
-    tab.style.background = _sel ? _pc : 'transparent';
-    tab.style.border = '1.5px solid ' + _pc;
-    tab.style.color = _sel ? '#101010' : _pc;
+    const _sel = currentPlatform === p;
+    tab.style.background = _sel ? 'var(--accent)' : 'transparent';
+    tab.style.border = '1.5px solid var(--accent)';
+    tab.style.color = _sel ? '#101010' : 'var(--accent)';
     tab.style.fontWeight = _sel ? '800' : '600';
-    tab.style.boxShadow = _sel ? '0 0 12px ' + _pc + '66' : 'none';
+    tab.style.boxShadow = _sel ? '0 0 12px rgba(230,180,80,0.4)' : 'none';
     tab.style.opacity = '1';
     tab.innerHTML = `${p} <span style="opacity:0.6">(${cnt})</span>`;
     tab.onclick = function(){ setPlatform(p, this); };
