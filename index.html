@@ -1328,11 +1328,24 @@ async function tryFetch() {
       sqm: parseFloat(item.sqm) || 0,
       year: parseInt(item.year) || 0,
       energy: normEnergy(item.energy),
+      sqmRaw: item.sqm_raw || (parseFloat(item.sqm) > 0 ? parseFloat(item.sqm) + 'τ.μ.' : ''),
       pricePerSqm: fixPpm(parseFloat(item.price_per_sqm) || 0, parseFloat(item.price) || 0, parseFloat(item.sqm) || 0),
       imageUrl: item.image_url,
       agencyNr: item.agency_nr,
       platformNr: item.platform_nr
     }));
+
+    allListings.forEach(h => {
+      const out = enrichFromDescription(h);
+      if (out) {
+        Object.assign(h, out);
+        if (out.sqm && !h.sqmRaw) h.sqmRaw = out.sqm + 'τ.μ.';
+        if (out.sqm && !(h.pricePerSqm > 0) && h.price > 0) h.pricePerSqm = Math.round(h.price / out.sqm);
+        if (h._dbId) _enrichQueue.push({ id: h._dbId, out });
+      }
+    });
+    _drainEnrichQueue();
+
 
     if (!allListings.length) {
       document.getElementById('main-content').innerHTML = `
@@ -1796,8 +1809,8 @@ function renderGroupedCard(g) {
         </div>
       </div>
       <div class="grouped-specs">
-        ${g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:''}
-        ${g.year?`<span class="spec-tag">🏗 ${g.year}</span>`:''}
+        ${(function(){const v=g.items.map(x=>x.sqm).filter(x=>x>0);if(!v.length)return g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:'';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">📐 ${mn===mx?mn:mn+'–'+mx}τ.μ.</span>`;})()}
+        ${(function(){const v=g.items.map(x=>x.year).filter(x=>x>1800);if(!v.length)return '';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">🏗 ${mn===mx?mn:mn+'–'+mx}</span>`;})()}
         ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
         ${g.heating&&g.heating.includes('αέριο')?`<span class="spec-tag">🔥 Αέριο</span>`:''}
         ${g.heating&&g.heating.includes('Αντλία')?`<span class="spec-tag">♨️ Αντλία</span>`:''}
@@ -2606,6 +2619,37 @@ async function setGroupRating(e,hid,score){
   }
   showToast('★ '+score+'/5 για όλο το σπίτι');
   applyFilters();
+}
+
+const _enrichQueue=[];
+let _enrichDraining=false;
+async function _drainEnrichQueue(){
+  if(_enrichDraining) return; _enrichDraining=true;
+  while(_enrichQueue.length){
+    const p=_enrichQueue.shift();
+    try{ await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${p.id}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify(p.out)}); }catch(e){}
+    await new Promise(r=>setTimeout(r,150));
+  }
+  _enrichDraining=false;
+}
+function enrichFromDescription(h){
+  const d=String(h.description||''); if(!d) return null;
+  const out={};
+  if(!(h.sqm>0)){ const m=d.match(/(\d{2,4})(?:[.,]\d+)?\s*(?:τ\.?\s?μ|m2|m²|τετραγωνικ)/i); if(m){ const v=parseFloat(m[1]); if(v>=20&&v<2000) out.sqm=v; } }
+  if(!(h.year>1800)){ const m=d.match(/κατασκευ\w*\s*(?:το\s*)?(\d{4})|(\d{4})\s*κατασκευ/i); const y=m?+(m[1]||m[2]):0; if(y>1900&&y<2031) out.year=y; }
+  if(!h.heating){
+    if(/αντλί\w+\s+θερμ/i.test(d)) out.heating='Αντλία θερμότητας';
+    else if(/φυσικ\w+\s+αέρι/i.test(d)) out.heating='Φυσικό αέριο';
+    else if(/πετρέλαι/i.test(d)) out.heating='Πετρέλαιο';
+    else { const hm=d.match(/θέρμανση[ς]?\s*(?:με|:)?\s*([^,.!\n]{3,35})/i); if(hm) out.heating=hm[1].trim(); }
+  }
+  if(!h.floor){
+    if(/ρετιρέ/i.test(d)) out.floor='Ρετιρέ';
+    else { const fm=d.match(/(\d)\s*ος?\s*όροφ/i); if(fm) out.floor=fm[1]+'ος'; else if(/ισόγει/i.test(d)) out.floor='Ισόγειο'; }
+  }
+  if(!(h.rooms>0)){ const rm=d.match(/(\d+)\s*(?:υ\/δ|υπνοδωμάτι)/i); if(rm) out.rooms=+rm[1]; }
+  if(!(h.baths>0)){ const bm=d.match(/(\d+)\s*(?:μπάνι|wc|λουτρ)/i); if(bm) out.baths=+bm[1]; }
+  return Object.keys(out).length?out:null;
 }
 
 function openListingGallery(key, startIdx) {
