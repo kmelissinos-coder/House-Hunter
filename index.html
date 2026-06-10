@@ -1531,7 +1531,9 @@ function parsePpm(s) {
 
 function normEnergy(s){
   if(!s) return '';
-  let e=String(s).trim().toUpperCase();
+  let e=String(s).split(':')[0].trim().toUpperCase();
+  if(e.indexOf('ΕΞΑΙΡΕ')>=0) return 'Εξαιρείται';
+  if(e.indexOf('ΕΚΔΟΣΗ')>=0) return 'ΠΕΑ υπό έκδοση';
   const gm={'Α':'A','Β':'B','Γ':'C','Δ':'D','Ε':'E','Ζ':'Z','Η':'H'};
   e=e.split('').map(ch=>gm[ch]||ch).join('');
   if(e==='A++') e='A+';
