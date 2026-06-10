@@ -1558,7 +1558,7 @@ function buildUI() {
   const types = [...new Set(combined.map(h => h.type).filter(Boolean))].sort();
   const locSel = document.getElementById('filterLocation');
   const savedLoc = locSel.value;
-  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + locations.map(l => `<option>${l}</option>`).join('');
+  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + (function(){ const {groupCards:_gg, singles:_ss} = groupByHouseId(combined.filter(h=>!h.deleted)); const _hc={}; _gg.forEach(g=>{const L=(g[0].location||'').trim(); if(L)_hc[L]=(_hc[L]||0)+1;}); _ss.forEach(h=>{const L=(h.location||'').trim(); if(L)_hc[L]=(_hc[L]||0)+1;}); return locations.map(l => `<option value="${l}">${l}${_hc[l]?' ('+_hc[l]+')':''}</option>`).join(''); })();
   if (savedLoc) locSel.value = savedLoc;
   const typSel = document.getElementById('filterType');
   const savedTyp = typSel.value;
