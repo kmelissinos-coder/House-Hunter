@@ -1006,6 +1006,8 @@
 
   /* ── agency name white & bold ────────────────── */
   .agency-name, .lo-sib-agency, .agency-summary { color: #ffffff !important; font-weight: 700 !important; }
+
+  .card.hh-drop, .grouped-card.hh-drop { outline: 3px dashed var(--accent) !important; outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -1754,7 +1756,7 @@ function renderGroupedCard(g) {
       onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
   }
 
-  return `<div class="grouped-card${allFav?' favorited':''}"
+  return `<div class="grouped-card${allFav?' favorited':''}" draggable="true" ondragstart="hhDragStart(event,'g:${escJ(String(g.houseId))}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'g:${escJ(String(g.houseId))}')"
     onclick="openListingOverlay(null,'${g.houseId}',0)">
     <div class="photo-strip">
       ${stripHtml}
@@ -1822,7 +1824,7 @@ function getCoords(location) {
   if (!location) return null;
   if (GEO[location]) return GEO[location].map(c => c + (Math.random()-0.5)*0.003);
   for (const [k,v] of Object.entries(GEO)) {
-    if (location.includes(k) || k.includes(location)) return v.map(c => c + (Math.random()-0.5)*0.003);
+    if (location.includes(k) || k.includes(location)) return v.map(c => c + (Math.random()-0.5)*0.0004);
   }
   return null;
 }
@@ -1845,12 +1847,20 @@ function initMap() {
   }).addTo(leafletMap);
 
   let placed = 0;
+  const _areaIdx = {};
   const {groupCards:_mg,singles:_ms}=groupByHouseId(filtered);
   const _mapItems=[..._mg.map(g=>Object.assign({},g[0],{_mapCount:g.length,_mapGroup:g})),..._ms.map(h=>Object.assign({},h,{_mapCount:1,_mapGroup:[h]}))];  _mapItems.forEach(h => {
     const _grp = Array.isArray(h._mapGroup) ? h._mapGroup : [h];
     const _conf = _grp.find(x => x && x.address_lat && x.address_lng);
-    const coords = _conf ? [parseFloat(_conf.address_lat), parseFloat(_conf.address_lng)] : getCoords(h.location);
+    let coords = _conf ? [parseFloat(_conf.address_lat), parseFloat(_conf.address_lng)] : getCoords(h.location);
     if (!coords) return;
+    if (!_conf) {
+      const _ak = String(h.location||'').split('(')[0].trim() || '~';
+      _areaIdx[_ak] = (_areaIdx[_ak]||0) + 1;
+      const _ai = _areaIdx[_ak];
+      const _r = 0.0011 * Math.sqrt(_ai), _th = _ai * 2.39996323;
+      coords = [coords[0] + _r*Math.cos(_th), coords[1] + _r*Math.sin(_th)*1.35];
+    }
     placed++;
 
     const color = priceColor(h.price);
@@ -1942,7 +1952,7 @@ function renderCard(h) {
     }
   }
 
-  return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}" onclick="openModal('${escJ(h.url)}')">
+  return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
     <div class="card-img-wrap" style="cursor:pointer"
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
@@ -2517,6 +2527,32 @@ async function setCoverImage(key, ix){
     if(typeof _renderOvl==='function'&&document.getElementById('listingOverlay').classList.contains('open')) _renderOvl();
     applyFilters();
   }catch(e){ showToast('⚠ Σφάλμα'); }
+}
+
+let _dragKey=null;
+function hhDragStart(e,key){ _dragKey=key; try{ e.dataTransfer.setData('text/plain',key); e.dataTransfer.effectAllowed='link'; }catch(_){} }
+function hhDragOver(e){ if(!_dragKey) return; e.preventDefault(); e.dataTransfer.dropEffect='link'; e.currentTarget.classList.add('hh-drop'); }
+function hhDragLeave(e){ e.currentTarget.classList.remove('hh-drop'); }
+function _resolveMembers(key){
+  const all=[...allListings,...extraListings];
+  if(key.startsWith('g:')){ const hid=key.slice(2); const items=all.filter(x=>String(x.house_id||'').trim()===hid); return items.length?{hid,items}:null; }
+  const url=key.slice(2); const h=all.find(x=>x.url===url); if(!h) return null;
+  const hid=String(h.house_id||'').trim();
+  return (hid&&hid!=='0')?{hid,items:all.filter(x=>String(x.house_id||'').trim()===hid)}:{hid:null,items:[h]};
+}
+async function hhDrop(e,key){
+  e.preventDefault(); e.stopPropagation();
+  e.currentTarget.classList.remove('hh-drop');
+  const src=_dragKey; _dragKey=null;
+  if(!src||src===key) return;
+  const A=_resolveMembers(src), B=_resolveMembers(key);
+  if(!A||!B) return;
+  if(A.hid&&B.hid&&A.hid===B.hid){ showToast('Ήδη στο ίδιο σπίτι'); return; }
+  const hid=B.hid||A.hid||('group_'+Date.now());
+  const members=[...new Set([...A.items,...B.items])];
+  for(const m of members){ m.house_id=hid; if(m._dbId){ try{ await sb.update(m._dbId,{house_id:hid}); }catch(_){} } }
+  showToast('🔗 Συνδέθηκαν σε ένα σπίτι ('+members.length+' αγγελίες)');
+  applyFilters();
 }
 
 function openListingGallery(key, startIdx) {
