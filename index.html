@@ -1109,6 +1109,7 @@
   <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">€/τ.μ. ↑</button>
   <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">Νεότερα</button>
   <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">Πρόσφατη ενημ.</button>
+    <button class="sort-btn" onclick="setSort(this,'score')">★ Σκορ</button>
 </div>
 
 <div class="show-deleted-wrap">
@@ -1631,6 +1632,7 @@ function applyFilters() {
   filtered = combined.filter(h => {
     if (h.unfavorited === true) return false;
     if (!showDel && h.deleted) return false;
+    if (!showDel && h.hidden) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
@@ -1644,18 +1646,21 @@ function applyFilters() {
   });
 
   filtered.sort((a, b) => {
-    if (currentSort === 'price-asc')  return (a.price||Infinity) - (b.price||Infinity);
+    if (currentSort === 'price-asc')  { const av=a.price>0?a.price:9e15, bv=b.price>0?b.price:9e15; return av-bv; }
     if (currentSort === 'price-desc') return (b.price||0) - (a.price||0);
     if (currentSort === 'sqm-desc')   return (b.sqm||0) - (a.sqm||0);
-    if (currentSort === 'ppm-asc')    return (a.pricePerSqm||Infinity) - (b.pricePerSqm||Infinity);
+    if (currentSort === 'ppm-asc')    { const av=a.pricePerSqm>0?a.pricePerSqm:9e15, bv=b.pricePerSqm>0?b.pricePerSqm:9e15; return av-bv; }
     if (currentSort === 'year-desc')  return (b.year||0) - (a.year||0);
-    if (currentSort === 'updated')    return (b.updated||'').localeCompare(a.updated||'');
+    if (currentSort === 'updated')    return _dateKey(b.updated) - _dateKey(a.updated);
+    if (currentSort === 'score')      return (b.personal_score||0) - (a.personal_score||0);
     return 0;
   });
 
   document.getElementById('resultsCount').textContent = `${filtered.length} αγγελίες εμφανίζονται`;
   renderListings();
 }
+
+function _dateKey(s){ const m=String(s||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? (+m[3])*10000+(+m[2])*100+(+m[1]) : 0; }
 
 function setSort(el, sort) {
   currentSort = sort;
@@ -1802,6 +1807,7 @@ function renderGroupedCard(g) {
     <div class="grouped-card-footer">
       <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
       <div class="group-action-btns">
+        <span class="grp-btn" title="Σύγκριση" onclick="event.stopPropagation();addToCompare('${escJ(g.items[0].url)}')">⊕</span>
         <span class="grp-btn${allFav?' active':''}"
           onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
           title="${allFav?'Αφαίρεση αγαπημένου':'Αγαπημένο για όλες'}">${allFav?'★':'☆'}</span>
@@ -2773,6 +2779,25 @@ function loSelectSibling(ri){
 function closeListingOverlay(){
   document.getElementById('listingOverlay').classList.remove('open');
   document.body.style.overflow='';
+  (async()=>{
+    const hp=document.getElementById('loPriceHist');
+    if(hp&&h._dbId){
+      try{
+        const r=await fetch(`${SUPABASE_URL}/rest/v1/price_history?listing_id=eq.${h._dbId}&order=changed_at.asc&select=old_price,new_price,changed_at`,{headers:sb.headers});
+        if(r.ok){
+          const rows=await r.json();
+          if(rows.length){
+            const fmt=v=>'€'+Number(v).toLocaleString('el');
+            const dt=s=>new Date(s).toLocaleDateString('el-GR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+            hp.innerHTML='<div style="font-size:11px;color:var(--muted);margin:6px 0 4px;">📉 Ιστορικό τιμής</div>'
+              +'<div style="font-size:12px;line-height:1.6;">'
+              +fmt(rows[0].old_price)+rows.map(x=>' → <span style="color:'+(x.new_price<x.old_price?'#34d399':'#f87171')+'">'+fmt(x.new_price)+'</span> <span style="color:var(--muted);font-size:10px">('+dt(x.changed_at)+')</span>').join('')
+              +'</div>';
+          }
+        }
+      }catch(e){}
+    }
+  })();
   const pEl=document.getElementById('loPhotos');
   if(pEl){
     let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
@@ -2844,7 +2869,8 @@ function _featHTML(h){
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
       ${h.description?`<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📄 Περιγραφή αγγελίας</div><div style="font-size:12.5px;line-height:1.55;white-space:pre-wrap;max-height:240px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">${escH(h.description)}</div></div>`:''}
       <div style="margin-top:10px">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📍 Διεύθυνση (αν έχει επιβεβαιωθεί)</div>
+        <div id="loPriceHist"></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📍 Διεύθυνση (αν έχει επιβεβαιωθεί)</div>
         <div style="display:flex;gap:6px;">
           <input id="loAddress" type="text" value="${escA(h.address||'')}" placeholder="π.χ. Ηροδότου 30, Πεύκη 151 21" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:inherit;font-size:12px;" onclick="event.stopPropagation()"/>
           <button onclick="event.stopPropagation();saveAddress('${escJ(h.url)}')" title="Αποθήκευση & τοποθέτηση στον χάρτη" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;">✓</button>
