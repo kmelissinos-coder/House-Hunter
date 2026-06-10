@@ -1061,6 +1061,9 @@
   /* ── single toolbar line ─────────────────────── */
   .controls, .sort-row, .show-deleted-wrap { display: inline-flex !important; align-items: center; vertical-align: middle; gap: 8px; }
   .show-deleted-wrap { margin-left: 10px; }
+
+  /* ── view toggle pinned right ────────────────── */
+  .view-toggle { float: right; margin: 6px 16px 0 0; }
 </style>
 </head>
 <body>
@@ -1708,7 +1711,7 @@ function applyFilters() {
     if (h.sqm > 0 && (h.sqm < minS || h.sqm > maxS)) return false;
     if (h.year > 0 && (h.year < minY || h.year > maxY)) return false;
     if (energy && normEnergy(h.energy) !== energy) return false;
-    if (heating && !h.heating.toLowerCase().includes(heating)) return false;
+    if (heating) { const _n=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); if(!_n(h.heating).includes(_n(heating))) return false; }
     return true;
   });
 
@@ -3235,6 +3238,9 @@ function _restoreUI() {
 (function(){
   const rf=document.querySelector('.range-filters');
   if(rf){
+    const vt=document.querySelector('.view-toggle');
+    const ctrls=document.querySelector('.controls');
+    if(vt&&ctrls&&ctrls.parentElement) ctrls.parentElement.insertBefore(vt, ctrls);
     const sw=document.querySelector('.controls .search-wrap');
     if(sw) rf.appendChild(sw);
     ['filterLocation','filterType','filterEnergy','filterHeating'].forEach(id=>{
