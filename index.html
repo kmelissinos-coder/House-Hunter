@@ -1057,6 +1057,10 @@
   .range-filters { display: inline-flex !important; align-items: center; gap: 8px; flex-wrap: wrap; vertical-align: middle; }
   .range-filters #search { width: 200px; }
   .range-filters select { max-width: 170px; }
+
+  /* ── single toolbar line ─────────────────────── */
+  .controls, .sort-row, .show-deleted-wrap { display: inline-flex !important; align-items: center; vertical-align: middle; gap: 8px; }
+  .show-deleted-wrap { margin-left: 10px; }
 </style>
 </head>
 <body>
@@ -3224,7 +3228,9 @@ function _restoreUI() {
 (function(){
   const rf=document.querySelector('.range-filters');
   if(rf){
-    ['search','filterLocation','filterType','filterEnergy','filterHeating'].forEach(id=>{
+    const sw=document.querySelector('.controls .search-wrap');
+    if(sw) rf.appendChild(sw);
+    ['filterLocation','filterType','filterEnergy','filterHeating'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) rf.appendChild(el);
     });
