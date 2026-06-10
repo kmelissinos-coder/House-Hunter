@@ -1804,7 +1804,10 @@ function renderGroupedCard(g) {
       </div>
       ${connectHtml}
     </div>
-    <div class="grouped-card-footer">
+    <div class="card-stars" style="padding:0 13px 6px;display:flex;gap:2px;">
+        ${(function(){const sc=Math.max(0,...g.items.map(x=>x.personal_score||0));return [1,2,3,4,5].map(i=>`<span onclick="event.stopPropagation();setGroupRating(event,'${escJ(String(g.houseId))}',${i})" style="cursor:pointer;font-size:15px;line-height:1;color:${sc>=i?'#d4a853':'rgba(255,255,255,0.18)'}">★</span>`).join('');})()}
+      </div>
+      <div class="grouped-card-footer">
       <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
       <div class="group-action-btns">
         <span class="grp-btn" title="Σύγκριση" onclick="event.stopPropagation();addToCompare('${escJ(g.items[0].url)}')">⊕</span>
@@ -2002,6 +2005,9 @@ function renderCard(h) {
         ${h.energy ? `<span class="spec-tag"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></span>` : ''}
         ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">🔥 Αέριο</span>` : ''}
         ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">♨️ Αντλία</span>` : ''}
+      </div>
+      <div class="card-stars" style="padding:0 13px 6px;display:flex;gap:2px;">
+        ${[1,2,3,4,5].map(i=>`<span onclick="event.stopPropagation();setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:15px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.18)'}">★</span>`).join('')}
       </div>
       <div class="card-footer" style="flex-wrap: wrap;">
         <span class="agency-name" title="${h.agency||''}">${h.agency || '—'}</span>
@@ -2588,6 +2594,18 @@ function hhReset(){
     window.scrollTo(0,0);
     showToast('↺ Επαναφορά φίλτρων');
   }catch(e){}
+}
+
+async function setGroupRating(e,hid,score){
+  if(e&&e.stopPropagation) e.stopPropagation();
+  const all=[...allListings,...extraListings];
+  const members=all.filter(x=>String(x.house_id||'').trim()===String(hid));
+  for(const m of members){
+    m.personal_score=score;
+    if(m._dbId){ try{ await sb.update(m._dbId,{personal_score:score}); }catch(_){} }
+  }
+  showToast('★ '+score+'/5 για όλο το σπίτι');
+  applyFilters();
 }
 
 function openListingGallery(key, startIdx) {
