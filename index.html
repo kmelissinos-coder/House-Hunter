@@ -1052,6 +1052,11 @@
     border: 1.5px solid var(--accent) !important; background: transparent !important; cursor: pointer; }
   .lo-nav-btn:hover { background: var(--accent) !important; color: #101010 !important; }
   .lo-nav-btn.disabled { opacity: 0.25; pointer-events: none; }
+
+  /* ── one-line filter bar ─────────────────────── */
+  .range-filters { display: inline-flex !important; align-items: center; gap: 8px; flex-wrap: wrap; vertical-align: middle; }
+  .range-filters #search { width: 200px; }
+  .range-filters select { max-width: 170px; }
 </style>
 </head>
 <body>
@@ -1838,7 +1843,7 @@ function renderGroupedCard(g) {
     onclick="openListingOverlay(null,'${g.houseId}',0)">
     <div class="photo-strip">
       ${stripHtml}
-      <div class="group-id-pill">${String(g.houseId).startsWith("group_")?"🔗":"#"+g.houseId}</div>
+      <div class="group-id-pill">${shortId(g.houseId)}</div>
       <div class="group-listing-count">🏢 ${g.count}</div>
       ${g.allImgs.length > 1 ? `<div class="photo-count-pill">📷 ${g.allImgs.length}</div>` : ''}
     </div>
@@ -2042,7 +2047,7 @@ function renderCard(h) {
       <div class="no-img" ${h.imageUrl?'style="display:none"':''}>🏠</div>
       <div class="card-badge">${h.type || '—'}</div>
       <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
-      ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">${String(h.house_id).startsWith('group_')?'🔗':'#'+h.house_id}</div>` : ''}
+      ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">${shortId(h.house_id)}</div>` : ''}
       ${h.hasChanges ? `<div class="change-badge">🔄 Αλλαγή</div>` : ''}
       <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
     </div>
@@ -2113,7 +2118,7 @@ function renderListItem(h) {
         <span class="list-type">${h.type||''}</span>
         ${h.energy ? `<span class="energy-badge e-${energyClass(h.energy)}" style="font-size:10px;padding:2px 6px">${energyLabel(h.energy)}</span>` : ''}
         <span class="platform-badge ${platformBadgeClass(h.platform)}" style="font-size:10px;padding:2px 6px">${h.platform||''}</span>
-        ${h.house_id && h.house_id !== '0' ? `<span class="house-id-badge" style="position:static;margin-left:4px">${String(h.house_id).startsWith('group_')?'🔗':'#'+h.house_id}</span>` : ''}
+        ${h.house_id && h.house_id !== '0' ? `<span class="house-id-badge" style="position:static;margin-left:4px">${shortId(h.house_id)}</span>` : ''}
       </div>
       <div class="list-specs">
         ${(h.sqm_raw||h.sqmRaw)?`<span class="list-spec">📐 ${h.sqm_raw||h.sqmRaw}</span>`:''}
@@ -2179,7 +2184,7 @@ function openModal(url) {
     ${buildModalCarousel(h)}
     <div class="modal-body">
       <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
-      <div class="modal-subtitle">${h.floor?h.floor+' ·':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
+      <div class="modal-subtitle">${h.floor?h.floor+' ·':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· '+shortId(h.house_id):''}</div>
 
       <div class="modal-price-row">
         <div class="modal-price-left">
@@ -2726,6 +2731,14 @@ function cardPhotoNav(e,key,dir){
   if(img) img.src=urls[h._photoIdx];
 }
 
+function shortId(id){
+  const s=String(id||'').trim();
+  if(!s||s==='0') return '';
+  if(/^\d{1,4}$/.test(s)) return '#'+s;
+  let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; }
+  return '#'+h.toString(36).toUpperCase().slice(-4).padStart(4,'0');
+}
+
 function openListingGallery(key, startIdx) {
   const all = [...allListings, ...extraListings];
   const h = all.find(x => x.url === key);
@@ -2973,7 +2986,7 @@ function _featHTML(h){
     
     <div class="modal-body">
       <div class="modal-title">${h.location||'—'} <span style="color:var(--text2);font-size:16px">· ${h.type||''}</span></div>
-      <div class="modal-subtitle">${h.floor?h.floor+' · ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· #'+h.house_id:''}</div>
+      <div class="modal-subtitle">${h.floor?h.floor+' · ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· '+shortId(h.house_id):''}</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <div style="display:flex;align-items:baseline;gap:8px">
           <div class="modal-price">${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
@@ -3195,6 +3208,16 @@ function _restoreUI() {
     try{ const op=new URLSearchParams(location.search).get('open'); if(op) setTimeout(()=>{ try{ openListingOverlay(op); }catch(e){} }, 350); }catch(e){}
   } catch(e) {}
 }
+
+(function(){
+  const rf=document.querySelector('.range-filters');
+  if(rf){
+    ['search','filterLocation','filterType','filterEnergy','filterHeating'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) rf.appendChild(el);
+    });
+  }
+})();
 
 loadData().then(() => { _restoreUI(); });
 setInterval(loadData, 5 * 60 * 1000);
