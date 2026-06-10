@@ -1064,6 +1064,9 @@
 
   /* ── view toggle pinned right ────────────────── */
   .view-toggle { float: right; margin: 6px 16px 0 0; }
+
+  /* ── dropzone in header ──────────────────────── */
+  header #dropzone { margin: 0 8px 0 0 !important; max-width: 300px !important; }
 </style>
 </head>
 <body>
@@ -3238,6 +3241,9 @@ function _restoreUI() {
 (function(){
   const rf=document.querySelector('.range-filters');
   if(rf){
+    const dz=document.getElementById('dropzone');
+    const hdrRight=document.querySelector('header > div:last-child');
+    if(dz&&hdrRight) hdrRight.insertBefore(dz, hdrRight.firstChild);
     const vt=document.querySelector('.view-toggle');
     const ctrls=document.querySelector('.controls');
     if(vt&&ctrls&&ctrls.parentElement) ctrls.parentElement.insertBefore(vt, ctrls);
