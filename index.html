@@ -1340,7 +1340,7 @@ async function tryFetch() {
     }
   } catch(e) {
     document.getElementById('main-content').innerHTML =
-      `<div class="empty">L ${e.message}<br>
+      `<div class="empty">❌ ${e.message}<br>
        <small style="color:var(--text3);margin-top:8px;display:block">
          Ελέγξτε τα SUPABASE_URL και SUPABASE_ANON credentials στον κώδικα.
        </small>
@@ -1561,7 +1561,7 @@ function buildUI() {
   const types = [...new Set(combined.map(h => h.type).filter(Boolean))].sort();
   const locSel = document.getElementById('filterLocation');
   const savedLoc = locSel.value;
-  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + (function(){ const _main=s=>String(s||'').split('(')[0].trim(); const {groupCards:_gg, singles:_ss} = groupByHouseId(combined.filter(h=>!h.deleted)); const _hc={}; _gg.forEach(g=>{const L=_main(g[0].location); if(L)_hc[L]=(_hc[L]||0)+1;}); _ss.forEach(h=>{const L=_main(h.location); if(L)_hc[L]=(_hc[L]||0)+1;}); const mains=[...new Set(locations.map(_main).filter(Boolean))].sort(); return mains.map(l => `<option value="${l}">${l}${_hc[l]?' ('+_hc[l]+')':''}</option>`).join(''); })();
+  locSel.innerHTML = '<option value="">Όλες οι περιοχές</option>' + (function(){ const _main=s=>String(s||'').split('(')[0].trim(); const {groupCards:_gg, singles:_ss} = groupByHouseId(combined.filter(h=>!h.deleted)); const _hc={}; _gg.forEach(g=>{ if(!g||!g[0]) return; const L=_main(g[0].location); if(L)_hc[L]=(_hc[L]||0)+1;}); _ss.forEach(h=>{const L=_main(h.location); if(L)_hc[L]=(_hc[L]||0)+1;}); const mains=[...new Set(locations.map(_main).filter(Boolean))].sort(); return mains.map(l => `<option value="${l}">${l}${_hc[l]?' ('+_hc[l]+')':''}</option>`).join(''); })();
   if (savedLoc) locSel.value = savedLoc;
   const typSel = document.getElementById('filterType');
   const savedTyp = typSel.value;
@@ -1758,7 +1758,7 @@ function renderGroupedCard(g) {
     onclick="openListingOverlay(null,'${g.houseId}',0)">
     <div class="photo-strip">
       ${stripHtml}
-      <div class="group-id-pill">#${g.houseId}</div>
+      <div class="group-id-pill">${String(g.houseId).startsWith("group_")?"🔗":"#"+g.houseId}</div>
       <div class="group-listing-count">🏢 ${g.count}</div>
       ${g.allImgs.length > 1 ? `<div class="photo-count-pill">📷 ${g.allImgs.length}</div>` : ''}
     </div>
@@ -1949,7 +1949,7 @@ function renderCard(h) {
       <div class="no-img" ${h.imageUrl?'style="display:none"':''}>🏠</div>
       <div class="card-badge">${h.type || '—'}</div>
       <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
-      ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">#${h.house_id}</div>` : ''}
+      ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">${String(h.house_id).startsWith('group_')?'🔗':'#'+h.house_id}</div>` : ''}
       ${h.hasChanges ? `<div class="change-badge">🔄 Αλλαγή</div>` : ''}
       <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
     </div>
@@ -2017,7 +2017,7 @@ function renderListItem(h) {
         <span class="list-type">${h.type||''}</span>
         ${h.energy ? `<span class="energy-badge e-${energyClass(h.energy)}" style="font-size:10px;padding:2px 6px">${energyLabel(h.energy)}</span>` : ''}
         <span class="platform-badge ${platformBadgeClass(h.platform)}" style="font-size:10px;padding:2px 6px">${h.platform||''}</span>
-        ${h.house_id && h.house_id !== '0' ? `<span class="house-id-badge" style="position:static;margin-left:4px">#${h.house_id}</span>` : ''}
+        ${h.house_id && h.house_id !== '0' ? `<span class="house-id-badge" style="position:static;margin-left:4px">${String(h.house_id).startsWith('group_')?'🔗':'#'+h.house_id}</span>` : ''}
       </div>
       <div class="list-specs">
         ${(h.sqm_raw||h.sqmRaw)?`<span class="list-spec">📐 ${h.sqm_raw||h.sqmRaw}</span>`:''}
@@ -2502,6 +2502,23 @@ function openHouseGallery(key){
   _sortGalleryByRes();
 }
 
+async function setCoverImage(key, ix){
+  const all=[...allListings,...extraListings];
+  const h=all.find(x=>x.url===key); if(!h) return;
+  let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
+  if(!Array.isArray(ex)) ex=[];
+  const seen={}; const urls=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
+  const u=urls[ix]; if(!u){ showToast('⚠ Δεν βρέθηκε η φωτογραφία'); return; }
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:u})});
+    if(!r.ok){ showToast('⚠ Σφάλμα αποθήκευσης'); return; }
+    h.imageUrl=u; h.image_url=u;
+    showToast('✓ Ορίστηκε ως εξώφυλλο');
+    if(typeof _renderOvl==='function'&&document.getElementById('listingOverlay').classList.contains('open')) _renderOvl();
+    applyFilters();
+  }catch(e){ showToast('⚠ Σφάλμα'); }
+}
+
 function openListingGallery(key, startIdx) {
   const all = [...allListings, ...extraListings];
   const h = all.find(x => x.url === key);
@@ -2695,11 +2712,12 @@ function closeListingOverlay(){
   if(pEl){
     let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
     if(!Array.isArray(ex)) ex=[];
-    const urls=ex.filter(u=>u&&u!==h.imageUrl);
+    const _sn={}; const _all=[h.imageUrl,...ex].filter(u=>u&&!_sn[u]&&(_sn[u]=1));
+    const urls=_all.slice(4);
     if(urls.length){
       pEl.style.display='block';
       pEl.innerHTML='<div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">📷 Όλες οι φωτογραφίες ('+(urls.length+1)+')</div>'
-        + urls.map((u,ix)=>'<img src="'+escA(u)+'" loading="lazy" onclick="event.stopPropagation();openListingGallery(\''+escJ(h.url)+'\','+(ix+1)+')" style="width:100%;height:150px;object-fit:cover;border-radius:8px;cursor:pointer;margin-bottom:8px;border:1px solid var(--border)" onerror="this.style.display=\'none\'"/>').join('');
+        + urls.map((u,ix)=>'<div style="position:relative;margin-bottom:8px"><img src="'+escA(u)+'" loading="lazy" onclick="event.stopPropagation();openListingGallery(\''+escJ(h.url)+'\','+(ix+4)+')" style="width:100%;height:150px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border)" onerror="this.parentElement.style.display=\'none\'"/><button title="Κάνε το εξώφυλλο" onclick="event.stopPropagation();setCoverImage(\''+escJ(h.url)+'\','+(ix+4)+')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:6px;padding:3px 6px;font-size:11px;cursor:pointer;">🖼</button></div>').join('');
     } else { pEl.style.display='none'; pEl.innerHTML=''; }
   }
 }
@@ -2709,14 +2727,19 @@ function _featHTML(h){
   const isFav=h.favorited||favorites.has(h.url||h.platformNr);
   const isHid=h.hidden||false; const key=h.url||h.platformNr;
   return `
-    ${h.imageUrl
-      ? `<img id="lo-photo-preview" class="modal-img" src="${h.imageUrl}" style="cursor:zoom-in"
-          onclick="openListingGallery('${escJ(h.url)}')"
-          onerror="this.outerHTML='<div class=\'modal-no-img\' id=\'lo-photo-preview\'>🏠</div>'">`
-      : '<div class="modal-no-img" id="lo-photo-preview">🏠</div>'}
-    ${(function(){ let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){} if(!Array.isArray(ex)) ex=[];
-      const th=ex.filter(u=>u&&u!==h.imageUrl).slice(0,4);
-      return th.length?`<div style="display:flex;gap:6px;margin-top:6px">${th.map((u,ix)=>`<img src="${escA(u)}" loading="lazy" onclick="event.stopPropagation();openListingGallery('${escJ(h.url)}',${ix+1})" style="flex:1;min-width:0;height:84px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border)" onerror="this.style.display='none'"/>`).join('')}</div>`:'';})()}
+    ${(function(){
+      let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
+      if(!Array.isArray(ex)) ex=[];
+      const seen={}; const all=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
+      if(!all.length) return '<div class="modal-no-img" id="lo-photo-preview">🏠</div>';
+      const four=all.slice(0,4);
+      const cell=four.length===1?'460px':'225px';
+      return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+four.map(function(u,ix){
+        return '<div style="position:relative;'+(four.length===1?'grid-column:1/-1':'')+'">'
+        +'<img '+(ix===0?'id="lo-photo-preview" ':'')+'src="'+escA(u)+'" loading="lazy" onclick="event.stopPropagation();openListingGallery(\''+escJ(h.url)+'\','+ix+')" style="width:100%;height:'+cell+';object-fit:cover;border-radius:8px;cursor:zoom-in" onerror="this.style.visibility=\'hidden\'"/>'
+        +'<button title="Κάνε το εξώφυλλο" onclick="event.stopPropagation();setCoverImage(\''+escJ(h.url)+'\','+ix+')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:6px;padding:3px 6px;font-size:11px;cursor:pointer;">🖼</button>'
+        +'</div>';}).join('')+'</div>';
+    })()}
     ${_houseGroup(h).length>1?`<button onclick="event.stopPropagation();openHouseGallery('${escJ(h.url)}')" style="width:100%;margin:8px 0 2px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#101010;border:none;border-radius:10px;padding:11px;font-weight:800;font-size:13px;cursor:pointer;">📸 Όλες οι φωτογραφίες από όλα τα μεσιτικά (${_houseGroup(h).length} αγγελίες)</button>`:''}
     
     <div class="modal-body">
