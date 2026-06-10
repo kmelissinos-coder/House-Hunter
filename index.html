@@ -1013,7 +1013,7 @@
 <body>
 
 <header>
-  <div class="logo">
+  <div class="logo" onclick="hhReset()" style="cursor:pointer" title="Επαναφορά">
     🏡 House Hunter
     <span>Αθήνα Βόρεια · Live από Supabase DB</span>
   </div>
@@ -1326,6 +1326,7 @@ async function tryFetch() {
       price: parseFloat(item.price) || 0,
       sqm: parseFloat(item.sqm) || 0,
       year: parseInt(item.year) || 0,
+      energy: normEnergy(item.energy),
       pricePerSqm: fixPpm(parseFloat(item.price_per_sqm) || 0, parseFloat(item.price) || 0, parseFloat(item.sqm) || 0),
       imageUrl: item.image_url,
       agencyNr: item.agency_nr,
@@ -1528,6 +1529,15 @@ function parsePpm(s) {
   return isNaN(v) ? 0 : Math.round(v);
 }
 
+function normEnergy(s){
+  if(!s) return '';
+  let e=String(s).trim().toUpperCase();
+  const gm={'Α':'A','Β':'B','Γ':'C','Δ':'D','Ε':'E','Ζ':'Z','Η':'H'};
+  e=e.split('').map(ch=>gm[ch]||ch).join('');
+  if(e==='A++') e='A+';
+  return /^(A\+|A|B\+|B|C|D|E|Z|H)$/.test(e) ? e : String(s).trim();
+}
+
 function fixPpm(pps, price, sqm) {
   if (price > 0 && sqm > 0) return Math.round(price / sqm);
   let v = pps;
@@ -1569,6 +1579,16 @@ function buildUI() {
   const savedTyp = typSel.value;
   typSel.innerHTML = '<option value="">Όλοι οι τύποι</option>' + types.map(t => `<option>${t}</option>`).join('');
   if (savedTyp) typSel.value = savedTyp;
+
+  const enSel = document.getElementById('filterEnergy');
+  if (enSel) {
+    const savedEn = enSel.value;
+    const rank = ['A+','A','B+','B','C','D','E','Z','H'];
+    const present = [...new Set(combined.map(h => normEnergy(h.energy)).filter(Boolean))];
+    present.sort((a,b) => { const ia=rank.indexOf(a), ib=rank.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+    enSel.innerHTML = '<option value="">Ενεργειακή τάξη</option>' + present.map(e => `<option value="${e}">${e}</option>`).join('');
+    if (savedEn) enSel.value = savedEn;
+  }
 
   const active = combined.filter(h => !h.deleted);
   const prices = active.map(h => h.price).filter(p => p > 0);
@@ -1616,14 +1636,7 @@ function applyFilters() {
     if (h.price > 0 && (h.price < minP || h.price > maxP)) return false;
     if (h.sqm > 0 && (h.sqm < minS || h.sqm > maxS)) return false;
     if (h.year > 0 && (h.year < minY || h.year > maxY)) return false;
-    if (energy) {
-      const ec = h.energy || '';
-      if (energy === 'A' && !ec.match(/^Α[++]?:/)) return false;
-      if (energy === 'B' && !ec.startsWith('Β:')) return false;
-      if (energy === 'C' && !ec.startsWith('Β:')) return false;
-      if (energy === 'D' && !ec.startsWith('Β:')) return false;
-      if (energy === 'E' && !ec.match(/^[ΕΖΗ]:/)) return false;
-    }
+    if (energy && normEnergy(h.energy) !== energy) return false;
     if (heating && !h.heating.toLowerCase().includes(heating)) return false;
     return true;
   });
@@ -2553,6 +2566,20 @@ async function hhDrop(e,key){
   for(const m of members){ m.house_id=hid; if(m._dbId){ try{ await sb.update(m._dbId,{house_id:hid}); }catch(_){} } }
   showToast('🔗 Συνδέθηκαν σε ένα σπίτι ('+members.length+' αγγελίες)');
   applyFilters();
+}
+
+function hhReset(){
+  try{
+    ['minPrice','maxPrice','minSqm','maxSqm','minYear','maxYear','search'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+    ['filterLocation','filterType','filterEnergy','filterHeating'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+    const sd=document.getElementById('showDeleted'); if(sd) sd.checked=false;
+    currentPlatform='all';
+    localStorage.removeItem('hh_ui_v1');
+    setView('grid');
+    applyFilters();
+    window.scrollTo(0,0);
+    showToast('↺ Επαναφορά φίλτρων');
+  }catch(e){}
 }
 
 function openListingGallery(key, startIdx) {
