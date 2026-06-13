@@ -3315,6 +3315,8 @@ function _saveUI() {
   openListingOverlay=function(u,h,s){ try{ window._hhOpenCard={url:u||'',houseId:h||'',startIdx:s||0}; localStorage.setItem('hh_open_v1',JSON.stringify(window._hhOpenCard)); }catch(e){} return _o.apply(this,arguments); };
   closeListingOverlay=function(){ try{ window._hhOpenCard=null; localStorage.removeItem('hh_open_v1'); }catch(e){} return _c.apply(this,arguments); };
 })();
+/* move #numSearch into header next to dropzone */
+(function(){function place(){try{var ns=document.getElementById('numSearch'),dz=document.getElementById('dropzone');if(ns&&dz&&dz.parentElement&&ns.parentElement!==dz.parentElement){dz.parentElement.insertBefore(ns,dz);}}catch(e){}}[200,700,1500,3000].forEach(function(ms){setTimeout(place,ms);});})();
 let _saveT = null;
 function _saveUISoon() { clearTimeout(_saveT); _saveT = setTimeout(_saveUI, 250); }
 window.addEventListener('scroll', _saveUISoon, { passive: true });
