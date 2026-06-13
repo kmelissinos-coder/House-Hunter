@@ -3217,15 +3217,19 @@ function loToggleFav(key){
 
 function loToggleHide(key){
   const h=getByUrl(key);if(!h)return;
-  const prev=h.hidden;h.hidden=!prev;
-  if(h._dbId)sb.update(h._dbId,{hidden:h.hidden}).catch(()=>{});
-  pushAction({label:h.hidden?`✕ ${h.location}`:`☆ ${h.location}`,
-    undo:async()=>{h.hidden=prev;if(h._dbId)await sb.update(h._dbId,{hidden:prev});applyFilters();},
-    redo:async()=>{h.hidden=!prev;if(h._dbId)await sb.update(h._dbId,{hidden:!prev});applyFilters();}});
+  const hid=String(h.house_id||'').trim();
+  const members=(hid&&hid!=='0')?allListings.filter(x=>String(x.house_id||'').trim()===hid):[h];
+  const nv=!h.hidden;
+  const prev=members.map(x=>({x,p:x.hidden}));
+  for(const o of prev){o.x.hidden=nv;if(o.x._dbId)sb.update(o.x._dbId,{hidden:nv}).catch(()=>{});}
+  pushAction({label:nv?`✕ ${h.location}`:`☆ ${h.location}`,
+    undo:async()=>{for(const o of prev){o.x.hidden=o.p;if(o.x._dbId)await sb.update(o.x._dbId,{hidden:o.p});}applyFilters();},
+    redo:async()=>{for(const o of prev){o.x.hidden=nv;if(o.x._dbId)await sb.update(o.x._dbId,{hidden:nv});}applyFilters();}});
   const b=document.getElementById('lo-hide');
-  if(b){b.textContent=h.hidden?'↩ Επαναφορά':'✕ Απόκρυψη';b.style.borderColor=h.hidden?'var(--red)':'';b.style.color=h.hidden?'var(--red)':'';}
-  showToast(h.hidden?'✕ Κρύφτηκε':'↩ Εμφανίζεται ξανά');
-  if(h.hidden)applyFilters();
+  if(b){b.textContent=nv?'↩ Επαναφορά':'✕ Απόκρυψη';b.style.borderColor=nv?'var(--red)':'';b.style.color=nv?'var(--red)':'';}
+  showToast(nv?(members.length>1?'✕ Κρύφτηκαν όλες':'✕ Κρύφτηκε'):'↩ Εμφανίζεται ξανά');
+  applyFilters();
+  if(nv && typeof closeListingOverlay==='function') closeListingOverlay();
 }
 
 // Group-level fav/hide
