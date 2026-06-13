@@ -2822,8 +2822,14 @@ function shortId(id){
 async function toggleFlag(url, field, val){
   const all=[...allListings,...extraListings];
   const h=all.find(x=>x.url===url); if(!h) return;
-  h[field]=val;
-  if(h._dbId){ try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({[field]:val})}); if(!r.ok) showToast('⚠ Λείπει η στήλη '+field+' — τρέξε το add_efi_seen.sql'); }catch(e){} }
+  const hid=String(h.house_id||'').trim();
+  const members=(hid&&hid!=='0')?all.filter(x=>String(x.house_id||'').trim()===hid):[h];
+  let _missing=false;
+  for(const m of members){
+    m[field]=val;
+    if(m._dbId){ try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${m._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({[field]:val})}); if(!r.ok) _missing=true; }catch(e){} }
+  }
+  if(_missing) showToast('⚠ Λείπει η στήλη '+field+' — τρέξε το add_efi_seen.sql');
   applyFilters();
 }
 async function toggleGroupFlag(hid, field, val){
