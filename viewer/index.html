@@ -2826,8 +2826,14 @@ function shortId(id){
 async function toggleFlag(url, field, val){
   const all=[...allListings,...extraListings];
   const h=all.find(x=>x.url===url); if(!h) return;
-  h[field]=val;
-  if(h._dbId){ try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({[field]:val})}); if(!r.ok) showToast('⚠ Λείπει η στήλη '+field+' — τρέξε το add_efi_seen.sql'); }catch(e){} }
+  const hid=String(h.house_id||'').trim();
+  const members=(hid&&hid!=='0')?all.filter(x=>String(x.house_id||'').trim()===hid):[h];
+  let _missing=false;
+  for(const m of members){
+    m[field]=val;
+    if(m._dbId){ try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${m._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({[field]:val})}); if(!r.ok) _missing=true; }catch(e){} }
+  }
+  if(_missing) showToast('⚠ Λείπει η στήλη '+field+' — τρέξε το add_efi_seen.sql');
   applyFilters();
 }
 async function toggleGroupFlag(hid, field, val){
@@ -3302,6 +3308,11 @@ function _saveUI() {
     localStorage.setItem(HH_UI, JSON.stringify(st));
   } catch(e) {}
 }
+/* persist open card across reload */
+(function(){ var _o=openListingOverlay,_c=closeListingOverlay;
+  openListingOverlay=function(u,h,s){ try{ window._hhOpenCard={url:u||'',houseId:h||'',startIdx:s||0}; localStorage.setItem('hh_open_v1',JSON.stringify(window._hhOpenCard)); }catch(e){} return _o.apply(this,arguments); };
+  closeListingOverlay=function(){ try{ window._hhOpenCard=null; localStorage.removeItem('hh_open_v1'); }catch(e){} return _c.apply(this,arguments); };
+})();
 let _saveT = null;
 function _saveUISoon() { clearTimeout(_saveT); _saveT = setTimeout(_saveUI, 250); }
 window.addEventListener('scroll', _saveUISoon, { passive: true });
@@ -3319,7 +3330,7 @@ function _restoreUI() {
     applyFilters();
     if (_uiSt.view && _uiSt.view !== 'grid') setView(_uiSt.view);
     if (typeof _uiSt.scroll === 'number' && _uiSt.scroll > 0) setTimeout(() => window.scrollTo(0, _uiSt.scroll), 150);
-    try{ const op=new URLSearchParams(location.search).get('open'); if(op) setTimeout(()=>{ try{ openListingOverlay(op); }catch(e){} }, 350); }catch(e){}
+    try{ let op=new URLSearchParams(location.search).get('open'); let _oc=null; if(!op){ try{ _oc=JSON.parse(localStorage.getItem('hh_open_v1')||'null'); }catch(e){} } if(op){ setTimeout(()=>{ try{ openListingOverlay(op); }catch(e){} }, 350); } else if(_oc&&(_oc.url||_oc.houseId)){ setTimeout(()=>{ try{ openListingOverlay(_oc.url||'', _oc.houseId||'', _oc.startIdx||0); }catch(e){} }, 400); } }catch(e){}
   } catch(e) {}
 }
 
