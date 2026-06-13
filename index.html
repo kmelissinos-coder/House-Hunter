@@ -1180,6 +1180,8 @@
 <div class="show-deleted-wrap">
   <input type="checkbox" id="showDeleted" class="toggle-check" onchange="applyFilters()">
   <label for="showDeleted">Εμφάνιση αγγελιών με X (διαγραμμένες/απόρριψη)</label>
+  <label style="margin-left:18px;cursor:pointer"><input type="checkbox" id="hideEfi" class="toggle-check" onchange="applyFilters()"> Απόκρυψη αγγελιών που στείλαμε στην Έφη</label>
+  <label style="margin-left:18px;cursor:pointer"><input type="checkbox" id="hideSeen" class="toggle-check" onchange="applyFilters()"> Απόκρυψη αγγελιών που είδαμε</label>
 </div>
 
 
@@ -1707,11 +1709,15 @@ function applyFilters() {
   const minY     = parseInt(document.getElementById('minYear').value) || 0;
   const maxY     = parseInt(document.getElementById('maxYear').value) || Infinity;
   const showDel  = document.getElementById('showDeleted').checked;
+  const hideEfi  = (document.getElementById('hideEfi')||{}).checked;
+  const hideSeen = (document.getElementById('hideSeen')||{}).checked;
 
   filtered = combined.filter(h => {
     if (h.unfavorited === true) return false;
     if (!showDel && h.deleted) return false;
     if (!showDel && h.hidden) return false;
+    if (hideEfi && h.sent_efi) return false;
+    if (hideSeen && h.seen_it) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
@@ -1890,6 +1896,10 @@ function renderGroupedCard(g) {
     </div>
     <div class="card-stars" style="padding:0 13px 6px;display:flex;gap:2px;">
         ${(function(){const sc=Math.max(0,...g.items.map(x=>x.personal_score||0));return [1,2,3,4,5].map(i=>`<span onclick="event.stopPropagation();setGroupRating(event,'${escJ(String(g.houseId))}',${i})" style="cursor:pointer;font-size:15px;line-height:1;color:${sc>=i?'#d4a853':'rgba(255,255,255,0.18)'}">★</span>`).join('');})()}
+      </div>
+      <div class="card-flags" style="display:flex;gap:16px;padding:2px 13px 8px;font-size:12px;">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${g.items.some(x=>x.sent_efi)?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleGroupFlag('${escJ(String(g.houseId))}','sent_efi',this.checked)">Έφη</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${g.items.some(x=>x.seen_it)?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleGroupFlag('${escJ(String(g.houseId))}','seen_it',this.checked)">Το είδαμε</label>
       </div>
       <div class="grouped-card-footer">
       <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
@@ -2093,6 +2103,10 @@ function renderCard(h) {
       </div>
       <div class="card-stars" style="padding:0 13px 6px;display:flex;gap:2px;">
         ${[1,2,3,4,5].map(i=>`<span onclick="event.stopPropagation();setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:15px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.18)'}">★</span>`).join('')}
+      </div>
+      <div class="card-flags" style="display:flex;gap:16px;padding:2px 13px 8px;font-size:12px;">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.sent_efi?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleFlag('${escJ(h.url)}','sent_efi',this.checked)">Έφη</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.seen_it?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleFlag('${escJ(h.url)}','seen_it',this.checked)">Το είδαμε</label>
       </div>
       <div class="card-footer" style="flex-wrap: wrap;">
         <span class="agency-name" title="${h.agency||''}">${h.agency || '—'}</span>
@@ -2779,6 +2793,21 @@ function shortId(id){
   return '#'+h.toString(36).toUpperCase().slice(-4).padStart(4,'0');
 }
 
+async function toggleFlag(url, field, val){
+  const all=[...allListings,...extraListings];
+  const h=all.find(x=>x.url===url); if(!h) return;
+  h[field]=val;
+  if(h._dbId){ try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({[field]:val})}); if(!r.ok) showToast('⚠ Λείπει η στήλη '+field+' — τρέξε το add_efi_seen.sql'); }catch(e){} }
+  applyFilters();
+}
+async function toggleGroupFlag(hid, field, val){
+  const all=[...allListings,...extraListings];
+  const members=all.filter(x=>String(x.house_id||'').trim()===String(hid));
+  for(const m of members){ m[field]=val; if(m._dbId){ try{ await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${m._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({[field]:val})}); }catch(e){} } }
+  showToast('✓ ${members.length}'.replace('${members.length}',members.length)+' αγγελίες');
+  applyFilters();
+}
+
 function openListingGallery(key, startIdx) {
   const all = [...allListings, ...extraListings];
   const h = all.find(x => x.url === key);
@@ -3052,6 +3081,10 @@ function _featHTML(h){
           ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >↩ Δεν πουλήθηκε</span>` : ''}
         </div>
       </div>
+      <div style="margin-top:8px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⭐ Αξιολόγηση</div>
+        <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'★':'☆'}</span>`).join('')}</div>
+      </div>
       <div class="modal-grid">
         <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
@@ -3075,10 +3108,6 @@ function _featHTML(h){
           <button onclick="event.stopPropagation();saveAddress('${escJ(h.url)}')" title="Αποθήκευση & τοποθέτηση στον χάρτη" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;">✓</button>
         </div>
         ${h.address_lat?`<div style="font-size:10px;color:#16a34a;margin-top:3px;">✓ Επιβεβαιωμένη — εμφανίζεται με πράσινη πινέζα στον χάρτη</div>`:''}
-      </div>
-      <div style="margin-top:8px">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⭐ Αξιολόγηση</div>
-        <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'★':'☆'}</span>`).join('')}</div>
       </div>
       <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
     </div>`;
