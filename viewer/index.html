@@ -1868,7 +1868,7 @@ function renderListings() {
       });
     })();
     document.getElementById('resultsCount').textContent =
-      `${all.length} κάρτες · ${groupCards.length} σπίτια · ${singles.length} μεμονωμένες`;
+      `${all.length} σπίτια`;
     container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
   if(window._savedScroll!==undefined){setTimeout(()=>{window.scrollTo(0,window._savedScroll);window._savedScroll=undefined;},30);}
     renderRejectedSection();
