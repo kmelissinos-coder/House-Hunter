@@ -1074,7 +1074,6 @@
   #mapList .card, #mapList .grouped-card { width: 100% !important; max-width: none !important; flex: none; }
   #map-split #map { flex: 1; height: 100% !important; border-radius: 12px; }
 
-  /* ── viewer mode: clean header, read-only ratings & flags ── */
   #undoBtn, #redoBtn, #dropzone, .refresh-btn, .sync-btn { display: none !important; }
   .card-stars, [onclick*="setRating"], [onclick*="setGroupRating"] { pointer-events: none !important; cursor: default !important; }
   .admin-check { pointer-events: none !important; }
@@ -1180,6 +1179,7 @@
   <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">Νεότερα</button>
   <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">Πρόσφατη ενημ.</button>
     <button class="sort-btn" onclick="setSort(this,'score')">★ Σκορ</button>
+    <button class="sort-btn" onclick="setSort(this,'location')">📍 Περιοχή</button>
 </div>
 
 <div class="show-deleted-wrap">
@@ -1527,17 +1527,19 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
 //    LIVE DB GROUPING HANDLERS ─────────────────────────────────────────────
 async function ungroupListing(dbId) {
   if(!dbId)return;
-  const h=allListings.find(x=>x._dbId===dbId);const prev=h?(h.house_id||'0'):'0';
+  const h=allListings.find(x=>x._dbId===dbId);
+  const prev=h?(h.house_id||'0'):'0';
+  const snap=h?{house_id:prev,address:h.address,address_lat:h.address_lat,address_lng:h.address_lng,personal_score:h.personal_score}:null;
+  const reset={house_id:"0",address:null,address_lat:null,address_lng:null,personal_score:null};
   try{
-    await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";
+    await sb.update(dbId,reset);
+    if(h){ h.house_id="0"; h.address=null; h.address_lat=null; h.address_lng=null; h.personal_score=null; }
     pushAction({label:`✂️ ${h?h.location:dbId}`,
-      undo:async()=>{await sb.update(dbId,{house_id:prev});if(h)h.house_id=prev;await tryFetch();},
-      redo:async()=>{await sb.update(dbId,{house_id:"0"});if(h)h.house_id="0";await tryFetch();}});
-    showToast("✂️ Αποσυνδέθηκε!");await tryFetch();
-  }catch(e){showToast("❌ Σφάλμα αποσύνδεσης");}
+      undo:async()=>{ await sb.update(dbId,snap||{house_id:prev}); if(h&&snap)Object.assign(h,snap); await tryFetch(); },
+      redo:async()=>{ await sb.update(dbId,reset); if(h)Object.assign(h,reset); await tryFetch(); }});
+    showToast("✂️ Αποσυνδέθηκε — διεύθυνση & βαθμολογία επαναφέρθηκαν!"); await tryFetch();
+  }catch(e){ showToast("❌ Σφάλμα αποσύνδεσης"); }
 }
-
-// Select a single item to initiate a quick grouping flow
 function selectListingForGrouping(url) {
   const h = getByUrl(url);
   if (!h) return;
@@ -1743,6 +1745,7 @@ function applyFilters() {
     if (currentSort === 'year-desc')  return (b.year||0) - (a.year||0);
     if (currentSort === 'updated')    return _dateKey(b.updated) - _dateKey(a.updated);
     if (currentSort === 'score')      return (b.personal_score||0) - (a.personal_score||0);
+    if (currentSort === 'location')   return String(a.location||'').localeCompare(String(b.location||''),'el');
     return 0;
   });
 
@@ -1899,13 +1902,12 @@ function renderGroupedCard(g) {
       </div>
       ${connectHtml}
     </div>
-    <div class="card-stars" style="padding:0 13px 6px;display:flex;gap:2px;">
+    <div class="card-stars" style="padding:0 13px 8px;display:flex;align-items:center;gap:2px;">
         ${(function(){const sc=Math.max(0,...g.items.map(x=>x.personal_score||0));return [1,2,3,4,5].map(i=>`<span onclick="event.stopPropagation();setGroupRating(event,'${escJ(String(g.houseId))}',${i})" style="cursor:pointer;font-size:15px;line-height:1;color:${sc>=i?'#d4a853':'rgba(255,255,255,0.18)'}">★</span>`).join('');})()}
-      </div>
-      <div class="card-flags" style="display:flex;gap:16px;padding:2px 13px 8px;font-size:12px;">
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${g.items.some(x=>x.sent_efi)?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleGroupFlag('${escJ(String(g.houseId))}','sent_efi',this.checked)">Έφη</label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${g.items.some(x=>x.seen_it)?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleGroupFlag('${escJ(String(g.houseId))}','seen_it',this.checked)">Το είδαμε</label>
-      </div>
+      <span style="margin-left:auto;display:flex;gap:14px;font-size:12px;align-items:center;">
+        <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${g.items.some(x=>x.sent_efi)?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleGroupFlag('${escJ(String(g.houseId))}','sent_efi',this.checked)">Έφη</label>
+        <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${g.items.some(x=>x.seen_it)?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleGroupFlag('${escJ(String(g.houseId))}','seen_it',this.checked)">Το είδαμε</label>
+      </span></div>
       <div class="grouped-card-footer">
       <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
       <div class="group-action-btns">
@@ -2106,13 +2108,12 @@ function renderCard(h) {
         ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">🔥 Αέριο</span>` : ''}
         ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">♨️ Αντλία</span>` : ''}
       </div>
-      <div class="card-stars" style="padding:0 13px 6px;display:flex;gap:2px;">
+      <div class="card-stars" style="padding:0 13px 8px;display:flex;align-items:center;gap:2px;">
         ${[1,2,3,4,5].map(i=>`<span onclick="event.stopPropagation();setRating(event,'${h.id}',${i})" style="cursor:pointer;font-size:15px;line-height:1;color:${(h.personal_score||0)>=i?'#d4a853':'rgba(255,255,255,0.18)'}">★</span>`).join('')}
-      </div>
-      <div class="card-flags" style="display:flex;gap:16px;padding:2px 13px 8px;font-size:12px;">
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.sent_efi?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleFlag('${escJ(h.url)}','sent_efi',this.checked)">Έφη</label>
-        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.seen_it?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleFlag('${escJ(h.url)}','seen_it',this.checked)">Το είδαμε</label>
-      </div>
+      <span style="margin-left:auto;display:flex;gap:14px;font-size:12px;align-items:center;">
+        <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.sent_efi?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleFlag('${escJ(h.url)}','sent_efi',this.checked)">Έφη</label>
+        <label onclick="event.stopPropagation()" style="display:flex;align-items:center;gap:5px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.seen_it?'checked':''} onclick="event.stopPropagation()" onchange="event.stopPropagation();toggleFlag('${escJ(h.url)}','seen_it',this.checked)">Το είδαμε</label>
+      </span></div>
       <div class="card-footer" style="flex-wrap: wrap;">
         <span class="agency-name" title="${h.agency||''}">${h.agency || '—'}</span>
         <div class="card-actions">
@@ -2616,7 +2617,8 @@ async function saveAddress(key){
   try{
     const resp=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({address:addr||null,address_lat:lat,address_lng:lng})});
     if(!resp.ok){ showToast('⚠ Λείπουν οι στήλες address στη βάση — τρέξε το add_address_columns.sql'); return; }
-    h.address=addr; h.address_lat=lat; h.address_lng=lng;
+    const _grp=(h.house_id&&String(h.house_id).trim()&&String(h.house_id)!=='0')?all.filter(x=>String(x.house_id||'').trim()===String(h.house_id).trim()):[h];
+    for(const m of _grp){ m.address=addr; m.address_lat=lat; m.address_lng=lng; if(m._dbId!==h._dbId){ try{ await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${m._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({address:addr||null,address_lat:lat,address_lng:lng})}); }catch(e){} } }
     showToast(lat!=null?'✓ Αποθηκεύτηκε & μπήκε στον χάρτη':'✓ Αποθηκεύτηκε');
     if(currentView==='map') initMap();
   }catch(e){ showToast('⚠ Σφάλμα αποθήκευσης'); }
@@ -3090,6 +3092,10 @@ function _featHTML(h){
         <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⭐ Αξιολόγηση</div>
         <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'★':'☆'}</span>`).join('')}</div>
       </div>
+      <div style="display:flex;gap:18px;margin:6px 0 2px;font-size:13px;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.sent_efi?'checked':''} onchange="toggleFlag('${escJ(h.url)}','sent_efi',this.checked)">Έφη</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.seen_it?'checked':''} onchange="toggleFlag('${escJ(h.url)}','seen_it',this.checked)">Το είδαμε</label>
+      </div>
       <div class="modal-grid">
         <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
@@ -3315,7 +3321,7 @@ const VIEWER_MODE = true;
   const silent = function(){};
   ['setRating','setGroupRating','toggleFav','loToggleFav','toggleGroupFav','loToggleHide','toggleHide',
    'saveAddress','setCoverImage','setCoverFromGallery','savePhotoUrl','hhDrop','toggleMsSelect','toggleMultiSelect',
-   'modalToggleFav','undoAction','redoAction','openSyncModal','toggleFlag','toggleGroupFlag']
+   'modalToggleFav','undoAction','redoAction','openSyncModal','toggleFlag','toggleGroupFlag','ungroupListing']
   .forEach(n => { if (typeof window[n] === 'function') window[n] = lock; });
   ['hhDragStart','hhDragOver','_drainEnrichQueue'].forEach(n => { if (typeof window[n] === 'function') window[n] = silent; });
   setInterval(() => {
