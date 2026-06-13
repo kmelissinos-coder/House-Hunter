@@ -1074,8 +1074,9 @@
   #mapList .card, #mapList .grouped-card { width: 100% !important; max-width: none !important; flex: none; }
   #map-split #map { flex: 1; height: 100% !important; border-radius: 12px; }
 
-  /* ── viewer mode: clean header ───────────────── */
+  /* ── viewer mode: clean header, read-only ratings ── */
   #undoBtn, #redoBtn, #dropzone, .refresh-btn, .sync-btn { display: none !important; }
+  .card-stars, [onclick*="setRating"], [onclick*="setGroupRating"] { pointer-events: none !important; cursor: default !important; }
 </style>
 </head>
 <body>
@@ -3277,7 +3278,7 @@ function _restoreUI() {
   }
 })();
 
-// ── VIEWER MODE: read-only για επισκέπτες (μόνο σημειώσεις επιτρέπονται) ──
+// ── VIEWER MODE: read-only για επισκέπτες (μόνο σημειώσεις γράφονται· αξιολογήσεις ορατές αλλά κλειδωμένες) ──
 const VIEWER_MODE = true;
 (function(){
   const lock = () => showToast('🔒 Μόνο προβολή — μπορείς όμως να γράψεις Σημειώσεις!');
@@ -3290,11 +3291,13 @@ const VIEWER_MODE = true;
   setInterval(() => {
     document.querySelectorAll('button, span[onclick], div[onclick]').forEach(b => {
       if (b.id === 'listingOverlay' || b.classList.contains('card') || b.classList.contains('grouped-card') || b.classList.contains('lo-sib-card')) return;
+      const onc = b.getAttribute('onclick') || '';
+      // keep rating stars VISIBLE (read-only) — do not hide setRating elements
+      if (/setRating|setGroupRating/.test(onc)) return;
       const own = b.children.length === 0 ? (b.textContent || '') : '';
-      const s = own + ' ' + (b.getAttribute('title') || '') + ' ' + (b.getAttribute('onclick') || '');
-      if (/Αγαπημένο|Απόκρυψη|Επαναφορά|εξώφυλλο|Εξώφυλλο|setRating|setGroupRating|toggleFav|toggleGroupFav|ToggleHide|saveAddress|setCover|MsSelect|✂/.test(s)) b.style.display = 'none';
+      const s = own + ' ' + (b.getAttribute('title') || '') + ' ' + onc;
+      if (/Αγαπημένο|Απόκρυψη|Επαναφορά|εξώφυλλο|Εξώφυλλο|toggleFav|toggleGroupFav|ToggleHide|saveAddress|setCover|MsSelect|✂/.test(s)) b.style.display = 'none';
     });
-    document.querySelectorAll('.card-stars').forEach(e => e.style.display = 'none');
     const a = document.getElementById('loAddress');
     if (a) { const blk = a.closest('div[style*="margin-top"]'); (blk || a.parentElement).style.display = 'none'; }
   }, 700);
