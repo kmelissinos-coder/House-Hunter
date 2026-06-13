@@ -2287,7 +2287,7 @@ function openModal(url) {
         <div class="modal-field"><div class="modal-field-label">Αρ. Μεσιτικού</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
-      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2)"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${_mergedNotes(h)}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
     </div>`;
   document.getElementById('detailModal').classList.add('open');
 }
@@ -3151,7 +3151,7 @@ function _featHTML(h){
         </div>
         ${h.address_lat?`<div style="font-size:10px;color:#16a34a;margin-top:3px;">✓ Επιβεβαιωμένη — εμφανίζεται με πράσινη πινέζα στον χάρτη</div>`:''}
       </div>
-      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${h.personal_notes||''}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
+      <div class="modal-notes" style="background:rgba(126,184,154,0.06);border-color:rgba(126,184,154,0.2);margin-top:8px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📌 Προσωπικές Σημειώσεις</div><textarea id="loNotesTA" rows="3" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px;font-size:13px;resize:vertical;box-sizing:border-box;">${_mergedNotes(h)}</textarea><button onclick="saveNotes('${h.id}')" style="margin-top:6px;background:var(--accent);border:none;color:#0f0e0c;padding:4px 14px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:600;">💾 Αποθήκευση</button></div>
     </div>`;
 }
 
@@ -3525,13 +3525,25 @@ function setRating(e,id,score){
   const stars=e.currentTarget.parentNode.querySelectorAll('span[data-star]');
   stars.forEach((s,j)=>{s.textContent=j<score?'★':'☆';s.style.color=j<score?'#d4a853':'rgba(255,255,255,0.2)';});
 }
+function _mergedNotes(h){
+  if(!h) return '';
+  var hid=String(h.house_id||'').trim();
+  if(!hid||hid==='0') return h.personal_notes||'';
+  var seen=[],out=[];
+  allListings.filter(function(x){return String(x.house_id||'').trim()===hid;}).forEach(function(m){var n=(m.personal_notes||'').trim();if(n&&seen.indexOf(n)<0){seen.push(n);out.push(n);}});
+  return out.join('\n');
+}
 function saveNotes(id){
   const ta=document.getElementById('loNotesTA');
   if(!ta)return;
   const val=ta.value;
   const rec=allListings.find(x=>x.id===id);
-  if(rec)rec.personal_notes=val;
-  fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
+  const hid=rec?String(rec.house_id||'').trim():'';
+  const members=(rec&&hid&&hid!=='0')?allListings.filter(x=>String(x.house_id||'').trim()===hid):(rec?[rec]:[]);
+  members.forEach(m=>{m.personal_notes=val;});
+  const ids=members.map(m=>m.id);
+  const url=ids.length>1?('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=in.('+ids.join(',')+')'):('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id);
+  fetch(url,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
 </script>
 </body>
