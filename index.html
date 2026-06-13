@@ -1152,6 +1152,7 @@
     <option value="πετρέλαιο">Πετρέλαιο</option>
     <option value="αντλία">Αντλία Θέρμανσης</option>
   </select>
+  <input type="search" id="numSearch" placeholder="🔎 Αρ. Αγγελίας ή Αρ. Μεσιτικού" oninput="applyFilters();if(typeof _saveUISoon==='function')_saveUISoon()" style="flex:0 1 320px;min-width:170px;margin:0 10px;padding:9px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:#fff;font-size:13px;outline:none">
   <div class="upload-zone" id="dropzone"
        onclick="document.getElementById('csvInput').click()"
        ondragover="event.preventDefault();this.classList.add('drag')"
@@ -1704,6 +1705,7 @@ function getPlatformColor(p) {
 function applyFilters() {
   const combined = [...allListings, ...extraListings];
   const q        = document.getElementById('search').value.toLowerCase();
+  const nq = (document.getElementById('numSearch') ? document.getElementById('numSearch').value : '').trim().toLowerCase();
   const loc      = document.getElementById('filterLocation').value;
   const typ      = document.getElementById('filterType').value;
   const energy   = document.getElementById('filterEnergy').value;
@@ -1728,6 +1730,7 @@ function applyFilters() {
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
     if (q && !`${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating}`.toLowerCase().includes(q)) return false;
+    if (nq && !((String(h.platformNr||'')+' '+String(h.agencyNr||'')).toLowerCase().includes(nq))) return false;
     if (h.price > 0 && (h.price < minP || h.price > maxP)) return false;
     if (h.sqm > 0 && (h.sqm < minS || h.sqm > maxS)) return false;
     if (h.year > 0 && (h.year < minY || h.year > maxY)) return false;
