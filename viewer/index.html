@@ -3229,7 +3229,7 @@ function loToggleHide(key){
   if(b){b.textContent=nv?'↩ Επαναφορά':'✕ Απόκρυψη';b.style.borderColor=nv?'var(--red)':'';b.style.color=nv?'var(--red)':'';}
   showToast(nv?(members.length>1?'✕ Κρύφτηκαν όλες':'✕ Κρύφτηκε'):'↩ Εμφανίζεται ξανά');
   applyFilters();
-  if(nv && typeof closeListingOverlay==='function') closeListingOverlay();
+  if(nv){var _ov=document.getElementById('listingOverlay');if(_ov&&_ov.classList.contains('open')&&typeof closeListingOverlay==='function'){try{closeListingOverlay();}catch(e){}}}
 }
 
 // Group-level fav/hide
