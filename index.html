@@ -2984,7 +2984,7 @@ document.addEventListener('keydown', e => {
   if (!document.getElementById('galleryOverlay')?.classList.contains('open')) return;
   if (e.key==='ArrowRight'||e.key==='ArrowDown') galleryNav(1);
   if (e.key==='ArrowLeft' ||e.key==='ArrowUp')   galleryNav(-1);
-  if (e.key==='Escape') closeGallery();
+  if (e.key==='Escape') { e.preventDefault(); e.stopImmediatePropagation(); closeGallery(); }
 });
 
 
@@ -3509,7 +3509,7 @@ function _lbScrollNav(e){
   document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
   _lbUpdateCounter();
 }
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLightbox();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();closeLightbox();}});
 </script>
 <script>
 function setRating(e,id,score){
