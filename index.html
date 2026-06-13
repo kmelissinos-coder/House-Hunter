@@ -1777,6 +1777,7 @@ function setView(v) {
 let leafletMap = null;
 let expandedGroups = new Set();
 
+function _sortCards(all){var price=function(x){return x.price>0?x.price:(x.minPrice||0)};var sqmv=function(x){return x.sqm>0?x.sqm:(parseFloat(x.sqmRaw)||0)};var ppm=function(x){var p=price(x),s=sqmv(x);return x.pricePerSqm>0?x.pricePerSqm:(p>0&&s>0?p/s:0)};var score=function(x){return x._isGroup?Math.max.apply(null,[0].concat(x.items.map(function(i){return i.personal_score||0}))):(x.personal_score||0)};var upd=function(x){return x._isGroup?Math.max.apply(null,[0].concat(x.items.map(function(i){return _dateKey(i.updated)}))):_dateKey(x.updated)};all.sort(function(a,b){if(currentSort==='price-asc')return (price(a)||9e15)-(price(b)||9e15);if(currentSort==='price-desc')return price(b)-price(a);if(currentSort==='sqm-desc')return sqmv(b)-sqmv(a);if(currentSort==='ppm-asc')return (ppm(a)||9e15)-(ppm(b)||9e15);if(currentSort==='year-desc')return (b.year||0)-(a.year||0);if(currentSort==='updated')return upd(b)-upd(a);if(currentSort==='score')return score(b)-score(a);if(currentSort==='location'){var la=String(a.location||''),lb=String(b.location||'');if(!la&&!lb)return 0;if(!la)return 1;if(!lb)return -1;return la.localeCompare(lb,'el')}return 0});return all}
 function groupByHouseId(listings) {
   const groups = new Map(), singles = [];
   listings.forEach(h => {
@@ -1825,7 +1826,8 @@ function renderListings() {
   if (!filtered.length) { container.innerHTML = '<div class="empty">Δεν βρέθηκαν αγγελίες με αυτά τα φίλτρα.</div>'; return; }
   if (currentView === 'map') {
     const { groupCards, singles } = groupByHouseId(filtered);
-    const cardsHtml = [...groupCards.map(renderGroupedCard), ...singles.map(renderCard)].join('');
+    const _allMap=_sortCards([...groupCards, ...singles]);
+    const cardsHtml = _allMap.map(function(c){return c._isGroup?renderGroupedCard(c):renderCard(c);}).join('');
     container.innerHTML = `<div id="map-split">
       <div id="mapList">${cardsHtml}</div>
       <div id="map"></div>
