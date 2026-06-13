@@ -3532,7 +3532,7 @@ function setRating(e,id,score){
   fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_score:score})});
   const stars=e.currentTarget.parentNode.querySelectorAll('span[data-star]');
   stars.forEach((s,j)=>{s.textContent=j<score?'★':'☆';s.style.color=j<score?'#d4a853':'rgba(255,255,255,0.2)';});
-}
+;try{var _h=allListings.find(function(x){return x.id===id;});if(_h){var _hid=String(_h.house_id||"").trim();if(_hid&&_hid!=="0"){allListings.forEach(function(m){if(String(m.house_id||"").trim()===_hid){m.personal_score=score;if(m.id!==id&&m._dbId)sb.update(m._dbId,{personal_score:score}).catch(function(){});}});}}if(typeof applyFilters==="function")applyFilters();}catch(_e){}}
 function _mergedNotes(h){
   if(!h) return '';
   var hid=String(h.house_id||'').trim();
