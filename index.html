@@ -1835,6 +1835,24 @@ function renderListings() {
   if (currentView === 'grid') {
     const { groupCards, singles } = groupByHouseId(filtered);
     const all = [...groupCards, ...singles];
+    (function(){
+      const price=x=>(x.price>0?x.price:(x.minPrice||0));
+      const sqmv=x=>(x.sqm>0?x.sqm:(parseFloat(x.sqmRaw)||0));
+      const ppm=x=>(x.pricePerSqm>0?x.pricePerSqm:(price(x)>0&&sqmv(x)>0?price(x)/sqmv(x):0));
+      const score=x=>x._isGroup?Math.max(0,...x.items.map(i=>i.personal_score||0)):(x.personal_score||0);
+      const upd=x=>x._isGroup?Math.max(0,...x.items.map(i=>_dateKey(i.updated))):_dateKey(x.updated);
+      all.sort((a,b)=>{
+        if(currentSort==='price-asc'){const av=price(a)||9e15,bv=price(b)||9e15;return av-bv;}
+        if(currentSort==='price-desc')return price(b)-price(a);
+        if(currentSort==='sqm-desc')return sqmv(b)-sqmv(a);
+        if(currentSort==='ppm-asc'){const av=ppm(a)||9e15,bv=ppm(b)||9e15;return av-bv;}
+        if(currentSort==='year-desc')return (b.year||0)-(a.year||0);
+        if(currentSort==='updated')return upd(b)-upd(a);
+        if(currentSort==='score')return score(b)-score(a);
+        if(currentSort==='location')return String(a.location||'\uffff').localeCompare(String(b.location||'\uffff'),'el');
+        return 0;
+      });
+    })();
     document.getElementById('resultsCount').textContent =
       `${all.length} κάρτες · ${groupCards.length} σπίτια · ${singles.length} μεμονωμένες`;
     container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
