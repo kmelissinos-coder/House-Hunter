@@ -2909,6 +2909,7 @@ function _initGalleryControls() {
   wrap.addEventListener('dragstart', e => e.preventDefault());
   wrap.addEventListener('mousedown', function(e){
     if(e.button!==1) return;
+    if(galleryZoom<=1) return;
     e.preventDefault();
     var sx=e.clientX, sy=e.clientY, ox=galleryPanX, oy=galleryPanY;
     function mv(ev){ galleryPanX=ox+(ev.clientX-sx); galleryPanY=oy+(ev.clientY-sy); _applyGalleryT(); }
