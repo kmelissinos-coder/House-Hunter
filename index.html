@@ -237,7 +237,7 @@
     border-color: rgba(212,168,83,0.4);
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   }
-  .card.deleted{opacity:.55;position:relative}
+  .card.deleted{opacity:.55;position:relative}@keyframes hhflash{0%,100%{box-shadow:0 0 0 0 rgba(99,179,237,0)}50%{box-shadow:0 0 0 3px rgba(99,179,237,.85)}}.card.link-selected,.grouped-card.ms-picked{animation:hhflash 1.2s ease-in-out infinite;outline:2px solid var(--accent2);outline-offset:-2px}.action-btn.link-sel,.grp-btn.link-sel{border-color:var(--accent2);color:var(--accent2);background:rgba(99,179,237,.18)}
 .card.deleted::before{content:"REMOVED";position:absolute;top:7px;left:36px;z-index:7;background:#e02b2b;color:#fff;padding:1px 5px;border-radius:6px;font-weight:800;font-size:10px;box-shadow:0 1px 5px rgba(0,0,0,.6);pointer-events:none}.card.deleted::after{content:"\2715";position:absolute;top:7px;left:7px;z-index:7;background:#e02b2b;color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;box-shadow:0 1px 5px rgba(0,0,0,.6);pointer-events:none}
   .sold-overlay { position:absolute;inset:0;background:rgba(0,0,0,0.62);display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none; }
   .sold-badge { color:#ff3030;font-size:0.95rem;font-weight:900;border:3px solid #ff3030;padding:5px 13px;transform:rotate(-15deg);letter-spacing:2px;text-shadow:0 0 8px rgba(255,0,0,0.8);background:rgba(0,0,0,0.5);white-space:nowrap; }
@@ -1516,13 +1516,18 @@ async function linkSelectedTo(targetDbId, targetHouseId) {
     try { await sb.update(targetDbId,{house_id:finalHid}); } catch(e) { showToast("Σφάλμα"); return; }
     if(th) th.house_id=finalHid;
   }
+  const _all=[...allListings,...extraListings];
+  const _toMove=new Set();
   for(const id of [...multiSelectedIds]){
     if(id===targetDbId) continue;
-    try{
-      await sb.update(id,{house_id:finalHid});
-      const h2=allListings.find(x=>x._dbId===id);
-      if(h2) h2.house_id=finalHid;
-    }catch(e){console.error("link err",id,e);}
+    const _src=_all.find(x=>x._dbId===id);
+    const _shid=_src?String(_src.house_id||'').trim():'';
+    if(_shid&&_shid!=='0'&&_shid!==finalHid){ _all.filter(x=>String(x.house_id||'').trim()===_shid).forEach(x=>{if(x._dbId)_toMove.add(x._dbId);}); }
+    else _toMove.add(id);
+  }
+  for(const id of _toMove){
+    if(id===targetDbId) continue;
+    try{ await sb.update(id,{house_id:finalHid}); const h2=_all.find(x=>x._dbId===id); if(h2) h2.house_id=finalHid; }catch(e){console.error('link err',id,e);}
   }
   multiSelectMode=false; multiSelectedIds.clear(); selectedGroupSource=null;
   showToast("✓ Συνδέθηκαν!"); renderListings(); tryFetch();
@@ -1891,11 +1896,9 @@ function renderGroupedCard(g) {
   const agencyNames = [...new Set(g.items.map(h=>h.agency||'Ιδιώτης'))].slice(0,3).join(' · ');
 
   let connectHtml = '';
-  if (multiSelectMode) {
-    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">→ Σύνδεση εδώ</button>`;
-  } else if (selectedGroupSource && selectedGroupSource.house_id !== g.houseId) {
-    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px"
-      onclick="event.stopPropagation();executeQuickGroup('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
+  const _grpSel = multiSelectedIds.has(g.representativeDbId);
+  if (multiSelectedIds.size>0 && !_grpSel) {
+    connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
   }
 
   return `<div class="grouped-card${allFav?' favorited':''}${g.items.some(x=>multiSelectedIds.has(x._dbId))?' ms-picked':''}${(selectedGroupSource&&g.items.some(x=>x.url===selectedGroupSource.url))?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(g.items[0].url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'g:${escJ(String(g.houseId))}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'g:${escJ(String(g.houseId))}')"
@@ -1935,7 +1938,7 @@ function renderGroupedCard(g) {
       <div class="grouped-card-footer">
       <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
       <div class="group-action-btns">
-        <span class="grp-btn" title="Σύγκριση" onclick="event.stopPropagation();addToCompare('${escJ(g.items[0].url)}')">⊕</span>
+        <span class="grp-btn" title="Σύγκριση" onclick="event.stopPropagation();addToCompare('${escJ(g.items[0].url)}')">⊕</span><span class="grp-btn${multiSelectedIds.has(g.representativeDbId)?' link-sel':''}" title="Επιλογή για ένωση" onclick="event.stopPropagation();toggleMsSelect('${g.representativeDbId}')">🔗</span>
         <span class="grp-btn${allFav?' active':''}"
           onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
           title="${allFav?'Αφαίρεση αγαπημένου':'Αγαπημένο για όλες'}">${allFav?'★':'☆'}</span>
@@ -2090,18 +2093,14 @@ function renderCard(h) {
   // Grouping operation buttons dynamically rendered inside actions panel
   let groupActionHtml = '';
   if (h._dbId) {
-    if (selectedGroupSource) {
-      // Show join target button if another item is selected
-      if (selectedGroupSource._dbId !== h._dbId) {
-        groupActionHtml = `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();executeQuickGroup('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Ένωση εδώ">🔗</span>`;
-      }
-    } else {
-      // Default state: select entry point
-      groupActionHtml = `<span class="action-btn icon-only" onclick="event.stopPropagation();selectListingForGrouping('${escJ(h.url)}')" title="Επιλογή για Ένωση" aria-label="Επιλογή για Ένωση">🔗</span>`;
+    const _sel = multiSelectedIds.has(h._dbId);
+    groupActionHtml = `<span class="action-btn icon-only${_sel?' link-sel':''}" onclick="event.stopPropagation();toggleMsSelect('${h._dbId}')" title="${_sel?'Επιλεγμένο — κλικ για αναίρεση':'Επιλογή για ένωση'}" aria-label="Επιλογή για ένωση">🔗</span>`;
+    if (multiSelectedIds.size>0 && !_sel) {
+      groupActionHtml += `<span class="action-btn icon-only" style="border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();linkSelectedTo('${h._dbId}', '${h.house_id || '0'}')" title="Ένωση εδώ" aria-label="Ένωση εδώ">⤵</span>`;
     }
   }
 
-  return `<div class="card${h.deleted?' deleted':''}${isFav?' favorited':''}${(typeof msc!=='undefined'&&msc)?' ms-picked':''}${(selectedGroupSource&&selectedGroupSource.url===h.url)?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(h.url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
+  return `<div class="card${multiSelectedIds.has(h._dbId)?' link-selected':''}${h.deleted?' deleted':''}${isFav?' favorited':''}${(typeof msc!=='undefined'&&msc)?' ms-picked':''}${(selectedGroupSource&&selectedGroupSource.url===h.url)?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(h.url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
     <div class="card-img-wrap" style="cursor:pointer" data-nav="1"
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
