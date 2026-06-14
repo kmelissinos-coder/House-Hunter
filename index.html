@@ -1176,13 +1176,13 @@
 
 <div class="sort-row">
   <span>Ταξινόμηση:</span>
-  <button class="sort-btn active" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
+  <button class="sort-btn" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
   <button class="sort-btn" data-sort="price-desc" onclick="setSort(this,'price-desc')">Τιμή ↓</button>
   <button class="sort-btn" data-sort="sqm-desc" onclick="setSort(this,'sqm-desc')">τ.μ. ↓</button>
   <button class="sort-btn" data-sort="ppm-asc" onclick="setSort(this,'ppm-asc')">€/τ.μ. ↑</button>
   <button class="sort-btn" data-sort="year-desc" onclick="setSort(this,'year-desc')">Νεότερα</button>
   <button class="sort-btn" data-sort="updated" onclick="setSort(this,'updated')">Πρόσφατη ενημ.</button>
-    <button class="sort-btn" onclick="setSort(this,'score')">★ Σκορ</button>
+    <button class="sort-btn active" data-sort="score" onclick="setSort(this,'score')">★ Σκορ</button>
     <button class="sort-btn" onclick="setSort(this,'location')">📍 Περιοχή</button>
 </div>
 
@@ -1315,7 +1315,7 @@ let allListings    = [];
 let extraListings  = []; 
 let filtered       = [];
 let currentView    = 'grid';
-let currentSort    = 'price-asc';
+let currentSort    = 'score';
 let currentPlatform = 'all';
 let favorites      = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
 let compareList    = [];
@@ -1790,7 +1790,7 @@ function setView(v) {
 let leafletMap = null;
 let expandedGroups = new Set();
 
-function _sortCards(all){var price=function(x){return x.price>0?x.price:(x.minPrice||0)};var sqmv=function(x){return x.sqm>0?x.sqm:(parseFloat(x.sqmRaw)||0)};var ppm=function(x){var p=price(x),s=sqmv(x);return x.pricePerSqm>0?x.pricePerSqm:(p>0&&s>0?p/s:0)};var score=function(x){return x._isGroup?Math.max.apply(null,[0].concat(x.items.map(function(i){return i.personal_score||0}))):(x.personal_score||0)};var upd=function(x){return x._isGroup?Math.max.apply(null,[0].concat(x.items.map(function(i){return _dateKey(i.updated)}))):_dateKey(x.updated)};all.sort(function(a,b){if(currentSort==='price-asc')return (price(a)||9e15)-(price(b)||9e15);if(currentSort==='price-desc')return price(b)-price(a);if(currentSort==='sqm-desc')return sqmv(b)-sqmv(a);if(currentSort==='ppm-asc')return (ppm(a)||9e15)-(ppm(b)||9e15);if(currentSort==='year-desc')return (b.year||0)-(a.year||0);if(currentSort==='updated')return upd(b)-upd(a);if(currentSort==='score')return score(b)-score(a);if(currentSort==='location'){var la=String(a.location||''),lb=String(b.location||'');if(!la&&!lb)return 0;if(!la)return 1;if(!lb)return -1;return la.localeCompare(lb,'el')}return 0});return all}
+function _sortCards(all){var price=function(x){return x.price>0?x.price:(x.minPrice||0)};var sqmv=function(x){return x.sqm>0?x.sqm:(parseFloat(x.sqmRaw)||0)};var ppm=function(x){var p=price(x),s=sqmv(x);return x.pricePerSqm>0?x.pricePerSqm:(p>0&&s>0?p/s:0)};var score=function(x){return x._isGroup?Math.max.apply(null,[0].concat(x.items.map(function(i){return i.personal_score||0}))):(x.personal_score||0)};var upd=function(x){return x._isGroup?Math.max.apply(null,[0].concat(x.items.map(function(i){return _dateKey(i.updated)}))):_dateKey(x.updated)};all.sort(function(a,b){var _sa=score(a),_sb=score(b);if(currentSort==='score'){var _ra=_sa>0?1:0,_rb=_sb>0?1:0;if(_ra!==_rb)return _ra-_rb;if(_sa>0)return _sb-_sa;return upd(b)-upd(a);}else{var _ua=_sa>0?0:1,_ub=_sb>0?0:1;if(_ua!==_ub)return _ua-_ub;}if(currentSort==='price-asc')return (price(a)||9e15)-(price(b)||9e15);if(currentSort==='price-desc')return price(b)-price(a);if(currentSort==='sqm-desc')return sqmv(b)-sqmv(a);if(currentSort==='ppm-asc')return (ppm(a)||9e15)-(ppm(b)||9e15);if(currentSort==='year-desc')return (b.year||0)-(a.year||0);if(currentSort==='updated')return upd(b)-upd(a);if(currentSort==='score')return score(b)-score(a);if(currentSort==='location'){var la=String(a.location||''),lb=String(b.location||'');if(!la&&!lb)return 0;if(!la)return 1;if(!lb)return -1;return la.localeCompare(lb,'el')}return 0});return all}
 function groupByHouseId(listings) {
   const groups = new Map(), singles = [];
   listings.forEach(h => {
