@@ -2143,6 +2143,7 @@ function renderCard(h) {
         <div class="card-actions">
           <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Λεπτομέρειες">🔍</span>
           <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Σύγκριση">⊕</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFlag('${escJ(h.url)}','hidden',true)" title="Απόκρυψη" aria-label="Απόκρυψη">✕</span>
           ${groupActionHtml}
           ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="Άνοιγμα link" aria-label="Άνοιγμα link">↗</a>` : ''}
         </div>
