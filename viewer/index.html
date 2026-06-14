@@ -25,6 +25,7 @@
     --red: #c06060;
     --yellow: #c9a84c;
   }
+body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--accent:#a8792f;--accent2:#4e8a6c;--accent3:#b5604f;--text:#23211c;--text2:#5c5850;--text3:#8a857c;--green:#3f8a5e;--red:#c0504a;--yellow:#b08a2c;}
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1101,6 +1102,7 @@
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
     <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="Αναίρεση (Ctrl+Z)" disabled>↩</button>
     <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="Επανάληψη (Ctrl+Y)" disabled>↪</button>
+      <button class="header-icon-btn" id="themeBtn" onclick="toggleTheme()" title="Φωτεινό / Σκοτεινό θέμα">🌙</button>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
     <button class="refresh-btn" onclick="loadData()">⟳ Ανανέωση</button>
@@ -1178,6 +1180,7 @@
   </div>
 </div>
 
+<div style="float:right;display:flex;align-items:center;gap:12px;padding:0 40px"><span class="results-count" id="resultsCount"></span></div>
 <div class="sort-row">
   <span>Ταξινόμηση:</span>
   <button class="sort-btn" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
@@ -1198,7 +1201,7 @@
 </div>
 
 
-<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 40px 0"><div class="results-count" id="resultsCount"></div><button class="sync-btn" onclick="openSyncModal()">&#128260; Sync</button></div>
+
 
 <div id="main-content">
   <div class="loading">
@@ -1763,6 +1766,8 @@ function applyFilters() {
 
 function _dateKey(s){ const m=String(s||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? (+m[3])*10000+(+m[2])*100+(+m[1]) : 0; }
 
+function toggleTheme(){var l=document.body.classList.toggle('light');try{localStorage.setItem('hh_theme',l?'light':'dark');}catch(e){}var b=document.getElementById('themeBtn');if(b)b.textContent=l?'☀️':'🌙';}
+document.addEventListener('DOMContentLoaded',function(){try{if(localStorage.getItem('hh_theme')==='light'){document.body.classList.add('light');var tb=document.getElementById('themeBtn');if(tb)tb.textContent='☀️';}}catch(e){}});
 function setSort(el, sort) {
   currentSort = sort;
   document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
