@@ -1734,7 +1734,7 @@ function applyFilters() {
   filtered = combined.filter(h => {
     if (h.unfavorited === true) return false;
     /* REMOVED: deleted stays visible for review */
-    if (!showDel && h.hidden) return false;
+    if (!showDel && !q && h.hidden) return false;
     if (hideEfi && h.sent_efi) return false;
     if (hideSeen && h.seen_it) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
