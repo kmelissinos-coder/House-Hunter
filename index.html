@@ -1158,7 +1158,7 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
     <option value="πετρέλαιο">Πετρέλαιο</option>
     <option value="αντλία">Αντλία Θέρμανσης</option>
   </select>
-  <input type="search" id="numSearch" placeholder="🔎 Αναζήτηση: περιοχή, τύπος, μεσίτης, Αρ. Αγγελίας/Μεσιτικού..." oninput="applyFilters();if(typeof _saveUISoon==='function')_saveUISoon()" style="flex:0 1 480px;min-width:280px;margin:0 10px;padding:9px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.16);border-radius:10px;color:#fff;font-size:13px;outline:none">
+  <input type="search" id="numSearch" placeholder="🔎 Αναζήτηση: περιοχή, τύπος, μεσίτης, Αρ. Αγγελίας/Μεσιτικού..." oninput="applyFilters();if(typeof _saveUISoon==='function')_saveUISoon()" style="flex:0 1 480px;min-width:280px;margin:0 10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none">
   <div class="upload-zone" id="dropzone"
        onclick="document.getElementById('csvInput').click()"
        ondragover="event.preventDefault();this.classList.add('drag')"
