@@ -2143,7 +2143,7 @@ function renderCard(h) {
         <div class="card-actions">
           <span class="action-btn icon-only" onclick="event.stopPropagation();openModal('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Λεπτομέρειες">🔍</span>
           <span class="action-btn icon-only" onclick="event.stopPropagation();addToCompare('${escJ(h.url)}')" title="Λεπτομέρειες" aria-label="Σύγκριση">⊕</span>
-          <span class="action-btn icon-only" onclick="event.stopPropagation();toggleFlag('${escJ(h.url)}','hidden',true)" title="Απόκρυψη" aria-label="Απόκρυψη">✕</span>
+          <span class="action-btn icon-only" onclick="event.stopPropagation();hideListing('${escJ(h.url)}')" title="Απόκρυψη" aria-label="Απόκρυψη">✕</span>
           ${groupActionHtml}
           ${h.url ? `<a class="action-btn icon-only" onmousedown="handleLinkClick(event, '${escJ(h.url)}')" onclick="event.stopPropagation();handleLinkClick(event, '${escJ(h.url)}')" target="_blank" title="Άνοιγμα link" aria-label="Άνοιγμα link">↗</a>` : ''}
         </div>
@@ -2828,6 +2828,17 @@ function shortId(id){
   return '#'+h.toString(36).toUpperCase().slice(-4).padStart(4,'0');
 }
 
+async function hideListing(url){
+  const all=[...allListings,...extraListings];
+  const h=all.find(x=>x.url===url); if(!h) return;
+  const hid=String(h.house_id||'').trim();
+  const members=(hid&&hid!=='0')?all.filter(x=>String(x.house_id||'').trim()===hid):[h];
+  for(const m of members){
+    m.hidden=true;
+    if(m._dbId){ try{ await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+m._dbId,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({hidden:true})}); }catch(e){} }
+  }
+  applyFilters();
+}
 async function toggleFlag(url, field, val){
   const all=[...allListings,...extraListings];
   const h=all.find(x=>x.url===url); if(!h) return;
