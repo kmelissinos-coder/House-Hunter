@@ -1002,8 +1002,8 @@
   header { justify-content: flex-start !important; gap: 10px !important; }
   header > div:last-child { margin-left: auto !important; }
   .header-stats { gap: 8px !important; }
-  .platform-bar { display: inline-flex !important; vertical-align: middle; }
-  .range-filters { display: inline-flex !important; vertical-align: middle; }
+  .platform-bar { display: flex !important; }
+  .range-filters { display: flex !important; }
 
   /* ── agency name white & bold ────────────────── */
   .agency-name, .lo-sib-agency, .agency-summary { color: #ffffff !important; font-weight: 700 !important; }
@@ -1055,7 +1055,7 @@
   .lo-nav-btn.disabled { opacity: 0.25; pointer-events: none; }
 
   /* ── one-line filter bar ─────────────────────── */
-  .range-filters { display: inline-flex !important; align-items: center; gap: 8px; flex-wrap: wrap; vertical-align: middle; }
+  .range-filters { display: flex !important; align-items: center; gap: 8px; flex-wrap: wrap; }
   .range-filters #search { width: 200px; }
   .range-filters select { max-width: 170px; }
 
