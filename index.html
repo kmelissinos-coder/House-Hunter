@@ -1082,6 +1082,8 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 
 /* merged search into header box — hide old bottom search */
 .search-wrap{display:none!important}
+
+.card-seen .card-body{background:rgba(255,160,195,0.32)!important;}
 </style>
 </head>
 <body>
@@ -1907,7 +1909,7 @@ function renderGroupedCard(g) {
     connectHtml = `<button class="action-btn" style="border-color:var(--accent2);color:var(--accent2);margin-bottom:8px" onclick="event.stopPropagation();linkSelectedTo('${g.representativeDbId}','${g.houseId}')">🔗 Ένωση εδώ</button>`;
   }
 
-  return `<div class="grouped-card${allFav?' favorited':''}${g.items.some(x=>multiSelectedIds.has(x._dbId))?' ms-picked':''}${(selectedGroupSource&&g.items.some(x=>x.url===selectedGroupSource.url))?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(g.items[0].url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'g:${escJ(String(g.houseId))}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'g:${escJ(String(g.houseId))}')"
+  return `<div class="grouped-card${allFav?' favorited':''}${g.items.some(x=>x.seen_it)?' card-seen':''}${g.items.some(x=>multiSelectedIds.has(x._dbId))?' ms-picked':''}${(selectedGroupSource&&g.items.some(x=>x.url===selectedGroupSource.url))?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(g.items[0].url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'g:${escJ(String(g.houseId))}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'g:${escJ(String(g.houseId))}')"
     onclick="openListingOverlay(null,'${g.houseId}',0)">
     <div class="photo-strip">
       ${stripHtml}
@@ -2106,7 +2108,7 @@ function renderCard(h) {
     }
   }
 
-  return `<div class="card${multiSelectedIds.has(h._dbId)?' link-selected':''}${h.deleted?' deleted':''}${isFav?' favorited':''}${(typeof msc!=='undefined'&&msc)?' ms-picked':''}${(selectedGroupSource&&selectedGroupSource.url===h.url)?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(h.url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
+  return `<div class="card${multiSelectedIds.has(h._dbId)?' link-selected':''}${h.deleted?' deleted':''}${isFav?' favorited':''}${h.seen_it?' card-seen':''}${(typeof msc!=='undefined'&&msc)?' ms-picked':''}${(selectedGroupSource&&selectedGroupSource.url===h.url)?' ms-origin':''}" onmousedown="if(event.button===1)event.preventDefault()" onauxclick="if(event.button===1){event.preventDefault();event.stopPropagation();window.open(location.pathname+'?open='+encodeURIComponent('${escJ(h.url)}'),'_blank');}" draggable="true" ondragstart="hhDragStart(event,'u:${escJ(h.url)}')" ondragover="hhDragOver(event)" ondragleave="hhDragLeave(event)" ondrop="hhDrop(event,'u:${escJ(h.url)}')" onclick="openModal('${escJ(h.url)}')">
     <div class="card-img-wrap" style="cursor:pointer" data-nav="1"
       onclick="event.stopPropagation();openListingOverlay('${escJ(h.url)}',null)">
       ${imgHtml}
