@@ -1197,6 +1197,7 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
   <label for="showDeleted">Εμφάνιση αγγελιών με X (διαγραμμένες/απόρριψη)</label>
   <label style="margin-left:18px;cursor:pointer"><input type="checkbox" id="hideEfi" class="toggle-check" onchange="applyFilters()"> Απόκρυψη αγγελιών που στείλαμε στην Έφη</label>
   <label style="margin-left:18px;cursor:pointer"><input type="checkbox" id="hideSeen" class="toggle-check" onchange="applyFilters()"> Απόκρυψη αγγελιών που είδαμε</label>
+<button onclick="resetFilters()" class="sort-btn" style="border:1px solid var(--text3);border-radius:4px;margin-left:14px;padding:3px 9px;white-space:nowrap;" onmouseover="this.style.borderColor=this.style.color='var(--accent)'" onmouseout="this.style.borderColor=this.style.color='var(--text3)'">↺ Επαναφορά φίλτρων</button>
 </div>
 
 
@@ -1717,6 +1718,35 @@ function getPlatformColor(p) {
 }
 
 //    FILTERS & SORT ────────────────────────────────────────────────────────
+function resetFilters() {
+  // Text search
+  var ns = document.getElementById('numSearch');
+  if(ns) ns.value = '';
+  // Dropdowns
+  ['filterLocation','filterType','filterEnergy','filterHeating'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  // Number inputs
+  ['minPrice','maxPrice','minSqm','maxSqm','minYear','maxYear'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  // Checkboxes
+  var sd=document.getElementById('showDeleted'); if(sd) sd.checked=false;
+  var he=document.getElementById('hideEfi');     if(he) he.checked=false;
+  var hs=document.getElementById('hideSeen');    if(hs) hs.checked=false;
+  // Sort -> score
+  currentSort='score';
+  document.querySelectorAll('.sort-btn').forEach(function(b){b.classList.remove('active');});
+  var scoreBtn=document.querySelector('.sort-btn[data-sort="score"]');
+  if(scoreBtn) scoreBtn.classList.add('active');
+  // Platform -> all
+  currentPlatform='all';
+  document.querySelectorAll('.platform-tab').forEach(function(b){b.classList.remove('active');});
+  var allTab=document.querySelector('.platform-tab[data-platform="all"]');
+  if(allTab) allTab.classList.add('active');
+  applyFilters();
+}
+
 function applyFilters() {
   const combined = [...allListings, ...extraListings];
   const q        = (document.getElementById('numSearch') ? document.getElementById('numSearch').value : '').trim().toLowerCase();
