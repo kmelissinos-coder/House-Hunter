@@ -1078,6 +1078,7 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
 
 /* favorites feature removed — hidden everywhere */
 [onclick*="toggleFav"],[onclick*="toggleGroupFav"],[onclick*="modalToggleFav"],[onclick*="loToggleFav"],#modal-fav-btn,#lo-fav{display:none!important}
+body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop-filter:blur(10px);}
 
 /* merged search into header box — hide old bottom search */
 .search-wrap{display:none!important}
@@ -3128,7 +3129,7 @@ function _featHTML(h){
           ${h.url?`<span class="modal-btn primary" style="cursor:pointer"
             onmousedown="handleLinkClick(event,'${escJ(h.url)}')"
             onclick="event.stopPropagation();handleLinkClick(event,'${escJ(h.url)}')">↗ Άνοιγμα</span>`:''}
-          ${h.video_url?`<span class="modal-btn" title="Βίντεο" onclick="event.stopPropagation();window.open('${escJ(h.video_url)}','_blank','noopener')">▶ Βίντεο</span>`:''}
+          ${_mergedVideos(h).map((v,i,a)=>`<span class="modal-btn" title="Βίντεο${a.length>1?' '+(i+1):''}" onclick="event.stopPropagation();window.open('${escJ(v)}','_blank','noopener')">▶ Βίντεο${a.length>1?' '+(i+1):''}</span>`).join('')}
           ${h.deleted?`<span class="modal-btn" style="color:#fff;background:#e02b2b;border-color:#e02b2b;pointer-events:none">✕ REMOVED</span>`:''}
           <span class="modal-btn${isFav?' active':''}" id="lo-fav" style="cursor:pointer"
             onclick="loToggleFav('${escJ(key)}')">${isFav?'★ Αγαπημένο':'☆ Αγαπημένο'}</span>
@@ -3139,14 +3140,13 @@ function _featHTML(h){
           ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >↩ Δεν πουλήθηκε</span>` : ''}
         </div>
       </div>
-      <div style="margin-top:8px">
+      <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center"><div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">⭐ Αξιολόγηση</div>
         <div style="font-size:22px;line-height:1">${[1,2,3,4,5].map(i=>`<span data-star="${i}" onclick="setRating(event,'${h.id}',${i})" style="cursor:pointer;color:${i<=(h.personal_score||0)?'#d4a853':'rgba(255,255,255,0.2)'}">${i<=(h.personal_score||0)?'★':'☆'}</span>`).join('')}</div>
-      </div>
-      <div style="display:flex;gap:18px;margin:6px 0 2px;font-size:13px;">
+      </div><div style="display:flex;gap:14px;font-size:13px;align-items:center;flex-wrap:wrap">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.sent_efi?'checked':''} onchange="toggleFlag('${escJ(h.url)}','sent_efi',this.checked)">Το στείλαμε στην Έφη</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.seen_it?'checked':''} onchange="toggleFlag('${escJ(h.url)}','seen_it',this.checked)">Το είδαμε</label>
-      </div>
+      </div></div>
       <div class="modal-grid">
         <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
@@ -3556,6 +3556,16 @@ function _mergedNotes(h){
   var seen=[],out=[];
   allListings.filter(function(x){return String(x.house_id||'').trim()===hid;}).forEach(function(m){var n=(m.personal_notes||'').trim();if(n&&seen.indexOf(n)<0){seen.push(n);out.push(n);}});
   return out.join('\n');
+}
+function _mergedVideos(h){
+  if(!h) return [];
+  var hid=String(h.house_id||'').trim();
+  if(!hid||hid==='0') return h.video_url?[h.video_url]:[];
+  var seen=[],out=[];
+  allListings.filter(function(x){return String(x.house_id||'').trim()===hid;}).forEach(function(x){
+    if(x.video_url&&!seen.includes(x.video_url)){seen.push(x.video_url);out.push(x.video_url);}
+  });
+  return out;
 }
 function saveNotes(id){
   const ta=document.getElementById('loNotesTA');
