@@ -1087,6 +1087,9 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 #undoBtn,#redoBtn,#dropzone,.refresh-btn,.sync-btn{display:none!important}
 .card-stars,[onclick*="setRating"],[onclick*="setGroupRating"]{pointer-events:none!important;cursor:default!important}
 .admin-check{pointer-events:none!important}
+
+  /* Star outline — visible in light theme even when fill is transparent */
+  .card-stars span { -webkit-text-stroke: 0.7px rgba(180,140,0,0.55); text-shadow: 0 0 1px rgba(160,120,0,0.35); }
 </style>
 </head>
 <body>
