@@ -1164,6 +1164,7 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
     <option value="πετρέλαιο">Πετρέλαιο</option>
     <option value="αντλία">Αντλία Θέρμανσης</option>
   </select>
+  <button onclick="resetFilters()" class="sort-btn" style="border:1px solid var(--text3);border-radius:4px;margin-left:12px;padding:4px 10px;white-space:nowrap;" onmouseover="this.style.borderColor=this.style.color='var(--accent)'" onmouseout="this.style.borderColor=this.style.color='var(--text3)'">↺ Επαναφορά φίλτρων</button>
   <input type="search" id="numSearch" placeholder="🔎 Αναζήτηση: περιοχή, τύπος, μεσίτης, Αρ. Αγγελίας/Μεσιτικού..." oninput="applyFilters();if(typeof _saveUISoon==='function')_saveUISoon()" style="flex:0 1 480px;min-width:280px;margin:0 10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none">
   <div class="upload-zone" id="dropzone"
        onclick="document.getElementById('csvInput').click()"
@@ -1174,7 +1175,7 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
     <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
     <div class="upload-text" style="font-size:11px;white-space:nowrap">📂 Προσθήκη δεδομένων από άλλη πλατφόρμα</div>
     <div class="upload-sub" style="font-size:10px;white-space:nowrap">Σύρε ή κλίκαρε · CSV από XE, Nodaliste κ.λπ.</div>
-  <button onclick="resetFilters()" class="sort-btn" style="border:1px solid var(--text3);border-radius:4px;margin-left:12px;padding:4px 10px;white-space:nowrap;" onmouseover="this.style.borderColor=this.style.color='var(--accent)'" onmouseout="this.style.borderColor=this.style.color='var(--text3)'">↺ Επαναφορά φίλτρων</button>
+ 
 </div>
   <div class="view-toggle">
     <button class="view-btn active" id="gridBtn" onclick="setView('grid')">⊞ Grid</button>
