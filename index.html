@@ -1171,7 +1171,8 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
     <input type="file" id="csvInput" accept=".csv,.tsv" onchange="handleCSV(event)">
     <div class="upload-text" style="font-size:11px;white-space:nowrap">📂 Προσθήκη δεδομένων από άλλη πλατφόρμα</div>
     <div class="upload-sub" style="font-size:10px;white-space:nowrap">Σύρε ή κλίκαρε · CSV από XE, Nodaliste κ.λπ.</div>
-  </div>
+  <button onclick="resetFilters()" class="sort-btn" style="border:1px solid var(--text3);border-radius:4px;margin-left:12px;padding:4px 10px;white-space:nowrap;" onmouseover="this.style.borderColor=this.style.color='var(--accent)'" onmouseout="this.style.borderColor=this.style.color='var(--text3)'">↺ Επαναφορά φίλτρων</button>
+</div>
   <div class="view-toggle">
     <button class="view-btn active" id="gridBtn" onclick="setView('grid')">⊞ Grid</button>
     <button class="view-btn" id="listBtn" onclick="setView('list')">a List</button>
@@ -1197,7 +1198,6 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
   <label for="showDeleted">Εμφάνιση αγγελιών με X (διαγραμμένες/απόρριψη)</label>
   <label style="margin-left:18px;cursor:pointer"><input type="checkbox" id="hideEfi" class="toggle-check" onchange="applyFilters()"> Απόκρυψη αγγελιών που στείλαμε στην Έφη</label>
   <label style="margin-left:18px;cursor:pointer"><input type="checkbox" id="hideSeen" class="toggle-check" onchange="applyFilters()"> Απόκρυψη αγγελιών που είδαμε</label>
-<button onclick="resetFilters()" class="sort-btn" style="border:1px solid var(--text3);border-radius:4px;margin-left:14px;padding:3px 9px;white-space:nowrap;" onmouseover="this.style.borderColor=this.style.color='var(--accent)'" onmouseout="this.style.borderColor=this.style.color='var(--text3)'">↺ Επαναφορά φίλτρων</button>
 </div>
 
 
