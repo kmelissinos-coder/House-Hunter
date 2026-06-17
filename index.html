@@ -3082,6 +3082,7 @@ function _renderOvl(){
   const rest=[..._loSiblings];
   document.getElementById('loFeatured').innerHTML=_featHTML(h);
   document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
+  try{hhPopPriceHist(h,'loPriceHist');}catch(e){}
   const rEl=document.getElementById('loRight');
   if(_loSiblings.length>1){
     rEl.style.display='flex';
@@ -3137,6 +3138,9 @@ function closeListingOverlay(){
     } else { pEl.style.display='none'; pEl.innerHTML=''; }
   }
 }
+
+function hhPriceChartSVG(rows,curPrice){if(!rows||!rows.length)return '';var pts=[];pts.push({t:new Date(rows[0].changed_at).getTime()-86400000,p:rows[0].old_price});rows.forEach(function(r){pts.push({t:new Date(r.changed_at).getTime(),p:r.new_price});});var cur=curPrice||rows[rows.length-1].new_price;pts.push({t:Date.now(),p:cur});pts.sort(function(a,b){return a.t-b.t;});var prices=pts.map(function(x){return x.p;});var minP=Math.min.apply(null,prices),maxP=Math.max.apply(null,prices);var t0=pts[0].t,t1=pts[pts.length-1].t,tr=(t1-t0)||1,pr=(maxP-minP)||1;var W=300,H=96,padL=10,padR=10,padT=16,padB=18,iw=W-padL-padR,ih=H-padT-padB;var X=function(t){return padL+(t-t0)/tr*iw;};var Y=function(p){return padT+(1-(p-minP)/pr)*ih;};var d='';for(var i=0;i<pts.length;i++){var x=X(pts[i].t),y=Y(pts[i].p);if(i===0){d='M'+x.toFixed(1)+','+y.toFixed(1);}else{var px=X(pts[i].t);d+=' L'+px.toFixed(1)+','+Y(pts[i-1].p).toFixed(1)+' L'+px.toFixed(1)+','+y.toFixed(1);}}var fmt=function(v){return '€'+Number(v).toLocaleString('el');};var dots=pts.map(function(pp){return '<circle cx="'+X(pp.t).toFixed(1)+'" cy="'+Y(pp.p).toFixed(1)+'" r="2.5" fill="#0891b2"/>';}).join('');var pct=pts[0].p?Math.round((cur-pts[0].p)/pts[0].p*100):0;var pc=cur<pts[0].p?'#34d399':(cur>pts[0].p?'#f87171':'#9aa');var svg='<svg width="100%" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto;">'+'<path d="'+d+'" fill="none" stroke="#0891b2" stroke-width="2" stroke-linejoin="round"/>'+dots+'<text x="'+padL+'" y="11" font-size="9" fill="#9aa">'+fmt(maxP)+'</text>'+'<text x="'+padL+'" y="'+(H-5)+'" font-size="9" fill="#9aa">'+fmt(minP)+'</text>'+'</svg>';var hdr='<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin:2px 0 4px;"><span>📉 Ιστορικό τιμής</span><span style="color:'+pc+';font-weight:600;">'+fmt(cur)+' ('+(pct>0?'+':'')+pct+'%)</span></div>';return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:8px;">'+hdr+svg+'</div>';}
+async function hhPopPriceHist(h,elId){var el=document.getElementById(elId||'loPriceHist');if(!el||!h||!h._dbId)return;try{var r=await fetch(SUPABASE_URL+'/rest/v1/price_history?listing_id=eq.'+h._dbId+'&order=changed_at.asc&select=old_price,new_price,changed_at',{headers:sb.headers()});if(!r.ok)return;var rows=await r.json();el.innerHTML=hhPriceChartSVG(rows,h.price);}catch(e){}}
 
 function _featHTML(h){
   const ppm=h.pricePerSqm||(h.sqm>0&&h.price>0?Math.round(h.price/h.sqm):0);
@@ -3588,6 +3592,7 @@ function _lbScrollNav(e){
   img.src=h.imageUrl;img.style.transform='';img.classList.remove('lb-zoomed');
   document.getElementById('loFeatured').innerHTML=_featHTML(h);
   document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
+  try{hhPopPriceHist(h,'loPriceHist');}catch(e){}
   _lbUpdateCounter();
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();closeLightbox();}});
