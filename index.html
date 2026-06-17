@@ -1980,7 +1980,7 @@ function renderGroupedCard(g) {
       <div class="grouped-card-footer">
       <span class="agency-summary" title="${agencyNames}">${agencyNames}</span>
       <div class="group-action-btns">
-        <span class="grp-btn" title="Σύγκριση" onclick="event.stopPropagation();addToCompare('${escJ(g.items[0].url)}')">⊕</span><span class="grp-btn${multiSelectedIds.has(g.representativeDbId)?' link-sel':''}" title="Επιλογή για ένωση" onclick="event.stopPropagation();toggleMsSelect('${g.representativeDbId}')">🔗</span>
+        <span class="grp-btn" title="Σύγκριση" onclick="event.stopPropagation();addGroupCompare('${escJ(g.houseId)}')">⊕</span><span class="grp-btn${multiSelectedIds.has(g.representativeDbId)?' link-sel':''}" title="Επιλογή για ένωση" onclick="event.stopPropagation();toggleMsSelect('${g.representativeDbId}')">🔗</span>
         <span class="grp-btn${allFav?' active':''}"
           onclick="event.stopPropagation();toggleGroupFav('${g.houseId}')"
           title="${allFav?'Αφαίρεση αγαπημένου':'Αγαπημένο για όλες'}">${allFav?'★':'☆'}</span>
@@ -2380,6 +2380,7 @@ function toggleFav(key) {
 }
 
 //    COMPARE ───────────────────────────────────────────────────────────────
+function addGroupCompare(houseId){const grp=(typeof combined!=="undefined"?combined:[]).filter(x=>x.house_id===houseId&&houseId&&houseId!=="0");(grp.length?grp:[]).forEach(x=>{if(x.url)addToCompare(x.url);});}
 function addToCompare(url) {
   const h = getByUrl(url); if (!h) return;
   if (compareList.find(c => c.url === url)) { showToast('Ήδη στη λίστα σύγκρισης'); return; }
