@@ -3414,6 +3414,8 @@ function _restoreUI() {
       const el=document.getElementById(id);
       if(el) rf.appendChild(el);
     });
+    const _resetB=document.querySelector('[onclick="resetFilters()"]');
+    if(_resetB) rf.appendChild(_resetB);
   }
 })();
 
