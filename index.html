@@ -1102,13 +1102,14 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
     <div class="stat-pill"><strong id="stat-active">—</strong> ενεργές</div>
     <div class="stat-pill">avg <strong id="stat-avg">—</strong></div></div>
     <div class="stat-pill">avg €/τ.μ. <strong id="stat-ppm">—</strong></div>
+      <div class="stat-pill" id="resultsCount"></div>
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
     <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="Αναίρεση (Ctrl+Z)" disabled>↩</button>
     <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="Επανάληψη (Ctrl+Y)" disabled>↪</button>
       <button class="header-icon-btn" id="themeBtn" onclick="toggleTheme()" title="Φωτεινό / Σκοτεινό θέμα">🌙</button>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="refresh-btn" onclick="loadData()">⟳ Ανανέωση</button>
+    
   </div>
 </header>
 
@@ -1185,7 +1186,7 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
   </div>
 </div>
 
-<div style="float:right;display:flex;align-items:center;gap:12px;padding:0 40px"><span class="results-count" id="resultsCount"></span></div>
+
 <div class="sort-row">
   <span>Ταξινόμηση:</span>
   <button class="sort-btn" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
