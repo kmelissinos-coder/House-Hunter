@@ -1072,9 +1072,9 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
 
   /* ── split map view ──────────────────────────── */
   #map-split { display: flex; gap: 10px; align-items: stretch; height: calc(100vh - 215px); min-height: 480px; padding: 0 4px; }
-  #mapList { width: 440px; min-width: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding: 4px 8px 20px 4px; }
-  #mapList .card, #mapList .grouped-card { width: 100% !important; max-width: none !important; flex: none; }
-  #map-split #map { flex: 1; height: 100% !important; border-radius: 12px; }
+  #mapList { flex: 0 0 68%; min-width: 280px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 8px 20px 4px; align-content: flex-start; }
+  #mapList .card, #mapList .grouped-card { width: calc(33.33% - 6px) !important; max-width: none !important; flex: none; }
+  #map-split #map { flex: 0 0 30%; min-width: 200px; height: 100% !important; border-radius: 12px; }
 
 /* favorites feature removed — hidden everywhere */
 [onclick*="toggleFav"],[onclick*="toggleGroupFav"],[onclick*="modalToggleFav"],[onclick*="loToggleFav"],#modal-fav-btn,#lo-fav{display:none!important}
@@ -2057,12 +2057,13 @@ function initMap() {
     }
     placed++;
 
-    const color = priceColor(h.price);
+    const _isGrp = Array.isArray(h._mapGroup) && h._mapGroup.length > 1;
+    const color = _conf ? '#15803d' : _isGrp ? '#0891b2' : (h.url&&h.url.includes('xe.gr')) ? '#ca8a04' : '#ea580c';
     const ppm = h.pricePerSqm || (h.sqm>0&&h.price>0 ? Math.round(h.price/h.sqm) : 0);
 
     const icon = L.divIcon({
       className: '',
-      html: `<a href="${location.pathname}?open=${encodeURIComponent(h.url)}" onclick="event.preventDefault()" style="all:unset;display:block"><div style="background:${color};color:#000;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid ${typeof _conf!=='undefined'&&_conf?'#16a34a':'rgba(255,255,255,0.2)'};cursor:pointer;">${typeof _conf!=='undefined'&&_conf?'<span style="font-size:9px;color:#166534">✓</span> ':''}${h.price ? '€'+Math.round(h.price/1000)+'k' : '?'}</div></a>`,
+      html: `<a href="${location.pathname}?open=${encodeURIComponent(h.url)}" onclick="event.preventDefault()" style="all:unset;display:block"><div style="background:${color};color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid ${'rgba(255,255,255,0.4)'};cursor:pointer;">${typeof _conf!=='undefined'&&_conf?'<span style="font-size:9px;color:#166534">✓</span> ':''}${h.price ? '€'+Math.round(h.price/1000)+'k' : '?'}</div></a>`,
       iconAnchor: [20, 12],
     });
 
