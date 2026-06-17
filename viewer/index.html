@@ -960,7 +960,8 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
 /*    PHOTO LIGHTBOX    */
 #imgLightbox{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.93);align-items:center;justify-content:center;}
 #imgLightbox.lb-open{display:flex;}
-#lbImg{max-width:92vw;max-height:86vh;object-fit:contain;transition:transform 0.22s ease;cursor:zoom-in;user-select:none;border-radius:4px;}
+#lbImg{width:100vw;height:100vh;object-fit:contain;transition:transform 0.22s ease;cursor:zoom-in;user-select:none;}
+#lbImg.lb-stretch-cursor{cursor:zoom-out;}
 #lbImg.lb-zoomed{cursor:zoom-out;}
 #lbClose{position:absolute;top:14px;right:18px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:26px;line-height:1;cursor:pointer;padding:3px 10px;border-radius:6px;z-index:10;}
 #lbCounter{position:absolute;top:18px;left:20px;color:#fff;font-size:13px;opacity:0.6;pointer-events:none;}
@@ -3571,6 +3572,9 @@ function openPhotoLightbox(src){
   img.src=src;
   img.style.transform='';img.style.transformOrigin='center center';
   img.classList.remove('lb-zoomed');
+  window._lbStretched=false;img.classList.remove('lb-stretch-cursor');
+  var _lbcs=function(){var _sc=Math.min(window.innerWidth/(img.naturalWidth||1),window.innerHeight/(img.naturalHeight||1));window._lbStretched=_sc>1;img.classList.toggle('lb-stretch-cursor',window._lbStretched);};
+  img.onload=_lbcs;if(img.complete&&img.naturalWidth>0)_lbcs();
   lb.classList.add('lb-open');
   _lbUpdateCounter();
 }
@@ -3585,6 +3589,12 @@ function lbToggleZoom(e){
   if(img.classList.contains('lb-zoomed')){
     img.style.transform='';img.style.transformOrigin='center center';
     img.classList.remove('lb-zoomed');
+    if(window._lbStretched)img.classList.add('lb-stretch-cursor');
+  }else if(window._lbStretched){
+    var _sc=Math.min(window.innerWidth/(img.naturalWidth||1),window.innerHeight/(img.naturalHeight||1));
+    img.style.transformOrigin='center center';
+    img.style.transform='scale('+(_sc>0?(1/_sc).toFixed(3):'1')+')';
+    img.classList.add('lb-zoomed');img.classList.remove('lb-stretch-cursor');
   }else{
     var r=img.getBoundingClientRect();
     var ox=((e.clientX-r.left)/r.width*100).toFixed(1)+'%';
