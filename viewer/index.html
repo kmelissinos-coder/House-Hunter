@@ -2067,7 +2067,7 @@ function initMap() {
 
     const icon = L.divIcon({
       className: '',
-      html: `<a href="${location.pathname}?open=${encodeURIComponent(h.url)}" onclick="event.preventDefault()" style="all:unset;display:block"><div style="background:${color};color:#fff;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid ${'rgba(255,255,255,0.4)'};cursor:pointer;">${typeof _conf!=='undefined'&&_conf?'<span style="font-size:9px;color:#166534">✓</span> ':''}${h.price ? '€'+Math.round(h.price/1000)+'k' : '?'}</div></a>`,
+      html: `<a href="${location.pathname}?open=${encodeURIComponent(h.url)}" onclick="event.preventDefault()" style="all:unset;display:block"><div style="background:${color};color:#fff;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000,0 0 3px #000;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;padding:4px 8px;border-radius:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.5);border:2px solid ${'rgba(255,255,255,0.4)'};cursor:pointer;">${typeof _conf!=='undefined'&&_conf?'<span style="font-size:9px;color:#166534">✓</span> ':''}${shortId(h.house_id) || ('#'+(h.platform_nr||'?'))}</div></a>`,
       iconAnchor: [20, 12],
     });
 
@@ -2092,10 +2092,11 @@ function initMap() {
   legend.onAdd = () => {
     const div = L.DomUtil.create('div','map-legend');
     div.innerHTML = `
-      <div style="font-weight:600;margin-bottom:6px;color:#e8e4dc">Τιμές</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#5a9e78"></div> &lt; €300k</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#c9a84c"></div> €300k–400k</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#c97b6a"></div> &gt; €400k</div>
+      <div style="font-weight:600;margin-bottom:6px;color:var(--text)">Υπόμνημα</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#15803d"></div> Επιβεβαιωμένη τοποθεσία</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#0891b2"></div> Ομάδα αγγελιών</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#ca8a04"></div> xe.gr</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#ea580c"></div> Spitogatos</div>
       <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} αγγελίες στο χάρτη</div>`;
     return div;
   };
