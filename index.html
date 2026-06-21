@@ -1084,15 +1084,13 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 /* merged search into header box — hide old bottom search */
 .search-wrap{display:none!important}
   /* Price history feature */
-  #loPriceHist{display:none;margin-top:10px;}
+  #loPriceHist{margin-top:0;margin-bottom:14px;}
   .ph-hint{font-size:12px;opacity:0.4;vertical-align:middle;pointer-events:none;}
   .hh-price-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
   .hh-price-table th{color:var(--muted);font-weight:500;text-align:left;padding:5px 8px;border-bottom:1px solid var(--border);font-size:11px;}
   .hh-price-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);}
   .hh-price-table tr:last-child td{border-bottom:none;}
-  #hhGrpPhPop{position:fixed;z-index:8000;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;width:330px;max-height:440px;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.55);}
-  .modal-price{cursor:pointer;}
-  .price-range-main{cursor:pointer;}
+
 
 .card-seen .card-body{background:rgba(255,160,195,0.32)!important;}
 
@@ -1973,7 +1971,7 @@ function renderGroupedCard(g) {
           <div class="grouped-sub">${g.type||''} ${g.floor?'· '+g.floor:''} ${g.lvl&&Number(g.lvl)>1?'· '+g.lvl+' επίπ.':''}</div>
         </div>
         <div class="grouped-price-range">
-          <div class="price-range-main" onclick="event.stopPropagation();showGroupPriceHist(this,'${escJ(g.houseId)}')" title="Ιστορικό τιμής">${priceStr} <span class="ph-hint">📈</span></div>
+          <div class="price-range-main" >${priceStr}</div>
           <div class="price-range-sub">${g.count} αγγελίες</div>
         </div>
       </div>
@@ -3093,7 +3091,7 @@ function _openOvl(sibs,fi){
 function _renderOvl(){
   const h=_loSiblings[_loFeatIdx];
   const rest=[..._loSiblings];
-  document.getElementById('loFeatured').innerHTML=_featHTML(h);
+  document.getElementById('loFeatured').innerHTML=_featHTML(h);hhPopPriceHist(h,'loPriceHist').catch(function(){});
   document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
 
   const rEl=document.getElementById('loRight');
@@ -3135,7 +3133,7 @@ function closeListingOverlay(){
 }
 
 function hhPriceChartSVG(rows,curPrice){if(!rows||!rows.length)return '';var pts=[];pts.push({t:new Date(rows[0].changed_at).getTime()-86400000,p:rows[0].old_price});rows.forEach(function(r){pts.push({t:new Date(r.changed_at).getTime(),p:r.new_price});});var cur=curPrice||rows[rows.length-1].new_price;pts.push({t:Date.now(),p:cur});pts.sort(function(a,b){return a.t-b.t;});var prices=pts.map(function(x){return x.p;});var minP=Math.min.apply(null,prices),maxP=Math.max.apply(null,prices);var t0=pts[0].t,t1=pts[pts.length-1].t,tr=(t1-t0)||1,pr=(maxP-minP)||1;var W=300,H=96,padL=10,padR=10,padT=16,padB=18,iw=W-padL-padR,ih=H-padT-padB;var X=function(t){return padL+(t-t0)/tr*iw;};var Y=function(p){return padT+(1-(p-minP)/pr)*ih;};var d='';for(var i=0;i<pts.length;i++){var x=X(pts[i].t),y=Y(pts[i].p);if(i===0){d='M'+x.toFixed(1)+','+y.toFixed(1);}else{var px=X(pts[i].t);d+=' L'+px.toFixed(1)+','+Y(pts[i-1].p).toFixed(1)+' L'+px.toFixed(1)+','+y.toFixed(1);}}var fmt=function(v){return '€'+Number(v).toLocaleString('el');};var dots=pts.map(function(pp){return '<circle cx="'+X(pp.t).toFixed(1)+'" cy="'+Y(pp.p).toFixed(1)+'" r="2.5" fill="#0891b2"/>';}).join('');var pct=pts[0].p?Math.round((cur-pts[0].p)/pts[0].p*100):0;var pc=cur<pts[0].p?'#34d399':(cur>pts[0].p?'#f87171':'#9aa');var svg='<svg width="100%" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" style="display:block;width:100%;height:auto;">'+'<path d="'+d+'" fill="none" stroke="#0891b2" stroke-width="2" stroke-linejoin="round"/>'+dots+'<text x="'+padL+'" y="11" font-size="9" fill="#9aa">'+fmt(maxP)+'</text>'+'<text x="'+padL+'" y="'+(H-5)+'" font-size="9" fill="#9aa">'+fmt(minP)+'</text>'+'</svg>';var hdr='<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);margin:2px 0 4px;"><span>📉 Ιστορικό τιμής</span><span style="color:'+pc+';font-weight:600;">'+fmt(cur)+' ('+(pct>0?'+':'')+pct+'%)</span></div>';return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:8px;">'+hdr+svg+'</div>';}
-async function hhPopPriceHist(h,elId){var el=document.getElementById(elId||'loPriceHist');if(!el||!h||!h._dbId)return;el.style.display='block';el.innerHTML='<div style="color:var(--muted);font-size:12px;padding:6px 0">⏳...</div>';try{var r=await fetch(SUPABASE_URL+'/rest/v1/price_history?listing_id=eq.'+h._dbId+'&order=changed_at.asc&select=old_price,new_price,changed_at',{headers:sb.headers()});if(!r.ok){el.style.display='none';el.innerHTML='';return;}var rows=await r.json();el.innerHTML=hhRenderPriceHistHtml(rows,h.price,null);}catch(e){el.style.display='none';el.innerHTML='';}}
+async function hhPopPriceHist(h,elId){var el=document.getElementById(elId||'loPriceHist');if(!el||!h)return;var siblings=typeof _loSiblings!=='undefined'&&_loSiblings.length>1?_loSiblings:null;var isGrp=siblings&&siblings[0]&&siblings[0].house_id&&siblings[0].house_id!=='0'&&siblings.every(function(x){return x.house_id===siblings[0].house_id;});var members=isGrp?siblings:[h];var ids=members.map(function(x){return x._dbId;}).filter(Boolean);if(!ids.length){el.innerHTML='';return;}el.innerHTML='';try{var qs=ids.length===1?('listing_id=eq.'+ids[0]):('listing_id=in.('+ids.join(',')+')') ;var sel=isGrp?'listing_id,old_price,new_price,changed_at':'old_price,new_price,changed_at';var r=await fetch(SUPABASE_URL+'/rest/v1/price_history?'+qs+'&order=changed_at.asc&select='+sel,{headers:sb.headers()});if(!r.ok){el.innerHTML='';return;}var rows=await r.json();if(!rows.length){el.innerHTML='';return;}var agMap=isGrp?{}:null;if(isGrp)members.forEach(function(m){if(m._dbId)agMap[m._dbId]=m.agency||'—';});var curP=isGrp?members.reduce(function(mx,m){return Math.max(mx,m.price||0);},0)||null:h.price;el.innerHTML=hhRenderPriceHistHtml(rows,curP,agMap);}catch(e){el.innerHTML='';}}
 
 function hhRenderPriceHistHtml(rows,curPrice,agencyMap){
   if(!rows||!rows.length)return '<div style="text-align:center;padding:10px 0;color:var(--muted);font-size:12px">📊 Καμία αλλαγή τιμής</div>';
@@ -3154,36 +3152,6 @@ function hhRenderPriceHistHtml(rows,curPrice,agencyMap){
   var ath=hasAg?'<th>Μεσιτικό</th>':'';
   var tbl='<table class="hh-price-table"><thead><tr><th>Ημερομηνία</th><th>Αλλαγή τιμής</th>'+ath+'</tr></thead><tbody>'+trs+'</tbody></table>';
   return chart+tbl;
-}
-function toggleLoPriceHist(){
-  var el=document.getElementById('loPriceHist');if(!el)return;
-  if(el.innerHTML&&el.style.display!=='none'){el.style.display='none';return;}
-  if(el.innerHTML){el.style.display='block';return;}
-  var h=_loSiblings[_loFeatIdx];if(!h)return;
-  hhPopPriceHist(h,'loPriceHist');
-}
-async function showGroupPriceHist(el,houseId){
-  event.stopPropagation();
-  var pop=document.getElementById('hhGrpPhPop');if(!pop)return;
-  if(pop._hid===houseId&&pop.style.display!=='none'){pop.style.display='none';return;}
-  var members=(typeof combined!=='undefined'?combined:[]).filter(function(x){return x.house_id===houseId&&houseId&&houseId!=='0';});
-  if(!members.length){pop.style.display='none';return;}
-  var ids=members.map(function(x){return x._dbId;}).filter(Boolean);
-  if(!ids.length){pop.style.display='none';return;}
-  var rect=el.getBoundingClientRect();
-  pop.style.left=Math.min(rect.left,window.innerWidth-350)+'px';
-  pop.style.top=(rect.bottom+6)+'px';
-  pop.style.display='block';pop._hid=houseId;
-  pop.innerHTML='<div style="color:var(--muted);font-size:12px;padding:8px">⏳ Φόρτωση...</div>';
-  try{
-    var idStr=ids.join(',');
-    var r=await fetch(SUPABASE_URL+'/rest/v1/price_history?listing_id=in.('+idStr+')&order=changed_at.asc&select=listing_id,old_price,new_price,changed_at',{headers:sb.headers()});
-    if(!r.ok)throw new Error('fail');
-    var rows=await r.json();
-    var agMap={};members.forEach(function(m){if(m._dbId)agMap[m._dbId]=m.agency||'—';});
-    var curP=members.reduce(function(mx,m){return Math.max(mx,m.price||0);},0)||null;
-    pop.innerHTML='<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px">📈 Ιστορικό τιμής ομάδας</div>'+hhRenderPriceHistHtml(rows,curP,agMap);
-  }catch(e){pop.innerHTML='<div style="color:#f87171;font-size:12px;padding:8px">Σφάλμα φόρτωσης</div>';}
 }
 
 function _featHTML(h){
@@ -3211,7 +3179,7 @@ function _featHTML(h){
       <div class="modal-subtitle">${h.floor?h.floor+' · ':''} ${h.platform||''} ${h.house_id&&h.house_id!=='0'?'· '+shortId(h.house_id):''}</div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:14px;flex-wrap:wrap">
         <div style="display:flex;align-items:baseline;gap:8px">
-          <div class="modal-price" onclick="event.stopPropagation();toggleLoPriceHist()" title="Ιστορικό τιμής">${h.price?'€'+h.price.toLocaleString('el'):'—'} <span class="ph-hint">📈</span></div>
+          <div class="modal-price" >${h.price?'€'+h.price.toLocaleString('el'):'—'}</div>
           ${ppm?`<div class="modal-ppm">€${ppm}/τ.μ.</div>`:''}
         </div>
         <div style="display:flex;gap:5px;flex-wrap:wrap">
@@ -3236,6 +3204,7 @@ function _featHTML(h){
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.sent_efi?'checked':''} onchange="toggleFlag('${escJ(h.url)}','sent_efi',this.checked)">Το στείλαμε στην Έφη</label>
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--text2)"><input type="checkbox" class="admin-check" ${h.seen_it?'checked':''} onchange="toggleFlag('${escJ(h.url)}','seen_it',this.checked)">Το είδαμε</label>
       </div></div>
+      <div id="loPriceHist"></div>
       <div class="modal-grid">
         <div class="modal-field"><div class="modal-field-label">Τετραγωνικά</div><div class="modal-field-value">${h.sqm_raw||h.sqmRaw||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Δωμάτια</div><div class="modal-field-value">${h.rooms||'—'} ${h.baths?'· '+h.baths+' μπ':''}</div></div>
@@ -3251,8 +3220,7 @@ function _featHTML(h){
       </div>
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
       ${h.description?`<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📄 Περιγραφή αγγελίας</div><div style="font-size:12.5px;line-height:1.55;white-space:pre-wrap;max-height:240px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">${escH(h.description)}</div></div>`:''}
-      <div style="margin-top:10px">
-        <div id="loPriceHist"></div>
+
       <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📍 Διεύθυνση (αν έχει επιβεβαιωθεί)</div>
         <div style="display:flex;gap:6px;">
           <input id="loAddress" type="text" value="${escA(h.address||'')}" placeholder="π.χ. Ηροδότου 30, Πεύκη 151 21" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:inherit;font-size:12px;" onclick="event.stopPropagation()"/>
@@ -3634,7 +3602,7 @@ function _lbScrollNav(e){
   _loFeatIdx=ni;
   var img=document.getElementById('lbImg');
   img.src=h.imageUrl;img.style.transform='';img.classList.remove('lb-zoomed');
-  document.getElementById('loFeatured').innerHTML=_featHTML(h);
+  document.getElementById('loFeatured').innerHTML=_featHTML(h);hhPopPriceHist(h,'loPriceHist').catch(function(){});
   document.getElementById('loFeatured').insertAdjacentHTML('afterbegin','<div class="lo-feat-num">'+(_loFeatIdx+1)+'</div>');
 
   _lbUpdateCounter();
@@ -3680,10 +3648,6 @@ function saveNotes(id){
   const url=ids.length>1?('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=in.('+ids.join(',')+')'):('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id);
   fetch(url,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
-</script>
-<div id="hhGrpPhPop" style="display:none;" onclick="event.stopPropagation()"></div>
-<script>
-document.addEventListener('click',function(e){var p=document.getElementById('hhGrpPhPop');if(p&&p.style.display!=='none'&&!p.contains(e.target))p.style.display='none';});
 </script>
 </body>
 </html>
