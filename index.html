@@ -3109,25 +3109,7 @@ function loSelectSibling(ri){
 function closeListingOverlay(){
   document.getElementById('listingOverlay').classList.remove('open');
   document.body.style.overflow='';
-  (async()=>{
-    const hp=document.getElementById('loPriceHist');
-    if(hp&&h._dbId){
-      try{
-        const r=await fetch(`${SUPABASE_URL}/rest/v1/price_history?listing_id=eq.${h._dbId}&order=changed_at.asc&select=old_price,new_price,changed_at`,{headers:sb.headers()});
-        if(r.ok){
-          const rows=await r.json();
-          if(rows.length){
-            const fmt=v=>'€'+Number(v).toLocaleString('el');
-            const dt=s=>new Date(s).toLocaleDateString('el-GR',{day:'2-digit',month:'2-digit',year:'2-digit'});
-            hp.innerHTML='<div style="font-size:11px;color:var(--muted);margin:6px 0 4px;">📉 Ιστορικό τιμής</div>'
-              +'<div style="font-size:12px;line-height:1.6;">'
-              +fmt(rows[0].old_price)+rows.map(x=>' → <span style="color:'+(x.new_price<x.old_price?'#34d399':'#f87171')+'">'+fmt(x.new_price)+'</span> <span style="color:var(--muted);font-size:10px">('+dt(x.changed_at)+')</span>').join('')
-              +'</div>';
-          }
-        }
-      }catch(e){}
-    }
-  })();
+  /* removed orphaned price_history dead code */
   const pEl=document.getElementById('loPhotos');
   if(pEl){
     let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
