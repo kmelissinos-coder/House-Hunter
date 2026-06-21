@@ -1091,6 +1091,9 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 
   /* Star outline — visible in light theme even when fill is transparent */
   .card-stars span { -webkit-text-stroke: 0.7px rgba(180,140,0,0.55); text-shadow: 0 0 1px rgba(160,120,0,0.35); }
+
+/* "Το είδαμε" → pink info strip */
+.card-body.seen-it,.grouped-body.seen-it{background:rgba(236,72,153,0.20)!important}
 </style>
 </head>
 <body>
@@ -1955,7 +1958,7 @@ function renderGroupedCard(g) {
       <div class="group-listing-count">🏢 ${g.count}</div>
       ${g.allImgs.length > 1 ? `<div class="photo-count-pill">📷 ${g.allImgs.length}</div>` : ''}
     </div>
-    <div class="grouped-body">
+    <div class="grouped-body${(g.items&&g.items.every(function(i){return i.seen_it;}))?' seen-it':''}">
       <div class="grouped-meta">
         <div>
           <div class="grouped-title">${g.location||'—'}</div>
@@ -2160,7 +2163,7 @@ function renderCard(h) {
       ${h.hasChanges ? `<div class="change-badge">🔄 Αλλαγή</div>` : ''}
       <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
     </div>
-    <div class="card-body">
+    <div class="card-body${h.seen_it?' seen-it':''}">
       <div class="card-top">
         <div>
           <div class="card-location">${h.location || '—'}</div>
