@@ -1374,7 +1374,7 @@ function handleLinkClick(e, url) {
 
 //    LOAD DATA ───────────────────────────────────────────────────────────
 async function loadData() {
-  document.querySelector('.refresh-btn').disabled = true;
+  (document.querySelector('.refresh-btn')||{}).disabled = true;
   window._savedScroll = window.scrollY;
   document.getElementById('main-content').innerHTML = `
     <div class="loading"><div class="loading-spinner"></div>
@@ -1396,7 +1396,7 @@ async function loadData() {
           Κατέβασε το αρχείο και άνοιξέ το απευθείας στο Chrome/Firefox.
         </div>
       </div>`;
-    document.querySelector('.refresh-btn').disabled = false;
+    (document.querySelector('.refresh-btn')||{}).disabled = false;
     return;
   }
 
@@ -1457,7 +1457,7 @@ async function tryFetch() {
        <button onclick="tryFetch()" style="margin-top:12px;background:var(--accent);color:#000;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:600">⟳ Δοκίμασε ξανά</button>
       </div>`;
   }
-  document.querySelector('.refresh-btn').disabled = false;
+  (document.querySelector('.refresh-btn')||{}).disabled = false;
 }
 
 //    CSV PARSER ───────────────────────────────────────────────────────────
