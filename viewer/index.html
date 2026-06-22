@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>House Hunter — Αθήνα Βόρεια</title>
+<title>🏡 Προβολή — House Hunter</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js">
@@ -92,6 +92,30 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
   .refresh-btn:disabled { opacity: 0.5; cursor: default; }
 
   /* PLATFORM TABS */
+  .project-bar {
+    padding: 8px 40px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .project-tab {
+    padding: 5px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .project-tab:hover { border-color: #a78bfa; color: #a78bfa; }
+  .project-tab.active { background: #a78bfa; color: #0f0e0c; border-color: #a78bfa; }
+
   .platform-bar {
     padding: 14px 40px;
     background: var(--surface);
@@ -1093,15 +1117,17 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 
 
 .card-seen .card-body{background:rgba(255,160,195,0.32)!important;}
-#undoBtn,#redoBtn,#dropzone,.refresh-btn,.sync-btn{display:none!important}
-.card-stars,[onclick*="setRating"],[onclick*="setGroupRating"]{pointer-events:none!important;cursor:default!important}
-.admin-check{pointer-events:none!important}
 
   /* Star outline — visible in light theme even when fill is transparent */
   .card-stars span { -webkit-text-stroke: 0.7px rgba(180,140,0,0.55); text-shadow: 0 0 1px rgba(160,120,0,0.35); }
 
 /* "Το είδαμε" → pink info strip */
 .card-body.seen-it,.grouped-body.seen-it{background:rgba(236,72,153,0.20)!important}
+</style>
+
+<style>
+#undo-btn,#redo-btn,#dropzone,.search-wrap,[onclick*="toggleFav"],[onclick*="toggleGroupFav"],[onclick*="modalToggleFav"],[onclick*="loToggleFav"],#modal-fav-btn,#lo-fav{display:none!important}
+.card-stars,[onclick*=setRating],[onclick*=setGroupRating],.admin-check{pointer-events:none}
 </style>
 </head>
 <body>
@@ -1116,16 +1142,22 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
     <div class="stat-pill"><strong id="stat-active">—</strong> ενεργές</div>
     <div class="stat-pill">avg <strong id="stat-avg">—</strong></div></div>
     <div class="stat-pill">avg €/τ.μ. <strong id="stat-ppm">—</strong></div>
+      <div class="stat-pill" id="resultsCount"></div>
     <div style="width:1px;height:24px;background:var(--border);margin:0 4px"></div>
     <button class="header-icon-btn" id="undoBtn" onclick="undoAction()" title="Αναίρεση (Ctrl+Z)" disabled>↩</button>
     <button class="header-icon-btn" id="redoBtn" onclick="redoAction()" title="Επανάληψη (Ctrl+Y)" disabled>↪</button>
       <button class="header-icon-btn" id="themeBtn" onclick="toggleTheme()" title="Φωτεινό / Σκοτεινό θέμα">🌙</button>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="refresh-btn" onclick="loadData()">⟳ Ανανέωση</button>
+    
   </div>
 </header>
 
+<div class="project-bar" id="project-bar">
+  <button class="project-tab active" data-project="all" onclick="setProject('all',this)">🏠 Όλες</button>
+  <button class="project-tab" data-project="Fameli" onclick="setProject('Fameli',this)">Fameli</button>
+  <button class="project-tab" data-project="2xFam" onclick="setProject('2xFam',this)">2xFam</button>
+</div>
 <div class="platform-bar" id="platform-bar">
   <button class="platform-tab active" data-platform="all" onclick="setPlatform('all', this)">
     Όλες οι πλατφόρμες
@@ -1156,7 +1188,8 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 
 <div class="controls">
   <div class="search-wrap">
-    <span class="search-icon">=</span>
+    <span class="search-icon">=
+</span>
     <input type="text" id="search" placeholder="Αναζήτηση περιοχής, τύπου, μεσίτη..." oninput="applyFilters()">
   </div>
   <select id="filterLocation" onchange="applyFilters()">
@@ -1199,7 +1232,7 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
   </div>
 </div>
 
-<div style="float:right;display:flex;align-items:center;gap:12px;padding:0 40px"><span class="results-count" id="resultsCount"></span><button class="sync-btn" onclick="openSyncModal()">&#128260; Sync</button></div>
+
 <div class="sort-row">
   <span>Ταξινόμηση:</span>
   <button class="sort-btn" data-sort="price-asc" onclick="setSort(this,'price-asc')">Τιμή ↑</button>
@@ -1343,6 +1376,7 @@ let filtered       = [];
 let currentView    = 'grid';
 let currentSort    = 'score';
 let currentPlatform = 'all';
+let currentProject  = 'all';
 let favorites      = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
 let compareList    = [];
 let selectedGroupSource = null;
@@ -1790,6 +1824,7 @@ function applyFilters() {
     if (hideEfi && h.sent_efi) return false;
     if (hideSeen && h.seen_it) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
+    if (currentProject  !== 'all' && (h.project||'Fameli') !== currentProject) return false;
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
     if (q && !`${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating} ${h.platformNr||''} ${h.agencyNr||''}`.toLowerCase().includes(q)) return false;
@@ -1832,6 +1867,14 @@ function setPlatform(p, el) {
   currentPlatform = p;
   document.querySelectorAll('.platform-tab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  applyFilters();
+}
+
+function setProject(p, el) {
+  currentProject = p;
+  document.querySelectorAll('.project-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  try { _saveUISoon(); } catch(e) {}
   applyFilters();
 }
 
@@ -3387,6 +3430,7 @@ function _saveUI() {
       scroll: window.scrollY,
       view: currentView,
       platform: currentPlatform,
+      project: currentProject,
       filters: f,
       showDeleted: sd ? sd.checked : false,
       map: (typeof leafletMap !== 'undefined' && leafletMap) ? { lat: leafletMap.getCenter().lat, lng: leafletMap.getCenter().lng, z: leafletMap.getZoom() } : (_uiSt.map || null)
@@ -3416,6 +3460,7 @@ function _restoreUI() {
     const sd = document.getElementById('showDeleted');
     if (sd && _uiSt.showDeleted) sd.checked = true;
     if (_uiSt.platform && _uiSt.platform !== 'all') currentPlatform = _uiSt.platform;
+    if (_uiSt.project && _uiSt.project !== 'all') { currentProject = _uiSt.project; const pt = document.querySelector('.project-tab[data-project="'+_uiSt.project+'"]'); if(pt){document.querySelectorAll('.project-tab').forEach(b=>b.classList.remove('active'));pt.classList.add('active');} }
     applyFilters();
     if (_uiSt.view && _uiSt.view !== 'grid') setView(_uiSt.view);
     if (typeof _uiSt.scroll === 'number' && _uiSt.scroll > 0) setTimeout(() => window.scrollTo(0, _uiSt.scroll), 150);
@@ -3443,41 +3488,6 @@ function _restoreUI() {
   }
 })();
 
-(function(){
-  function _lkT(){var t=document.createElement('div');t.textContent='🏐 Κλειδωμένη προβολή';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:8px;z-index:99999;font-size:14px;pointer-events:none;opacity:1;transition:opacity 0.5s';document.body.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},500);},2500);}
-  window['toggleFav']=function(){_lkT();};
-  window['loToggleFav']=function(){_lkT();};
-  window['toggleGroupFav']=function(){_lkT();};
-  window['loToggleHide']=function(){_lkT();};
-  window['toggleHide']=function(){_lkT();};
-  window['modalToggleHide']=function(){_lkT();};
-  window['toggleGroupHide']=function(){_lkT();};
-  window['saveAddress']=function(){_lkT();};
-  window['setCoverImage']=function(){_lkT();};
-  window['setCoverFromGallery']=function(){_lkT();};
-  window['savePhotoUrl']=function(){_lkT();};
-  window['hhDrop']=function(){_lkT();};
-  window['toggleMsSelect']=function(){_lkT();};
-  window['toggleMultiSelect']=function(){_lkT();};
-  window['modalToggleFav']=function(){_lkT();};
-  window['undoAction']=function(){_lkT();};
-  window['redoAction']=function(){_lkT();};
-  window['openSyncModal']=function(){_lkT();};
-  window['toggleFlag']=function(){_lkT();};
-  window['toggleGroupFlag']=function(){_lkT();};
-  window['ungroupListing']=function(){_lkT();};
-  window.hhDragStart=window.hhDragOver=function(e){if(e)e.preventDefault();};
-  window._drainEnrichQueue=function(){};
-  setTimeout(function(){
-    document.querySelectorAll('button,[onclick]').forEach(function(b){
-      var onc=b.getAttribute('onclick')||'';var txt=b.textContent||'';
-      if(/setRating|setGroupRating|resetFilters/.test(onc))return;
-      if(/Αγαπημένο|Απόκρυψη|Επαναφορά|Εξώφυλλο|toggleFav|toggleGroupFav|ToggleHide|saveAddress|setCover|MsSelect|✂/.test(onc+txt))b.style.display='none';
-    });
-    var la=document.getElementById('loAddress');if(la)la.style.display='none';
-    document.querySelectorAll('.admin-check').forEach(function(cb){cb.disabled=true;});
-  },700);
-})();
 loadData().then(() => { _restoreUI(); });
 setInterval(loadData, 5 * 60 * 1000);
 
@@ -3687,6 +3697,29 @@ function saveNotes(id){
   const url=ids.length>1?('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=in.('+ids.join(',')+')'):('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?id=eq.'+id);
   fetch(url,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
+</script>
+
+<script>
+(function VIEWER_MODE(){
+  var LOCK='🔒 Κλειδωμένη προβολή';
+  function toast(){var t=document.createElement('div');t.textContent=LOCK;t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2030;color:#e0e0e0;border:1px solid #c8a84b;border-radius:8px;padding:10px 22px;font-size:14px;z-index:99999;pointer-events:none;';document.body.appendChild(t);setTimeout(function(){t.remove();},2200);}
+  window.saveAddress=function(){toast();};
+  window.toggleFlag=function(){toast();};
+  window.toggleGroupFlag=function(){toast();};
+  window.ungroupListing=function(){toast();};
+  window.modalToggleHide=function(){toast();};
+  window.loToggleHide=function(){toast();};
+  window.toggleHide=function(){toast();};
+  function sweep(){
+    document.querySelectorAll('[onclick]').forEach(function(el){
+      var oc=el.getAttribute('onclick')||'';
+      if(/setRating|setGroupRating/.test(oc)) return;
+      if(/saveAddress|toggleFlag|toggleGroupFlag|ungroupListing|modalToggleHide|loToggleHide|toggleHide|openSyncModal|showDropzone|setCover/.test(oc)) el.style.display='none';
+    });
+    document.querySelectorAll('.admin-check').forEach(function(el){el.disabled=true;});
+  }
+  setTimeout(sweep,100);setTimeout(sweep,700);
+})();
 </script>
 </body>
 </html>
