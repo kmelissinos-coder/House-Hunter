@@ -92,6 +92,30 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
   .refresh-btn:disabled { opacity: 0.5; cursor: default; }
 
   /* PLATFORM TABS */
+  .project-bar {
+    padding: 8px 40px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .project-tab {
+    padding: 5px 18px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.3px;
+  }
+  .project-tab:hover { border-color: #a78bfa; color: #a78bfa; }
+  .project-tab.active { background: #a78bfa; color: #0f0e0c; border-color: #a78bfa; }
+
   .platform-bar {
     padding: 14px 40px;
     background: var(--surface);
@@ -1124,6 +1148,11 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
   </div>
 </header>
 
+<div class="project-bar" id="project-bar">
+  <button class="project-tab active" data-project="all" onclick="setProject('all',this)">🏠 Όλες</button>
+  <button class="project-tab" data-project="Fameli" onclick="setProject('Fameli',this)">Fameli</button>
+  <button class="project-tab" data-project="2xFam" onclick="setProject('2xFam',this)">2xFam</button>
+</div>
 <div class="platform-bar" id="platform-bar">
   <button class="platform-tab active" data-platform="all" onclick="setPlatform('all', this)">
     Όλες οι πλατφόρμες
@@ -1154,7 +1183,8 @@ body.light .listing-overlay{background:rgba(255,255,255,0.88)!important;backdrop
 
 <div class="controls">
   <div class="search-wrap">
-    <span class="search-icon">=</span>
+    <span class="search-icon">=
+</span>
     <input type="text" id="search" placeholder="Αναζήτηση περιοχής, τύπου, μεσίτη..." oninput="applyFilters()">
   </div>
   <select id="filterLocation" onchange="applyFilters()">
@@ -1341,6 +1371,7 @@ let filtered       = [];
 let currentView    = 'grid';
 let currentSort    = 'score';
 let currentPlatform = 'all';
+let currentProject  = 'all';
 let favorites      = new Set(JSON.parse(localStorage.getItem('favs') || '[]'));
 let compareList    = [];
 let selectedGroupSource = null;
@@ -1788,6 +1819,7 @@ function applyFilters() {
     if (hideEfi && h.sent_efi) return false;
     if (hideSeen && h.seen_it) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
+    if (currentProject  !== 'all' && (h.project||'Fameli') !== currentProject) return false;
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
     if (q && !`${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating} ${h.platformNr||''} ${h.agencyNr||''}`.toLowerCase().includes(q)) return false;
@@ -1830,6 +1862,14 @@ function setPlatform(p, el) {
   currentPlatform = p;
   document.querySelectorAll('.platform-tab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+  applyFilters();
+}
+
+function setProject(p, el) {
+  currentProject = p;
+  document.querySelectorAll('.project-tab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  try { _saveUISoon(); } catch(e) {}
   applyFilters();
 }
 
@@ -3385,6 +3425,7 @@ function _saveUI() {
       scroll: window.scrollY,
       view: currentView,
       platform: currentPlatform,
+      project: currentProject,
       filters: f,
       showDeleted: sd ? sd.checked : false,
       map: (typeof leafletMap !== 'undefined' && leafletMap) ? { lat: leafletMap.getCenter().lat, lng: leafletMap.getCenter().lng, z: leafletMap.getZoom() } : (_uiSt.map || null)
@@ -3414,6 +3455,7 @@ function _restoreUI() {
     const sd = document.getElementById('showDeleted');
     if (sd && _uiSt.showDeleted) sd.checked = true;
     if (_uiSt.platform && _uiSt.platform !== 'all') currentPlatform = _uiSt.platform;
+    if (_uiSt.project && _uiSt.project !== 'all') { currentProject = _uiSt.project; const pt = document.querySelector('.project-tab[data-project="'+_uiSt.project+'"]'); if(pt){document.querySelectorAll('.project-tab').forEach(b=>b.classList.remove('active'));pt.classList.add('active');} }
     applyFilters();
     if (_uiSt.view && _uiSt.view !== 'grid') setView(_uiSt.view);
     if (typeof _uiSt.scroll === 'number' && _uiSt.scroll > 0) setTimeout(() => window.scrollTo(0, _uiSt.scroll), 150);
