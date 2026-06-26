@@ -1963,8 +1963,7 @@ function renderListings() {
         return 0;
       });
     })();
-    document.getElementById('resultsCount').textContent =
-      `${all.length} σπίτια`;
+    document.getElementById('resultsCount').innerHTML = (function(){function _pc(p){try{var s=allListings.filter(function(h){return (h.project||'Fameli')===p;});var g=groupByHouseId(s);return g.groupCards.length+g.singles.length;}catch(e){return 0;}}return '<span style="display:inline-block;padding:1px 8px;border-radius:9px;background:rgba(255,255,255,0.10);margin-right:5px">Fameli '+_pc('Fameli')+'</span><span style="display:inline-block;padding:1px 8px;border-radius:9px;background:rgba(150,90,240,0.32)">2xFam '+_pc('2xFam')+'</span>';})();
     container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
   if(window._savedScroll!==undefined){setTimeout(()=>{window.scrollTo(0,window._savedScroll);window._savedScroll=undefined;},30);}
     renderRejectedSection();
