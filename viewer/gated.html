@@ -2781,7 +2781,7 @@ async function setCoverImage(key, ix){
   const h=all.find(x=>x.url===key); if(!h) return;
   let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
   if(!Array.isArray(ex)) ex=[];
-  const seen={}; const urls=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
+  const seen={}; const urls=[h.imageUrl,...ex].filter(function(u){if(!u)return false;var k=(u.split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');if(seen[k])return false;seen[k]=1;return true;});
   const u=urls[ix]; if(!u){ showToast('⚠ Δεν βρέθηκε η φωτογραφία'); return; }
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?id=eq.${h._dbId}`,{method:'PATCH',headers:{...sb.headers(),'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({image_url:u})});
@@ -2908,7 +2908,7 @@ function cardPhotoNav(e,key,dir){
   const h=all.find(x=>x.url===key); if(!h) return;
   let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(_){ }
   if(!Array.isArray(ex)) ex=[];
-  const seen={}; const urls=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
+  const seen={}; const urls=[h.imageUrl,...ex].filter(function(u){if(!u)return false;var k=(u.split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');if(seen[k])return false;seen[k]=1;return true;});
   if(urls.length<2) return;
   h._photoIdx=((h._photoIdx||0)+dir+urls.length)%urls.length;
   const wrap=e.currentTarget.parentElement;
@@ -2964,7 +2964,7 @@ function openListingGallery(key, startIdx) {
   try { extras = JSON.parse(h.extra_images || '[]'); } catch(e) {}
   if (!Array.isArray(extras)) extras = [];
   const seen = {};
-  const urls = [h.imageUrl, ...extras].filter(u => u && !seen[u] && (seen[u] = 1));
+  const urls = [h.imageUrl, ...extras].filter(function(u){if(!u)return false;var k=(u.split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');if(seen[k])return false;seen[k]=1;return true;});
   if (!urls.length) return;
   galleryItems = urls.map(u => ({ url: u, listing: h }));
   galleryIdx   = Math.min(startIdx || 0, galleryItems.length - 1);
@@ -3161,7 +3161,7 @@ function closeListingOverlay(){
   if(pEl){
     let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
     if(!Array.isArray(ex)) ex=[];
-    const _sn={}; const _all=[h.imageUrl,...ex].filter(u=>u&&!_sn[u]&&(_sn[u]=1));
+    const _sn={}; const _all=[h.imageUrl,...ex].filter(function(u){if(!u)return false;var k=(u.split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');if(_sn[k])return false;_sn[k]=1;return true;});
     const urls=_all.slice(4);
     if(urls.length){
       pEl.style.display='block';
@@ -3203,7 +3203,7 @@ function _featHTML(h){
     ${(function(){
       let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
       if(!Array.isArray(ex)) ex=[];
-      const seen={}; const all=[h.imageUrl,...ex].filter(u=>u&&!seen[u]&&(seen[u]=1));
+      const seen={}; const all=[h.imageUrl,...ex].filter(function(u){if(!u)return false;var k=(u.split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');if(seen[k])return false;seen[k]=1;return true;});
       if(!all.length) return '<div class="modal-no-img" id="lo-photo-preview">🏠</div>';
       const four=all.slice(0,4);
       const cell=four.length===1?'460px':'225px';
