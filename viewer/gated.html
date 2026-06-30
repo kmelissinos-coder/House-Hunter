@@ -3703,7 +3703,7 @@ window.__grpImgCache=window.__grpImgCache||{};
 window.__favKeys=window.__favKeys||{};
 window.__hhKey=function(u){return (String(u||'').split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');};
 window.__favCmp=function(a,b){return (window.__favKeys[window.__hhKey(b)]?1:0)-(window.__favKeys[window.__hhKey(a)]?1:0);};
-function isAdmin(){try{for(var k in localStorage){if(/sb-.*-auth-token/.test(k)){var v=JSON.parse(localStorage.getItem(k));var u=(v&&(v.user||(v.currentSession&&v.currentSession.user)));if(u&&u.email)return u.email==='kmelissinos@gmail.com';}}}catch(e){}return false;}
+function isAdmin(){try{var v=JSON.parse(localStorage.getItem('hh_auth')||'{}');return !!(v.user&&v.user.email==='kmelissinos@gmail.com');}catch(e){return false;}}
 function loadFavs(){fetch(FAV+'?select=image_key,image_url',{headers:AH}).then(function(r){return r.json();}).then(function(rows){var o={};(rows||[]).forEach(function(r){o[r.image_key]={url:r.image_url};});window.__favKeys=o;if(window.applyFilters){try{window.applyFilters();}catch(e){}}}).catch(function(){});}
 function hid(){try{return (JSON.parse(localStorage.getItem('hh_open_v1')||'{}').houseId)||null;}catch(e){return null;}}
 function num(v){v=parseFloat(v);return isNaN(v)?null:v;}
