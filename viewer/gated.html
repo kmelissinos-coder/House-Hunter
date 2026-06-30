@@ -3692,6 +3692,6 @@ function saveNotes(id){
   fetch(url,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
 </script>
-</body>
+<script>(function(){function fix(){var dz=document.getElementById('dropzone');if(dz)dz.style.display='none';var ub=document.getElementById('hhUserBar');var ns=document.getElementById('numSearch');if(!ub)return;ub.style.background='var(--bg)';ub.style.border='1px solid var(--border)';ub.style.color='var(--text)';ub.style.boxShadow='none';var nm=document.getElementById('hhUserName');if(nm)nm.style.color='var(--text)';var lo=ub.querySelector('button');if(lo){lo.style.background='var(--accent)';lo.style.color='#fff';lo.style.border='none';}if(ns&&ns.parentElement&&ub.parentElement!==ns.parentElement){var row=ns.parentElement;row.style.display='flex';row.style.alignItems='center';row.style.gap='8px';ns.style.flex='1';ns.style.minWidth='0';ub.style.position='static';ub.style.top='';ub.style.right='';ub.style.flex='0 0 auto';row.appendChild(ub);}}var n=0;var iv=setInterval(function(){n++;if(window.hhUser)fix();if(n>40)clearInterval(iv);},400);})();/*uifixBlock*/</script></body>
 </html>
 <!-- build: 1780867944512 -->
