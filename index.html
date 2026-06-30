@@ -3692,6 +3692,6 @@ function saveNotes(id){
   fetch(url,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
 </script>
-</body>
+<script>(function(){function pink(){var ls=document.querySelectorAll('label');for(var i=0;i<ls.length;i++){var t=ls[i].textContent||'';if(t.indexOf('Απόκρυψη')>=0&&t.indexOf('είδαμε')>=0){ls[i].style.background='rgba(236,72,153,0.20)';ls[i].style.padding='3px 10px';ls[i].style.borderRadius='7px';}}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){pink();setTimeout(pink,800);});else{pink();setTimeout(pink,800);}})();/*pinkSeen*/</script></body>
 </html>
 <!-- build: 1780867944512 -->
