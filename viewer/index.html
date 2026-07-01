@@ -3785,6 +3785,18 @@ function apply(){
  return true;
 }
 apply();setInterval(apply,600);
+function fix2(){try{
+ var dz=document.getElementById('dropzone'); if(dz&&dz.style.display!=='none') dz.style.setProperty('display','none','important');
+ var ub=document.getElementById('hhUserBar');
+ if(ub){ ub.style.position='static'; ub.style.flex='0 0 auto';
+  var p=ub.parentElement;
+  if(p&&p.parentElement&&p.parentElement.tagName==='HEADER'){
+   p.style.display='flex';p.style.alignItems='center';p.style.gap='8px';p.style.flexWrap='nowrap';p.style.marginLeft='auto';
+   var ns=document.getElementById('numSearch'); if(ns){ns.style.flex='1 1 140px';ns.style.minWidth='110px';ns.style.maxWidth='420px';}
+  }
+ }
+}catch(e){}}
+fix2();setInterval(fix2,700);
 })();
 </script></body>
 </html>
