@@ -2916,7 +2916,7 @@ function cardPhotoNav(e,key,dir){
 function shortId(id){
   const s=String(id||'').trim();
   if(!s||s==='0') return '';
-  if(/^\d{1,4}$/.test(s)) return '#'+s;
+  if(/^[A-Z]?\d{1,4}$/i.test(s)) return '#'+s.toUpperCase();
   let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))>>>0; }
   return '#'+h.toString(36).toUpperCase().slice(-4).padStart(4,'0');
 }
