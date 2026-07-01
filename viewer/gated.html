@@ -693,7 +693,7 @@ body.light{--bg:#f5f3ee;--surface:#ffffff;--surface2:#efece5;--border:#d9d5cb;--
   .map-popup-price { color: var(--accent); font-size: 16px; font-weight: 600; margin: 4px 0; }
   .map-popup-specs { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
   .map-popup-link { display: inline-block; background: var(--accent); color: #0f0e0c; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; margin-top: 4px; }
-  .map-legend { position: absolute; bottom: 20px; left: 10px; z-index: 1000; background: rgba(26,25,22,0.92); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--text2); }
+  .map-legend { z-index: 1000; background: rgba(26,25,22,0.92); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 11px; color: var(--text2); }
   .map-legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
   .map-dot { width: 10px; height: 10px; border-radius: 50%; }
 
@@ -2121,7 +2121,7 @@ function initMap() {
 
     const marker = L.marker(coords, { icon }).addTo(leafletMap);
 
-    const popup = `<div class="map-popup"><a href="${location.pathname}?open=${encodeURIComponent(h.url)}" onclick="event.preventDefault()" style="all:unset;display:block;cursor:pointer" title="Μεσαίο κλικ: άνοιγμα σε νέα καρτέλα">
+    const popup = `<div class="map-popup"><a href="${location.pathname}?open=${encodeURIComponent(h.url)}" data-h="${h.house_id||''}" onclick="event.preventDefault();event.stopPropagation();var a=this,u=decodeURIComponent((a.getAttribute('href')||'').split('open=')[1]||'');if(window.openListingOverlay&&u)openListingOverlay(u,a.getAttribute('data-h')||'0',0)" style="all:unset;display:block;cursor:pointer" title="Άνοιγμα κάρτας HH">
       ${h.imageUrl ? `<img src="${h.imageUrl}" onerror="this.style.display='none'">` : ''}
       <div class="map-popup-loc">${h.location}</div>
       <div style="font-size:11px;color:#888;margin-bottom:4px">${h.type||''} · ${h.floor||''}</div>
@@ -2130,13 +2130,13 @@ function initMap() {
         ${(h.sqm_raw||h.sqmRaw)?'📐 '+(h.sqm_raw||h.sqmRaw):''} ${h.rooms?'· 🛏 '+h.rooms:''} ${h.year?'· 🏗 '+h.year:''}<br>
         ${ppm?'€'+ppm+'/τ.μ. · ':''}${h.agency||''}
       </div>
-      ${h.url?`<a class="map-popup-link" href="${h.url}" target="_blank">↗ Άνοιγμα</a>`:''}
+      ${h.url?`<a class="map-popup-link" href="${h.url}" target="_blank" onclick="event.stopPropagation()">🔗 Άνοιγμα</a>`:''}
     </div>`;
 
     marker.bindPopup(popup + '</a>', { maxWidth: 260 });
   });
 
-  const legend = L.control({ position: 'bottomleft' });
+  const legend = L.control({ position: 'topright' });
   legend.onAdd = () => {
     const div = L.DomUtil.create('div','map-legend');
     div.innerHTML = `
