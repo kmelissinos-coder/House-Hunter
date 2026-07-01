@@ -2110,7 +2110,7 @@ function initMap() {
     placed++;
 
     const _isGrp = Array.isArray(h._mapGroup) && h._mapGroup.length > 1;
-    const color = _confM ? '#15803d' : _isGrp ? '#0891b2' : (h.url&&h.url.includes('xe.gr')) ? '#ca8a04' : '#ea580c';
+    const color = _confM ? '#15803d' : '#ea8a2a';
     const ppm = h.pricePerSqm || (h.sqm>0&&h.price>0 ? Math.round(h.price/h.sqm) : 0);
 
     const icon = L.divIcon({
@@ -2142,9 +2142,7 @@ function initMap() {
     div.innerHTML = `
       <div style="font-weight:600;margin-bottom:6px;color:var(--text)">Υπόμνημα</div>
       <div class="map-legend-item"><div class="map-dot" style="background:#15803d"></div> Επιβεβαιωμένη τοποθεσία</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#0891b2"></div> Ομάδα αγγελιών</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#ca8a04"></div> xe.gr</div>
-      <div class="map-legend-item"><div class="map-dot" style="background:#ea580c"></div> Spitogatos</div>
+      <div class="map-legend-item"><div class="map-dot" style="background:#ea8a2a"></div> Προσεγγιστική τοποθεσία</div>
       <div style="margin-top:6px;color:#5c5a55;font-size:10px">${placed} αγγελίες στο χάρτη</div>`;
     return div;
   };
