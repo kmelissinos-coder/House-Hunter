@@ -3750,7 +3750,7 @@ loadFavs();
   };
   var _oim=window.initMap;
   if(typeof _oim==="function"&&!_oim.__wrapped){
-    window.initMap=function(){var r=_oim.apply(this,arguments);setTimeout(function(){if(window._hhMap&&window.hhFilterMapList){window._hhMap.off("moveend zoomend",window.hhFilterMapList);window._hhMap.on("moveend zoomend",window.hhFilterMapList);window.hhFilterMapList();}},220);return r;};
+    window.initMap=function(){var r=_oim.apply(this,arguments);setTimeout(function(){if(window._hhMap&&window.hhFilterMapList){window._hhMap.off("moveend zoomend",window.hhFilterMapList);window._hhMap.on("moveend zoomend",window.hhFilterMapList);try{window._hhMap.invalidateSize();}catch(e){}setTimeout(window.hhFilterMapList,80);}},260);return r;};
     window.initMap.__wrapped=1;
   }
 })();</script></body>
