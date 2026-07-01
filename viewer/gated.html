@@ -2107,7 +2107,7 @@ function initMap() {
     const _conf = _grp.find(x => x && x.address_lat && x.address_lng);var _confM = _grp.find(function(x){return x && x.address && (''+x.address).trim() && x.address_lat && x.address_lng;});
     let coords = _conf ? [parseFloat(_conf.address_lat), parseFloat(_conf.address_lng)] : getCoords(h.location);
     if (!coords) return;
-    if (!_conf) {
+    if (!_confM) {
       const _ak = String(h.location||'').split('(')[0].trim() || '~';
       _areaIdx[_ak] = (_areaIdx[_ak]||0) + 1;
       const _ai = _areaIdx[_ak];
