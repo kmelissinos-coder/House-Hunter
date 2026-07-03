@@ -3854,7 +3854,7 @@ fix2();setInterval(fix2,700);
 })();
 ;/*hhLogPanel*/(function(){
  var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
- function sess(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('auth-token')>=0&&k.indexOf('sb-')===0){var j=JSON.parse(localStorage.getItem(k));return j&&(j.access_token?j:(j.currentSession||null));}}}catch(e){} return null;}
+ function sess(){try{var j=JSON.parse(localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;if(j&&j.currentSession&&j.currentSession.access_token)return j.currentSession;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('auth')>=0){var q=JSON.parse(localStorage.getItem(k)||'null');if(q&&q.access_token)return q;if(q&&q.currentSession&&q.currentSession.access_token)return q.currentSession;}}}catch(e){} return null;}
  function isAdmin(s){try{var t=s.access_token;var p=JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));return p.email==='kmelissinos@gmail.com';}catch(e){return false;}}
  function el(t,css,txt){var e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e;}
  async function fetchRows(s,path){var r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:AK,Authorization:'Bearer '+s.access_token}});return r.ok?r.json():[];}
