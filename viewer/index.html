@@ -3821,6 +3821,31 @@ fix2();setInterval(fix2,700);
  window.addEventListener('unhandledrejection',function(e){log('js_rejection',{msg:(''+(e.reason&&e.reason.message||e.reason)).slice(0,200)})});
  log('page_load',{path:location.pathname});
 })();
+;/*hhGalleryFit*/(function(){
+ var st={z:1,tx:0,ty:0,drag:false,moved:false,sx:0,sy:0,ox:0,oy:0};
+ var steps=[1,1.6,2.5,4];
+ function img(){return document.getElementById('galleryImg');}
+ function wrap(){return document.getElementById('galleryImgWrap');}
+ function apply(){var im=img(); if(!im)return; im.style.transform='translate('+st.tx+'px,'+st.ty+'px) scale('+st.z+')'; im.style.cursor=st.z>1?'grab':'zoom-in';}
+ function reset(){st.z=1;st.tx=0;st.ty=0;apply();}
+ function clamp(){var w=wrap(); if(!w)return; var mx=(st.z-1)*w.clientWidth/2, my=(st.z-1)*w.clientHeight/2; st.tx=Math.max(-mx,Math.min(mx,st.tx)); st.ty=Math.max(-my,Math.min(my,st.ty));}
+ document.addEventListener('click',function(e){
+   var im=img(), w=wrap(); if(!im||!w) return;
+   if(e.target!==im&&e.target!==w) return;
+   e.stopImmediatePropagation(); e.preventDefault();
+   if(st.moved){st.moved=false;return;}
+   var i=steps.indexOf(st.z); st.z=steps[(i+1)%steps.length]; if(st.z===1){st.tx=0;st.ty=0;} clamp(); apply();
+ },true);
+ document.addEventListener('mousedown',function(e){ var im=img(),w=wrap(); if(!im||(e.target!==im&&e.target!==w))return; if(st.z<=1)return; st.drag=true;st.moved=false;st.sx=e.clientX;st.sy=e.clientY;st.ox=st.tx;st.oy=st.ty; e.preventDefault(); im.style.cursor='grabbing'; },true);
+ document.addEventListener('mousemove',function(e){ if(!st.drag)return; var dx=e.clientX-st.sx,dy=e.clientY-st.sy; if(Math.abs(dx)+Math.abs(dy)>5)st.moved=true; st.tx=st.ox+dx; st.ty=st.oy+dy; clamp(); apply(); });
+ document.addEventListener('mouseup',function(){ if(st.drag){st.drag=false;var im=img(); if(im)im.style.cursor=st.z>1?'grab':'zoom-in';} });
+ var mo=new MutationObserver(function(m){for(var k=0;k<m.length;k++){if(m[k].attributeName==='src'){reset();break;}}});
+ function arm(){var im=img(); if(im&&!im.__hhArmed){im.__hhArmed=true;mo.observe(im,{attributes:true});}}
+ arm(); setInterval(arm,1500);
+ var s2=document.createElement('style');
+ s2.textContent='#galleryImg{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;transition:transform .12s}';
+ document.head.appendChild(s2);
+})();
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
