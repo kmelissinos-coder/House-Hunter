@@ -3852,6 +3852,57 @@ fix2();setInterval(fix2,700);
  s2.textContent='#galleryImg{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;transition:transform .12s}';
  document.head.appendChild(s2);
 })();
+;/*hhLogPanel*/(function(){
+ var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+ function sess(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('auth-token')>=0&&k.indexOf('sb-')===0){var j=JSON.parse(localStorage.getItem(k));return j&&(j.access_token?j:(j.currentSession||null));}}}catch(e){} return null;}
+ function isAdmin(s){try{var t=s.access_token;var p=JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));return p.email==='kmelissinos@gmail.com';}catch(e){return false;}}
+ function el(t,css,txt){var e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e;}
+ async function fetchRows(s,path){var r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:AK,Authorization:'Bearer '+s.access_token}});return r.ok?r.json():[];}
+ function fmt(ts){try{return new Date(ts).toLocaleString('el-GR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return ts;}}
+ function summ(a){
+   var d=a.new||a.old||{};
+   if(a.tbl==='user_ratings')return (a.op==='DELETE'?'διαγραφή βαθμολογίας':'βαθμολογία '+(d.rating||'?')+'★')+' — σπίτι #'+(d.house_id||'?');
+   if(a.tbl==='user_notes')return (a.op==='DELETE'?'διαγραφή σημείωσης':'σημείωση')+' — σπίτι #'+(d.house_id||'?');
+   if(a.tbl==='user_seen')return 'είδαμε — σπίτι #'+(d.house_id||'?');
+   if(a.tbl==='listings'){var ch=[];if(a.old&&a.new){for(var k in a.new){if(JSON.stringify(a.new[k])!==JSON.stringify(a.old[k]))ch.push(k);}}return 'listing hhl#'+(d.hhl_id||'?')+' '+(a.op==='DELETE'?'ΔΙΑΓΡΑΦΗΚΕ':('αλλαγή: '+ch.slice(0,4).join(', ')));}
+   return a.tbl+' '+a.op;
+ }
+ async function open(){
+   var s=sess(); if(!s)return;
+   var ov=el('div','position:fixed;inset:0;z-index:2147482500;background:rgba(0,0,0,.82);overflow:auto;padding:26px;font-family:sans-serif');
+   ov.id='hh-logpanel';
+   var box=el('div','max-width:1050px;margin:0 auto;background:#1a1916;border:1px solid #d4a85355;border-radius:12px;padding:18px;color:#e8e4dc');
+   var top=el('div','display:flex;align-items:center;gap:10px;margin-bottom:12px');
+   top.appendChild(el('b','font-size:17px','\uD83D\uDCDC \u039B\u03BF\u03B3 \u2014 \u03C4\u03B5\u03BB\u03B5\u03C5\u03C4\u03B1\u03AF\u03B5\u03C2 \u03B5\u03BD\u03AD\u03C1\u03B3\u03B5\u03B9\u03B5\u03C2'));
+   var x=el('button','margin-left:auto;background:#333;color:#fff;border:none;border-radius:7px;padding:6px 14px;cursor:pointer','\u2715 \u039A\u03BB\u03B5\u03AF\u03C3\u03B9\u03BC\u03BF');
+   x.onclick=function(){ov.remove();}; top.appendChild(x); box.appendChild(top);
+   var body=el('div','','\u03A6\u03CC\u03C1\u03C4\u03C9\u03C3\u03B7...'); box.appendChild(body); ov.appendChild(box); document.body.appendChild(ov);
+   try{
+     var profs=await fetchRows(s,'profiles?select=id,username');
+     var pm={}; profs.forEach(function(p){pm[p.id]=p.username;});
+     var aud=await fetchRows(s,'audit_log?order=at.desc&limit=80&select=at,tbl,op,uid,old,new');
+     var ev=await fetchRows(s,'app_events?order=at.desc&limit=60&select=at,uid,event,payload');
+     body.textContent='';
+     var h1=el('div','font-weight:bold;color:#d4a853;margin:8px 0','\u0391\u03BB\u03BB\u03B1\u03B3\u03AD\u03C2 \u03B4\u03B5\u03B4\u03BF\u03BC\u03AD\u03BD\u03C9\u03BD (audit)');
+     body.appendChild(h1);
+     aud.forEach(function(a){var r=el('div','padding:4px 0;border-bottom:1px solid #2e2c27;font-size:13px');r.textContent=fmt(a.at)+'  \u00B7  '+(pm[a.uid]||'\u03C3\u03CD\u03C3\u03C4\u03B7\u03BC\u03B1')+'  \u00B7  '+summ(a);body.appendChild(r);});
+     if(!aud.length)body.appendChild(el('div','opacity:.6;font-size:13px','\u2014'));
+     var h2=el('div','font-weight:bold;color:#d4a853;margin:14px 0 8px','\u03A3\u03C5\u03BC\u03B2\u03AC\u03BD\u03C4\u03B1 \u03B5\u03C6\u03B1\u03C1\u03BC\u03BF\u03B3\u03AE\u03C2 (errors/failures)');
+     body.appendChild(h2);
+     ev.filter(function(e){return e.event!=='page_load';}).forEach(function(e){var r=el('div','padding:4px 0;border-bottom:1px solid #2e2c27;font-size:13px');r.textContent=fmt(e.at)+'  \u00B7  '+(pm[e.uid]||'\u03B1\u03BD\u03CE\u03BD\u03C5\u03BC\u03BF\u03C2')+'  \u00B7  '+e.event+'  '+JSON.stringify(e.payload||{}).slice(0,90);body.appendChild(r);});
+   }catch(e){body.textContent='\u03A3\u03C6\u03AC\u03BB\u03BC\u03B1: '+e;}
+ }
+ function inject(){
+   if(document.getElementById('hh-logbtn'))return true;
+   var ub=document.getElementById('hhUserBar'); if(!ub)return false;
+   var s=sess(); if(!s||!isAdmin(s))return true;
+   var b=el('button','background:rgba(0,0,0,.4);border:1px solid #2e2c27;color:#d4a853;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px','\uD83D\uDCDC \u039B\u03BF\u03B3');
+   b.id='hh-logbtn'; b.title='Audit log (admin)'; b.onclick=open;
+   ub.parentElement.insertBefore(b,ub);
+   return true;
+ }
+ inject(); var t=setInterval(function(){if(inject())clearInterval(t);},900);
+})();
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
