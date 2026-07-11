@@ -3219,17 +3219,7 @@ function closeListingOverlay(){
   document.getElementById('listingOverlay').classList.remove('open');
   document.body.style.overflow='';
   /* removed orphaned price_history dead code */
-  const pEl=document.getElementById('loPhotos');
-  if(pEl){
-    let ex=[]; try{ ex=JSON.parse(h.extra_images||'[]'); }catch(e){}
-    if(!Array.isArray(ex)) ex=[];
-    const _sn={}; const _all=[h.imageUrl,...ex].filter(function(u){if(!u)return false;var k=(u.split('?')[0].toLowerCase().match(/[^\/]+\/[^\/]+$/)||[u])[0].replace(/\.(jpe?g|png|webp)$/,'');if(_sn[k])return false;_sn[k]=1;return true;}).sort(window.__favCmp||function(){return 0;});
-    const urls=_all.slice(4);
-    if(urls.length){
-      pEl.style.display='block';
-      pEl.innerHTML='<div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">📷 Όλες οι φωτογραφίες ('+(urls.length+1)+')</div>'
-        + urls.map((u,ix)=>'<div style="position:relative;margin-bottom:8px"><img src="'+escA(u)+'" loading="lazy" onclick="event.stopPropagation();openListingGallery(\''+escJ(h.url)+'\','+(ix+4)+')" style="width:100%;height:150px;object-fit:cover;border-radius:8px;cursor:pointer;border:1px solid var(--border)" onerror="this.parentElement.style.display=\'none\'"/><button title="Κάνε το εξώφυλλο" onclick="event.stopPropagation();setCoverImage(\''+escJ(h.url)+'\','+(ix+4)+')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.25);color:#fff;border-radius:6px;padding:3px 6px;font-size:11px;cursor:pointer;">🖼</button></div>').join('');
-    } else { pEl.style.display='none'; pEl.innerHTML=''; }
+  const pEl=document.getElementById('loPhotos'); if(pEl){pEl.style.display='none';pEl.innerHTML='';}
   }
 }
 
@@ -3865,7 +3855,7 @@ fix2();setInterval(fix2,700);
   var p=of.apply(this,arguments);
   if(url.indexOf('supabase.co/rest')>=0 && method!=='GET' && url.indexOf('app_events')<0){
    p=p.then(function(res){
-    if(!res.ok){var pth=(url.split('/rest/v1/')[1]||'').split('?')[0];log('write_failed',{path:pth,status:res.status,method:method});toast('\u26A0\uFE0F \u0397 \u03B1\u03C0\u03BF\u03B8\u03AE\u03BA\u03B5\u03C5\u03C3\u03B7 \u0391\u03A0\u0395\u03A4\u03A5\u03A7\u0395 ('+res.status+') \u2014 \u03BE\u03B1\u03BD\u03B1\u03B4\u03BF\u03BA\u03AF\u03BC\u03B1\u03C3\u03B5 \u03AE \u03BA\u03AC\u03BD\u03B5 \u03B5\u03C0\u03B1\u03BD\u03B1\u03C3\u03CD\u03BD\u03B4\u03B5\u03C3\u03B7');}
+    if(!res.ok){var pth=(url.split('/rest/v1/')[1]||'').split('?')[0];log('write_failed',{path:pth,status:res.status,method:method});if(res.status!==401)toast('\u26A0\uFE0F \u0397 \u03B1\u03C0\u03BF\u03B8\u03AE\u03BA\u03B5\u03C5\u03C3\u03B7 \u0391\u03A0\u0395\u03A4\u03A5\u03A7\u0395 ('+res.status+') \u2014 \u03BE\u03B1\u03BD\u03B1\u03B4\u03BF\u03BA\u03AF\u03BC\u03B1\u03C3\u03B5 \u03AE \u03BA\u03AC\u03BD\u03B5 \u03B5\u03C0\u03B1\u03BD\u03B1\u03C3\u03CD\u03BD\u03B4\u03B5\u03C3\u03B7');}
     return res;
    });
   }
@@ -3956,6 +3946,78 @@ fix2();setInterval(fix2,700);
    return true;
  }
  inject(); var t=setInterval(function(){if(inject())clearInterval(t);},900);
+})();
+;/*hhAuthFix*/(function(){
+ var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+ var _ofPrev=window.fetch;
+ function getAuth(){try{return JSON.parse(localStorage.getItem('hh_auth')||'null');}catch(e){return null;}}
+ function saveAuth(j){try{localStorage.setItem('hh_auth',JSON.stringify(j));}catch(e){}}
+ function toast(m,ok){try{var t=document.createElement('div');t.style.cssText='position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:'+(ok?'#2e7d32':'#a11')+';color:#fff;padding:10px 18px;border-radius:9px;z-index:2147483000;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.5)';t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},5000);}catch(e){}}
+ var refreshing=null;
+ function refresh(){
+   if(refreshing) return refreshing;
+   refreshing=(async function(){
+     var a=getAuth();
+     if(!a||!a.refresh_token){refreshing=null;return null;}
+     try{
+       var r=await _ofPrev(SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:a.refresh_token})});
+       if(r.ok){
+         var j=await r.json();
+         if(j&&j.access_token){
+           a.access_token=j.access_token;
+           if(j.refresh_token)a.refresh_token=j.refresh_token;
+           if(j.user)a.user=j.user;
+           saveAuth(a); refreshing=null; return j.access_token;
+         }
+       }
+     }catch(e){}
+     refreshing=null; return null;
+   })();
+   return refreshing;
+ }
+ window.hhRefreshAuth=refresh;
+ window.fetch=function(u,o){
+   var url=(typeof u==='string')?u:(u&&u.url)||'';
+   var method=(o&&o.method)||'GET';
+   try{
+     if(url.indexOf('/rest/v1/user_ratings')>=0 && method==='POST' && o && typeof o.body==='string'){
+       var b=JSON.parse(o.body); var row=Array.isArray(b)?b[0]:b;
+       if(row && (row.rating===0||row.rating==='0') && row.user_id && row.house_id){
+         var h2={}; var srcH=o.headers||{}; for(var k in srcH)h2[k]=srcH[k];
+         u=SB+'/rest/v1/user_ratings?user_id=eq.'+encodeURIComponent(row.user_id)+'&house_id=eq.'+encodeURIComponent(row.house_id);
+         o={method:'DELETE',headers:h2};
+         url=u; method='DELETE';
+       }
+     }
+   }catch(e){}
+   var p=_ofPrev.call(this,u,o);
+   if(url.indexOf('supabase.co/rest/')>=0){
+     p=p.then(async function(res){
+       if(res.status===401){
+         var nt=await refresh();
+         if(nt){
+           var o2={}; if(o){for(var k3 in o)o2[k3]=o[k3];}
+           var hh={}; var sh=(o&&o.headers)||{}; for(var k4 in sh)hh[k4]=sh[k4];
+           hh['Authorization']='Bearer '+nt; o2.headers=hh;
+           var r2=await _ofPrev(u,o2);
+           if(r2.ok&&method!=='GET') toast('Η σύνδεση ανανεώθηκε — αποθηκεύτηκε κανονικά',true);
+           return r2;
+         } else if(method!=='GET'){
+           toast('Η σύνδεση έληξε — κάνε Έξοδο και ξανά Είσοδο');
+         }
+       }
+       return res;
+     });
+   }
+   return p;
+ };
+ setInterval(function(){
+   try{
+     var a=getAuth(); if(!a||!a.access_token)return;
+     var pl=JSON.parse(atob(a.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+     if(pl.exp - Date.now()/1000 < 600) refresh();
+   }catch(e){}
+ }, 240000);
 })();
 </script></body>
 </html>
