@@ -2874,7 +2874,7 @@ async function hhDrop(e,key){
   const A=_resolveMembers(src), B=_resolveMembers(key);
   if(!A||!B) return;
   if(A.hid&&B.hid&&A.hid===B.hid){ showToast('Ήδη στο ίδιο σπίτι'); return; }
-  const hid=B.hid||A.hid||('group_'+Date.now());
+  const hid=B.hid||A.hid||((function(){var m=469;try{(allListings||[]).concat(window.extraListings||[]).forEach(function(x){var v=parseInt(x.house_id,10);if(v===v&&v>m)m=v;});}catch(e){}return ''+(m+1);})());
   const members=[...new Set([...A.items,...B.items])];
   const prev=members.map(m=>({m, hid:m.house_id}));
   for(const m of members){ m.house_id=hid; if(m._dbId){ try{ await sb.update(m._dbId,{house_id:hid}); }catch(_){} } }
