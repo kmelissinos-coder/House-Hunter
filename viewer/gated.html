@@ -3854,7 +3854,7 @@ fix2();setInterval(fix2,700);
   var p=of.apply(this,arguments);
   if(url.indexOf('supabase.co/rest')>=0 && method!=='GET' && url.indexOf('app_events')<0){
    p=p.then(function(res){
-    if(!res.ok){var pth=(url.split('/rest/v1/')[1]||'').split('?')[0];log('write_failed',{path:pth,status:res.status,method:method});if(res.status!==401)toast('\u26A0\uFE0F \u0397 \u03B1\u03C0\u03BF\u03B8\u03AE\u03BA\u03B5\u03C5\u03C3\u03B7 \u0391\u03A0\u0395\u03A4\u03A5\u03A7\u0395 ('+res.status+') \u2014 \u03BE\u03B1\u03BD\u03B1\u03B4\u03BF\u03BA\u03AF\u03BC\u03B1\u03C3\u03B5 \u03AE \u03BA\u03AC\u03BD\u03B5 \u03B5\u03C0\u03B1\u03BD\u03B1\u03C3\u03CD\u03BD\u03B4\u03B5\u03C3\u03B7');}
+    if(!res.ok){var pth=(url.split('/rest/v1/')[1]||'').split('?')[0];log('write_failed',{path:pth,status:res.status,method:method,body:(o&&typeof o.body==='string')?o.body.slice(0,400):null});if(res.status!==401)toast('\u26A0\uFE0F \u0397 \u03B1\u03C0\u03BF\u03B8\u03AE\u03BA\u03B5\u03C5\u03C3\u03B7 \u0391\u03A0\u0395\u03A4\u03A5\u03A7\u0395 ('+res.status+') \u2014 \u03BE\u03B1\u03BD\u03B1\u03B4\u03BF\u03BA\u03AF\u03BC\u03B1\u03C3\u03B5 \u03AE \u03BA\u03AC\u03BD\u03B5 \u03B5\u03C0\u03B1\u03BD\u03B1\u03C3\u03CD\u03BD\u03B4\u03B5\u03C3\u03B7');}
     return res;
    });
   }
