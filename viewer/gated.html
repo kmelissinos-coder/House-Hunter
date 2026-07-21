@@ -3916,7 +3916,7 @@ fix2();setInterval(fix2,700);
    ov.id='hh-logpanel';
    var box=el('div','max-width:1050px;margin:0 auto;background:#1a1916;border:1px solid #d4a85355;border-radius:12px;padding:18px;color:#e8e4dc');
    var top=el('div','display:flex;align-items:center;gap:10px;margin-bottom:12px');
-   top.appendChild(el('b','font-size:17px','\uD83D\uDCDC \u039B\u03BF\u03B3 \u2014 \u03C4\u03B5\u03BB\u03B5\u03C5\u03C4\u03B1\u03AF\u03B5\u03C2 \u03B5\u03BD\u03AD\u03C1\u03B3\u03B5\u03B9\u03B5\u03C2'));
+   top.appendChild(el('b','font-size:17px','\uD83D\uDCDC Log \u2014 \u03C4\u03B5\u03BB\u03B5\u03C5\u03C4\u03B1\u03AF\u03B5\u03C2 \u03B5\u03BD\u03AD\u03C1\u03B3\u03B5\u03B9\u03B5\u03C2'));
    var x=el('button','margin-left:auto;background:#333;color:#fff;border:none;border-radius:7px;padding:6px 14px;cursor:pointer','\u2715 \u039A\u03BB\u03B5\u03AF\u03C3\u03B9\u03BC\u03BF');
    x.onclick=function(){ov.remove();}; top.appendChild(x); box.appendChild(top);
    var body=el('div','','\u03A6\u03CC\u03C1\u03C4\u03C9\u03C3\u03B7...'); box.appendChild(body); ov.appendChild(box); document.body.appendChild(ov);
@@ -3939,7 +3939,7 @@ fix2();setInterval(fix2,700);
    if(document.getElementById('hh-logbtn'))return true;
    var ub=document.getElementById('hhUserBar'); if(!ub)return false;
    var s=sess(); if(!s||!isAdmin(s))return true;
-   var b=el('button','background:rgba(0,0,0,.4);border:1px solid #2e2c27;color:#d4a853;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px','\uD83D\uDCDC \u039B\u03BF\u03B3');
+   var b=el('button','background:rgba(0,0,0,.4);border:1px solid #2e2c27;color:#d4a853;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px','\uD83D\uDCDC Log');
    b.id='hh-logbtn'; b.title='Audit log (admin)'; b.onclick=open;
    ub.parentElement.insertBefore(b,ub);
    return true;
@@ -4031,6 +4031,26 @@ fix2();setInterval(fix2,700);
 'body.light #hh-grpsum-ov [style*="#e9cf86"]{color:#7a5c00!important}'+
 'body.light #hh-grpsum-ov .hh-gs-more{background:#e3cf8e!important;color:#3a2f10!important}';
 document.head.appendChild(s);})();
+;/*hhLight2*/(function(){
+ var s=document.createElement('style');
+ s.textContent='body.light .photo-count-pill{background:rgba(250,248,240,.92)!important;color:#333!important}'+
+ '.card .card-type{display:none!important}'+
+ 'body.light .hh-gs-leg{background:#faf7ee!important;color:#2a2620!important;border:1px solid #d8cba4!important}'+
+ 'body.light .hh-cz-main{background:#e8e2d2!important}'+
+ 'body.light .hh-cz-nav{background:rgba(120,100,50,.25)!important;color:#3a2f10!important}'+
+ 'body.light .hh-cz-cnt,body.light .hh-cz-tag{background:rgba(250,248,240,.85)!important;color:#3a2f10!important}'+
+ 'body.light #hh-grpsum-ov [style*="#e9cf86"],body.light #hh-grpsum-ov [style*="#c8a84b"]{color:#7a5c00!important}'+
+ 'body.light #hh-sib0 [style*="#e9cf86"]{color:#4a3a0a!important}';
+ document.head.appendChild(s);
+ setInterval(function(){try{
+   var ov=document.getElementById('hh-grpsum-ov'); if(!ov) return;
+   var head=ov.querySelector('.hh-gs-head')||ov.firstElementChild; if(!head||head.__hhIdDone) return;
+   var st=null; try{st=JSON.parse(localStorage.getItem('hh_open_v1')||'null');}catch(e){}
+   var hid=st&&st.houseId; if(!hid) return;
+   if((head.textContent||'').indexOf('#'+hid)<0){var sp=document.createElement('span');sp.style.cssText='margin-left:8px;opacity:.85';sp.textContent='\u00B7 #'+hid;head.appendChild(sp);}
+   head.__hhIdDone=true;
+ }catch(e){}},900);
+})();
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
