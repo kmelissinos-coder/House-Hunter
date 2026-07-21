@@ -1,0 +1,4 @@
+# Netlify config — ONLY declares the functions dir.
+# (publish dir intentionally NOT set here so each Netlify project keeps its own UI setting)
+[functions]
+  directory = "netlify/functions"
