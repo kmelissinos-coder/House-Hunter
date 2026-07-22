@@ -3839,7 +3839,7 @@ function ensure(){
  var bar=document.getElementById('hh-hb'); if(!bar)bar=buildBar();
  homeBorrowed(bar);
 }
-ensure();setInterval(ensure,600);
+ensure();setInterval(ensure,600);var _moP=false;try{var _mo=new MutationObserver(function(){if(_moP)return;_moP=true;requestAnimationFrame(function(){_moP=false;var b=document.getElementById('hh-hb');if(b)homeBorrowed(b);});});_mo.observe(document.body,{childList:true,subtree:true});}catch(e){}
 })();
 ;/*hhLogger*/(function(){
  var SB='https://ofvanbbujgcqhbiyihgy.supabase.co';
