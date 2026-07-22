@@ -3825,7 +3825,7 @@ function buildBar(){
  if(ns){var si=document.createElement('button');si.type='button';si.className='hb-ctrl';si.textContent='🔍';si.onclick=function(e){e.stopPropagation();if(ns.style.display==='none'||!ns.style.display){var r=si.getBoundingClientRect();ns.style.left=Math.max(8,r.right-220)+'px';ns.style.top=(r.bottom+4)+'px';ns.style.display='block';ns.focus();}else ns.style.display='none';};bar.appendChild(si);}
  var vt=document.createElement('div');vt.style.cssText='display:flex;gap:3px';var vl=['⊞','≡','🗺'];if(viewT){[].forEach.call(viewT.querySelectorAll('button'),function(ob,i){var v=document.createElement('button');v.type='button';v.className='hb-ctrl'+(/active/.test(ob.className)?' hb-active':'');v.textContent=vl[i]||'?';v.title=ob.textContent.trim();v.onclick=function(){ob.click();setTimeout(function(){[].forEach.call(vt.children,function(cv,ci){var oa=/active/.test(viewT.querySelectorAll('button')[ci].className);cv.className='hb-ctrl'+(oa?' hb-active':'');});},100);};vt.appendChild(v);});}bar.appendChild(vt);
  document.body.insertBefore(bar,document.body.firstChild);
- if(!window.__hbClickClose){window.__hbClickClose=1;document.addEventListener('click',function(){document.querySelectorAll('.hh-hb-menu').forEach(function(m){m.style.display='none';});});}
+ if(!window.__hbClickClose){window.__hbClickClose=1;document.addEventListener('click',function(ev){document.querySelectorAll('.hh-hb-menu').forEach(function(m){m.style.display='none';});var fp=document.getElementById('hh-fpanel-real');if(fp&&fp.style.display==='block'&&!fp.contains(ev.target))fp.style.display='none';});}
  return bar;
 }
 function homeBorrowed(bar){
@@ -4011,6 +4011,7 @@ document.head.appendChild(s);})();
    head.__hhIdDone=true;
  }catch(e){}},900);
 })();
+;/*hhSessionWatch*/(function(){var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';var logged={};function log(ev,pl){try{var x=new XMLHttpRequest();x.open('POST',SB+'/rest/v1/app_events');x.setRequestHeader('apikey',AK);x.setRequestHeader('Authorization','Bearer '+AK);x.setRequestHeader('Content-Type','application/json');x.setRequestHeader('Prefer','return=minimal');x.send(JSON.stringify({event:ev,payload:pl||{},user_agent:(navigator.userAgent||'').slice(0,120)}));}catch(e){}}function chk(store,name){var v=null;try{v=store.getItem('hh_auth');}catch(e){return;}if(v==null)return;try{JSON.parse(v);}catch(e){var key=name+':'+((''+v).length)+':'+(''+e).slice(0,20);if(logged[key])return;logged[key]=1;log('session_corrupt',{store:name,len:(''+v).length,head:(''+v).slice(0,150),tail:(''+v).slice(-60),err:(''+e).slice(0,90)});}}function run(){chk(localStorage,'local');chk(sessionStorage,'session');}run();setInterval(run,500);window.addEventListener('storage',function(e){if(e.key==='hh_auth')run();});})();
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
