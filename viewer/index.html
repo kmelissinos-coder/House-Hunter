@@ -3896,55 +3896,15 @@ fix2();setInterval(fix2,700);
  document.head.appendChild(s2);
 })();
 ;/*hhLogPanel*/(function(){
- var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
- function sess(){try{var j=JSON.parse(localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;if(j&&j.currentSession&&j.currentSession.access_token)return j.currentSession;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('auth')>=0){var q=JSON.parse(localStorage.getItem(k)||'null');if(q&&q.access_token)return q;if(q&&q.currentSession&&q.currentSession.access_token)return q.currentSession;}}}catch(e){} return null;}
- function isAdmin(s){try{var t=s.access_token;var p=JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));return p.email==='kmelissinos@gmail.com';}catch(e){return false;}}
- function el(t,css,txt){var e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;return e;}
- async function fetchRows(s,path){var r=await fetch(SB+'/rest/v1/'+path,{headers:{apikey:AK,Authorization:'Bearer '+s.access_token}});return r.ok?r.json():[];}
- function fmt(ts){try{return new Date(ts).toLocaleString('el-GR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return ts;}}
- function summ(a){
-   var d=a.new||a.old||{};
-   if(a.tbl==='user_ratings')return (a.op==='DELETE'?'διαγραφή βαθμολογίας':'βαθμολογία '+(d.rating||'?')+'★')+' — σπίτι #'+(d.house_id||'?');
-   if(a.tbl==='user_notes')return (a.op==='DELETE'?'διαγραφή σημείωσης':'σημείωση')+' — σπίτι #'+(d.house_id||'?');
-   if(a.tbl==='user_seen')return 'είδαμε — σπίτι #'+(d.house_id||'?');
-   if(a.tbl==='listings'){var ch=[];if(a.old&&a.new){for(var k in a.new){if(JSON.stringify(a.new[k])!==JSON.stringify(a.old[k]))ch.push(k);}}return 'listing hhl#'+(d.hhl_id||'?')+' '+(a.op==='DELETE'?'ΔΙΑΓΡΑΦΗΚΕ':('αλλαγή: '+ch.slice(0,4).join(', ')));}
-   return a.tbl+' '+a.op;
- }
- async function open(){
-   var s=sess(); if(!s)return;
-   var ov=el('div','position:fixed;inset:0;z-index:2147482500;background:rgba(0,0,0,.82);overflow:auto;padding:26px;font-family:sans-serif');
-   ov.id='hh-logpanel';
-   var box=el('div','max-width:1050px;margin:0 auto;background:#1a1916;border:1px solid #d4a85355;border-radius:12px;padding:18px;color:#e8e4dc');
-   var top=el('div','display:flex;align-items:center;gap:10px;margin-bottom:12px');
-   top.appendChild(el('b','font-size:17px','\uD83D\uDCDC Log \u2014 \u03C4\u03B5\u03BB\u03B5\u03C5\u03C4\u03B1\u03AF\u03B5\u03C2 \u03B5\u03BD\u03AD\u03C1\u03B3\u03B5\u03B9\u03B5\u03C2'));
-   var x=el('button','margin-left:auto;background:#333;color:#fff;border:none;border-radius:7px;padding:6px 14px;cursor:pointer','\u2715 \u039A\u03BB\u03B5\u03AF\u03C3\u03B9\u03BC\u03BF');
-   x.onclick=function(){ov.remove();}; top.appendChild(x); box.appendChild(top);
-   var body=el('div','','\u03A6\u03CC\u03C1\u03C4\u03C9\u03C3\u03B7...'); box.appendChild(body); ov.appendChild(box); document.body.appendChild(ov);
-   try{
-     var profs=await fetchRows(s,'profiles?select=id,username');
-     var pm={}; profs.forEach(function(p){pm[p.id]=p.username;});
-     var aud=await fetchRows(s,'audit_log?order=at.desc&limit=80&select=at,tbl,op,uid,old,new');
-     var ev=await fetchRows(s,'app_events?order=at.desc&limit=60&select=at,uid,event,payload');
-     body.textContent='';
-     var h1=el('div','font-weight:bold;color:#d4a853;margin:8px 0','\u0391\u03BB\u03BB\u03B1\u03B3\u03AD\u03C2 \u03B4\u03B5\u03B4\u03BF\u03BC\u03AD\u03BD\u03C9\u03BD (audit)');
-     body.appendChild(h1);
-     aud.forEach(function(a){var r=el('div','padding:4px 0;border-bottom:1px solid #2e2c27;font-size:13px');r.textContent=fmt(a.at)+'  \u00B7  '+(pm[a.uid]||'\u03C3\u03CD\u03C3\u03C4\u03B7\u03BC\u03B1')+'  \u00B7  '+summ(a);body.appendChild(r);});
-     if(!aud.length)body.appendChild(el('div','opacity:.6;font-size:13px','\u2014'));
-     var h2=el('div','font-weight:bold;color:#d4a853;margin:14px 0 8px','\u03A3\u03C5\u03BC\u03B2\u03AC\u03BD\u03C4\u03B1 \u03B5\u03C6\u03B1\u03C1\u03BC\u03BF\u03B3\u03AE\u03C2 (errors/failures)');
-     body.appendChild(h2);
-     ev.filter(function(e){return e.event!=='page_load';}).forEach(function(e){var r=el('div','padding:4px 0;border-bottom:1px solid #2e2c27;font-size:13px');r.textContent=fmt(e.at)+'  \u00B7  '+(pm[e.uid]||'\u03B1\u03BD\u03CE\u03BD\u03C5\u03BC\u03BF\u03C2')+'  \u00B7  '+e.event+'  '+JSON.stringify(e.payload||{}).slice(0,90);body.appendChild(r);});
-   }catch(e){body.textContent='\u03A3\u03C6\u03AC\u03BB\u03BC\u03B1: '+e;}
- }
- function inject(){
-   if(document.getElementById('hh-logbtn'))return true;
-   var ub=document.getElementById('hhUserBar'); if(!ub)return false;
-   var s=sess(); if(!s||!isAdmin(s))return true;
-   var b=el('button','background:rgba(0,0,0,.4);border:1px solid #2e2c27;color:#d4a853;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px','\uD83D\uDCDC Log');
-   b.id='hh-logbtn'; b.title='Audit log (admin)'; b.onclick=open;
-   ub.parentElement.insertBefore(b,ub);
-   return true;
- }
- inject(); var t=setInterval(function(){if(inject())clearInterval(t);},900);
+ var SB='https://ofvanbbujgcqhbiyihgy.supabase.co';
+ var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+ function sess(){try{var j=JSON.parse(localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;if(j&&j.currentSession&&j.currentSession.access_token)return j.currentSession;}catch(e){}return null;}
+ function isAdmin(s){try{var p=JSON.parse(atob(s.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));return p.email==='kmelissinos@gmail.com';}catch(e){return false;}}
+ function page(TOK){return '<!doctype html><html lang=el><head><meta charset=utf-8><title>House Hunter Log</title>'+'<style>body{margin:0;font-family:sans-serif;background:#0f0e0c;color:#e8e4dc}'+'#top{padding:12px 18px;border-bottom:1px solid #2e2c27;font-size:16px;font-weight:600;color:#d4a853}'+'#wrap{display:flex;height:calc(100vh - 49px)}'+'#side{width:210px;border-right:1px solid #2e2c27;overflow:auto;padding:8px;box-sizing:border-box}'+'.folder{padding:8px 10px;border-radius:8px;cursor:pointer;font-size:14px;margin-bottom:2px}'+'.folder:hover{background:#1a1916}.folder.active{background:#d4a85333;color:#d4a853}'+'#main{flex:1;overflow:auto;padding:6px 16px}'+'.row{padding:7px 4px;border-bottom:1px solid #201e1a;font-size:13px;display:flex;gap:12px;align-items:baseline}'+'.tm{color:#9a9a9a;white-space:nowrap;font-variant-numeric:tabular-nums;min-width:120px}'+'.usr{color:#d4a853;white-space:nowrap;min-width:74px}'+'.act{flex:1}.err{color:#e07a7a}'+'</style></head><body><div id=top>Log — House Hunter</div>'+'<div id=wrap><div id=side>...</div><div id=main>Loading...</div></div>'+'<'+'script>'+'var SB="'+SB+'",AK="'+AK+'",TOK="'+TOK+'";'+'var H={apikey:AK,Authorization:"Bearer "+TOK};var ALL=[],PROF={},CUR="__all";'+'function fmt(t){try{return new Date(t).toLocaleString("el-GR",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"});}catch(e){return t;}}'+'function esc(x){return String(x==null?"":x).replace(/</g,"&lt;");}'+'function summ(a){var d=a.__new||a.__old||{};'+'if(a.__src=="ev"){return esc((a.event||"event")+" "+(a.payload?JSON.stringify(a.payload).slice(0,140):""));}'+'if(a.tbl=="user_ratings")return (a.op=="DELETE"?"διέγραψε βαθμολογία":"βαθμολόγησε "+(d.rating||"?")+"★")+" — σπίτι #"+(d.house_id||"?");'+'if(a.tbl=="user_notes")return (a.op=="DELETE"?"διέγραψε σημείωση":"έγραψε σημείωση")+" — σπίτι #"+(d.house_id||"?");'+'if(a.tbl=="user_seen")return "σημείωσε ως είδαμε — σπίτι #"+(d.house_id||"?");'+'if(a.tbl=="listings")return "listing hhl#"+(d.hhl_id||"?")+" "+(a.op=="DELETE"?"ΔΙΑΓΡΑΦΗ":"αλλαγή");'+'return esc((a.tbl||"?")+" "+(a.op||""));}'+'function render(){var m=document.getElementById("main");var rows=ALL.filter(function(a){if(CUR=="__all")return true;if(CUR=="__sys")return !a.uid;return a.uid==CUR;});'+'if(!rows.length){m.innerHTML="<p style=opacity:.6>Καμία εγγραφή.</p>";return;}'+'m.innerHTML=rows.map(function(a){var u=a.uid?(PROF[a.uid]||a.uid.slice(0,6)):"σύστημα";var er=(a.__src=="ev"&&/fail|error|reject/i.test(a.event||""))?" err":"";'+'return "<div class=row><span class=tm>"+fmt(a.__at)+"</span><span class=usr>"+esc(u)+"</span><span class=\x27act"+er+"\x27>"+summ(a)+"</span></div>";}).join("");}'+'function folders(){var s=document.getElementById("side");var seen={};ALL.forEach(function(a){if(a.uid)seen[a.uid]=(seen[a.uid]||0)+1;});'+'var h="<div class=\x27folder active\x27 data-f=__all>Όλα ("+ALL.length+")</div><div class=folder data-f=__sys>Σύστημα</div>";'+'Object.keys(seen).forEach(function(u){h+="<div class=folder data-f=\x27"+u+"\x27>"+esc(PROF[u]||u.slice(0,6))+" ("+seen[u]+")</div>";});'+'s.innerHTML=h;var fs=s.querySelectorAll(".folder");for(var i=0;i<fs.length;i++){(function(f){f.onclick=function(){CUR=f.getAttribute("data-f");for(var k=0;k<fs.length;k++)fs[k].classList.remove("active");f.classList.add("active");render();};})(fs[i]);}}'+'Promise.all([fetch(SB+"/rest/v1/profiles?select=id,username",{headers:H}).then(function(r){return r.ok?r.json():[];}),'+'fetch(SB+"/rest/v1/audit_log?order=at.desc&limit=800&select=at,tbl,op,uid,old,new",{headers:H}).then(function(r){return r.ok?r.json():[];}),'+'fetch(SB+"/rest/v1/app_events?order=at.desc&limit=800&select=at,uid,event,payload",{headers:H}).then(function(r){return r.ok?r.json():[];})]).then(function(res){'+'res[0].forEach(function(p){PROF[p.id]=p.username;});'+'res[1].forEach(function(a){a.__src="au";a.__at=a.at;a.__new=a.new;a.__old=a.old;ALL.push(a);});'+'res[2].forEach(function(e){e.__src="ev";e.__at=e.at;ALL.push(e);});'+'ALL.sort(function(a,b){return new Date(b.__at)-new Date(a.__at);});folders();render();'+'}).catch(function(e){document.getElementById("main").innerHTML="Σφάλμα: "+e;});'+'<'+'/'+'script></body></html>';}
+ function openLog(){var s=sess();if(!s)return;var w=window.open('about:blank','_blank');if(!w){alert('Popup blocked - allow popups');return;}var d=w.document;d.open();d.write(page(s.access_token));d.close();}
+ window.hhOpenLog=openLog;
+ function inject(){var ub=document.getElementById('hhUserBar');if(!ub)return;var s=sess();if(!s||!isAdmin(s)){var ex=document.getElementById('hh-logbtn');if(ex)ex.remove();return;}var b=document.getElementById('hh-logbtn');if(!b){b=document.createElement('button');b.id='hh-logbtn';b.type='button';b.textContent='📜 Log';b.title='Audit log (admin)';b.style.cssText='background:rgba(0,0,0,.35);border:1px solid #2e2c27;color:#d4a853;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px;margin-right:8px';b.onclick=openLog;}if(ub.previousElementSibling!==b){ub.parentElement.insertBefore(b,ub);}}
+ inject();setInterval(inject,700);
 })();
 ;/*hhAuthFix*/(function(){
  var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
