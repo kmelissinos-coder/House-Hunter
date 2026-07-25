@@ -4021,6 +4021,14 @@ function hid(){try{var o=JSON.parse(localStorage.getItem('hh_open_v1')||'null');
 setInterval(function(){try{var g=document.getElementById('galleryOverlay');var open=g&&getComputedStyle(g).display!=='none'&&g.offsetParent!==null;var lab=document.getElementById('hh-gal-hid');if(open){var id=hid();if(id){if(!lab){lab=document.createElement('div');lab.id='hh-gal-hid';g.appendChild(lab);}lab.textContent='#'+id;lab.style.display='block';}else if(lab){lab.style.display='none';}}else if(lab){lab.style.display='none';}}catch(e){}},600);
 })();
 
+;/*hhPrivFilter*/(function(){
+try{var s=document.createElement('style');s.textContent='body.hh-onlypriv .card:not(.hh-private){display:none!important}#hhOnlyPrivWrap{display:inline-flex;align-items:center;gap:5px;margin-left:10px;padding:3px 9px;border-radius:7px;border:1px solid #d4af37;color:#c9a83a;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:600}#hhOnlyPrivWrap input{accent-color:#d4af37;cursor:pointer;margin:0}body.hh-onlypriv #hhOnlyPrivWrap{background:linear-gradient(135deg,rgba(247,222,126,.22),rgba(212,175,55,.22))}';document.head.appendChild(s);}catch(e){}
+function isPriv(t){var s=(t||'').trim();if(/ιδιωτ|ιδιώτ/i.test(s))return true;return !/[a-zA-ZͰ-Ͽἀ-῿]/.test(s);}
+function markPriv(){try{document.querySelectorAll('.card').forEach(function(c){var ag=c.querySelector('.agency-name');if(ag&&isPriv(ag.textContent)){if(!c.classList.contains('hh-private'))c.classList.add('hh-private');}});}catch(e){}}
+function ensure(){try{markPriv();var wrap=document.querySelector('.show-deleted-wrap');if(wrap&&!document.getElementById('hhOnlyPrivWrap')){var l=document.createElement('label');l.id='hhOnlyPrivWrap';l.innerHTML='<input type="checkbox" id="hhOnlyPriv"> 🏅 Μόνο ιδιώτες';wrap.appendChild(l);l.querySelector('#hhOnlyPriv').addEventListener('change',function(e){markPriv();document.body.classList.toggle('hh-onlypriv',e.target.checked);});}}catch(e){}}
+setInterval(ensure,1000);setTimeout(ensure,400);setTimeout(ensure,1600);
+})();
+
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
