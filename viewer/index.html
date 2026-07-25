@@ -4115,7 +4115,7 @@ function ensure(){
     if(sqmD && !sr.querySelector("[onclick*='sqm-asc']")){ sqmD.parentNode.insertBefore(mkBtn(model,'τ.μ. ↑','sqm-asc'), sqmD); }
     if(ppmA && !sr.querySelector("[onclick*='ppm-desc']")){ ppmA.parentNode.insertBefore(mkBtn(model,'€/τ.μ. ↓','ppm-desc'), ppmA.nextSibling); }
     if(sc){
-      if(sc.textContent.indexOf('↓')<0 && sc.textContent.indexOf('↑')<0){ sc.textContent='★ Σκορ ↓'; }
+      if(sc.textContent.indexOf('↓')<0 && sc.textContent.indexOf('↑')<0){ sc.textContent='★ Σκορ ↓'; sc.setAttribute('onclick',"setSortX(this,'score-desc')"); }
       if(!sr.querySelector("[onclick*='score-asc']")){ sc.parentNode.insertBefore(mkBtn(model,'★ Σκορ ↑','score-asc'), sc.nextSibling); }
     }
     if(!sr.__hhOvrHook){ sr.__hhOvrHook=1;
