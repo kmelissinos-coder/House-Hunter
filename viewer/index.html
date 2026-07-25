@@ -4029,6 +4029,19 @@ function ensure(){try{markPriv();var wrap=document.querySelector('.show-deleted-
 setInterval(ensure,1000);setTimeout(ensure,400);setTimeout(ensure,1600);
 })();
 
+;/*hhSessSync*/(function(){
+function ok(v){try{var o=JSON.parse(v);return !!(o&&o.access_token&&o.user&&o.user.id);}catch(e){return false;}}
+function sync(){try{
+ var L=localStorage.getItem('hh_auth'), S=sessionStorage.getItem('hh_auth');
+ if(L&&ok(L)){ if(S!==L){ sessionStorage.setItem('hh_auth',L); } return; }
+ if(S&&ok(S)&&!L){ localStorage.setItem('hh_auth',S); }
+}catch(e){}}
+sync();
+setInterval(sync,400);
+try{window.addEventListener('storage',sync);}catch(e){}
+try{document.addEventListener('visibilitychange',sync);}catch(e){}
+})();
+
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
