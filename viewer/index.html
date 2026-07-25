@@ -4042,6 +4042,95 @@ try{window.addEventListener('storage',sync);}catch(e){}
 try{document.addEventListener('visibilitychange',sync);}catch(e){}
 })();
 
+;/*hhSortDirs*/(function(){
+var OVR=null, AVG={}, avgLoaded=false;
+function num(t){ if(!t) return null; var d=String(t).replace(/[^0-9]/g,''); return d?parseInt(d,10):null; }
+function tok(){try{var o=JSON.parse(localStorage.getItem('hh_'+'auth')||'null');return o&&o.access_token?o.access_token:null;}catch(e){return null;}}
+function loadAvg(){ if(avgLoaded) return; avgLoaded=true;
+  try{ var t=tok(); if(!t) { avgLoaded=false; return; }
+    fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/user_ratings?select=house_id,rating',{headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr',Authorization:'Bearer '+t}})
+    .then(function(r){return r.ok?r.json():[];})
+    .then(function(rows){ var s={},c={};
+      (rows||[]).forEach(function(x){ var h=String(x.house_id); var v=Number(x.rating); if(!isFinite(v)||v<=0) return; s[h]=(s[h]||0)+v; c[h]=(c[h]||0)+1; });
+      AVG={}; Object.keys(s).forEach(function(h){ AVG[h]=s[h]/c[h]; });
+      if(OVR) apply();
+    }).catch(function(){ avgLoaded=false; });
+  }catch(e){ avgLoaded=false; }
+}
+function val(el,key){
+  try{
+    if(key==='sqm-asc'){ var sp=[...el.querySelectorAll('.card-specs .spec-tag')].find(function(s){return /τ\.?μ/.test(s.textContent);}); return num(sp&&sp.textContent); }
+    if(key==='ppm-desc'){ var p=el.querySelector('.price-sqm'); return num(p&&p.textContent); }
+    if(key==='score-asc'||key==='score-desc'){ var h=el.dataset?el.dataset.hhh:null; var v=(h!=null&&AVG[String(h)]!=null)?AVG[String(h)]:null; return v; }
+  }catch(e){}
+  return null;
+}
+function grid(){ return document.querySelector('.grid-container'); }
+function items(){ var g=grid(); if(!g) return []; return [...g.children].filter(function(x){ return x.classList&&(x.classList.contains('card')||x.classList.contains('grouped-card')); }); }
+function desiredOrder(){
+  var key=OVR; var arr=items().map(function(el,i){ return {el:el,i:i,v:val(el,key)}; });
+  var asc = (key==='sqm-asc'||key==='score-asc');
+  arr.sort(function(a,b){
+    if(a.v==null&&b.v==null) return a.i-b.i;
+    if(a.v==null) return 1;
+    if(b.v==null) return -1;
+    if(a.v===b.v) return a.i-b.i;
+    return asc?(a.v-b.v):(b.v-a.v);
+  });
+  return arr.map(function(x){return x.el;});
+}
+function apply(){
+  if(!OVR) return;
+  var g=grid(); if(!g) return;
+  var want=desiredOrder(); if(!want.length) return;
+  var cur=items();
+  var same = cur.length===want.length && cur.every(function(el,i){return el===want[i];});
+  if(same) return;
+  var f=document.createDocumentFragment();
+  want.forEach(function(el){ f.appendChild(el); });
+  g.appendChild(f);
+}
+window.setSortX=function(el,key){
+  OVR=key; loadAvg();
+  try{ document.querySelectorAll('.sort-row button').forEach(function(b){ b.classList.remove('active'); }); }catch(e){}
+  try{ el.classList.add('active'); }catch(e){}
+  apply();
+  setTimeout(apply,150); setTimeout(apply,600);
+};
+function mkBtn(model,label,key){
+  var b=model.cloneNode(true);
+  b.textContent=label;
+  b.setAttribute('onclick',"setSortX(this,'"+key+"')");
+  b.classList.remove('active');
+  return b;
+}
+function ensure(){
+  try{
+    var sr=document.querySelector('.sort-row'); if(!sr) return;
+    var btns=[...sr.querySelectorAll('button')];
+    if(!btns.length) return;
+    function byKey(k){ return btns.find(function(b){ return (b.getAttribute('onclick')||'').indexOf("'"+k+"'")>=0; }); }
+    var model=btns[0];
+    var sqmD=byKey('sqm-desc'), ppmA=byKey('ppm-asc'), sc=byKey('score');
+    if(sqmD && !sr.querySelector("[onclick*='sqm-asc']")){ sqmD.parentNode.insertBefore(mkBtn(model,'τ.μ. ↑','sqm-asc'), sqmD); }
+    if(ppmA && !sr.querySelector("[onclick*='ppm-desc']")){ ppmA.parentNode.insertBefore(mkBtn(model,'€/τ.μ. ↓','ppm-desc'), ppmA.nextSibling); }
+    if(sc){
+      if(sc.textContent.indexOf('↓')<0 && sc.textContent.indexOf('↑')<0){ sc.textContent='★ Σκορ ↓'; }
+      if(!sr.querySelector("[onclick*='score-asc']")){ sc.parentNode.insertBefore(mkBtn(model,'★ Σκορ ↑','score-asc'), sc.nextSibling); }
+    }
+    if(!sr.__hhOvrHook){ sr.__hhOvrHook=1;
+      sr.addEventListener('click',function(ev){
+        var b=ev.target&&ev.target.closest?ev.target.closest('button'):null; if(!b) return;
+        var oc=b.getAttribute('onclick')||'';
+        if(oc.indexOf('setSortX')<0){ OVR=null; }
+      },true);
+    }
+  }catch(e){}
+}
+setInterval(function(){ ensure(); apply(); },700);
+setTimeout(ensure,400); setTimeout(ensure,1500);
+})();
+
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
