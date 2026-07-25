@@ -4211,6 +4211,35 @@ if(want){
 }
 })();
 
+;/*hhGroupCompareFix*/(function(){
+function tok(){try{var o=JSON.parse(localStorage.getItem('hh_'+'auth')||'null');return o&&o.access_token?o.access_token:null;}catch(e){return null;}}
+function toast(m){try{ if(typeof showToast==='function') showToast(m); }catch(e){}}
+function install(){
+ if(typeof window.addToCompare!=='function') return false;
+ if(window.__hhGCFixed) return true;
+ window.__hhGCFixed=true;
+ window.addGroupCompare=function(houseId){
+  try{
+   var id=String(houseId);
+   var t=tok(); if(!t){ toast('Χρειάζεται σύνδεση'); return; }
+   var h={apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr',Authorization:'Bearer '+t};
+   fetch('https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/listings?select=url&house_id=eq.'+encodeURIComponent(id)+'&limit=30',{headers:h})
+    .then(function(r){return r.ok?r.json():[];})
+    .then(function(rows){
+      var n=0;
+      (rows||[]).forEach(function(x){ if(x&&x.url){ try{ window.addToCompare(x.url); n++; }catch(e){} } });
+      if(!n) toast('Δεν βρέθηκαν αγγελίες για αυτό το σπίτι');
+    })
+    .catch(function(){ toast('Σφάλμα σύνδεσης'); });
+  }catch(e){}
+ };
+ return true;
+}
+var tries=0;
+var iv=setInterval(function(){ tries++; if(install()||tries>60) clearInterval(iv); },500);
+setTimeout(install,800);
+})();
+
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
