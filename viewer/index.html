@@ -4183,6 +4183,34 @@ setInterval(function(){ load(); paintAll(); },900);
 setTimeout(load,600); setTimeout(paintAll,1200);
 })();
 
+;/*hhDeepLink*/(function(){
+var KEY='hh_open_v1', last='';
+function cur(){ try{ var o=JSON.parse(localStorage.getItem(KEY)||'null'); return (o&&o.houseId!=null&&o.houseId!=='')?String(o.houseId):''; }catch(e){ return ''; } }
+function sync(){
+ try{
+  var id=cur(); if(id===last) return; last=id;
+  var u=new URL(location.href);
+  if(id){ u.searchParams.set('house',id); } else { u.searchParams.delete('house'); }
+  history.replaceState(history.state,'',u.pathname+(u.search||'')+u.hash);
+ }catch(e){}
+}
+setInterval(sync,600);
+var want=null;
+try{ want=new URL(location.href).searchParams.get('house'); }catch(e){}
+if(want){
+ var n=0;
+ var iv=setInterval(function(){
+  n++;
+  if(n>40){ clearInterval(iv); return; }
+  try{
+   if(cur()===String(want)){ clearInterval(iv); return; }
+   var el=document.querySelector('[data-hhh="'+String(want).replace(/"/g,'')+'"]');
+   if(el){ clearInterval(iv); setTimeout(function(){ try{ el.click(); }catch(e){} },250); }
+  }catch(e){}
+ },400);
+}
+})();
+
 </script></body>
 </html>
 <!-- build: 1780867944512 -->
