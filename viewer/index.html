@@ -2156,8 +2156,8 @@ function initMap() {
   leafletMap = L.map('map', { center: _mv ? [_mv.lat, _mv.lng] : [38.07, 23.82], zoom: _mv ? _mv.z : 12, zoomControl: true });
   window._hhMap=leafletMap;leafletMap.on('moveend zoomend', () => { if (typeof _saveUISoon === 'function') _saveUISoon(); });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO', maxZoom: 19
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { /*hhPolish1: CARTO basemaps need an API key since Sep 2026*/
+    attribution: '© OpenStreetMap contributors', maxZoom: 19
   }).addTo(leafletMap);
 
   let placed = 0;
@@ -2167,8 +2167,10 @@ function initMap() {
     const _grp = Array.isArray(h._mapGroup) ? h._mapGroup : [h];
     const _conf = _grp.find(x => x && x.address_lat && x.address_lng);var _confM = _grp.find(function(x){return x && x.address && (''+x.address).trim() && x.address_lat && x.address_lng;});
     let coords = _conf ? [parseFloat(_conf.address_lat), parseFloat(_conf.address_lng)] : getCoords(h.location);
+    /*hhPolish1*/ var _pcE=_grp.find(function(x){return x&&x.platform_lat!=null&&x.platform_lng!=null&&(x.geo_radius_m==null||+x.geo_radius_m<=60);}),_pcA=_grp.find(function(x){return x&&x.platform_lat!=null&&x.platform_lng!=null;}),_pc=_pcE||_pcA;
+    if(!_conf&&_pc){coords=[+_pc.platform_lat,+_pc.platform_lng];} if(_pcE&&!_confM){_confM=_pcE;}
     if (!coords) return;
-    if (!_confM) {
+    if (!_confM && !_pc) {
       const _ak = String(h.location||'').split('(')[0].trim() || '~';
       _areaIdx[_ak] = (_areaIdx[_ak]||0) + 1;
       const _ai = _areaIdx[_ak];
@@ -4372,6 +4374,36 @@ setTimeout(load,700);
 
 
 ;/*hhMobileV2*/(function(){try{var st=document.createElement('style');st.id='hh-mobile-v2';st.textContent='@media (max-width:560px){#hh-hb{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:5px 8px;gap:6px}#hh-hb::-webkit-scrollbar{display:none}#hh-hb .hb-ctrl{padding:4px 8px;font-size:12px;flex:0 0 auto}.hh-hb-menu{position:fixed;left:10px;right:10px;top:50px;min-width:0;max-height:70vh}#hh-fpanel-real{position:fixed;left:10px;right:10px;top:50px;width:auto;max-width:none;max-height:75vh;overflow:auto;box-sizing:border-box}#numSearch{width:calc(100vw - 24px);left:12px;box-sizing:border-box}.grid-container{grid-template-columns:1fr;margin-top:0;padding-top:10px}#hh-newhdr{margin-left:8px;margin-right:8px}#map-container{height:calc(100vh - 150px);min-height:340px}.card,.grouped-card{max-width:100%}body{-webkit-text-size-adjust:100%}}@media (min-width:561px) and (max-width:920px){.grid-container{grid-template-columns:repeat(2,1fr);margin-top:0;padding-top:10px}}@media (max-height:720px){#hh-hb{padding:3px 8px}#map-container{height:calc(100vh - 120px);min-height:280px}.hh-hb-menu,#hh-fpanel-real{max-height:60vh}}';document.head.appendChild(st);}catch(e){}})();
+
+;/*hhPolish1*/(function(){try{
+var st=document.createElement('style');st.id='hh-polish1';
+st.textContent='body.hh-rent .card-price::after,body.hh-rent .list-price::after,body.hh-rent .modal-price::after,body.hh-rent .price-range-main::after{content:"/μήνα";font-size:.55em;opacity:.65;margin-left:2px;font-weight:500}'
++'#hh-lo-map{height:230px;border-radius:10px;margin:10px 0;border:1px solid rgba(255,255,255,.12);overflow:hidden}#hh-lo-map .leaflet-control-attribution{font-size:9px}.hh-lo-map-t{font-size:11px;color:var(--muted);margin:10px 0 4px}';
+document.head.appendChild(st);
+setInterval(function(){try{var t=document.querySelector('.project-tab.active');document.body.classList.toggle('hh-rent',!!t&&t.getAttribute('data-project')==='Rent');}catch(e){}},600);
+function drawMap(){try{
+ if(!window.L)return; var ov=document.getElementById('listingOverlay'); if(!ov||!ov.classList.contains('open'))return;
+ var sib=(typeof _loSiblings!=='undefined')?_loSiblings:[]; var idx=(typeof _loFeatIdx!=='undefined')?_loFeatIdx:0; var h=sib[idx]; if(!h)return;
+ var old=document.getElementById('hh-lo-map'); if(old&&old.getAttribute('data-k')===String(h.url||h._dbId))return; if(old){var tt=old.previousElementSibling;if(tt&&tt.className==='hh-lo-map-t')tt.remove();old.remove();}
+ var lat=null,lng=null,exact=false,src='';
+ if(h.address&&(''+h.address).trim()&&h.address_lat!=null&&h.address_lng!=null){lat=+h.address_lat;lng=+h.address_lng;exact=true;src='Επιβεβαιωμένη διεύθυνση';}
+ else if(h.platform_lat!=null&&h.platform_lng!=null){lat=+h.platform_lat;lng=+h.platform_lng;exact=(h.geo_radius_m==null||+h.geo_radius_m<=60);src=exact?'Ακριβής θέση από την πλατφόρμα':'Προσεγγιστική θέση (η πλατφόρμα κρύβει την ακριβή διεύθυνση)';}
+ if(lat==null||isNaN(lat))return;
+ var grid=document.querySelector('.lo-featured .modal-grid'); if(!grid)return;
+ var t=document.createElement('div');t.className='hh-lo-map-t';t.textContent='🗺 Θέση στον χάρτη — '+src;
+ var d=document.createElement('div');d.id='hh-lo-map';d.setAttribute('data-k',String(h.url||h._dbId));
+ grid.parentNode.insertBefore(t,grid.nextSibling);grid.parentNode.insertBefore(d,t.nextSibling);
+ var mp=L.map('hh-lo-map',{zoomControl:true,scrollWheelZoom:false}).setView([lat,lng],exact?16:14);
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(mp);
+ var col=exact?'#15803d':'#ea8a2a';
+ if(!exact){L.circle([lat,lng],{radius:Math.max(150,+h.geo_radius_m||600),color:col,weight:1,fillColor:col,fillOpacity:.12}).addTo(mp);}
+ L.circleMarker([lat,lng],{radius:8,color:'#222',weight:2,fillColor:col,fillOpacity:1}).addTo(mp).bindTooltip((h.agency||h.platform||'αγγελία'),{direction:'top'});
+ sib.forEach(function(m,i){if(i===idx||!m||m.platform_lat==null)return;L.circleMarker([+m.platform_lat,+m.platform_lng],{radius:6,color:'#333',weight:1,fillColor:'#9aa0a6',fillOpacity:.9}).addTo(mp).bindTooltip((m.agency||m.platform||'')+' (#'+(i+1)+')',{direction:'top'});});
+ setTimeout(function(){try{mp.invalidateSize();}catch(e){}},250);
+}catch(e){}}
+var n=0,iv=setInterval(function(){n++;try{if(typeof _renderOvl==='function'&&!_renderOvl.__p1){var _r=_renderOvl;window._renderOvl=function(){var r=_r.apply(this,arguments);setTimeout(drawMap,60);setTimeout(drawMap,500);return r;};window._renderOvl.__p1=true;clearInterval(iv);}}catch(e){} if(n>40)clearInterval(iv);},300);
+document.addEventListener('click',function(){setTimeout(drawMap,400);},true);
+}catch(e){}})();
 </script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
