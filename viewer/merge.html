@@ -3,28 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>House Hunter — Προτάσεις ένωσης</title>
+<title>House Hunter — Ενώσεις</title>
 <style>
 :root{--bg:#0f0e0c;--card:#1b1a17;--border:#2e2c27;--text:#e8e4dc;--muted:#9a968c;--accent:#d4a853;--accent2:#7eb89a;--red:#e05a5a;--blue:#5b8def}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
-header{position:sticky;top:0;z-index:10;background:rgba(15,14,12,.96);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header{position:sticky;top:0;z-index:10;background:rgba(15,14,12,.97);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 header h1{font-size:17px;margin:0;color:var(--accent)}
-header a{color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:13px}
-header a:hover{border-color:var(--accent)}
-.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-left:auto}
+a.back{color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:13px}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:3px}
+.tabs button{background:none;border:none;color:var(--muted);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.tabs button.on{background:var(--accent);color:#1a1206}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-left:auto;flex-wrap:wrap}
 .ctl select,.ctl button{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:13px;cursor:pointer}
+.ctl button.undo{color:#f0a0a0;border-color:rgba(224,90,90,.5)}
+.ctl button:disabled{opacity:.4;cursor:default}
 main{max-width:1240px;margin:0 auto;padding:16px}
 .msg{padding:30px;text-align:center;color:var(--muted)}
 .pair{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden}
-.pair.done{opacity:.45;pointer-events:none}
-.ptop{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
-.score{font-weight:800;font-size:15px;padding:2px 10px;border-radius:9px;background:rgba(212,168,83,.18);color:var(--accent)}
+.pair.done{opacity:.4;pointer-events:none}
+.ptop{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.score{font-weight:800;font-size:13px;padding:3px 10px;border-radius:9px;background:rgba(212,168,83,.18);color:var(--accent);cursor:help}
 .score.hi{background:rgba(126,184,154,.22);color:var(--accent2)}
-.tier{font-size:11px;letter-spacing:1px;color:var(--muted)}
 .reason{font-size:11.5px;padding:2px 8px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid var(--border)}
 .reason.neg{color:var(--red);border-color:rgba(224,90,90,.4)}
-.cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.cols{display:grid;grid-template-columns:1fr 1fr}
 .house{padding:12px 14px;display:grid;grid-template-columns:150px 1fr;gap:12px}
 .house+.house{border-left:1px solid var(--border)}
 .house img{width:150px;height:110px;object-fit:cover;border-radius:9px;background:#26241f}
@@ -33,94 +36,139 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .loc{font-weight:700;font-size:15px}
 .spec{color:var(--muted);font-size:12.5px;margin-top:3px}
 .spec b{color:var(--text)}
+.spec .bad{color:var(--red);font-weight:700}
 .plat{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:8px;background:rgba(91,141,239,.18);color:#9dbaf5;margin-top:4px}
 .stars{color:var(--accent);font-size:13px}
 .descr{font-size:11.5px;color:var(--muted);margin-top:6px;max-height:54px;overflow:hidden;line-height:1.35}
 .links{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
 .links a{font-size:12px;color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px}
-.links a:hover{border-color:var(--accent)}
 .acts{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
 .btn{border:none;border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
 .btn.merge{background:var(--accent2);color:#0f1a14}
 .btn.no{background:rgba(224,90,90,.18);color:#f0a0a0;border:1px solid rgba(224,90,90,.4)}
 .btn.later{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
+.btn.ok{background:rgba(126,184,154,.2);color:#bfe4cf;border:1px solid rgba(126,184,154,.5)}
+.btn.split{background:rgba(224,90,90,.14);color:#f0a0a0;border:1px solid rgba(224,90,90,.35);padding:4px 9px;font-size:12px}
 .btn:disabled{opacity:.5;cursor:default}
-.dist{font-size:12px;color:var(--muted);margin-left:auto}
+.keep{font-size:12px;color:var(--muted);margin-left:auto}
+/* one-by-one */
+.gal{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px}
+.gal button{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:50%;width:44px;height:44px;font-size:22px;cursor:pointer}
+.gal button:disabled{opacity:.3;cursor:default}
+.gal .pos{color:var(--muted);font-size:13px;min-width:90px;text-align:center}
+/* suspicious groups */
+.grp{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.grp .ptop .hid{font-size:15px}
+.mem{display:grid;grid-template-columns:96px 1fr auto;gap:10px;padding:8px 14px;border-top:1px solid var(--border);align-items:center}
+.mem img,.mem .noimg{width:96px;height:70px;object-fit:cover;border-radius:7px;background:#26241f;display:flex;align-items:center;justify-content:center;font-size:22px}
+.mem.gone{opacity:.55}
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50}
 #modal .box{background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:20px;max-width:440px;width:92%}
 #modal h3{margin:0 0 8px;color:var(--accent)}
 #modal .opt{display:block;width:100%;text-align:left;margin-top:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;cursor:pointer;font-size:14px}
-#modal .opt:hover{border-color:var(--accent)}
 #modal .newstars span{font-size:26px;cursor:pointer;color:rgba(255,255,255,.25)}
 #modal .newstars span.on{color:var(--accent)}
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:10px 18px;border-radius:9px;display:none;z-index:60}
-@media(max-width:760px){.cols{grid-template-columns:1fr}.house+.house{border-left:none;border-top:1px solid var(--border)}.house{grid-template-columns:110px 1fr}.house img,.house .noimg{width:110px;height:82px}}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:10px 18px;border-radius:9px;display:none;z-index:60;max-width:90vw}
+.help{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+@media(max-width:760px){.cols{grid-template-columns:1fr}.house+.house{border-left:none;border-top:1px solid var(--border)}.house{grid-template-columns:110px 1fr}.house img,.house .noimg{width:110px;height:82px}.mem{grid-template-columns:70px 1fr}.mem img,.mem .noimg{width:70px;height:52px}}
 </style>
 </head>
 <body>
 <header>
-  <h1>🔀 Προτάσεις ένωσης (Rent)</h1>
-  <a href="index.html">← Πίσω στο House Hunter</a>
+  <h1>🔀 Ενώσεις (Rent)</h1>
+  <a class="back" href="index.html">← House Hunter</a>
+  <div class="tabs"><button id="tabPairs" class="on">Προτάσεις ένωσης</button><button id="tabSusp">Ύποπτες ενώσεις</button></div>
+  <div class="tabs" id="viewTabs"><button id="viewList" class="on">Λίστα</button><button id="viewOne">Ένα-ένα</button></div>
   <div class="ctl">
     <span id="count"></span>
-    <label>Ελάχιστο σκορ <select id="minScore"><option value="70">70</option><option value="60">60</option><option value="50" selected>50</option><option value="40">40</option></select></label>
+    <label id="minWrap">Ελάχιστο σκορ <select id="minScore"><option value="70">70</option><option value="60">60</option><option value="50" selected>50</option><option value="40">40</option></select></label>
+    <button id="undoBtn" class="undo" disabled title="Αναιρεί την τελευταία ένωση">↶ Αναίρεση</button>
     <button id="reload">↻ Ανανέωση</button>
   </div>
 </header>
-<main><div id="list" class="msg">Φόρτωση…</div></main>
+<main>
+  <p class="help" id="help"></p>
+  <div id="gal" class="gal" style="display:none"><button id="prev">‹</button><span class="pos" id="pos"></span><button id="next">›</button></div>
+  <div id="list" class="msg">Φόρτωση…</div>
+</main>
 <div id="modal"><div class="box" id="mbox"></div></div>
 <div id="toast"></div>
 <script>
 const SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+const HELP={pairs:'Κάθε πρόταση δείχνει δύο σπίτια που μοιάζουν. Το <b>σκορ ομοιότητας</b> (0–100) βγαίνει από τα τ.μ., την τιμή, τη θέση, το έτος, τον όροφο, τον μεσίτη, την περιγραφή και τις κοινές φωτογραφίες — όσο ψηλότερο, τόσο πιο πιθανό να είναι το ίδιο σπίτι. «Ένωση» κρατάει τον αριθμό του σπιτιού που έχει τις περισσότερες αγγελίες. «Αναίρεση» επαναφέρει την τελευταία ένωση.',
+ susp:'Ομάδες που ήδη έχουν ενωθεί αλλά τα στοιχεία τους δεν συμφωνούν (τ.μ., τιμή, έτος, δωμάτια, όροφος, τύπος ή πινέζες μακριά η μία από την άλλη). Με «✂ Αποσύνδεση» μια αγγελία γίνεται ξεχωριστό σπίτι· με «Είναι σωστά» η ομάδα δεν ξαναεμφανίζεται εδώ.'};
 function sess(){try{const j=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;}catch(e){}return null;}
 async function refreshSess(s){try{const r=await fetch(SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});const d=await r.json();if(!r.ok)return null;const n={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:Date.now()+(d.expires_in||3600)*1000,user:d.user,remember:s.remember};(s.remember?localStorage:sessionStorage).setItem('hh_auth',JSON.stringify(n));return n;}catch(e){return null;}}
 async function rpc(name,args){let s=sess();if(!s)throw new Error('login');if(s.expires_at&&s.expires_at<Date.now()+60000&&s.refresh_token){s=(await refreshSess(s))||s;}
-  let r=await fetch(SB+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
-  if(r.status===401&&s.refresh_token){const n=await refreshSess(s);if(n){r=await fetch(SB+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+n.access_token,'Content-Type':'application/json'},body:JSON.stringify(args||{})});}}
+  const call=t=>fetch(SB+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  let r=await call(s.access_token);
+  if(r.status===401&&s.refresh_token){const n=await refreshSess(s);if(n)r=await call(n.access_token);}
   const t=await r.text();let j=null;try{j=JSON.parse(t);}catch(e){j=t;}
   if(!r.ok)throw new Error((j&&j.message)||t||r.status);return j;}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function eur(v){return v?'€'+Number(v).toLocaleString('el')+'/μήνα':'—';}
+function sq(v){return v?Math.round(v)+' τ.μ.':'—';}
 function stars(n){return n?'★'.repeat(n)+'☆'.repeat(5-n):'';}
-function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;t.style.background=bad?'#a11':'#2e7d32';t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
-let PAIRS=[];
+function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;t.style.background=bad?'#a11':'#2e7d32';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
+let TAB='pairs', VIEW='list', PAIRS=[], GROUPS=[], IDX=0, UNDO=[];
+function keepOf(p){const na=+(p.a&&p.a.n_ads)||0,nb=+(p.b&&p.b.n_ads)||0;if(na!==nb)return na>nb?'a':'b';return (+p.h1<=+p.h2)?'a':'b';}
 function houseHTML(h,rating,label){if(!h)return '<div class="house">—</div>';
   const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
   return `<div class="house">
     ${h.img?`<img src="${esc(h.img)}" loading="lazy" onerror="this.outerHTML='<div class=noimg>🏠</div>'">`:'<div class="noimg">🏠</div>'}
     <div>
       <div><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span></div>
-      <div class="spec"><b>${h.sqm||'—'} τ.μ.</b> · <b>${eur(h.price)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
+      <div class="spec"><b>${sq(h.sqm)}</b> · <b>${eur(h.price)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
       <div class="spec">${esc(h.agencies||'Ιδιώτης')}</div>
-      <span class="plat">${esc(h.platforms||h.platform||'')}${h.n_ads>1?' · '+h.n_ads+' αγγελίες':''}</span>
+      <span class="plat">${esc(h.platforms||h.platform||'')}${h.n_ads>1?' · '+h.n_ads+' αγγελίες':' · 1 αγγελία'}</span>
       ${rating?`<div class="stars" title="η δική σου βαθμολογία">${stars(rating)}</div>`:''}${others?`<div class="spec">${others}</div>`:''}
       <div class="descr">${esc((h.descr||'').replace(/<[^>]+>/g,' '))}</div>
       <div class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</div>
     </div></div>`;}
-function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/.test(r);
+function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/.test(r);const k=keepOf(p);const keepId=k==='a'?p.h1:p.h2;
   const dist=p.dist_exact!=null?Math.round(p.dist_exact)+' μ (ακριβείς πινέζες)':(p.dist_any!=null?'~'+Math.round(p.dist_any)+' μ':'χωρίς θέση');
   return `<div class="pair" id="p${i}">
-    <div class="ptop"><span class="score${p.score>=75?' hi':''}">${p.score}</span><span class="tier">${esc(p.tier)}</span>
+    <div class="ptop"><span class="score${p.score>=75?' hi':''}" title="Σκορ ομοιότητας 0–100: πόσο μοιάζουν τα δύο σπίτια">Σκορ ομοιότητας ${p.score}</span>
       ${(p.reasons||[]).map(r=>`<span class="reason${neg(r)?' neg':''}">${esc(r)}</span>`).join('')}
-      ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}%</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτό</span>':''}
-      <span class="dist">📍 ${dist}</span></div>
+      ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}% ίδια</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτογραφία</span>':''}
+      <span class="keep">📍 ${dist}</span></div>
     <div class="cols">${houseHTML(p.a,p.rating_a,'A')}${houseHTML(p.b,p.rating_b,'B')}</div>
     <div class="acts">
-      <button class="btn merge" onclick="doMerge(${i},'a')">🔗 Ένωση → κρατάω #${esc(p.h1)}</button>
-      <button class="btn merge" onclick="doMerge(${i},'b')">🔗 Ένωση → κρατάω #${esc(p.h2)}</button>
+      <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
       <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
       <button class="btn later" onclick="verdict(${i},'later')">⏳ Αργότερα</button>
     </div></div>`;}
+function memHTML(m,flags){const f=s=>flags.some(x=>x.startsWith(s));const b=(s,v)=>f(s)?'<span class="bad">'+v+'</span>':v;
+  return `<div class="mem${m.deleted?' gone':''}">
+    ${m.img?`<img src="${esc(m.img)}" loading="lazy" onerror="this.outerHTML='<div class=noimg>🏠</div>'">`:'<div class="noimg">🏠</div>'}
+    <div><div><span class="plat">${esc(m.platform||'')}</span> <b>${esc(m.location||'')}</b> ${m.deleted?'<span class="bad" style="color:#f0a0a0;font-size:11px">⛔ αφαιρέθηκε</span>':''}</div>
+      <div class="spec">${b('τ.μ.',sq(m.sqm))} · ${b('τιμή',eur(m.price))} · ${b('διαφορετικό έτος',m.year?'🏗 '+m.year:'—')} · ${b('διαφορετικά δωμ','🛏 '+esc(m.rooms||'—'))} · ${b('διαφορετικός όροφος','όροφος '+esc(m.floor||'—'))} · ${b('διαφορετικός τύπος',esc(m.type||'—'))}</div>
+      <div class="spec">${esc(m.agency||'Ιδιώτης')} ${m.url?`· <a href="${esc(m.url)}" target="_blank" rel="noopener" style="color:var(--text)">↗ αγγελία</a>`:''}</div></div>
+    <button class="btn split" onclick="doSplit('${esc(m.id)}',this)">✂ Αποσύνδεση</button></div>`;}
+function groupHTML(g,i){return `<div class="grp" id="g${i}">
+    <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}
+      <span class="keep"><a href="index.html?house=${encodeURIComponent(g.house_id)}" target="_blank" style="color:var(--text)">🏡 Άνοιγμα στο HH</a></span></div>
+    ${(g.members||[]).map(m=>memHTML(m,g.flags||[])).join('')}
+    <div class="acts"><button class="btn ok" onclick="groupOk(${i})">✓ Είναι σωστά, μην το ξαναδείξεις</button></div></div>`;}
+function items(){return TAB==='pairs'?PAIRS:GROUPS;}
+function render(){const el=document.getElementById('list');const arr=items();el.className='';
+  document.getElementById('help').innerHTML=HELP[TAB];
+  document.getElementById('count').textContent=arr.length+(TAB==='pairs'?' ζευγάρια':' ομάδες');
+  if(!arr.length){el.className='msg';el.textContent=TAB==='pairs'?'Καμία εκκρεμής πρόταση 🎉':'Καμία ύποπτη ομάδα 🎉';document.getElementById('gal').style.display='none';return;}
+  const one=VIEW==='one';document.getElementById('gal').style.display=one?'flex':'none';
+  if(one){IDX=Math.min(Math.max(0,IDX),arr.length-1);document.getElementById('pos').textContent=(IDX+1)+' / '+arr.length;document.getElementById('prev').disabled=IDX<=0;document.getElementById('next').disabled=IDX>=arr.length-1;
+    el.innerHTML=TAB==='pairs'?pairHTML(arr[IDX],IDX):groupHTML(arr[IDX],IDX);}
+  else el.innerHTML=arr.map((x,i)=>TAB==='pairs'?pairHTML(x,i):groupHTML(x,i)).join('');
+  window.scrollTo(0,0);}
 async function load(){const el=document.getElementById('list');el.className='msg';el.textContent='Φόρτωση…';
   if(!sess()){el.innerHTML='Δεν είσαι συνδεδεμένος. <a href="index.html" style="color:var(--accent)">Σύνδεση στο House Hunter</a> και μετά ξαναέλα εδώ.';return;}
-  try{PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});}
+  try{if(TAB==='pairs')PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});else GROUPS=await rpc('rent_suspicious_groups',{});}
   catch(e){el.textContent='Σφάλμα: '+e.message+(/admin/.test(e.message)?' — η σελίδα είναι μόνο για τον διαχειριστή.':'');return;}
-  document.getElementById('count').textContent=PAIRS.length+' ζευγάρια';
-  if(!PAIRS.length){el.textContent='Καμία εκκρεμής πρόταση 🎉';return;}
-  el.className='';el.innerHTML=PAIRS.map(pairHTML).join('');}
-async function verdict(i,v){const p=PAIRS[i];try{await rpc('merge_verdict',{p_h1:p.h1,p_h2:p.h2,p_verdict:v});document.getElementById('p'+i).classList.add('done');toast(v==='no'?'✓ Σημειώθηκε ως διαφορετικά':'✓ Για αργότερα');}catch(e){toast('Σφάλμα: '+e.message,true);}}
+  render();}
+function advance(i){const arr=items();arr.splice(i,1);if(VIEW==='one'){IDX=Math.min(i,arr.length-1);render();}else{const el=document.getElementById('p'+i)||document.getElementById('g'+i);if(el)el.classList.add('done');document.getElementById('count').textContent=arr.length+(TAB==='pairs'?' ζευγάρια':' ομάδες');setTimeout(render,600);}}
+async function verdict(i,v){const p=PAIRS[i];try{await rpc('merge_verdict',{p_h1:p.h1,p_h2:p.h2,p_verdict:v});toast(v==='no'?'✓ Σημειώθηκε ως διαφορετικά σπίτια':'✓ Για αργότερα');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
 function askRating(p,keep){return new Promise(res=>{const m=document.getElementById('modal'),b=document.getElementById('mbox');const rk=keep==='a'?p.rating_a:p.rating_b,ro=keep==='a'?p.rating_b:p.rating_a,idk=keep==='a'?p.h1:p.h2,ido=keep==='a'?p.h2:p.h1;let nv=0;
-  b.innerHTML=`<h3>Και τα δύο έχουν βαθμολογία</h3><div style="color:var(--muted);font-size:13px">Ποια να κρατήσω για το ενωμένο #${esc(idk)};</div>
+  b.innerHTML=`<h3>Και τα δύο έχουν βαθμολογία</h3><div style="color:var(--muted);font-size:13px">Ποια να κρατήσω για το ενωμένο σπίτι #${esc(idk)};</div>
     <button class="opt" data-c="keep_new">Κρατάω του #${esc(idk)}: <b class="stars">${stars(rk)}</b></button>
     <button class="opt" data-c="keep_old">Κρατάω του #${esc(ido)}: <b class="stars">${stars(ro)}</b></button>
     <div class="opt" style="cursor:default">Νέα βαθμολογία: <span class="newstars">${[1,2,3,4,5].map(i=>`<span data-v="${i}">★</span>`).join('')}</span> <button class="btn merge" id="mnew" disabled style="float:right">OK</button></div>
@@ -129,15 +177,26 @@ function askRating(p,keep){return new Promise(res=>{const m=document.getElementB
   b.querySelectorAll('.opt[data-c]').forEach(o=>o.onclick=()=>{m.style.display='none';res(o.dataset.c==='cancel'?null:{choice:o.dataset.c});});
   b.querySelectorAll('.newstars span').forEach(s=>s.onclick=()=>{nv=+s.dataset.v;b.querySelectorAll('.newstars span').forEach(x=>x.classList.toggle('on',+x.dataset.v<=nv));document.getElementById('mnew').disabled=false;});
   document.getElementById('mnew').onclick=()=>{m.style.display='none';res({choice:'new',rating:nv});};});}
-async function doMerge(i,keep){const p=PAIRS[i];const newH=keep==='a'?p.h1:p.h2,oldH=keep==='a'?p.h2:p.h1;let choice='keep_new',rating=null;
+async function doMerge(i){const p=PAIRS[i];const keep=keepOf(p);const newH=keep==='a'?p.h1:p.h2,oldH=keep==='a'?p.h2:p.h1;let choice='keep_new',rating=null;
   if(p.rating_a&&p.rating_b){const r=await askRating(p,keep);if(!r)return;choice=r.choice;rating=r.rating||null;}
   const btns=document.querySelectorAll('#p'+i+' button');btns.forEach(b=>b.disabled=true);
-  try{const msg=await rpc('merge_house_v2',{old_h:oldH,new_h:newH,rating_choice:choice,new_rating:rating});toast('✓ '+msg);document.getElementById('p'+i).classList.add('done');
-    // pairs that involved the merged-away id are stale now — refresh in the background
-    setTimeout(load,800);}
+  try{const msg=await rpc('merge_house_v2',{old_h:oldH,new_h:newH,rating_choice:choice,new_rating:rating});const id=(String(msg).match(/#(\d+)$/)||[])[1];if(id){UNDO.push({id:+id,txt:'#'+oldH+' → #'+newH});document.getElementById('undoBtn').disabled=false;}
+    toast('✓ Ενώθηκαν: #'+oldH+' → #'+newH);
+    // pairs involving either id are stale now
+    PAIRS=PAIRS.filter((q,j)=>j===i||!(q.h1===oldH||q.h2===oldH||q.h1===newH||q.h2===newH));const ni=PAIRS.indexOf(p);advance(ni);}
   catch(e){btns.forEach(b=>b.disabled=false);toast('Σφάλμα: '+e.message,true);}}
-document.getElementById('reload').onclick=load;document.getElementById('minScore').onchange=load;
-load();
+async function undo(){const u=UNDO.pop();if(!u)return;try{const msg=await rpc('merge_undo',{p_log_id:u.id});toast('↶ '+msg);document.getElementById('undoBtn').disabled=!UNDO.length;load();}catch(e){UNDO.push(u);toast('Σφάλμα: '+e.message,true);}}
+async function doSplit(id,btn){btn.disabled=true;try{const nh=await rpc('split_listing',{p_listing:id});toast('✂ Έγινε ξεχωριστό σπίτι #'+nh);load();}catch(e){btn.disabled=false;toast('Σφάλμα: '+e.message,true);}}
+async function groupOk(i){const g=GROUPS[i];try{await rpc('group_check',{p_house:g.house_id,p_verdict:'ok'});toast('✓ Η ομάδα #'+g.house_id+' σημειώθηκε ως σωστή');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
+document.getElementById('reload').onclick=load;document.getElementById('minScore').onchange=load;document.getElementById('undoBtn').onclick=undo;
+document.getElementById('tabPairs').onclick=()=>{TAB='pairs';IDX=0;setTabs();load();};document.getElementById('tabSusp').onclick=()=>{TAB='susp';IDX=0;setTabs();load();};
+document.getElementById('viewList').onclick=()=>{VIEW='list';setTabs();render();};document.getElementById('viewOne').onclick=()=>{VIEW='one';setTabs();render();};
+document.getElementById('prev').onclick=()=>{IDX--;render();};document.getElementById('next').onclick=()=>{IDX++;render();};
+document.addEventListener('keydown',e=>{if(VIEW!=='one'||document.getElementById('modal').style.display==='flex')return;if(e.key==='ArrowLeft'&&IDX>0){IDX--;render();}if(e.key==='ArrowRight'&&IDX<items().length-1){IDX++;render();}});
+function setTabs(){document.getElementById('tabPairs').classList.toggle('on',TAB==='pairs');document.getElementById('tabSusp').classList.toggle('on',TAB==='susp');document.getElementById('viewList').classList.toggle('on',VIEW==='list');document.getElementById('viewOne').classList.toggle('on',VIEW==='one');document.getElementById('minWrap').style.display=TAB==='pairs'?'':'none';}
+try{VIEW=localStorage.getItem('hh_merge_view')||'list';}catch(e){}
+document.getElementById('viewList').addEventListener('click',()=>{try{localStorage.setItem('hh_merge_view','list');}catch(e){}});document.getElementById('viewOne').addEventListener('click',()=>{try{localStorage.setItem('hh_merge_view','one');}catch(e){}});
+if(location.hash==='#susp')TAB='susp';setTabs();load();
 </script>
 </body>
 </html>
