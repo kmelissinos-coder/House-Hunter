@@ -2229,6 +2229,8 @@ function initMap() {
     return div;
   };
   legend.addTo(leafletMap);
+  /*hhPolish4: a search should show its results on the map, not the last viewport*/
+  try{var _q=(document.getElementById('numSearch')||{}).value||'';if(_q.trim()&&placed>0&&placed<=80){var _pts=Object.values(window._pinLL||{});if(_pts.length){leafletMap.fitBounds(L.latLngBounds(_pts),{padding:[40,40],maxZoom:16});}}}catch(e){}
 }
 
 function energyClass(e) {
@@ -4459,11 +4461,31 @@ document.head.appendChild(st);
 '.hh-gone-banner{background:#e02b2b;color:#fff;font-weight:700;font-size:13.5px;padding:10px 14px;border-radius:10px;margin-bottom:12px;line-height:1.4}'
 +'.hh-gone-ribbon{position:absolute;left:0;right:0;bottom:0;background:rgba(224,43,43,.92);color:#fff;font-size:11px;font-weight:700;padding:4px 8px;text-align:center;z-index:2;letter-spacing:.3px}'
 +'.hh-gs-tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:-4px 0 12px}'
-+'body.light .card-stars span[style*="transparent"]{color:transparent!important}body.light .card-stars span[style*="rgba(255,255,255,0.18)"],body.light .card-stars span[style*="rgba(255,255,255,0.2)"],body.light [data-star][style*="rgba(255,255,255,0.2)"],body.light .hh-gs-tools span[style*="rgba(255,255,255,0.2)"]{color:#cfc5ad!important}'
-+'body.light .card-stars span[style*="#d4a853"],body.light [data-star][style*="#d4a853"]{color:#c8a84b!important}';
++'';
 document.head.appendChild(st);}catch(e){}})();
 /* second admin link: suspicious groups */
 (function(){function inj(){try{var ub=document.getElementById('hhUserBar');if(!ub)return;var adm=(window.hhRole==='admin');var b=document.getElementById('hh-suspbtn');if(!adm){if(b)b.remove();return;}if(!b){b=document.createElement('a');b.id='hh-suspbtn';b.href='merge.html#susp';b.textContent='⚠ Ύποπτες';b.title='Ομάδες που μάλλον δεν έπρεπε να ενωθούν';b.className='hb-ctrl';b.style.cssText='margin-right:8px;color:#f0a0a0;text-decoration:none;display:inline-flex;align-items:center';}var mg=document.getElementById('hh-mergebtn');var ref=mg?mg.nextSibling:(document.getElementById('hh-logbtn')||ub);if(mg){if(mg.nextSibling!==b)mg.parentElement.insertBefore(b,mg.nextSibling);}else if(ref&&ref.previousElementSibling!==b){ref.parentElement.insertBefore(b,ref);}}catch(e){}}inj();setInterval(inj,900);})();</script>
+
+<script>/*hhPolish4*/(function(){try{
+var st=document.createElement('style');st.id='hh-polish4';st.textContent=
+/* light theme: unrated = soft grey (visible), rated = gold, family-average classes win, hover wins over everything */
+'body.light .card-stars span,body.light [data-star]{-webkit-text-stroke:0.85px rgba(120,110,90,.55)!important}'
++'body.light .card-stars span[style*="transparent"],body.light .card-stars span[style*="rgba(255,255,255,0.18)"],body.light .card-stars span[style*="rgba(255,255,255,0.2)"],body.light [data-star][style*="rgba(255,255,255,0.2)"]{color:#d9d1bf!important}'
++'body.light .card-stars span[style*="#c8a84b"],body.light .card-stars span[style*="#d4a853"],body.light [data-star][style*="#d4a853"]{color:#c8a84b!important}'
++'body.light .card-stars span.hh-star-full.hh-star-full{color:#c8a84b!important}'
++'body.light .card-stars span.hh-star-dim.hh-star-dim{color:#d9d1bf!important}'
++'body.light .card-stars span.hh-star-half.hh-star-half{background:linear-gradient(90deg,#c8a84b 50%,#d9d1bf 50%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}'
+/* dark theme: unrated stars were fully transparent (only a faint outline) — give them a visible dim fill */
++'body:not(.light) .card-stars span[style*="transparent"],body:not(.light) .card-stars span[style*="rgba(255,255,255,0.18)"]{color:rgba(255,255,255,.16)!important}'
+/* hover preview: the star under the mouse and the ones before it turn gold */
++'.card-stars span.hh-star-hov.hh-star-hov.hh-star-hov,[data-star].hh-star-hov.hh-star-hov.hh-star-hov,.hh-gs-tools span.hh-star-hov.hh-star-hov.hh-star-hov{color:#e9c35a!important;background:none!important;-webkit-text-fill-color:#e9c35a!important;-webkit-text-stroke:0.85px #b8902a!important;transform:scale(1.18);transition:transform .08s}'
++'.card-stars span[onclick*="Rating"],[data-star]{display:inline-block;transition:transform .08s}';
+document.head.appendChild(st);
+function starsOf(el){var p=el.parentElement;if(!p)return[];return [].filter.call(p.children,function(x){return x.tagName==='SPAN'&&((x.getAttribute('onclick')||'').indexOf('Rating')>=0||x.hasAttribute('data-star'));});}
+function clear(){document.querySelectorAll('.hh-star-hov').forEach(function(x){x.classList.remove('hh-star-hov');});}
+document.addEventListener('mouseover',function(e){try{var t=e.target;if(!t||t.tagName!=='SPAN')return;var isStar=(t.getAttribute('onclick')||'').indexOf('Rating')>=0||t.hasAttribute('data-star');if(!isStar)return;var sib=starsOf(t);var i=sib.indexOf(t);if(i<0)return;clear();for(var k=0;k<=i;k++)sib[k].classList.add('hh-star-hov');}catch(x){}});
+document.addEventListener('mouseout',function(e){try{var t=e.target;if(!t||t.tagName!=='SPAN')return;var isStar=(t.getAttribute('onclick')||'').indexOf('Rating')>=0||t.hasAttribute('data-star');if(!isStar)return;var to=e.relatedTarget;if(to&&to.tagName==='SPAN'&&to.parentElement===t.parentElement)return;clear();}catch(x){}});
+}catch(e){console.warn('hhPolish4',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){

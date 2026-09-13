@@ -71,6 +71,38 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:10px 18px;border-radius:9px;display:none;z-index:60;max-width:90vw}
 .help{font-size:12px;color:var(--muted);margin:0 0 12px;line-height:1.5}
 @media(max-width:760px){.cols{grid-template-columns:1fr}.house+.house{border-left:none;border-top:1px solid var(--border)}.house{grid-template-columns:110px 1fr}.house img,.house .noimg{width:110px;height:82px}.mem{grid-template-columns:70px 1fr}.mem img,.mem .noimg{width:70px;height:52px}}
+
+/* galleries */
+.gal2{position:relative;background:#000;border-radius:10px;overflow:hidden;height:340px;display:flex;align-items:center;justify-content:center}
+.gal2 img.main{max-width:100%;max-height:340px;object-fit:contain;cursor:zoom-in}
+.gal2 .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);color:#fff;border:none;font-size:30px;width:42px;height:64px;cursor:pointer;border-radius:8px}
+.gal2 .nav.l{left:8px}.gal2 .nav.r{right:8px}
+.gal2 .cnt{position:absolute;bottom:8px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:2px 8px;border-radius:10px}
+.thumbs{display:flex;gap:5px;overflow-x:auto;padding:6px 0 2px;scrollbar-width:thin}
+.thumbs img{width:calc((100% - 25px)/6);min-width:70px;aspect-ratio:4/3;object-fit:cover;border-radius:6px;cursor:pointer;opacity:.55;border:2px solid transparent;flex:0 0 auto}
+.thumbs img.on{opacity:1;border-color:var(--accent)}
+.hcols{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:12px 14px}
+.hinfo{margin-top:8px}
+.hinfo .top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+/* suspicious mini cards */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:12px 14px}
+.mini{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:11px;overflow:hidden;position:relative}
+.mini.gone{opacity:.55}
+.mini.sel{border-color:#f0a0a0;box-shadow:0 0 0 2px rgba(224,90,90,.35)}
+.mini .mg{position:relative;height:150px;background:#000}
+.mini .mg img{width:100%;height:150px;object-fit:cover;display:block}
+.mini .mg .nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.5);color:#fff;border:none;width:28px;height:40px;font-size:20px;cursor:pointer;border-radius:6px}
+.mini .mg .nav.l{left:4px}.mini .mg .nav.r{right:4px}
+.mini .mg .cnt{position:absolute;bottom:4px;right:6px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:1px 6px;border-radius:8px}
+.mini .body{padding:8px 10px;font-size:12px}
+.mini .row{display:flex;justify-content:space-between;gap:6px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.mini .row span:first-child{color:var(--muted)}
+.mini .same{color:#7ed8a0;font-weight:600}
+.mini .diff{color:#ff7a7a;font-weight:700}
+.mini label.pick{display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;color:#f0a0a0;font-weight:600}
+.legend{font-size:12px;color:var(--muted);padding:0 14px 6px}
+.legend .same,.legend .diff{font-weight:700}.legend .same{color:#7ed8a0}.legend .diff{color:#ff7a7a}
+@media(max-width:760px){.hcols{grid-template-columns:1fr}.gal2{height:240px}.gal2 img.main{max-height:240px}}
 </style>
 </head>
 <body>
@@ -112,15 +144,20 @@ function stars(n){return n?'★'.repeat(n)+'☆'.repeat(5-n):'';}
 function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;t.style.background=bad?'#a11':'#2e7d32';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 let TAB='pairs', VIEW='list', PAIRS=[], GROUPS=[], IDX=0, UNDO=[];
 function keepOf(p){const na=+(p.a&&p.a.n_ads)||0,nb=+(p.b&&p.b.n_ads)||0;if(na!==nb)return na>nb?'a':'b';return (+p.h1<=+p.h2)?'a':'b';}
-function houseHTML(h,rating,label){if(!h)return '<div class="house">—</div>';
+function galHTML(imgs,key){imgs=(imgs||[]).filter(Boolean);if(!imgs.length)return '<div class="gal2"><div class="noimg" style="width:100%;height:100%;font-size:40px">🏠</div></div>';
+  return `<div class="gal2" data-g="${key}" data-i="0"><img class="main" src="${esc(imgs[0])}" onclick="openBig('${key}')" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="galNav('${key}',-1)">‹</button><button class="nav r" onclick="galNav('${key}',1)">›</button><span class="cnt">1/${imgs.length}</span></div>
+  <div class="thumbs" data-t="${key}">${imgs.map((u,k)=>`<img src="${esc(u)}" loading="lazy" class="${k===0?'on':''}" onclick="galTo('${key}',${k})" onerror="this.style.display='none'">`).join('')}</div>`;}
+const GALS={};
+function galTo(key,k){const g=document.querySelector(`.gal2[data-g="${key}"]`);const imgs=GALS[key]||[];if(!g||!imgs.length)return;k=(k+imgs.length)%imgs.length;g.dataset.i=k;g.querySelector('img.main').src=imgs[k];g.querySelector('img.main').style.visibility='';g.querySelector('.cnt').textContent=(k+1)+'/'+imgs.length;const t=document.querySelector(`.thumbs[data-t="${key}"]`);if(t){[...t.children].forEach((im,j)=>im.classList.toggle('on',j===k));const a=t.children[k];if(a&&a.scrollIntoView)a.scrollIntoView({inline:'center',block:'nearest'});}}
+function galNav(key,d){const g=document.querySelector(`.gal2[data-g="${key}"]`);if(!g)return;galTo(key,(+g.dataset.i||0)+d);}
+function openBig(key){const g=document.querySelector(`.gal2[data-g="${key}"]`);const imgs=GALS[key]||[];if(!imgs.length)return;let i=+g.dataset.i||0;const lb=document.createElement('div');lb.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:80;display:flex;align-items:center;justify-content:center';lb.innerHTML=`<img style="max-width:96vw;max-height:92vh;object-fit:contain"><button class="nav l" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:40px;background:rgba(255,255,255,.12);color:#fff;border:none;width:56px;height:84px;border-radius:8px;cursor:pointer">‹</button><button class="nav r" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;background:rgba(255,255,255,.12);color:#fff;border:none;width:56px;height:84px;border-radius:8px;cursor:pointer">›</button><span style="position:absolute;top:14px;right:18px;color:#fff;font-size:14px" id="lbc"></span>`;const im=lb.querySelector('img');const show=k=>{i=(k+imgs.length)%imgs.length;im.src=imgs[i];lb.querySelector('#lbc').textContent=(i+1)+'/'+imgs.length;galTo(key,i);};lb.querySelector('.l').onclick=e=>{e.stopPropagation();show(i-1);};lb.querySelector('.r').onclick=e=>{e.stopPropagation();show(i+1);};lb.onclick=()=>lb.remove();const kd=e=>{if(e.key==='Escape'){lb.remove();document.removeEventListener('keydown',kd);}if(e.key==='ArrowLeft')show(i-1);if(e.key==='ArrowRight')show(i+1);};document.addEventListener('keydown',kd);document.body.appendChild(lb);show(i);}
+function houseHTML(h,rating,label,key){if(!h)return '<div>—</div>';const imgs=(h.imgs&&h.imgs.length?h.imgs:(h.img?[h.img]:[])).filter(Boolean);GALS[key]=imgs;
   const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
-  return `<div class="house">
-    ${h.img?`<img src="${esc(h.img)}" loading="lazy" onerror="this.outerHTML='<div class=noimg>🏠</div>'">`:'<div class="noimg">🏠</div>'}
-    <div>
-      <div><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span></div>
+  return `<div>${galHTML(imgs,key)}
+    <div class="hinfo">
+      <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span></div>
       <div class="spec"><b>${sq(h.sqm)}</b> · <b>${eur(h.price)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
-      <div class="spec">${esc(h.agencies||'Ιδιώτης')}</div>
-      <span class="plat">${esc(h.platforms||h.platform||'')}${h.n_ads>1?' · '+h.n_ads+' αγγελίες':' · 1 αγγελία'}</span>
+      <div class="spec">${esc(h.agencies||'Ιδιώτης')} · <span class="plat">${esc(h.platforms||h.platform||'')}${h.n_ads>1?' · '+h.n_ads+' αγγελίες':' · 1 αγγελία'}</span></div>
       ${rating?`<div class="stars" title="η δική σου βαθμολογία">${stars(rating)}</div>`:''}${others?`<div class="spec">${others}</div>`:''}
       <div class="descr">${esc((h.descr||'').replace(/<[^>]+>/g,' '))}</div>
       <div class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</div>
@@ -132,26 +169,44 @@ function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/
       ${(p.reasons||[]).map(r=>`<span class="reason${neg(r)?' neg':''}">${esc(r)}</span>`).join('')}
       ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}% ίδια</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτογραφία</span>':''}
       <span class="keep">📍 ${dist}</span></div>
-    <div class="cols">${houseHTML(p.a,p.rating_a,'A')}${houseHTML(p.b,p.rating_b,'B')}</div>
+    <div class="hcols">${houseHTML(p.a,p.rating_a,'A','a'+i)}${houseHTML(p.b,p.rating_b,'B','b'+i)}</div>
     <div class="acts">
       <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
       <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
       <button class="btn later" onclick="verdict(${i},'later')">⏳ Αργότερα</button>
     </div></div>`;}
-function memHTML(m,flags){const f=s=>flags.some(x=>x.startsWith(s));const b=(s,v)=>f(s)?'<span class="bad">'+v+'</span>':v;
-  return `<div class="mem${m.deleted?' gone':''}">
-    ${m.img?`<img src="${esc(m.img)}" loading="lazy" onerror="this.outerHTML='<div class=noimg>🏠</div>'">`:'<div class="noimg">🏠</div>'}
-    <div><div><span class="plat">${esc(m.platform||'')}</span> <b>${esc(m.location||'')}</b> ${m.deleted?'<span class="bad" style="color:#f0a0a0;font-size:11px">⛔ αφαιρέθηκε</span>':''}</div>
-      <div class="spec">${b('τ.μ.',sq(m.sqm))} · ${b('τιμή',eur(m.price))} · ${b('διαφορετικό έτος',m.year?'🏗 '+m.year:'—')} · ${b('διαφορετικά δωμ','🛏 '+esc(m.rooms||'—'))} · ${b('διαφορετικός όροφος','όροφος '+esc(m.floor||'—'))} · ${b('διαφορετικός τύπος',esc(m.type||'—'))}</div>
-      <div class="spec">${esc(m.agency||'Ιδιώτης')} ${m.url?`· <a href="${esc(m.url)}" target="_blank" rel="noopener" style="color:var(--text)">↗ αγγελία</a>`:''}</div></div>
-    <button class="btn split" onclick="doSplit('${esc(m.id)}',this)">✂ Αποσύνδεση</button></div>`;}
-function groupHTML(g,i){return `<div class="grp" id="g${i}">
+const MG={};
+function mgTo(key,k){const box=document.querySelector(`.mg[data-g="${key}"]`);const imgs=MG[key]||[];if(!box||!imgs.length)return;k=(k+imgs.length)%imgs.length;box.dataset.i=k;box.querySelector('img').src=imgs[k];box.querySelector('.cnt').textContent=(k+1)+'/'+imgs.length;}
+function majority(vals){const c={};let best=null,bn=0;vals.forEach(v=>{if(v==null||v==='')return;const k=String(v);c[k]=(c[k]||0)+1;if(c[k]>bn){bn=c[k];best=k;}});return best;}
+function miniHTML(m,key,maj){const imgs=[m.img].concat(m.imgs||[]).filter(Boolean);MG[key]=imgs;
+  const cell=(label,val,mv,fmt,tol)=>{const shown=val==null||val===''?'—':(fmt?fmt(val):val);let cls='';if(val!=null&&val!==''&&mv!=null){const same=tol?Math.abs(+val-+mv)/(+mv||1)<=tol:String(val)===String(mv);cls=same?'same':'diff';}return `<div class="row"><span>${label}</span><span class="${cls}">${esc(shown)}</span></div>`;};
+  return `<div class="mini${m.deleted?' gone':''}" id="mini_${esc(m.id)}">
+    <div class="mg" data-g="${key}" data-i="0">${imgs.length?`<img src="${esc(imgs[0])}" loading="lazy" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)-1)">‹</button><button class="nav r" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)+1)">›</button><span class="cnt">1/${imgs.length}</span>`:'<div class="noimg" style="width:100%;height:150px">🏠</div>'}</div>
+    <div class="body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="plat">${esc(m.platform||'')}</span>${m.deleted?'<span class="diff" style="font-size:11px">⛔ αφαιρέθηκε</span>':''}<span style="color:var(--muted);font-size:11px">#${m.hhl||''}</span></div>
+      ${cell('Περιοχή',m.location,maj.location)}
+      ${cell('τ.μ.',m.sqm,maj.sqm,v=>Math.round(v)+' τ.μ.',0.05)}
+      ${cell('Τιμή',m.price,maj.price,v=>'€'+Number(v).toLocaleString('el'),0.05)}
+      ${cell('Έτος',m.year,maj.year)}
+      ${cell('Δωμάτια',m.rooms,maj.rooms)}
+      ${cell('Όροφος',m.floor,maj.floor)}
+      ${cell('Τύπος',m.type,maj.type)}
+      <div class="row"><span>Μεσίτης</span><span>${esc(m.agency||'Ιδιώτης')}</span></div>
+      ${m.url?`<div style="margin-top:6px"><a href="${esc(m.url)}" target="_blank" rel="noopener" style="color:var(--text);font-size:12px">↗ αγγελία</a></div>`:''}
+      <label class="pick"><input type="checkbox" onchange="pickSplit('${esc(m.id)}',this.checked)"> ✂ Αποσύνδεση</label>
+    </div></div>`;}
+function groupHTML(g,i){const ms=g.members||[];const maj={location:majority(ms.map(m=>m.location)),sqm:majority(ms.map(m=>m.sqm!=null?Math.round(m.sqm):null)),price:majority(ms.map(m=>m.price!=null?Math.round(m.price):null)),year:majority(ms.map(m=>m.year)),rooms:majority(ms.map(m=>m.rooms)),floor:majority(ms.map(m=>m.floor)),type:majority(ms.map(m=>m.type))};
+  return `<div class="grp" id="g${i}">
     <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}
       <span class="keep"><a href="index.html?house=${encodeURIComponent(g.house_id)}" target="_blank" style="color:var(--text)">🏡 Άνοιγμα στο HH</a></span></div>
-    ${(g.members||[]).map(m=>memHTML(m,g.flags||[])).join('')}
-    <div class="acts"><button class="btn ok" onclick="groupOk(${i})">✓ Είναι σωστά, μην το ξαναδείξεις</button></div></div>`;}
+    <div class="legend"><span class="same">πράσινο</span> = ίδιο με τις περισσότερες αγγελίες της ομάδας · <span class="diff">κόκκινο</span> = διαφέρει. Τσέκαρε τις αγγελίες που είναι άλλο σπίτι και πάτα «Αποσύνδεση».</div>
+    <div class="mgrid">${ms.map((m,k)=>miniHTML(m,'g'+i+'_'+k,maj)).join('')}</div>
+    <div class="acts"><button class="btn split" style="padding:8px 14px;font-size:13px" onclick="splitPicked(${i})">✂ Αποσύνδεση επιλεγμένων (<span id="npick${i}">0</span>)</button><button class="btn ok" onclick="groupOk(${i})">✓ Είναι σωστά, μην το ξαναδείξεις</button></div></div>`;}
+const PICK=new Set();
+function pickSplit(id,on){if(on)PICK.add(id);else PICK.delete(id);const el=document.getElementById('mini_'+id);if(el)el.classList.toggle('sel',on);document.querySelectorAll('[id^=npick]').forEach(x=>x.textContent=PICK.size);}
+async function splitPicked(i){const ids=[...PICK];if(!ids.length){toast('Τσέκαρε πρώτα ποιες αγγελίες είναι άλλο σπίτι',true);return;}try{for(const id of ids){await rpc('split_listing',{p_listing:id});}toast('✂ '+ids.length+' αγγελίες έγιναν ξεχωριστά σπίτια');PICK.clear();load();}catch(e){toast('Σφάλμα: '+e.message,true);}}
 function items(){return TAB==='pairs'?PAIRS:GROUPS;}
-function render(){const el=document.getElementById('list');const arr=items();el.className='';
+function render(){PICK.clear();const el=document.getElementById('list');const arr=items();el.className='';
   document.getElementById('help').innerHTML=HELP[TAB];
   document.getElementById('count').textContent=arr.length+(TAB==='pairs'?' ζευγάρια':' ομάδες');
   if(!arr.length){el.className='msg';el.textContent=TAB==='pairs'?'Καμία εκκρεμής πρόταση 🎉':'Καμία ύποπτη ομάδα 🎉';document.getElementById('gal').style.display='none';return;}
