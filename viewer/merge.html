@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>House Hunter — Προτάσεις ένωσης</title>
+<style>
+:root{--bg:#0f0e0c;--card:#1b1a17;--border:#2e2c27;--text:#e8e4dc;--muted:#9a968c;--accent:#d4a853;--accent2:#7eb89a;--red:#e05a5a;--blue:#5b8def}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px}
+header{position:sticky;top:0;z-index:10;background:rgba(15,14,12,.96);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;color:var(--accent)}
+header a{color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:13px}
+header a:hover{border-color:var(--accent)}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-left:auto}
+.ctl select,.ctl button{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:5px 9px;font-size:13px;cursor:pointer}
+main{max-width:1240px;margin:0 auto;padding:16px}
+.msg{padding:30px;text-align:center;color:var(--muted)}
+.pair{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.pair.done{opacity:.45;pointer-events:none}
+.ptop{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.score{font-weight:800;font-size:15px;padding:2px 10px;border-radius:9px;background:rgba(212,168,83,.18);color:var(--accent)}
+.score.hi{background:rgba(126,184,154,.22);color:var(--accent2)}
+.tier{font-size:11px;letter-spacing:1px;color:var(--muted)}
+.reason{font-size:11.5px;padding:2px 8px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid var(--border)}
+.reason.neg{color:var(--red);border-color:rgba(224,90,90,.4)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.house{padding:12px 14px;display:grid;grid-template-columns:150px 1fr;gap:12px}
+.house+.house{border-left:1px solid var(--border)}
+.house img{width:150px;height:110px;object-fit:cover;border-radius:9px;background:#26241f}
+.house .noimg{width:150px;height:110px;border-radius:9px;background:#26241f;display:flex;align-items:center;justify-content:center;font-size:30px}
+.hid{font-weight:800;color:var(--accent);font-size:15px}
+.loc{font-weight:700;font-size:15px}
+.spec{color:var(--muted);font-size:12.5px;margin-top:3px}
+.spec b{color:var(--text)}
+.plat{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:8px;background:rgba(91,141,239,.18);color:#9dbaf5;margin-top:4px}
+.stars{color:var(--accent);font-size:13px}
+.descr{font-size:11.5px;color:var(--muted);margin-top:6px;max-height:54px;overflow:hidden;line-height:1.35}
+.links{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.links a{font-size:12px;color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px}
+.links a:hover{border-color:var(--accent)}
+.acts{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
+.btn{border:none;border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
+.btn.merge{background:var(--accent2);color:#0f1a14}
+.btn.no{background:rgba(224,90,90,.18);color:#f0a0a0;border:1px solid rgba(224,90,90,.4)}
+.btn.later{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
+.btn:disabled{opacity:.5;cursor:default}
+.dist{font-size:12px;color:var(--muted);margin-left:auto}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:50}
+#modal .box{background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:20px;max-width:440px;width:92%}
+#modal h3{margin:0 0 8px;color:var(--accent)}
+#modal .opt{display:block;width:100%;text-align:left;margin-top:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px 12px;cursor:pointer;font-size:14px}
+#modal .opt:hover{border-color:var(--accent)}
+#modal .newstars span{font-size:26px;cursor:pointer;color:rgba(255,255,255,.25)}
+#modal .newstars span.on{color:var(--accent)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#2e7d32;color:#fff;padding:10px 18px;border-radius:9px;display:none;z-index:60}
+@media(max-width:760px){.cols{grid-template-columns:1fr}.house+.house{border-left:none;border-top:1px solid var(--border)}.house{grid-template-columns:110px 1fr}.house img,.house .noimg{width:110px;height:82px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🔀 Προτάσεις ένωσης (Rent)</h1>
+  <a href="index.html">← Πίσω στο House Hunter</a>
+  <div class="ctl">
+    <span id="count"></span>
+    <label>Ελάχιστο σκορ <select id="minScore"><option value="70">70</option><option value="60">60</option><option value="50" selected>50</option><option value="40">40</option></select></label>
+    <button id="reload">↻ Ανανέωση</button>
+  </div>
+</header>
+<main><div id="list" class="msg">Φόρτωση…</div></main>
+<div id="modal"><div class="box" id="mbox"></div></div>
+<div id="toast"></div>
+<script>
+const SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+function sess(){try{const j=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;}catch(e){}return null;}
+async function refreshSess(s){try{const r=await fetch(SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});const d=await r.json();if(!r.ok)return null;const n={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:Date.now()+(d.expires_in||3600)*1000,user:d.user,remember:s.remember};(s.remember?localStorage:sessionStorage).setItem('hh_auth',JSON.stringify(n));return n;}catch(e){return null;}}
+async function rpc(name,args){let s=sess();if(!s)throw new Error('login');if(s.expires_at&&s.expires_at<Date.now()+60000&&s.refresh_token){s=(await refreshSess(s))||s;}
+  let r=await fetch(SB+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  if(r.status===401&&s.refresh_token){const n=await refreshSess(s);if(n){r=await fetch(SB+'/rest/v1/rpc/'+name,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+n.access_token,'Content-Type':'application/json'},body:JSON.stringify(args||{})});}}
+  const t=await r.text();let j=null;try{j=JSON.parse(t);}catch(e){j=t;}
+  if(!r.ok)throw new Error((j&&j.message)||t||r.status);return j;}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function eur(v){return v?'€'+Number(v).toLocaleString('el')+'/μήνα':'—';}
+function stars(n){return n?'★'.repeat(n)+'☆'.repeat(5-n):'';}
+function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;t.style.background=bad?'#a11':'#2e7d32';t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
+let PAIRS=[];
+function houseHTML(h,rating,label){if(!h)return '<div class="house">—</div>';
+  const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
+  return `<div class="house">
+    ${h.img?`<img src="${esc(h.img)}" loading="lazy" onerror="this.outerHTML='<div class=noimg>🏠</div>'">`:'<div class="noimg">🏠</div>'}
+    <div>
+      <div><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span></div>
+      <div class="spec"><b>${h.sqm||'—'} τ.μ.</b> · <b>${eur(h.price)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
+      <div class="spec">${esc(h.agencies||'Ιδιώτης')}</div>
+      <span class="plat">${esc(h.platforms||h.platform||'')}${h.n_ads>1?' · '+h.n_ads+' αγγελίες':''}</span>
+      ${rating?`<div class="stars" title="η δική σου βαθμολογία">${stars(rating)}</div>`:''}${others?`<div class="spec">${others}</div>`:''}
+      <div class="descr">${esc((h.descr||'').replace(/<[^>]+>/g,' '))}</div>
+      <div class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</div>
+    </div></div>`;}
+function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/.test(r);
+  const dist=p.dist_exact!=null?Math.round(p.dist_exact)+' μ (ακριβείς πινέζες)':(p.dist_any!=null?'~'+Math.round(p.dist_any)+' μ':'χωρίς θέση');
+  return `<div class="pair" id="p${i}">
+    <div class="ptop"><span class="score${p.score>=75?' hi':''}">${p.score}</span><span class="tier">${esc(p.tier)}</span>
+      ${(p.reasons||[]).map(r=>`<span class="reason${neg(r)?' neg':''}">${esc(r)}</span>`).join('')}
+      ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}%</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτό</span>':''}
+      <span class="dist">📍 ${dist}</span></div>
+    <div class="cols">${houseHTML(p.a,p.rating_a,'A')}${houseHTML(p.b,p.rating_b,'B')}</div>
+    <div class="acts">
+      <button class="btn merge" onclick="doMerge(${i},'a')">🔗 Ένωση → κρατάω #${esc(p.h1)}</button>
+      <button class="btn merge" onclick="doMerge(${i},'b')">🔗 Ένωση → κρατάω #${esc(p.h2)}</button>
+      <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
+      <button class="btn later" onclick="verdict(${i},'later')">⏳ Αργότερα</button>
+    </div></div>`;}
+async function load(){const el=document.getElementById('list');el.className='msg';el.textContent='Φόρτωση…';
+  if(!sess()){el.innerHTML='Δεν είσαι συνδεδεμένος. <a href="index.html" style="color:var(--accent)">Σύνδεση στο House Hunter</a> και μετά ξαναέλα εδώ.';return;}
+  try{PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});}
+  catch(e){el.textContent='Σφάλμα: '+e.message+(/admin/.test(e.message)?' — η σελίδα είναι μόνο για τον διαχειριστή.':'');return;}
+  document.getElementById('count').textContent=PAIRS.length+' ζευγάρια';
+  if(!PAIRS.length){el.textContent='Καμία εκκρεμής πρόταση 🎉';return;}
+  el.className='';el.innerHTML=PAIRS.map(pairHTML).join('');}
+async function verdict(i,v){const p=PAIRS[i];try{await rpc('merge_verdict',{p_h1:p.h1,p_h2:p.h2,p_verdict:v});document.getElementById('p'+i).classList.add('done');toast(v==='no'?'✓ Σημειώθηκε ως διαφορετικά':'✓ Για αργότερα');}catch(e){toast('Σφάλμα: '+e.message,true);}}
+function askRating(p,keep){return new Promise(res=>{const m=document.getElementById('modal'),b=document.getElementById('mbox');const rk=keep==='a'?p.rating_a:p.rating_b,ro=keep==='a'?p.rating_b:p.rating_a,idk=keep==='a'?p.h1:p.h2,ido=keep==='a'?p.h2:p.h1;let nv=0;
+  b.innerHTML=`<h3>Και τα δύο έχουν βαθμολογία</h3><div style="color:var(--muted);font-size:13px">Ποια να κρατήσω για το ενωμένο #${esc(idk)};</div>
+    <button class="opt" data-c="keep_new">Κρατάω του #${esc(idk)}: <b class="stars">${stars(rk)}</b></button>
+    <button class="opt" data-c="keep_old">Κρατάω του #${esc(ido)}: <b class="stars">${stars(ro)}</b></button>
+    <div class="opt" style="cursor:default">Νέα βαθμολογία: <span class="newstars">${[1,2,3,4,5].map(i=>`<span data-v="${i}">★</span>`).join('')}</span> <button class="btn merge" id="mnew" disabled style="float:right">OK</button></div>
+    <button class="opt" data-c="cancel" style="text-align:center;color:var(--muted)">Ακύρωση</button>`;
+  m.style.display='flex';
+  b.querySelectorAll('.opt[data-c]').forEach(o=>o.onclick=()=>{m.style.display='none';res(o.dataset.c==='cancel'?null:{choice:o.dataset.c});});
+  b.querySelectorAll('.newstars span').forEach(s=>s.onclick=()=>{nv=+s.dataset.v;b.querySelectorAll('.newstars span').forEach(x=>x.classList.toggle('on',+x.dataset.v<=nv));document.getElementById('mnew').disabled=false;});
+  document.getElementById('mnew').onclick=()=>{m.style.display='none';res({choice:'new',rating:nv});};});}
+async function doMerge(i,keep){const p=PAIRS[i];const newH=keep==='a'?p.h1:p.h2,oldH=keep==='a'?p.h2:p.h1;let choice='keep_new',rating=null;
+  if(p.rating_a&&p.rating_b){const r=await askRating(p,keep);if(!r)return;choice=r.choice;rating=r.rating||null;}
+  const btns=document.querySelectorAll('#p'+i+' button');btns.forEach(b=>b.disabled=true);
+  try{const msg=await rpc('merge_house_v2',{old_h:oldH,new_h:newH,rating_choice:choice,new_rating:rating});toast('✓ '+msg);document.getElementById('p'+i).classList.add('done');
+    // pairs that involved the merged-away id are stale now — refresh in the background
+    setTimeout(load,800);}
+  catch(e){btns.forEach(b=>b.disabled=false);toast('Σφάλμα: '+e.message,true);}}
+document.getElementById('reload').onclick=load;document.getElementById('minScore').onchange=load;
+load();
+</script>
+</body>
+</html>
