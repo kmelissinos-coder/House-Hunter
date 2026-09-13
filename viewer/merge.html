@@ -127,7 +127,7 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 <div id="toast"></div>
 <script>
 const SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
-const HELP={pairs:'Κάθε πρόταση δείχνει δύο σπίτια που μοιάζουν. Το <b>σκορ ομοιότητας</b> (0–100) βγαίνει από τα τ.μ., την τιμή, τη θέση, το έτος, τον όροφο, τον μεσίτη, την περιγραφή και τις κοινές φωτογραφίες — όσο ψηλότερο, τόσο πιο πιθανό να είναι το ίδιο σπίτι. «Ένωση» κρατάει τον αριθμό του σπιτιού που έχει τις περισσότερες αγγελίες. «Αναίρεση» επαναφέρει την τελευταία ένωση.',
+const HELP={pairs:'Κάθε πρόταση δείχνει δύο σπίτια που μοιάζουν. Το <b>σκορ ομοιότητας</b> (0–100) βγαίνει από τα τ.μ., την τιμή, τη θέση, το έτος, τον όροφο, τον μεσίτη, την περιγραφή και τις κοινές φωτογραφίες — όσο ψηλότερο, τόσο πιο πιθανό να είναι το ίδιο σπίτι. «Ένωση» κρατάει τον αριθμό του σπιτιού που έχει τις περισσότερες αγγελίες. «Αναίρεση» επαναφέρει την τελευταία ένωση. Αν και τα δύο σπίτια έχουν <b>διαφορετική</b> βαθμολογία σου, ρωτάει ποια να κρατήσει· ίδια βαθμολογία = ένωση χωρίς ερώτηση.',
  susp:'Ομάδες που ήδη έχουν ενωθεί αλλά τα στοιχεία τους δεν συμφωνούν (τ.μ., τιμή, έτος, δωμάτια, όροφος, τύπος ή πινέζες μακριά η μία από την άλλη). Με «✂ Αποσύνδεση» μια αγγελία γίνεται ξεχωριστό σπίτι· με «Είναι σωστά» η ομάδα δεν ξαναεμφανίζεται εδώ.'};
 function sess(){try{const j=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;}catch(e){}return null;}
 async function refreshSess(s){try{const r=await fetch(SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});const d=await r.json();if(!r.ok)return null;const n={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:Date.now()+(d.expires_in||3600)*1000,user:d.user,remember:s.remember};(s.remember?localStorage:sessionStorage).setItem('hh_auth',JSON.stringify(n));return n;}catch(e){return null;}}
@@ -233,7 +233,7 @@ function askRating(p,keep){return new Promise(res=>{const m=document.getElementB
   b.querySelectorAll('.newstars span').forEach(s=>s.onclick=()=>{nv=+s.dataset.v;b.querySelectorAll('.newstars span').forEach(x=>x.classList.toggle('on',+x.dataset.v<=nv));document.getElementById('mnew').disabled=false;});
   document.getElementById('mnew').onclick=()=>{m.style.display='none';res({choice:'new',rating:nv});};});}
 async function doMerge(i){const p=PAIRS[i];const keep=keepOf(p);const newH=keep==='a'?p.h1:p.h2,oldH=keep==='a'?p.h2:p.h1;let choice='keep_new',rating=null;
-  if(p.rating_a&&p.rating_b){const r=await askRating(p,keep);if(!r)return;choice=r.choice;rating=r.rating||null;}
+  if(p.rating_a&&p.rating_b&&+p.rating_a!==+p.rating_b){const r=await askRating(p,keep);if(!r)return;choice=r.choice;rating=r.rating||null;}/*v4: ίδια βαθμολογία → καμία ερώτηση*/
   const btns=document.querySelectorAll('#p'+i+' button');btns.forEach(b=>b.disabled=true);
   try{const msg=await rpc('merge_house_v2',{old_h:oldH,new_h:newH,rating_choice:choice,new_rating:rating});const id=(String(msg).match(/#(\d+)$/)||[])[1];if(id){UNDO.push({id:+id,txt:'#'+oldH+' → #'+newH});document.getElementById('undoBtn').disabled=false;}
     toast('✓ Ενώθηκαν: #'+oldH+' → #'+newH);
