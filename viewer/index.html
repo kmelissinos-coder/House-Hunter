@@ -1515,12 +1515,18 @@ async function tryFetch() {
   document.getElementById('main-content').innerHTML = `
     <div class="loading"><div class="loading-spinner"></div>Φόρτωση δεδομένων από το Supabase...</div>`;
   try {
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc`, {
-      method: 'GET',
-      headers: sb.headers()
-    });
-    if (!resp.ok) throw new Error(`Σφάλμα Βάσης: ${resp.status} ${resp.statusText}`);
-    const data = await resp.json();
+    /*hhPolish2b: PostgREST caps a request at 1000 rows — page through with offset */
+    const data = [];
+    for (let _off = 0; _off < 20000; _off += 1000) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc,id.asc&limit=1000&offset=${_off}`, {
+        method: 'GET',
+        headers: sb.headers()
+      });
+      if (!resp.ok) throw new Error(`Σφάλμα Βάσης: ${resp.status} ${resp.statusText}`);
+      const _chunk = await resp.json();
+      data.push(..._chunk);
+      if (_chunk.length < 1000) break;
+    }
     
     allListings = data.map(item => ({
       ...item,
