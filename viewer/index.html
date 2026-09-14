@@ -4827,11 +4827,10 @@ setTimeout(function(){ addFilterRow(); labelFilters(); load(true); },600);
 
 <script>/*hhPolish10*/(function(){try{
 var st=document.createElement('style');st.id='hh-polish10';st.textContent=
-'.hh-idiot{color:#f5d76e;font-weight:800;letter-spacing:.4px}'
-+'.hh-idiot small{display:block;font-weight:600;font-size:9.5px;letter-spacing:0;opacity:.6;color:var(--text2,#b0b0b0)}';
+'.hh-idiot{color:#f5d76e;font-weight:700}';
 document.head.appendChild(st);
 function empty(t){var v=String(t==null?'':t).replace(/—|-|—/g,'').trim();return v===''||!/[a-zA-ZͰ-Ͽἀ-῿]/.test(v);}
-function mark(el){ if(!el||el.__idiot) return; el.__idiot=1; el.innerHTML='<span class="hh-idiot">ΙΔΙΩΤΗΣ<small>χωρίς μεσιτικό</small></span>'; }
+function mark(el){ if(!el||el.__idiot) return; el.__idiot=1; el.innerHTML='<span class="hh-idiot">Ιδιώτης</span>'; }
 function scan(){try{
   /* listing overlay + detail modal: <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">…</div></div> */
   document.querySelectorAll('.modal-field').forEach(function(f){
