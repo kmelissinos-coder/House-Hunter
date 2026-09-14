@@ -4824,6 +4824,32 @@ window.hhRefreshRatings=function(){lastLoad=0;load(true);};
 setInterval(function(){ addFilterRow(); labelFilters(); load(false); paint(); zeroButtons(); applyUnrated(); },1200);
 setTimeout(function(){ addFilterRow(); labelFilters(); load(true); },600);
 }catch(e){console.warn('hhPolish9',e);}})();</script>
+
+<script>/*hhPolish10*/(function(){try{
+var st=document.createElement('style');st.id='hh-polish10';st.textContent=
+'.hh-idiot{color:#f5d76e;font-weight:800;letter-spacing:.4px}'
++'.hh-idiot small{display:block;font-weight:600;font-size:9.5px;letter-spacing:0;opacity:.6;color:var(--text2,#b0b0b0)}';
+document.head.appendChild(st);
+function empty(t){var v=String(t==null?'':t).replace(/—|-|—/g,'').trim();return v===''||!/[a-zA-ZͰ-Ͽἀ-῿]/.test(v);}
+function mark(el){ if(!el||el.__idiot) return; el.__idiot=1; el.innerHTML='<span class="hh-idiot">ΙΔΙΩΤΗΣ<small>χωρίς μεσιτικό</small></span>'; }
+function scan(){try{
+  /* listing overlay + detail modal: <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">…</div></div> */
+  document.querySelectorAll('.modal-field').forEach(function(f){
+    var l=f.querySelector('.modal-field-label'); if(!l||!/^\s*Μεσιτικό\s*$/.test(l.textContent||'')) return;
+    var v=f.querySelector('.modal-field-value'); if(!v) return;
+    if(v.__idiot){ return; }
+    if(empty(v.textContent)) mark(v);
+  });
+  /* zero card summary grid: <div><span>Μεσιτικά</span><b>…</b></div> */
+  document.querySelectorAll('.hh-gs-grid > div').forEach(function(r){
+    var sp=r.querySelector('span'), b=r.querySelector('b');
+    if(!sp||!b||!/^\s*Μεσιτικ/.test(sp.textContent||'')) return;
+    if(b.__idiot) return;
+    if(empty(b.textContent)) mark(b);
+  });
+}catch(e){}}
+setInterval(scan,900); setTimeout(scan,400);
+}catch(e){console.warn('hhPolish10',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
