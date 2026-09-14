@@ -4629,6 +4629,39 @@ window.hhRefreshNotes=function(){load(true);};
 setInterval(function(){fixBadges();hookSave();load(false);paint();},1200);
 setTimeout(function(){fixBadges();load(true);},900);
 }catch(e){console.warn('hhPolish7',e);}})();</script>
+
+<script>/*hhPolish8*/(function(){try{
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var st=document.createElement('style');st.id='hh-polish8';st.textContent=
+'.hh-tsp-badge{position:absolute;top:32px;right:10px;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:#f2b632;color:#1b1710;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.35)}'
++'.lo-sib-card .hh-tsp-badge{top:29px;right:7px}'
++'.grouped-specs .hh-tsp-inline{margin-left:0}'
++'.hh-tsp-inline{display:inline-block;margin-left:4px;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:#f2b632;color:#1b1710;vertical-align:middle}'
++'.hh-tsp-logo img{height:100%}';
+document.head.appendChild(st);
+var KEYS={},lastLoad=0,loading=false;
+function tok(){try{var o=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');return o&&o.access_token?o.access_token:AK;}catch(e){return AK;}}
+async function load(force){try{if(loading)return;if(!force&&Date.now()-lastLoad<5*60*1000)return;loading=true;lastLoad=Date.now();var r=await fetch(SB+'/rest/v1/listings?select=id,house_id,platform_nr,url&also_on=cs.{tospitimou}',{headers:{apikey:AK,Authorization:'Bearer '+tok()}});if(!r.ok)return;var j=await r.json();if(!Array.isArray(j))return;KEYS={};j.forEach(function(x){var v=x.platform_nr||true;KEYS[String(x.id)]=v;if(x.url)KEYS[String(x.url)]=v;var h=String(x.house_id==null?'':x.house_id).trim();if(h&&h!=='0')KEYS[h]=v;});paint();}catch(e){}finally{loading=false;}}
+function keyOf(card){try{if(card.classList.contains('lo-sib-card')){var f=card.querySelector('[onclick*=toggleFav]');if(!f)return null;var o=f.getAttribute('onclick')||'';var a=o.indexOf("'"),b=o.indexOf("'",a+1);return (a<0||b<0)?null:o.slice(a+1,b);}if(card.classList.contains('grouped-card'))return String(card.dataset.hhh||'');var hh=String(card.dataset.hhh||'').trim();if(hh&&hh!=='0')return hh;var s=card.querySelector('[onclick*=setRating]');if(!s)return null;var oc=s.getAttribute('onclick')||'';var q1=oc.indexOf("'"),q2=oc.indexOf("'",q1+1);if(q1<0||q2<0)return null;return oc.slice(q1+1,q2);}catch(e){return null;}}
+function paint(){try{
+  document.querySelectorAll('.card,.grouped-card,.lo-sib-card').forEach(function(card){
+    var k=keyOf(card);var hit=k&&KEYS[k]!==undefined;
+    var old=card.querySelector(':scope .hh-tsp-badge, :scope .hh-tsp-inline');
+    if(!hit){if(old)old.remove();return;}
+    if(old)return;
+    if(card.classList.contains('grouped-card')){var gs=card.querySelector('.grouped-specs');if(!gs)return;var sp=document.createElement('span');sp.className='spec-tag hh-tsp-inline';sp.title='Η αγγελία υπάρχει και στο tospitimou.gr';sp.textContent='tospitimou';gs.appendChild(sp);return;}
+    var b=card.querySelector('.platform-badge');if(!b)return;
+    if(!/spitogatos/i.test(b.textContent||''))return;
+    var inline=(getComputedStyle(b).position!=='absolute');
+    var d=document.createElement(inline?'span':'div');d.className=inline?'hh-tsp-inline':'platform-badge hh-tsp-badge';d.textContent='tospitimou';
+    b.parentNode.insertBefore(d,b.nextSibling);
+  });
+}catch(e){}}
+function hookLogo(){try{if(window.hhLogoBtn&&!window.hhLogoBtn.__p8){var _o=window.hhLogoBtn;window.hhLogoBtn=function(h,cls){var r=_o.apply(this,arguments);try{var ao=h&&h.also_on;if(ao&&ao.indexOf('tospitimou')>=0){var nr=h.platform_nr||h.platformNr;if(nr&&window.HH_LOGOS&&window.HH_LOGOS.tospitimou){var u='https://en.tospitimou.gr/property/'+String(nr).replace(/[^0-9]/g,'');r+='<span class="'+cls+' hh-logo-btn hh-tsp-logo" title="Άνοιγμα στο tospitimou.gr" onmousedown="handleLinkClick(event,\''+u+'\')" onclick="event.stopPropagation();handleLinkClick(event,\''+u+'\')"><img src="'+window.HH_LOGOS.tospitimou+'" alt="tospitimou" draggable="false"></span>';}}}catch(e){}return r;};window.hhLogoBtn.__p8=true;}}catch(e){}}
+window.hhRefreshTsp=function(){load(true);};
+setInterval(function(){hookLogo();load(false);paint();},1500);
+setTimeout(function(){hookLogo();load(true);},700);
+}catch(e){console.warn('hhPolish8',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
