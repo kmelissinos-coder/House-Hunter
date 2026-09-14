@@ -105,6 +105,7 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .legend{font-size:12px;color:var(--muted);padding:0 14px 6px}
 .legend .same,.legend .diff{font-weight:700}.legend .same{color:#7ed8a0}.legend .diff{color:#ff7a7a}
 @media(max-width:760px){.hcols{grid-template-columns:1fr}.gal2{height:240px}.gal2 img.main{max-height:240px}}
+.fresh{font-size:11px;opacity:.7;margin-left:8px;white-space:nowrap}.fresh b{color:var(--accent);font-weight:600}
 </style>
 </head>
 <body>
@@ -117,7 +118,7 @@ main{max-width:1240px;margin:0 auto;padding:16px}
     <span id="count"></span>
     <label id="minWrap">Ελάχιστο σκορ <select id="minScore"><option value="70">70</option><option value="60">60</option><option value="50" selected>50</option><option value="40">40</option></select></label>
     <button id="undoBtn" class="undo" disabled title="Αναιρεί την τελευταία ένωση">↶ Αναίρεση</button>
-    <button id="reload">↻ Ανανέωση</button>
+    <button id="reload" title="Ξανατρέχει τον αλγόριθμο πάνω στα τωρινά δεδομένα και φέρνει νέες προτάσεις">↻ Ανανέωση</button><span id="freshness" class="fresh"></span>
   </div>
 </header>
 <main>
@@ -217,7 +218,8 @@ async function load(){const el=document.getElementById('list');el.className='msg
   if(!sess()){el.innerHTML='Δεν είσαι συνδεδεμένος. <a href="index.html" style="color:var(--accent)">Σύνδεση στο House Hunter</a> και μετά ξαναέλα εδώ.';return;}
   try{if(TAB==='pairs')PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});else GROUPS=await rpc('rent_suspicious_groups',{});}
   catch(e){el.textContent='Σφάλμα: '+e.message+(/admin/.test(e.message)?' — η σελίδα είναι μόνο για τον διαχειριστή.':'');return;}
-  render();}
+  render();showFreshness();}
+async function showFreshness(){/*mergeV6*/try{var st=await rpc('rent_pairs_status',{});var el=document.getElementById('freshness');if(!el||!st)return;var d=st.built_at?new Date(st.built_at):null;var mins=d?Math.round((Date.now()-d.getTime())/60000):null;var when=!d?'—':(mins<1?'μόλις τώρα':(mins<60?('πριν '+mins+'′'):d.toLocaleString('el-GR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})));el.innerHTML='ζεύγη: <b>'+(st.n_pairs||0)+'</b> · υπολογίστηκαν '+when+(st.dirty?' · <b>άλλαξαν αγγελίες — ανανεώνεται</b>':'');}catch(e){}}
 function advance(i){const arr=items();arr.splice(i,1);if(VIEW==='one'){IDX=Math.min(i,arr.length-1);render();}else{const el=document.getElementById('p'+i)||document.getElementById('g'+i);if(el)el.classList.add('done');document.getElementById('count').textContent=arr.length+(TAB==='pairs'?' ζευγάρια':' ομάδες');setTimeout(render,600);}}
 async function verdict(i,v){const p=PAIRS[i];try{await rpc('merge_verdict',{p_h1:p.h1,p_h2:p.h2,p_verdict:v});toast(v==='no'?'✓ Σημειώθηκε ως διαφορετικά σπίτια':'✓ Για αργότερα');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
 function askRating(p,keep){return new Promise(res=>{const m=document.getElementById('modal'),b=document.getElementById('mbox');const rk=keep==='a'?p.rating_a:p.rating_b,ro=keep==='a'?p.rating_b:p.rating_a,idk=keep==='a'?p.h1:p.h2,ido=keep==='a'?p.h2:p.h1;let nv=0;
@@ -241,7 +243,7 @@ async function doMerge(i){const p=PAIRS[i];const keep=keepOf(p);const newH=keep=
 async function undo(){const u=UNDO.pop();if(!u)return;try{const msg=await rpc('merge_undo',{p_log_id:u.id});toast('↶ '+msg);document.getElementById('undoBtn').disabled=!UNDO.length;load();}catch(e){UNDO.push(u);toast('Σφάλμα: '+e.message,true);}}
 async function doSplit(id,btn){btn.disabled=true;try{const nh=await rpc('split_listing',{p_listing:id});toast('✂ Έγινε ξεχωριστό σπίτι #'+nh);load();}catch(e){btn.disabled=false;toast('Σφάλμα: '+e.message,true);}}
 async function groupOk(i){const g=GROUPS[i];try{await rpc('group_check',{p_house:g.house_id,p_verdict:'ok'});toast('✓ Η ομάδα #'+g.house_id+' σημειώθηκε ως σωστή');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
-document.getElementById('reload').onclick=load;document.getElementById('minScore').onchange=load;document.getElementById('undoBtn').onclick=undo;
+document.getElementById('reload').onclick=async function(){/*mergeV6*/var b=this;var t=b.textContent;b.disabled=true;b.textContent='⏳ Υπολογίζω ξανά…';var el=document.getElementById('list');el.className='msg';el.textContent='Ξανατρέχει ο αλγόριθμος σύγκρισης σε όλα τα σπίτια…';try{await rpc('rent_pairs_refresh',{});}catch(e){toast('Σφάλμα ανανέωσης: '+e.message,true);}b.disabled=false;b.textContent=t;await load();};document.getElementById('minScore').onchange=load;document.getElementById('undoBtn').onclick=undo;
 document.getElementById('tabPairs').onclick=()=>{TAB='pairs';IDX=0;setTabs();load();};document.getElementById('tabSusp').onclick=()=>{TAB='susp';IDX=0;setTabs();load();};
 document.getElementById('viewList').onclick=()=>{VIEW='list';setTabs();render();};document.getElementById('viewOne').onclick=()=>{VIEW='one';setTabs();render();};
 document.getElementById('prev').onclick=()=>{IDX--;render();};document.getElementById('next').onclick=()=>{IDX++;render();};
