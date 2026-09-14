@@ -99,6 +99,8 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .mini .row span:first-child{color:var(--muted)}
 .mini .same{color:#7ed8a0;font-weight:600}
 .mini .diff{color:#ff7a7a;font-weight:700}
+.mini.odd{outline:3px solid #e05252;outline-offset:-1px;box-shadow:0 0 0 4px rgba(224,82,82,.25),0 6px 22px rgba(224,82,82,.25)}
+.mini .oddtag{position:absolute;top:6px;left:6px;z-index:5;background:#e05252;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
 .mini label.pick{display:flex;align-items:center;gap:6px;margin-top:8px;cursor:pointer;color:#f0a0a0;font-weight:600}
 .legend{font-size:12px;color:var(--muted);padding:0 14px 6px}
 .legend .same,.legend .diff{font-weight:700}.legend .same{color:#7ed8a0}.legend .diff{color:#ff7a7a}
@@ -179,18 +181,14 @@ const MG={};
 function mgTo(key,k){const box=document.querySelector(`.mg[data-g="${key}"]`);const imgs=MG[key]||[];if(!box||!imgs.length)return;k=(k+imgs.length)%imgs.length;box.dataset.i=k;box.querySelector('img').src=imgs[k];box.querySelector('.cnt').textContent=(k+1)+'/'+imgs.length;}
 function majority(vals){const c={};let best=null,bn=0;vals.forEach(v=>{if(v==null||v==='')return;const k=String(v);c[k]=(c[k]||0)+1;if(c[k]>bn){bn=c[k];best=k;}});return best;}
 function miniHTML(m,key,maj){const imgs=[m.img].concat(m.imgs||[]).filter(Boolean);MG[key]=imgs;
-  const cell=(label,val,mv,fmt,tol)=>{const shown=val==null||val===''?'—':(fmt?fmt(val):val);let cls='';if(val!=null&&val!==''&&mv!=null){const same=tol?Math.abs(+val-+mv)/(+mv||1)<=tol:String(val)===String(mv);cls=same?'same':'diff';}return `<div class="row"><span>${label}</span><span class="${cls}">${esc(shown)}</span></div>`;};
-  return `<div class="mini${m.deleted?' gone':''}" id="mini_${esc(m.id)}">
+  let odd=0;/*v5: count the fields where this ad disagrees with the group (price only if >20%)*/
+  const cell=(label,val,mv,fmt,tol,hard)=>{const shown=val==null||val===''?'—':(fmt?fmt(val):val);let cls='';if(val!=null&&val!==''&&mv!=null){const same=tol?Math.abs(+val-+mv)/(+mv||1)<=tol:String(val)===String(mv);cls=same?'same':'diff';if(!same&&hard!==false){if(label==='Τιμή'){if(Math.abs(+val-+mv)/(+mv||1)>0.2)odd++;}else odd++;}}return `<div class="row"><span>${label}</span><span class="${cls}">${esc(shown)}</span></div>`;};
+  const rows=[cell('Περιοχή',m.location,maj.location,null,null,false),cell('τ.μ.',m.sqm,maj.sqm,v=>Math.round(v)+' τ.μ.',0.05),cell('Τιμή',m.price,maj.price,v=>'€'+Number(v).toLocaleString('el'),0.05),cell('Έτος',m.year,maj.year),cell('Δωμάτια',m.rooms,maj.rooms),cell('Όροφος',m.floor,maj.floor),cell('Τύπος',m.type,maj.type)];
+  return `<div class="mini${m.deleted?' gone':''}${odd?' odd':''}" id="mini_${esc(m.id)}" title="${odd?'Διαφέρει από τα υπόλοιπα σε '+odd+' στοιχεί'+(odd===1?'ο':'α')+' — μάλλον άλλο σπίτι':''}">${odd?'<div class="oddtag">⚠ μάλλον άλλο σπίτι</div>':''}
     <div class="mg" data-g="${key}" data-i="0">${imgs.length?`<img src="${esc(imgs[0])}" loading="lazy" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)-1)">‹</button><button class="nav r" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)+1)">›</button><span class="cnt">1/${imgs.length}</span>`:'<div class="noimg" style="width:100%;height:150px">🏠</div>'}</div>
     <div class="body">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="plat">${esc(m.platform||'')}</span>${m.deleted?'<span class="diff" style="font-size:11px">⛔ αφαιρέθηκε</span>':''}<span style="color:var(--muted);font-size:11px">#${m.hhl||''}</span></div>
-      ${cell('Περιοχή',m.location,maj.location)}
-      ${cell('τ.μ.',m.sqm,maj.sqm,v=>Math.round(v)+' τ.μ.',0.05)}
-      ${cell('Τιμή',m.price,maj.price,v=>'€'+Number(v).toLocaleString('el'),0.05)}
-      ${cell('Έτος',m.year,maj.year)}
-      ${cell('Δωμάτια',m.rooms,maj.rooms)}
-      ${cell('Όροφος',m.floor,maj.floor)}
-      ${cell('Τύπος',m.type,maj.type)}
+      ${rows.join('')}
       <div class="row"><span>Μεσίτης</span><span>${esc(m.agency||'Ιδιώτης')}</span></div>
       ${m.url?`<div style="margin-top:6px"><a href="${esc(m.url)}" target="_blank" rel="noopener" style="color:var(--text);font-size:12px">↗ αγγελία</a></div>`:''}
       <label class="pick"><input type="checkbox" onchange="pickSplit('${esc(m.id)}',this.checked)"> ✂ Αποσύνδεση</label>
@@ -199,7 +197,7 @@ function groupHTML(g,i){const ms=g.members||[];const maj={location:majority(ms.m
   return `<div class="grp" id="g${i}">
     <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}
       <span class="keep"><a href="index.html?house=${encodeURIComponent(g.house_id)}" target="_blank" style="color:var(--text)">🏡 Άνοιγμα στο HH</a></span></div>
-    <div class="legend"><span class="same">πράσινο</span> = ίδιο με τις περισσότερες αγγελίες της ομάδας · <span class="diff">κόκκινο</span> = διαφέρει. Τσέκαρε τις αγγελίες που είναι άλλο σπίτι και πάτα «Αποσύνδεση».</div>
+    <div class="legend"><b style="color:#e05252">Κόκκινο πλαίσιο</b> = η αγγελία διαφέρει από τις υπόλοιπες της ομάδας (τ.μ., έτος, όροφος, τύπος ή τιμή >20%) — κοίτα μόνο αυτές. <span class="same">πράσινο</span> = ίδιο · <span class="diff">κόκκινο</span> = διαφέρει. Τσέκαρε τις αγγελίες που είναι άλλο σπίτι και πάτα «Αποσύνδεση».</div>
     <div class="mgrid">${ms.map((m,k)=>miniHTML(m,'g'+i+'_'+k,maj)).join('')}</div>
     <div class="acts"><button class="btn split" style="padding:8px 14px;font-size:13px" onclick="splitPicked(${i})">✂ Αποσύνδεση επιλεγμένων (<span id="npick${i}">0</span>)</button><button class="btn ok" onclick="groupOk(${i})">✓ Είναι σωστά, μην το ξαναδείξεις</button></div></div>`;}
 const PICK=new Set();

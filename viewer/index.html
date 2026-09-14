@@ -4580,6 +4580,55 @@ window.hhMergeSelected=async function(target,choice){try{
 var n=0;var iv=setInterval(function(){n++;install();try{mergeBar();}catch(e){}if(n>60)clearInterval(iv);},300);install();
 setInterval(function(){try{mergeBar();}catch(e){}},1200);
 }catch(e){console.warn('hhPolish5',e);}})();</script>
+
+<script>/*hhPolish6*/(function(){try{
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var st=document.createElement('style');st.id='hh-polish6';st.textContent=
+/* merge bar: solid, on top of everything */
+'#ms-bar{background:#1e1a12!important;border:2px solid var(--accent2,#63b3ed)!important;box-shadow:0 8px 30px rgba(0,0,0,.75)!important;opacity:1!important;backdrop-filter:none!important;color:#f3efe6!important;z-index:2147483000!important}'
++'body.light #ms-bar{background:#fffaf0!important;color:#1b1710!important;box-shadow:0 8px 30px rgba(0,0,0,.35)!important}'
++'#ms-bar .hh-ms-hint{color:inherit!important;opacity:.85}#ms-bar span{color:inherit}'
+/* count badges on the admin links */
++'.hh-cnt{display:inline-block;min-width:18px;padding:0 6px;margin-left:5px;border-radius:999px;font-size:11px;font-weight:800;line-height:18px;text-align:center;background:#c8a84b;color:#20170a;vertical-align:1px}'
++'.hh-cnt.zero{background:rgba(127,127,127,.35);color:inherit}#hh-suspbtn .hh-cnt{background:#e05252;color:#fff}';
+document.head.appendChild(st);
+function tok(){try{var o=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');return o&&o.access_token?o.access_token:null;}catch(e){return null;}}
+var counts=null,lastAt=0;
+function paint(){try{var m=document.getElementById('hh-mergebtn'),u=document.getElementById('hh-suspbtn');if(!counts)return;[[m,counts.suggestions],[u,counts.suspicious]].forEach(function(p){var el=p[0],n=p[1];if(!el)return;var b=el.querySelector('.hh-cnt');if(!b){b=document.createElement('span');b.className='hh-cnt';el.appendChild(b);}var v=(n==null?'…':String(n));if(b.textContent!==v)b.textContent=v;b.classList.toggle('zero',!n);el.title=(el.id==='hh-mergebtn'?'Προτάσεις ένωσης που περιμένουν: ':'Ύποπτες ενώσεις που περιμένουν: ')+v;});}catch(e){}}
+async function load(force){try{if(window.hhRole!=='admin')return;var t=tok();if(!t)return;if(!force&&Date.now()-lastAt<5*60*1000)return;lastAt=Date.now();var r=await fetch(SB+'/rest/v1/rpc/rent_admin_counts',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+t,'Content-Type':'application/json'},body:'{}'});if(!r.ok)return;counts=await r.json();paint();}catch(e){}}
+setInterval(function(){load(false);paint();},1500);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)load(true);});
+window.hhRefreshCounts=function(){load(true);};
+}catch(e){console.warn('hhPolish6',e);}})();</script>
+
+<script>/*hhPolish7*/(function(){try{
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var st=document.createElement('style');st.id='hh-polish7';st.textContent=
+/* uniform card skeleton: photo on top, body grows, footer glued to the bottom */
+'.grid-container .card,.grid-container .grouped-card,#hh-newsec .card,#hh-newsec .grouped-card{display:flex!important;flex-direction:column!important}'
++'.card>.card-body,.grouped-card>.grouped-body{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}'
++'.card-body>.card-footer,.grouped-body>.grouped-card-footer{margin-top:auto!important}'
++'.card-body>.card-footer{padding-bottom:0}'
+/* ΙΔΙΩΤΗΣ badge: same place on every card — bottom-left corner of the photo */
++'.card-img-wrap>.hh-private-badge,.photo-strip>.hh-private-badge{position:absolute!important;left:8px!important;bottom:8px!important;top:auto!important;right:auto!important;z-index:7!important;font-size:10px!important;padding:3px 8px!important}'
+/* notes preview line */
++'.hh-notepv{display:flex;align-items:flex-start;gap:5px;margin:6px 0 2px;padding:5px 8px;border-radius:7px;background:rgba(126,184,154,.12);border:1px solid rgba(126,184,154,.35);font-size:11.5px;line-height:1.35;color:var(--text2,#ccc);overflow:hidden}'
++'.hh-notepv b{flex:none;color:#7eb89a}.hh-notepv span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}'
++'body.light .hh-notepv{background:rgba(60,120,90,.10);border-color:rgba(60,120,90,.35);color:#333}body.light .hh-notepv b{color:#2f6f4c}';
+document.head.appendChild(st);
+function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');}catch(e){return null;}}
+/* 1. badge relocation */
+function fixBadges(){try{document.querySelectorAll('.hh-private-badge').forEach(function(b){var card=b.closest('.card,.grouped-card');if(!card)return;var host=card.querySelector('.card-img-wrap')||card.querySelector('.photo-strip');if(host&&b.parentElement!==host){host.appendChild(b);}else if(!host){b.style.cssText='position:absolute;left:8px;top:8px;z-index:7';}});}catch(e){}}
+/* 2. notes preview */
+var H={},NOTES={},uid=null,tokn=null,lastLoad=0,loading=false;
+function keyOf(card){try{if(card.classList.contains('grouped-card'))return String(card.dataset.hhh||'');var hh=String(card.dataset.hhh||'').trim();if(hh&&hh!=='0')return hh;var s=card.querySelector('[onclick*=setRating]');if(!s)return null;var oc=s.getAttribute('onclick')||'';var q1=oc.indexOf("'"),q2=oc.indexOf("'",q1+1);if(q1<0||q2<0)return null;var id=oc.slice(q1+1,q2);var h=H[id];return (h!=null&&String(h).trim()!=='0'&&String(h).trim()!=='')?String(h):id;}catch(e){return null;}}
+async function load(force){try{var a=sess();if(!a||!a.user||!a.access_token)return;uid=a.user.id;tokn=a.access_token;if(loading)return;if(!force&&Date.now()-lastLoad<60000)return;loading=true;lastLoad=Date.now();var hd={apikey:AK,Authorization:'Bearer '+tokn};var lj=await (await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hd})).json();if(Array.isArray(lj)){H={};lj.forEach(function(x){H[x.id]=x.house_id;});}var nj=await (await fetch(SB+'/rest/v1/user_notes?select=house_id,note_text&user_id=eq.'+encodeURIComponent(uid),{headers:hd})).json();if(Array.isArray(nj)){NOTES={};nj.forEach(function(x){if(x.note_text&&String(x.note_text).trim())NOTES[String(x.house_id)]=String(x.note_text).trim();});}paint();}catch(e){}finally{loading=false;}}
+function paint(){try{document.querySelectorAll('.card,.grouped-card').forEach(function(card){var k=keyOf(card);var txt=k?NOTES[k]:null;var old=card.querySelector('.hh-notepv');if(!txt){if(old)old.remove();return;}var one=txt.replace(/\s+/g,' ');var short=one.length>90?one.slice(0,90)+'…':one;if(old){if(old.dataset.t!==one){old.dataset.t=one;old.querySelector('span').textContent=short;old.title=txt;}return;}var d=document.createElement('div');d.className='hh-notepv';d.dataset.t=one;d.title=txt;d.innerHTML='<b>📝 Σημειώσεις:</b><span></span>';d.querySelector('span').textContent=short;var foot=card.querySelector('.card-body>.card-footer')||card.querySelector('.grouped-card-footer');if(foot&&foot.parentElement)foot.parentElement.insertBefore(d,foot);else (card.querySelector('.card-body')||card.querySelector('.grouped-body')||card).appendChild(d);});}catch(e){}}
+function hookSave(){try{if(window.saveNotes&&!window.saveNotes.__p7){var _s=window.saveNotes;window.saveNotes=function(){var r=_s.apply(this,arguments);setTimeout(function(){load(true);},800);return r;};window.saveNotes.__p7=true;}}catch(e){}}
+window.hhRefreshNotes=function(){load(true);};
+setInterval(function(){fixBadges();hookSave();load(false);paint();},1200);
+setTimeout(function(){fixBadges();load(true);},900);
+}catch(e){console.warn('hhPolish7',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
