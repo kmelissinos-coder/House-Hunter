@@ -2053,7 +2053,7 @@ function renderGroupedCard(g) {
   const priceStr = g.minPrice === g.maxPrice
     ? (g.minPrice ? '€'+g.minPrice.toLocaleString('el') : '—')
     : `€${g.minPrice.toLocaleString('el')} – €${g.maxPrice.toLocaleString('el')}`;
-  const photos = g.allImgs.slice(0, 5);
+  const photos = g.allImgs.slice(0, 2);
   const stripHtml = photos.length
     ? photos.map((p,i) => `<img class="photo-strip-img" src="${p.url}"
         onclick="event.stopPropagation();openListingOverlay(null,'${g.houseId}',${i})"
@@ -4994,7 +4994,7 @@ if(typeof resetFilters==='function' && !window.__h13reset){
   window.__h13reset=true;
 }
 
-setInterval(function(){ chipRow(); recountPlatforms(); },1200);
+setInterval(function(){ chipRow(); if(!window.__h15) recountPlatforms(); },1200);
 setTimeout(function(){ chipRow(); recountPlatforms(); },500);
 }catch(e){console.warn('hhPolish13',e);}})();</script>
 
@@ -5032,6 +5032,166 @@ function hook(){
 var n=0,iv=setInterval(function(){ n++; if(hook()||n>80) clearInterval(iv); },250);
 hook();
 }catch(e){console.warn('hhPolish14',e);}})();</script>
+
+<script>/*hhPolish15*/(function(){try{
+window.__h15=true;
+
+/* light theme: the type badge on the photo was still dark */
+try{ var st15=document.createElement('style'); st15.id='hh-polish15-css';
+ st15.textContent='body.light .card-badge{background:rgba(255,255,255,.9)!important;color:#2b2b2b!important;border-color:rgba(0,0,0,.18)!important;backdrop-filter:blur(4px)}'
+  +'body.light .card-img-wrap .card-badge{box-shadow:0 1px 3px rgba(0,0,0,.18)}';
+ document.head.appendChild(st15); }catch(e){}
+
+function HK(h){try{var k=String((h&&h.house_id)||'').trim();return (k&&k!=='0')?('H'+k):('L'+String((h&&h.hhl_id)||(h&&h.url)||''));}catch(e){return 'L?';}}
+function houses(list){var s={},n=0;(list||[]).forEach(function(h){var k=HK(h);if(!s[k]){s[k]=1;n++;}});return n;}
+
+/* ---- «Εμφάνιση διαγραμμένων σπιτιών» ---------------------------------- */
+function ensureBox(){
+  if(document.getElementById('hh-delh15')) return;
+  var wrap=document.querySelector('.show-deleted-wrap'); if(!wrap) return;
+  var lab=document.createElement('label');
+  lab.id='hh-delh15-l';
+  lab.title='Δείχνει και τα σπίτια που δεν υπάρχουν πλέον σε καμία πλατφόρμα. Ένα σπίτι μετράει ως διαγραμμένο μόνο όταν ΟΛΕΣ οι αγγελίες του έχουν αφαιρεθεί — όχι 3 στις 5.';
+  lab.innerHTML='<input type="checkbox" id="hh-delh15"> ⛔ Εμφάνιση διαγραμμένων σπιτιών <span class="n" id="hh-delh15-n" style="opacity:.6"></span>';
+  var rst=wrap.querySelector('.hh-reset13');
+  if(rst) wrap.insertBefore(lab,rst); else wrap.appendChild(lab);
+  var cb=document.getElementById('hh-delh15');
+  try{ cb.checked = localStorage.getItem('hh_show_del_houses')==='1'; }catch(e){}
+  cb.addEventListener('change',function(){
+    try{ localStorage.setItem('hh_show_del_houses', cb.checked?'1':'0'); }catch(e){}
+    try{ applyFilters(); }catch(e){}
+  });
+}
+function delOn(){ var c=document.getElementById('hh-delh15'); return !!(c&&c.checked); }
+
+/* a house is deleted only when every one of its ads is */
+var _dm=null,_dmAt=0;
+function delMap(){
+  var now=Date.now(); if(_dm && now-_dmAt<2500) return _dm;
+  var m={},all=[];
+  try{ all=[].concat(allListings||[], extraListings||[]); }catch(e){}
+  all.forEach(function(h){ var k=HK(h); if(!(k in m)) m[k]=true; if(!h.deleted) m[k]=false; });
+  _dm=m; _dmAt=now; return m;
+}
+function stripDel(list){ if(delOn()) return list||[]; var m=delMap(); return (list||[]).filter(function(h){return !m[HK(h)];}); }
+
+/* in map view the counts follow what the map is showing */
+function inView(list){
+  try{
+    if(typeof currentView==='undefined' || currentView!=='map' || !window._hhMap) return list;
+    var b=window._hhMap.getBounds();
+    return (list||[]).filter(function(h){
+      var la=(h.address_lat!=null?+h.address_lat:(h.platform_lat!=null?+h.platform_lat:null));
+      var ln=(h.address_lng!=null?+h.address_lng:(h.platform_lng!=null?+h.platform_lng:null));
+      if(la==null||isNaN(la)||ln==null||isNaN(ln)) return false;
+      return b.contains([la,ln]);
+    });
+  }catch(e){ return list; }
+}
+
+function paint(base, rejN, delN){
+  try{
+    var bar=document.getElementById('platform-bar'); if(!bar) return;
+    var byP={}; (base||[]).forEach(function(h){ var p=h.platform||''; (byP[p]=byP[p]||[]).push(h); });
+    [].forEach.call(bar.querySelectorAll('.platform-tab'),function(t){
+      var p=t.getAttribute('data-platform');
+      var n = (p==='all') ? houses(base) : houses(byP[p]||[]);
+      var lbl = (p==='all') ? 'Όλες οι πλατφόρμες' : p;
+      t.innerHTML = lbl+' <span style="opacity:0.6">('+n+')</span>';
+      if(p!=='all') t.style.display = (n===0 && currentPlatform!==p) ? 'none' : '';
+    });
+    var act=bar.querySelector('.platform-tab.active')||bar.querySelector('.platform-tab');
+    if(act){
+      var txt=act.textContent.replace(/\s+/g,' ').trim();
+      var btns=document.querySelectorAll('#hh-hb .hb-ctrl');
+      var b=null;
+      for(var i=0;i<btns.length;i++){ if(btns[i].__h15p){ b=btns[i]; break; } }
+      if(!b){ for(var j=0;j<btns.length;j++){ if(/πλατφόρμ/.test(btns[j].textContent)){ b=btns[j]; b.__h15p=1; break; } } }
+      if(!b && btns.length>1){ b=btns[1]; b.__h15p=1; }
+      if(b) b.textContent=txt+' ▾';
+    }
+    var rn=document.getElementById('hh-rejn'); if(rn) rn.textContent='('+rejN+')';
+    var dn=document.getElementById('hh-delh15-n'); if(dn) dn.textContent='('+delN+')';
+  }catch(e){}
+}
+
+var _af=null, busy=false;
+
+/* run the app's own filter twice more, with rendering switched off, to learn what each
+   platform would show and how many rejected / deleted houses are being held back */
+function recount(){
+  if(!_af || busy) return;
+  busy=true;
+  var _rl=renderListings, savedP=currentPlatform, savedF=null;
+  var sd=document.getElementById('showDeleted'); var prevSd=sd?sd.checked:false;
+  try{
+    savedF = (typeof filtered!=='undefined') ? filtered : null;
+    renderListings=function(){};
+    currentPlatform='all';
+    _af.call(window);
+    var baseRaw=filtered.slice();
+    var base=inView(stripDel(baseRaw));
+    var dm=delMap();
+    var delN=houses(inView(baseRaw.filter(function(h){return dm[HK(h)];})));
+    var rejN=0;
+    if(sd){ sd.checked=true; _af.call(window);
+            rejN=houses(inView(stripDel(filtered).filter(function(h){return h.hidden;})));
+            sd.checked=prevSd; }
+    paint(base, rejN, delN);
+  }catch(e){ try{ if(sd) sd.checked=prevSd; }catch(e2){} }
+  finally{
+    renderListings=_rl;
+    currentPlatform=savedP;
+    if(savedF) { try{ filtered=savedF; }catch(e){} }
+    busy=false;
+  }
+}
+window.hhRecount15=recount;
+
+if(typeof applyFilters==='function' && !window.__h15af){
+  _af=applyFilters;
+  applyFilters=function(){
+    if(busy) return _af.apply(this,arguments);
+    var _rl=renderListings;
+    try{
+      ensureBox();
+      renderListings=function(){};
+      _af.call(window);
+      filtered=stripDel(filtered);
+    }catch(e){}
+    finally{ renderListings=_rl; }
+    try{
+      var rc=document.getElementById('resultsCount');
+      if(rc) rc.textContent=filtered.length+' αγγελίες εμφανίζονται';
+    }catch(e){}
+    try{ recount(); }catch(e){}
+    try{ renderListings(); }catch(e){}
+  };
+  window.__h15af=true;
+}
+
+/* the reset button should clear the new toggle too */
+if(typeof resetFilters==='function' && !window.__h15reset){
+  var _rf=resetFilters;
+  resetFilters=function(){
+    var r=_rf.apply(this,arguments);
+    try{ var c=document.getElementById('hh-delh15');
+         if(c&&c.checked){ c.checked=false; try{localStorage.setItem('hh_show_del_houses','0');}catch(e){} applyFilters(); } }catch(e){}
+    return r;
+  };
+  window.__h15reset=true;
+}
+
+/* map: recount when the view moves */
+var mn=0, miv=setInterval(function(){
+  mn++; if(mn>300){ clearInterval(miv); return; }
+  try{ if(window._hhMap && !window._hhMap.__h15){ window._hhMap.__h15=1;
+        window._hhMap.on('moveend zoomend', function(){ setTimeout(recount,120); }); } }catch(e){}
+},700);
+
+setTimeout(function(){ ensureBox(); try{applyFilters();}catch(e){} }, 1200);
+setInterval(function(){ ensureBox(); }, 2000);
+}catch(e){console.warn('hhPolish15',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
