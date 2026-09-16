@@ -176,12 +176,16 @@ const GALS={};
 function galTo(key,k){const g=document.querySelector(`.gal2[data-g="${key}"]`);const imgs=GALS[key]||[];if(!g||!imgs.length)return;k=(k+imgs.length)%imgs.length;g.dataset.i=k;g.querySelector('img.main').src=imgs[k];g.querySelector('img.main').style.visibility='';g.querySelector('.cnt').textContent=(k+1)+'/'+imgs.length;const t=document.querySelector(`.thumbs[data-t="${key}"]`);if(t){[...t.children].forEach((im,j)=>im.classList.toggle('on',j===k));const a=t.children[k];if(a&&a.scrollIntoView)a.scrollIntoView({inline:'center',block:'nearest'});}}
 function galNav(key,d){const g=document.querySelector(`.gal2[data-g="${key}"]`);if(!g)return;galTo(key,(+g.dataset.i||0)+d);}
 function openBig(key){const g=document.querySelector(`.gal2[data-g="${key}"]`);const imgs=GALS[key]||[];if(!imgs.length)return;let i=+g.dataset.i||0;const lb=document.createElement('div');lb.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:80;display:flex;align-items:center;justify-content:center';lb.innerHTML=`<img style="max-width:96vw;max-height:92vh;object-fit:contain"><button class="nav l" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:40px;background:rgba(255,255,255,.12);color:#fff;border:none;width:56px;height:84px;border-radius:8px;cursor:pointer">‹</button><button class="nav r" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:40px;background:rgba(255,255,255,.12);color:#fff;border:none;width:56px;height:84px;border-radius:8px;cursor:pointer">›</button><span style="position:absolute;top:14px;right:18px;color:#fff;font-size:14px" id="lbc"></span>`;const im=lb.querySelector('img');const show=k=>{i=(k+imgs.length)%imgs.length;im.src=imgs[i];lb.querySelector('#lbc').textContent=(i+1)+'/'+imgs.length;galTo(key,i);};lb.querySelector('.l').onclick=e=>{e.stopPropagation();show(i-1);};lb.querySelector('.r').onclick=e=>{e.stopPropagation();show(i+1);};lb.onclick=()=>lb.remove();const kd=e=>{if(e.key==='Escape'){lb.remove();document.removeEventListener('keydown',kd);}if(e.key==='ArrowLeft')show(i-1);if(e.key==='ArrowRight')show(i+1);};document.addEventListener('keydown',kd);document.body.appendChild(lb);show(i);}
-function houseHTML(h,rating,label,key){if(!h)return '<div>—</div>';const imgs=(h.imgs&&h.imgs.length?h.imgs:(h.img?[h.img]:[])).filter(Boolean);GALS[key]=imgs;
+function priceRange(h){const ps=(h.ads||[]).map(a=>+a.price).filter(v=>v>0);
+  if(!ps.length)return eur(h.price);
+  const lo=Math.min.apply(null,ps),hi=Math.max.apply(null,ps);
+  return lo===hi?eur(lo):('€'+lo.toLocaleString('el')+'–'+hi.toLocaleString('el')+'/μήνα');}
+function houseHTML(h,rating,label,key,aligned){if(!h)return '<div>—</div>';/*hhMergeV11*/const imgs=((aligned&&aligned.length?aligned:(h.imgs&&h.imgs.length?h.imgs:(h.img?[h.img]:[])))||[]).filter(Boolean);GALS[key]=imgs;
   const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
   return `<div>${galHTML(imgs,key)}
     <div class="hinfo">
       <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span><span class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</span></div>
-      <div class="spec"><b>${sq(h.sqm)}</b> · <b>${eur(h.price)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
+      <div class="spec"><b>${sq(h.sqm)}</b> · <b>${priceRange(h)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
       <div class="spec">${esc(h.agencies||'Ιδιώτης')} · <span class="plat">${esc(h.platforms||h.platform||'')}</span><span class="hbadge ${h.n_ads>1?'multi':'single'}">${h.n_ads>1?'🏠 σπίτι με '+h.n_ads+' αγγελίες':'μία αγγελία'}</span></div>
       ${adsHTML(h)}
       ${rating?`<div class="stars" title="η δική σου βαθμολογία">${stars(rating)}</div>`:''}${others?`<div class="spec">${others}</div>`:''}
@@ -211,7 +215,7 @@ function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/
       <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
       <button class="btn later" onclick="verdict(${i},'later')">⏳ Αργότερα</button>
     </div>
-    <div class="hcols">${houseHTML(p.a,p.rating_a,'A','a'+i)}${houseHTML(p.b,p.rating_b,'B','b'+i)}</div>
+    <div class="hcols">${houseHTML(p.a,p.rating_a,'A','a'+i,p.imgs_a)}${houseHTML(p.b,p.rating_b,'B','b'+i,p.imgs_b)}</div>
     <div class="acts">
       <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
       <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
