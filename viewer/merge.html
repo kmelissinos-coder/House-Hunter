@@ -57,6 +57,12 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .reason.ph{background:rgba(64,160,96,.18);border-color:rgba(64,160,96,.55);color:#8fe0ab}
 .reason.phno{background:rgba(224,43,43,.13);border-color:rgba(224,43,43,.45);color:#ef9a9a}
 .links{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+/*hhMergeV10*/.hinfo .top .links{margin:0 0 0 auto;flex-wrap:nowrap}
+.hinfo .top .links a{font-size:11px;padding:3px 8px}
+.acts.top{border-top:none;border-bottom:1px solid var(--border);padding:8px 14px}
+.phb{font-size:10.5px;border-radius:5px;padding:1px 6px;margin-left:6px;white-space:nowrap}
+.phb.ok{background:rgba(64,160,96,.18);border:1px solid rgba(64,160,96,.5);color:#8fe0ab}
+.phb.no{background:rgba(224,43,43,.13);border:1px solid rgba(224,43,43,.45);color:#ef9a9a}
 .links a{font-size:12px;color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:7px;padding:3px 8px}
 .acts{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center}
 .btn{border:none;border-radius:9px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
@@ -174,13 +180,13 @@ function houseHTML(h,rating,label,key){if(!h)return '<div>—</div>';const imgs=
   const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
   return `<div>${galHTML(imgs,key)}
     <div class="hinfo">
-      <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span></div>
+      <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span><span class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</span></div>
       <div class="spec"><b>${sq(h.sqm)}</b> · <b>${eur(h.price)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
       <div class="spec">${esc(h.agencies||'Ιδιώτης')} · <span class="plat">${esc(h.platforms||h.platform||'')}</span><span class="hbadge ${h.n_ads>1?'multi':'single'}">${h.n_ads>1?'🏠 σπίτι με '+h.n_ads+' αγγελίες':'μία αγγελία'}</span></div>
       ${adsHTML(h)}
       ${rating?`<div class="stars" title="η δική σου βαθμολογία">${stars(rating)}</div>`:''}${others?`<div class="spec">${others}</div>`:''}
       <div class="descr" id="d_${key}">${esc(cleanDescr(h.descr))}</div><span class="dtog" onclick="dtog('${key}',this)">▾ όλη η περιγραφή</span>
-      <div class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</div>
+
     </div></div>`;}
 /*hhMergeV8*/
 function cleanDescr(t){return String(t||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/[ \t]{2,}/g,' ').replace(/\n{3,}/g,'\n\n').trim();}
@@ -200,6 +206,11 @@ function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/
       ${(p.reasons||[]).filter(r=>!/φωτογραφί/.test(r)).map(r=>`<span class="reason${neg(r)?' neg':''}">${esc(r)}</span>`).join('')}
       ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}% ίδια</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτογραφία</span>':''}${photoChip(p)}
       <span class="keep">📍 ${dist}</span></div>
+    <div class="acts top">
+      <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
+      <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
+      <button class="btn later" onclick="verdict(${i},'later')">⏳ Αργότερα</button>
+    </div>
     <div class="hcols">${houseHTML(p.a,p.rating_a,'A','a'+i)}${houseHTML(p.b,p.rating_b,'B','b'+i)}</div>
     <div class="acts">
       <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
@@ -216,15 +227,18 @@ function miniHTML(m,key,maj){const imgs=[m.img].concat(m.imgs||[]).filter(Boolea
   return `<div class="mini${m.deleted?' gone':''}${odd?' odd':''}" id="mini_${esc(m.id)}" title="${odd?'Διαφέρει από τα υπόλοιπα σε '+odd+' στοιχεί'+(odd===1?'ο':'α')+' — μάλλον άλλο σπίτι':''}">${odd?'<div class="oddtag">⚠ μάλλον άλλο σπίτι</div>':''}
     <div class="mg" data-g="${key}" data-i="0">${imgs.length?`<img src="${esc(imgs[0])}" loading="lazy" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)-1)">‹</button><button class="nav r" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)+1)">›</button><span class="cnt">1/${imgs.length}</span>`:'<div class="noimg" style="width:100%;height:150px">🏠</div>'}</div>
     <div class="body">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="plat">${esc(m.platform||'')}</span>${m.deleted?'<span class="diff" style="font-size:11px">⛔ αφαιρέθηκε</span>':''}<span style="color:var(--muted);font-size:11px">#${m.hhl||''}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="plat">${esc(m.platform||'')}</span>${phBadge(m)}${m.deleted?'<span class="diff" style="font-size:11px">⛔ αφαιρέθηκε</span>':''}<span style="color:var(--muted);font-size:11px">#${m.hhl||''}</span></div>
       ${rows.join('')}
       <div class="row"><span>Μεσίτης</span><span>${esc(m.agency||'Ιδιώτης')}</span></div>
       ${m.url?`<div style="margin-top:6px"><a href="${esc(m.url)}" target="_blank" rel="noopener" style="color:var(--text);font-size:12px">↗ αγγελία</a></div>`:''}
       <label class="pick"><input type="checkbox" onchange="pickSplit('${esc(m.id)}',this.checked)"> ✂ Αποσύνδεση</label>
     </div></div>`;}
+function phBadge(m){const o=+m.ph_own||0,k=+m.ph_match||0;if(o<3)return '';
+  return k>0?`<span class="phb ok" title="Οι φωτογραφίες της αγγελίας υπάρχουν και σε άλλη αγγελία του σπιτιού">📸 ${k}/${o}</span>`
+   :`<span class="phb no" title="Καμία από τις ${o} φωτογραφίες της δεν υπάρχει σε άλλη αγγελία του σπιτιού">📸 0/${o}</span>`;}
 function groupHTML(g,i){const ms=g.members||[];const maj={location:majority(ms.map(m=>m.location)),sqm:majority(ms.map(m=>m.sqm!=null?Math.round(m.sqm):null)),price:majority(ms.map(m=>m.price!=null?Math.round(m.price):null)),year:majority(ms.map(m=>m.year)),rooms:majority(ms.map(m=>m.rooms)),floor:majority(ms.map(m=>m.floor)),type:majority(ms.map(m=>m.type))};
   return `<div class="grp" id="g${i}">
-    <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}
+    <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}${(+g.ph_ok>=2&&!+g.ph_odd)?'<span class="reason ph">📸 οι φωτογραφίες συμφωνούν—μάλλον σωστό</span>':''}
       <span class="keep"><a href="index.html?house=${encodeURIComponent(g.house_id)}" target="_blank" style="color:var(--text)">🏡 Άνοιγμα στο HH</a></span></div>
     <div class="legend"><b style="color:#e05252">Κόκκινο πλαίσιο</b> = η αγγελία διαφέρει από τις υπόλοιπες της ομάδας (τ.μ., έτος, όροφος, τύπος ή τιμή >20%) — κοίτα μόνο αυτές. <span class="same">πράσινο</span> = ίδιο · <span class="diff">κόκκινο</span> = διαφέρει. Τσέκαρε τις αγγελίες που είναι άλλο σπίτι και πάτα «Αποσύνδεση».</div>
     <div class="mgrid">${ms.map((m,k)=>miniHTML(m,'g'+i+'_'+k,maj)).join('')}</div>
