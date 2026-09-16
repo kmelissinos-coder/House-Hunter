@@ -5110,7 +5110,7 @@ function paint(base, rejN, delN){
       if(!b && btns.length>1){ b=btns[1]; b.__h15p=1; }
       if(b) b.textContent=txt+' ▾';
     }
-    var rn=document.getElementById('hh-rejn'); if(rn) rn.textContent='('+rejN+')';
+    var rn=document.getElementById('hh-rejn15'); if(rn) rn.textContent='('+rejN+')';
     var dn=document.getElementById('hh-delh15-n'); if(dn) dn.textContent='('+delN+')';
   }catch(e){}
 }
@@ -5234,6 +5234,16 @@ st.textContent=
  +'#hh-lo-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}';
 document.head.appendChild(st);
 
+function ensureRejSpan(){
+  try{
+    if(document.getElementById('hh-rejn15')) return;
+    var old=document.getElementById('hh-rejn'); if(!old) return;
+    var sp=document.createElement('span'); sp.id='hh-rejn15'; sp.style.opacity='.6';
+    old.parentNode.insertBefore(sp, old.nextSibling);
+    old.style.display='none';
+  }catch(e){}
+}
+
 function killEfi(){
   try{
     var c=document.getElementById('hideEfi');
@@ -5334,8 +5344,8 @@ if(typeof L!=='undefined' && L && L.map && !window.__h16zoom){
   window.__h16zoom=true;
 }
 
-setInterval(function(){ killEfi(); legend(); }, 1000);
-setTimeout(function(){ killEfi(); legend(); }, 600);
+setInterval(function(){ ensureRejSpan(); killEfi(); legend(); }, 1000);
+setTimeout(function(){ ensureRejSpan(); killEfi(); legend(); }, 600);
 }catch(e){console.warn('hhPolish16',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
