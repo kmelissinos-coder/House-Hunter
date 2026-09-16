@@ -4745,19 +4745,18 @@ function addFilterRow(){try{
   var cb=g.querySelector('input');
   try{ if(localStorage.getItem('hh_unrated_only')==='1') cb.checked=true; }catch(e){}
   cb.addEventListener('change',function(){ try{localStorage.setItem('hh_unrated_only',cb.checked?'1':'0');}catch(e){}
-    window._savedScroll=window.scrollY; applyUnrated(); });
+    window._savedScroll=window.scrollY; applyUnrated(); try{applyFilters();}catch(e){} });
 }catch(e){}}
-function applyUnrated(){try{
-  var on=onlyUnrated(), n=0, hidden=0;
+function applyUnrated(){try{/*hhPolish12: the filtering moved into renderListings*/
   document.querySelectorAll('.grid-container .card,.grid-container .grouped-card,.listing-row,.list-row').forEach(function(card){
-    var hid=hidOf(card); if(!hid) return;
-    var rated=!!MINE[hid]; if(!rated) n++;
-    if(on&&rated){ if(card.style.display!=='none'){card.__h9=card.style.display;card.style.display='none';} hidden++; }
-    else if(card.__h9!==undefined){ card.style.display=card.__h9==='none'?'':card.__h9; card.__h9=undefined; }
-    else if(on===false&&card.style.display==='none'&&card.__h9===undefined){ /* not ours — leave it */ }
+    if(card.__h9!==undefined){ card.style.display=card.__h9==='none'?'':card.__h9; card.__h9=undefined; }
   });
-  var lbl=document.querySelector('#hh-unrated9 ~ label .n'); if(lbl) lbl.textContent=ready?('('+n+')'):'';
+  var lbl=document.querySelector('#hh-unrated9 ~ label .n');
+  if(lbl) lbl.textContent=(ready&&window.__h12n!=null)?('('+window.__h12n+')'):'';
 }catch(e){}}
+window.hhUnratedOn=function(){return onlyUnrated();};
+window.hhMineMap=function(){return MINE;};
+window.hhRatReady=function(){return ready;};
 
 /* ---------- 2. «Φίλτρα» label on the filters button ---------- */
 function labelFilters(){try{
@@ -4884,6 +4883,41 @@ setInterval(function(){recount();rejCount();},1000);
 setTimeout(function(){lastKey='';recount();rejCount();},900);
 document.addEventListener('click',function(){setTimeout(function(){lastKey='';recount();rejCount();},120);},true);
 }catch(e){console.warn('hhPolish11',e);}})();</script>
+
+<script>/*hhPolish12*/(function(){try{
+function ON(){try{return !!(window.hhUnratedOn&&window.hhUnratedOn());}catch(e){return false;}}
+function MINE(){try{return (window.hhMineMap&&window.hhMineMap())||{};}catch(e){return {};}}
+function RDY(){try{return !!(window.hhRatReady&&window.hhRatReady());}catch(e){return false;}}
+function HID(h){try{return String((h&&(h.house_id||h.houseId))||'').trim();}catch(e){return '';}}
+if(!window.__h12 && typeof renderListings==='function'){
+  var _rl=renderListings;
+  renderListings=function(){
+    var saved=null;
+    try{
+      if(typeof filtered!=='undefined'&&Array.isArray(filtered)){
+        var M=MINE(),seen={},n=0;
+        filtered.forEach(function(h){var k=HID(h);
+          if(k&&k!=='0'){ if(seen[k])return; seen[k]=1; if(!M[k])n++; } else n++;});
+        window.__h12n=n;
+        if(ON()&&RDY()){
+          saved=filtered;
+          filtered=filtered.filter(function(h){var k=HID(h);return !(k&&M[k]);});
+          var rc=document.getElementById('resultsCount');
+          if(rc) rc.textContent=filtered.length+' αγγελίες εμφανίζονται';
+        }
+      }
+    }catch(e){}
+    try{ return _rl.apply(this,arguments); }
+    finally{ if(saved){ try{filtered=saved;}catch(e){} } }
+  };
+  window.__h12=true;
+}
+/* the ratings arrive after the first render — re-run the pipeline once they are in */
+var tries=0,t=setInterval(function(){ tries++;
+  if(RDY()){ clearInterval(t); try{ if(ON()) applyFilters(); else if(typeof applyUnrated==='function') applyUnrated(); }catch(e){} }
+  else if(tries>60) clearInterval(t);
+},700);
+}catch(e){console.warn('hhPolish12',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
