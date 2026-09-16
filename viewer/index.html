@@ -2076,7 +2076,7 @@ function renderGroupedCard(g) {
       ${stripHtml}
       <div class="group-id-pill">${shortId(g.houseId)}</div>
       <div class="group-listing-count">🏢 ${g.count}</div>
-      ${g.allImgs.length > 1 ? `<div class="photo-count-pill">📷 ${g.allImgs.length}</div>` : ''}
+      <div class="photo-count-pill" data-ph="${g.houseId}" style="display:none">📷 ${g.allImgs.length}</div>
     </div>
     <div class="grouped-body${(g.items&&g.items.every(function(i){return i.seen_it;}))?' seen-it':''}">
       <div class="grouped-meta">
@@ -2295,7 +2295,7 @@ function renderCard(h) {
       <div class="card-top">
         <div>
           <div class="card-location">${h.location || '—'}</div>
-          <div class="card-type">${h.floor ? h.floor + (h.lvl ? ' · '+h.lvl+' επίπεδα' : '') : ''}</div>
+          <div class="card-type">${[h.type||'', h.floor ? h.floor + (h.lvl ? ' · '+h.lvl+' επίπεδα' : '') : ''].filter(Boolean).join(' · ')}</div>
         </div>
         <div>
           <div class="card-price">${h.price ? '€'+h.price.toLocaleString('el') : '—'}</div>
@@ -3335,8 +3335,8 @@ function _featHTML(h){
         <div class="modal-field"><div class="modal-field-label">Αρ. Αγγελίας</div><div class="modal-field-value">${h.platformNr||'—'}</div></div>
         <div class="modal-field"><div class="modal-field-label">Αρ. Μεσιτικού</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
-      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
       ${h.description?`<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📄 Περιγραφή αγγελίας</div><div style="font-size:12.5px;line-height:1.55;white-space:pre-wrap;max-height:240px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">${escH((window.hhCleanDescr?window.hhCleanDescr(h.description):h.description))}</div></div>`:''}
+      ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
 
       <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📍 Διεύθυνση (αν έχει επιβεβαιωθεί)</div>
         <div style="display:flex;gap:6px;">
@@ -5347,6 +5347,59 @@ if(typeof L!=='undefined' && L && L.map && !window.__h16zoom){
 setInterval(function(){ ensureRejSpan(); killEfi(); legend(); }, 1000);
 setTimeout(function(){ ensureRejSpan(); killEfi(); legend(); }, 600);
 }catch(e){console.warn('hhPolish16',e);}})();</script>
+
+<script>/*hhPolish17*/(function(){try{
+var st=document.createElement('style'); st.id='hh-polish17-css';
+st.textContent=
+  '.card>.card-img-wrap>.card-badge,.grouped-card .photo-strip>.card-badge{display:none!important}'
+ +'.card-img-wrap>.hh-private-badge,.photo-strip>.hh-private-badge{left:8px!important;bottom:8px!important;top:auto!important;right:auto!important}'
+ +'.show-deleted-wrap>label.hh-efi,.show-deleted-wrap .hh-efi{display:none!important}';
+document.head.appendChild(st);
+
+function killEfi17(){
+  try{
+    var c=document.getElementById('hideEfi');
+    if(c){
+      if(c.checked){ c.checked=false; try{applyFilters();}catch(e){} }
+      var L=c.closest('label')||c.parentNode;
+      if(L&&L.classList&&!L.classList.contains('hh-efi')) L.classList.add('hh-efi');
+    }
+  }catch(e){}
+}
+
+/* the real number of distinct photos per house */
+var SB17='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1',
+    AK17='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+window.__hhPhN=null;
+function loadCounts(){
+  if(window.__hhPhN||window.__hhPhLoading) return;
+  window.__hhPhLoading=true;
+  fetch(SB17+'/rpc/rent_gallery_counts',{method:'POST',
+      headers:{apikey:AK17,Authorization:'Bearer '+AK17,'Content-Type':'application/json'},body:'{}'})
+   .then(function(r){return r.json();})
+   .then(function(rows){
+      window.__hhPhLoading=false;
+      if(!Array.isArray(rows)) return;
+      var m={}; rows.forEach(function(x){ m[String(x.house_id)]=+x.n||0; });
+      window.__hhPhN=m; paintPills();
+   })
+   .catch(function(){ window.__hhPhLoading=false; });
+}
+function paintPills(){
+  var m=window.__hhPhN; if(!m) return;
+  try{
+    [].forEach.call(document.querySelectorAll('.photo-count-pill[data-ph]'),function(p){
+      var n=m[String(p.getAttribute('data-ph'))];
+      if(n==null){ p.style.display='none'; return; }
+      p.textContent='📷 '+n;
+      p.style.display = n>1 ? '' : 'none';
+    });
+  }catch(e){}
+}
+loadCounts();
+setInterval(function(){ killEfi17(); paintPills(); },1000);
+setTimeout(function(){ killEfi17(); loadCounts(); },400);
+}catch(e){console.warn('hhPolish17',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
