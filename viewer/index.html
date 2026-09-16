@@ -1595,7 +1595,7 @@ function parseCSV(text, defaultPlatform) {
     return {
       id:         get('house_id','id') || String(i+1),
       house_id:   get('house_id','id'),
-      location:   get('location','περιοχή','περιοχη'),
+      location:   (window.hhGrLoc?window.hhGrLoc(get('location','περιοχή','περιοχη')):get('location','περιοχή','περιοχη')),
       type:       get('type_of_house','τύπος_κατοικίας','type','τυπος'),
       url:        get('url',' url'),
       rooms:      get('rooms','υπνοδωμάτια','δωμάτια'),
@@ -5831,6 +5831,61 @@ document.addEventListener('click',function(e){
   }catch(x){}
 }, true);
 }catch(e){console.warn('hhPolish27',e);}})();</script>
+<script>/*hhPolish28*/(function(){try{
+  /* Λατινικά ονόματα περιοχών (Rentola κ.ά.) -> ελληνικά, ώστε να μη φαίνονται
+     με διαφορετική (bold/serif) γραμματοσειρά από τις υπόλοιπες κάρτες. */
+  var MAP = {
+    'dionysos':'Διόνυσος','dionisos':'Διόνυσος','dionysus':'Διόνυσος',
+    'kifisia':'Κηφισιά','kifissia':'Κηφισιά','kifisias':'Κηφισιά',
+    'nea kifisia':'Νέα Κηφισιά','nea kifissia':'Νέα Κηφισιά',
+    'vrilissia':'Βριλήσσια','vrilisia':'Βριλήσσια','vrilissa':'Βριλήσσια',
+    'marousi':'Μαρούσι','maroussi':'Μαρούσι','amarousio':'Μαρούσι','amaroussion':'Μαρούσι',
+    'penteli':'Πεντέλη','pendeli':'Πεντέλη',
+    'nea penteli':'Νέα Πεντέλη','nea pendeli':'Νέα Πεντέλη',
+    'ano penteli':'Άνω Πεντέλη','ano pendeli':'Άνω Πεντέλη',
+    'chalandri':'Χαλάνδρι','halandri':'Χαλάνδρι',
+    'agia paraskevi':'Αγία Παρασκευή',
+    'cholargos':'Χολαργός','holargos':'Χολαργός',
+    'papagou':'Παπάγου','papagos':'Παπάγου',
+    'psychiko':'Ψυχικό','psichiko':'Ψυχικό','filothei':'Φιλοθέη',
+    'neo psychiko':'Νέο Ψυχικό','neo psichiko':'Νέο Ψυχικό',
+    'nea erythraia':'Νέα Ερυθραία','nea erithrea':'Νέα Ερυθραία','nea erythrea':'Νέα Ερυθραία',
+    'ekali':'Εκάλη','drosia':'Δροσιά','dionisou':'Διόνυσος',
+    'anoixi':'Άνοιξη','anixi':'Άνοιξη','stamata':'Σταμάτα','rodopoli':'Ροδόπολη',
+    'kryoneri':'Κρυονέρι','krioneri':'Κρυονέρι','agios stefanos':'Άγιος Στέφανος',
+    'melissia':'Μελίσσια','pefki':'Πεύκη','pefkh':'Πεύκη','lykovrysi':'Λυκόβρυση',
+    'irakleio':'Ηράκλειο','heraklio':'Ηράκλειο','metamorfosi':'Μεταμόρφωση',
+    'nea ionia':'Νέα Ιωνία','neo irakleio':'Νέο Ηράκλειο',
+    'galatsi':'Γαλάτσι','athens':'Αθήνα','athina':'Αθήνα'
+  };
+  function norm(v){
+    if(!v) return v;
+    var t = String(v).trim();
+    if(!/[A-Za-z]/.test(t)) return v;            /* ήδη ελληνικά */
+    if(/[\u0370-\u03ff\u1f00-\u1fff]/.test(t)) return v; /* μικτό - μην το πειράξεις */
+    var k = t.toLowerCase().replace(/\s+/g,' ')
+             .replace(/^(municipality|dimos|demos)\s+of\s+/,'')
+             .replace(/\s*,.*$/,'').trim();
+    return MAP[k] || v;
+  }
+  window.hhGrLoc = norm;
+
+  /* Ό,τι έχει ήδη γραφτεί στη σελίδα (τίτλοι καρτών) το διορθώνουμε κι εκεί. */
+  function sweep(){
+    try{
+      var sel = '.card-loc, .card-title, .mini-loc, .hh-loc, .card h3, .card .loc';
+      document.querySelectorAll(sel).forEach(function(e){
+        if(e.children.length) return;
+        var t = (e.textContent||'').trim();
+        if(!t || !/^[A-Za-z][A-Za-z\s]*$/.test(t)) return;
+        var g = norm(t);
+        if(g && g !== t) e.textContent = g;
+      });
+    }catch(e){}
+  }
+  sweep(); setInterval(sweep, 1500);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', sweep);
+}catch(e){console.warn('hhPolish28',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
