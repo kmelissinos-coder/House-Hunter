@@ -5514,6 +5514,71 @@ window.fetch=function(u,o){
   return p;
 };
 }catch(e){console.warn('hhPolish20',e);}})();</script>
+
+<script>/*hhPolish21*/(function(){try{
+var st=document.createElement('style'); st.id='hh-polish21-css';
+st.textContent=
+  '.hh-osm-btn{position:absolute!important;right:8px;bottom:22px;z-index:650;display:inline-flex;align-items:center;gap:5px;'
+ +'background:rgba(20,20,24,.86);color:#e8e6e1;font-size:11px;font-weight:600;line-height:1;padding:5px 9px;border-radius:7px;'
+ +'border:1px solid rgba(255,255,255,.18);cursor:pointer;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.35)}'
+ +'.hh-osm-btn:hover{background:rgba(20,20,24,.96);color:#fff}'
+ +'body.light .hh-osm-btn{background:rgba(252,250,244,.94);color:#2b2b2b;border-color:rgba(0,0,0,.18)}';
+document.head.appendChild(st);
+
+/* remember every Leaflet map we create, keyed by its container */
+window.__hhMaps = window.__hhMaps || [];
+if(typeof L!=='undefined' && L && L.map && !L.map.__h21){
+  var _lm=L.map;
+  var w=function(el,opt){
+    var m=_lm.call(this,el,opt);
+    try{ window.__hhMaps.push(m); }catch(e){}
+    return m;
+  };
+  for(var k in _lm){ try{ w[k]=_lm[k]; }catch(e){} }
+  w.__h21=true;
+  L.map=w;
+}
+
+function mapOf(container){
+  try{
+    for(var i=window.__hhMaps.length-1;i>=0;i--){
+      var m=window.__hhMaps[i];
+      try{ if(m && m.getContainer && m.getContainer()===container) return m; }catch(e){}
+    }
+  }catch(e){}
+  return null;
+}
+
+function osmUrl(m, withPin){
+  var c=m.getCenter(), z=Math.max(1,Math.min(19,Math.round(m.getZoom())));
+  var la=(+c.lat).toFixed(5), ln=(+c.lng).toFixed(5);
+  return 'https://www.openstreetmap.org/'+(withPin?('?mlat='+la+'&mlon='+ln):'')+'#map='+z+'/'+la+'/'+ln;
+}
+
+function addBtns(){
+  try{
+    [].forEach.call(document.querySelectorAll('.leaflet-container'),function(c){
+      if(c.querySelector(':scope > .hh-osm-btn')) return;
+      var m=mapOf(c); if(!m) return;
+      var a=document.createElement('a');
+      a.className='hh-osm-btn';
+      a.target='_blank'; a.rel='noopener';
+      a.href='https://www.openstreetmap.org/';
+      a.title='Άνοιγμα αυτού του χάρτη στο OpenStreetMap, σε νέα καρτέλα';
+      a.innerHTML='🗺 OpenStreetMap ↗';
+      var pin = (c.id==='hh-lo-map');
+      a.addEventListener('mousedown',function(ev){ ev.stopPropagation(); });
+      a.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        try{ a.href=osmUrl(m,pin); }catch(e){}
+      });
+      c.appendChild(a);
+    });
+  }catch(e){}
+}
+setInterval(addBtns,900);
+setTimeout(addBtns,700);
+}catch(e){console.warn('hhPolish21',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
