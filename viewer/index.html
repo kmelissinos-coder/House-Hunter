@@ -5753,6 +5753,46 @@ function fix(){
 setInterval(fix,1000);
 setTimeout(fix,900);
 }catch(e){console.warn('hhPolish25',e);}})();</script>
+
+<script>/*hhPolish26*/(function(){try{
+function rows(){ try{ return [].concat(allListings||[], extraListings||[]); }catch(e){ return []; } }
+function adsOf(hid){ hid=String(hid||'').trim(); return rows().filter(function(x){return String(x.house_id||'').trim()===hid;}); }
+function toast(m){ try{ if(window.showToast) showToast(m); }catch(e){} }
+
+window.hhGsReject=function(hid){
+  try{
+    var ms=adsOf(hid);
+    if(!ms.length){ toast('⚠ Δεν βρέθηκαν αγγελίες'); return; }
+    var allHidden=ms.every(function(m){return !!m.hidden;});
+    var on=!allHidden;
+    if(on && !confirm('Να κρυφτεί το σπίτι #'+hid+' και οι '+ms.length+' αγγελίες του («δεν μας αρέσει»);\n\nΜένει στη βάση — επανέρχεται με το φίλτρο «👎 Εμφάνιση απορριμμένων».')) return;
+    (async function(){
+      for(var i=0;i<ms.length;i++){
+        var m=ms[i];
+        try{ await sb.update(m._dbId||m.id,{hidden:on}); m.hidden=on; }catch(e){}
+      }
+      toast(on?('👎 Κρύφτηκε ('+ms.length+' αγγελί'+(ms.length===1?'α':'ες')+')'):'↩ Επανήλθε στη λίστα');
+      try{ closeListingOverlay(); }catch(e){}
+      try{ applyFilters(); }catch(e){}
+    })();
+  }catch(e){ toast('❌ Σφάλμα'); }
+};
+
+/* the button should say what it is about to do */
+function label(){
+  try{
+    var tools=document.querySelector('.hh-gs-tools'); if(!tools) return;
+    var hid=String(tools.dataset.hhh||'').trim(); if(!hid) return;
+    var b=tools.querySelector('.hh-gs-rm.nope'); if(!b) return;
+    var ms=adsOf(hid); if(!ms.length) return;
+    var hidden=ms.every(function(m){return !!m.hidden;});
+    var want=hidden?'↩ Επαναφορά (κρυμμένο)':'👎 Δεν μας αρέσει';
+    if(b.innerHTML!==want) b.innerHTML=want;
+  }catch(e){}
+}
+setInterval(label,900);
+setTimeout(label,900);
+}catch(e){console.warn('hhPolish26',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
