@@ -5698,6 +5698,61 @@ function install(){
 setInterval(install,800);
 setTimeout(install,900);
 }catch(e){console.warn('hhPolish24',e);}})();</script>
+
+<script>/*hhPolish25*/(function(){try{
+var st=document.createElement('style'); st.id='hh-polish25-css';
+st.textContent='.hh-unknown-ag{opacity:.75;font-style:italic}';
+document.head.appendChild(st);
+
+function rows(){ try{ return [].concat(allListings||[], extraListings||[]); }catch(e){ return []; } }
+function adsOf(card){
+  try{
+    var hid=String((card.dataset&&card.dataset.hhh)||'').trim();
+    var all=rows();
+    if(hid && hid!=='0') return all.filter(function(x){return String(x.house_id||'').trim()===hid;});
+    var a=card.querySelector('[onclick*="openListingOverlay("]');
+    if(a){ var oc=a.getAttribute('onclick')||''; var q=String.fromCharCode(39);
+           var i1=oc.indexOf(q), i2=oc.indexOf(q,i1+1);
+           if(i1>=0&&i2>i1){ var u=oc.slice(i1+1,i2); return all.filter(function(x){return x.url===u;}); } }
+  }catch(e){}
+  return [];
+}
+function looksPrivate(ads){
+  if(!ads.length) return null;                       /* unknown — leave the card alone */
+  var saysPriv=false, blankNonRentola=false, anyAgency=false, blankRentola=false;
+  ads.forEach(function(a){
+    var ag=String(a.agency||'').trim();
+    if(/ιδι[ώω]τ|private|owner/i.test(ag)) saysPriv=true;
+    else if(ag) anyAgency=true;
+    else if(String(a.platform||'')==='Rentola') blankRentola=true;
+    else blankNonRentola=true;
+  });
+  if(saysPriv) return true;
+  if(anyAgency) return false;
+  if(blankNonRentola) return true;                   /* those sites do print the agency when there is one */
+  if(blankRentola) return false;                     /* Rentola simply never prints it */
+  return null;
+}
+function fix(){
+  try{
+    document.querySelectorAll('.card,.grouped-card').forEach(function(c){
+      var v=looksPrivate(adsOf(c));
+      if(v===false){
+        if(c.classList.contains('hh-private')) c.classList.remove('hh-private');
+        var b=c.querySelector('.hh-private-badge'); if(b) b.remove();
+        var ag=c.querySelector('.agency-name,.agency-summary');
+        if(ag && !/[a-zA-Zα-ωΑ-Ω]/.test(ag.textContent||'') && !ag.classList.contains('hh-unknown-ag')){
+          ag.classList.add('hh-unknown-ag');
+          ag.textContent='άγνωστος μεσίτης (Rentola)';
+          ag.title='Το Rentola δεν δημοσιεύει ποιος διαφημίζει· φαίνεται μόνο αν επικοινωνήσεις.';
+        }
+      }
+    });
+  }catch(e){}
+}
+setInterval(fix,1000);
+setTimeout(fix,900);
+}catch(e){console.warn('hhPolish25',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
