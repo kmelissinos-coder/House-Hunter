@@ -2077,6 +2077,7 @@ function renderGroupedCard(g) {
       <div class="group-id-pill">${shortId(g.houseId)}</div>
       <div class="group-listing-count">🏢 ${g.count}</div>
       <div class="photo-count-pill" data-ph="${g.houseId}" style="display:none">📷 ${g.allImgs.length}</div>
+      ${(function(){try{var ds=(g.items||[]).filter(function(x){return x.deleted;});if(!ds.length)return '';var ps=[];ds.forEach(function(x){var p=x.platform||'';if(p&&ps.indexOf(p)<0)ps.push(p);});var w=ps.length>1?('τις πλατφόρμες '+ps.join(', ')):(ps[0]||'την πλατφόρμα');var txt=(ds.length===g.items.length)?('Αφαιρέθηκε από '+w):(ds.length+' από '+g.items.length+' αγγελίες αφαιρέθηκαν από '+w);return '<div class="hh-gone-ribbon">⛔ '+txt+'</div>';}catch(e){return '';}})()}
     </div>
     <div class="grouped-body${(g.items&&g.items.every(function(i){return i.seen_it;}))?' seen-it':''}">
       <div class="grouped-meta">
@@ -2288,6 +2289,7 @@ function renderCard(h) {
       ${h.deleted?`<div class="hh-gone-ribbon">⛔ Αφαιρέθηκε από ${escH(h.platform||'')}</div>`:''}
       <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
       ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">${shortId(h.house_id)}</div>` : ''}
+      ${h.house_id && h.house_id !== '0' ? `<div class="photo-count-pill" data-ph="${h.house_id}" style="display:none">📷</div>` : ''}
       ${h.hasChanges ? `<div class="change-badge">🔄 Αλλαγή</div>` : ''}
       <div class="fav-btn" onclick="event.stopPropagation();toggleFav('${escJ(h.url||h.platformNr)}')">${isFav?'★':'☆'}</div>
     </div>
@@ -5400,6 +5402,40 @@ loadCounts();
 setInterval(function(){ killEfi17(); paintPills(); },1000);
 setTimeout(function(){ killEfi17(); loadCounts(); },400);
 }catch(e){console.warn('hhPolish17',e);}})();</script>
+
+<script>/*hhPolish18*/(function(){try{
+var st=document.createElement('style'); st.id='hh-polish18-css';
+st.textContent=
+  /* 4. one line: stars · average · removed · don't like ......... share (right) */
+  '.hh-gs-tools{flex-wrap:wrap!important;align-items:center!important;gap:8px!important;row-gap:8px!important}'
+ +'.hh-gs-tools>.card-stars{order:1;padding:0!important}'
+ +'.hh-gs-tools>.hh-rv{order:2}'
+ +'.hh-gs-tools>.hh-gs-rm.gone{order:3}'
+ +'.hh-gs-tools>.hh-gs-rm.nope{order:4}'
+ +'.hh-gs-tools>.modal-btn{order:9;margin-left:auto!important}'
+  /* same size for all three buttons */
+ +'.hh-gs-tools>.modal-btn,.hh-gs-tools>.hh-gs-rm{display:inline-flex!important;align-items:center;justify-content:center;'
+ +'height:30px!important;padding:0 12px!important;font-size:12px!important;font-weight:600!important;'
+ +'border-radius:8px!important;white-space:nowrap;line-height:1!important;box-sizing:border-box}'
+  /* 2. the pill on a single card sits where it does on a grouped one */
+ +'.card>.card-img-wrap>.photo-count-pill{position:absolute;right:8px;bottom:8px;z-index:3}';
+document.head.appendChild(st);
+
+/* 1. the split view reaches the bottom of the window */
+function fitSplit(){
+  try{
+    var el=document.getElementById('map-split'); if(!el) return;
+    if(getComputedStyle(el).display==='none') return;
+    var top=el.getBoundingClientRect().top;
+    var h=Math.max(320, Math.round(window.innerHeight - top - 8));
+    if(el.style.height!==h+'px'){ el.style.height=h+'px'; el.style.maxHeight=h+'px'; 
+      try{ if(window._hhMap) setTimeout(function(){try{window._hhMap.invalidateSize();}catch(e){}},80); }catch(e){} }
+  }catch(e){}
+}
+window.addEventListener('resize',fitSplit);
+setInterval(fitSplit,900);
+setTimeout(fitSplit,500);
+}catch(e){console.warn('hhPolish18',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
