@@ -4709,7 +4709,7 @@ async function load(force){try{
   if(!NICK[uid]) NICK[uid]=(a.user.email||'').split('@')[0];
   var lj=await (await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hd})).json();
   if(Array.isArray(lj)){H={};lj.forEach(function(x){H[x.id]=x.house_id;});}
-  ready=true; paint();
+  ready=true; paint(); window.hhRatReload=function(){lastLoad=0;load(true);}; window.hhRatPaint=paint;
 }catch(e){}finally{loading=false;}}
 
 function hidOf(card){try{
@@ -5491,6 +5491,29 @@ document.head.appendChild(st);
 setInterval(addConfirm,900);
 setTimeout(addConfirm,700);
 }catch(e){console.warn('hhPolish19',e);}})();</script>
+
+<script>/*hhPolish20*/(function(){try{
+if(window.__h20) return; window.__h20=true;
+var _f=window.fetch, pending=null;
+function poke(){
+  if(pending) clearTimeout(pending);
+  pending=setTimeout(function(){
+    pending=null;
+    try{ if(window.hhRatReload) window.hhRatReload(); }catch(e){}
+    try{ if(window.hhRatPaint) setTimeout(window.hhRatPaint,600); }catch(e){}
+  },200);
+}
+window.fetch=function(u,o){
+  var url=(typeof u==='string')?u:((u&&u.url)||'');
+  var p=_f.apply(this,arguments);
+  try{
+    if(url.indexOf('/rest/v1/user_ratings')>=0 && String((o&&o.method)||'GET').toUpperCase()==='POST'){
+      p.then(function(r){ try{ if(r&&(r.ok||r.status===201||r.status===204)) poke(); }catch(e){} },function(){});
+    }
+  }catch(e){}
+  return p;
+};
+}catch(e){console.warn('hhPolish20',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
