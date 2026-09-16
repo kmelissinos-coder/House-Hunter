@@ -3336,7 +3336,7 @@ function _featHTML(h){
         <div class="modal-field"><div class="modal-field-label">Αρ. Μεσιτικού</div><div class="modal-field-value">${h.agencyNr||'—'}</div></div>
       </div>
       ${h.notes?`<div class="modal-notes">📝 <strong>Σημειώσεις Πλατφόρμας:</strong> ${h.notes}</div>`:''}
-      ${h.description?`<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📄 Περιγραφή αγγελίας</div><div style="font-size:12.5px;line-height:1.55;white-space:pre-wrap;max-height:240px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">${escH(h.description)}</div></div>`:''}
+      ${h.description?`<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📄 Περιγραφή αγγελίας</div><div style="font-size:12.5px;line-height:1.55;white-space:pre-wrap;max-height:240px;overflow-y:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;">${escH((window.hhCleanDescr?window.hhCleanDescr(h.description):h.description))}</div></div>`:''}
 
       <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">📍 Διεύθυνση (αν έχει επιβεβαιωθεί)</div>
         <div style="display:flex;gap:6px;">
@@ -3790,7 +3790,7 @@ function dist(arr){var s=[];arr.forEach(function(v){v=(v==null?'':(''+v)).trim()
 function parseEx(ex){if(Array.isArray(ex))return ex;try{return JSON.parse(ex||'[]');}catch(e){return [];}}
 function esc(s){return (s==null?'':(''+s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function measure(url){if(/res\.cloudinary\.com\/.+\/upload\//.test(url)){var gi=url.replace('/upload/','/upload/fl_getinfo/');return fetch(gi).then(function(r){return r.json();}).then(function(j){var i=j.input||j.output||{};return (i.width||0)*(i.height||0);}).catch(function(){return 0;});}return new Promise(function(res){var im=new Image();var done=false;var t=setTimeout(function(){if(!done){done=true;res(0);}},2600);im.onload=function(){if(done)return;done=true;clearTimeout(t);res((im.naturalWidth||0)*(im.naturalHeight||0));};im.onerror=function(){if(done)return;done=true;clearTimeout(t);res(0);};im.src=url;});}
-function collectImgs(){var out=[];members.forEach(function(m){var ex=parseEx(m.extra_images);var seen={};[m.image_url].concat(ex).forEach(function(u){if(!u)return;var k=window.__hhKey(u);if(seen[k])return;seen[k]=1;out.push({url:u,agency:m.agency,id:m.id});});});var fs={};return out.filter(function(o){if(fs[o.url])return false;fs[o.url]=1;return true;});}
+function collectImgs(){var out=[];members.forEach(function(m){var ex=parseEx(m.extra_images);var seen={};[m.image_url].concat(ex).forEach(function(u){if(!u)return;var k=window.__hhKey(u);if(seen[k])return;seen[k]=1;out.push({url:u,agency:m.agency,id:m.id});});});var fs={};out=out.filter(function(o){if(fs[o.url])return false;fs[o.url]=1;return true;});try{var K=window.__hhGalKeep;if(K&&String(K.h)===String(hid())&&K.rank){var f=out.filter(function(o){return K.rank[o.url]!=null;});if(f.length>=Math.min(3,out.length)){f.sort(function(a,b){return K.rank[a.url]-K.rank[b.url];});return f;}}}catch(e){}return out;}
 function collectVideos(){var out=[],s={};members.forEach(function(m){if(m.video_url&&!s[m.video_url]){s[m.video_url]=1;out.push({url:m.video_url,agency:m.agency});}});return out;}
 function removeSummary(){try{if(window.hhGsRestoreNotes)hhGsRestoreNotes();}catch(e){}var ov=document.getElementById('hh-grpsum-ov');if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);var c0=document.getElementById('hh-sib0');if(c0)c0.classList.remove('lo-sib-active');var f=document.querySelector('.lo-featured');if(f){[].forEach.call(f.querySelectorAll('[data-hhhid]'),function(c){var v=c.getAttribute('data-hhhid');c.style.display=(v==='_'?'':v);c.removeAttribute('data-hhhid');});}}
 function toggleFav(it){var key=window.__hhKey(it.url);if(window.__favKeys[key]){delete window.__favKeys[key];fetch(FAV+'?image_key=eq.'+encodeURIComponent(key),{method:'DELETE',headers:AH});}else{window.__favKeys[key]={url:it.url};fetch(FAV,{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},AH),body:JSON.stringify({image_key:key,image_url:it.url,listing_id:it.id||null,house_id:hid()})});}if(window.applyFilters){try{window.applyFilters();}catch(e){}}}
@@ -5132,10 +5132,10 @@ function recount(){
     var baseRaw=filtered.slice();
     var base=inView(stripDel(baseRaw));
     var dm=delMap();
-    var delN=houses(inView(baseRaw.filter(function(h){return dm[HK(h)];})));
+    var delN=houses(baseRaw.filter(function(h){return dm[HK(h)];}));
     var rejN=0;
     if(sd){ sd.checked=true; _af.call(window);
-            rejN=houses(inView(stripDel(filtered).filter(function(h){return h.hidden;})));
+            rejN=houses(stripDel(filtered).filter(function(h){return h.hidden;}));
             sd.checked=prevSd; }
     paint(base, rejN, delN);
   }catch(e){ try{ if(sd) sd.checked=prevSd; }catch(e2){} }
@@ -5192,6 +5192,151 @@ var mn=0, miv=setInterval(function(){
 setTimeout(function(){ ensureBox(); try{applyFilters();}catch(e){} }, 1200);
 setInterval(function(){ ensureBox(); }, 2000);
 }catch(e){console.warn('hhPolish15',e);}})();</script>
+
+<script>/*hhPolish16*/(function(){try{
+
+/* ---------- 2. description without the markup and without the sales pitch ---------- */
+var NOISE=/(https?:\/\/|www\.|utm_|[a-z0-9._-]+@[a-z0-9.-]+\.[a-z]{2,}|\b\d{10}\b|\b2\d{2}[\s.-]?\d{7}\b|\b69\d{8}\b)/i;
+var PITCH=/(επισκεφ|επικοινων|καλ[εέ]στε|τηλεφων[ήη]στε|κλε[ιί]στε\s|κρατ[ήη]σ|book\b|booking\b|visit\b|contact\b|website|ιστ[οό]τοπ|ιστοσελ[ιί]δ|online\b|μεσιτικ[ήη]\s+αμοιβ|προμ[ήη]θει|αναβαθμ[ιί]σ|ακολουθ[ήη]στε\s+μας|η\s+εταιρε[ιί]α\s+μας|δε[ιί]τε\s+περισσ[οό]τερ|μ[άα]θετε\s+περισσ[οό]τερ|εγγεγραμμ[εέ]ν|αρ\.?\s*μητρ[ώω]ου|α\.?μ\.?α\.?\s*:)/i;
+window.hhCleanDescr=function(t){
+  var s=String(t==null?'':t);
+  if(!s) return '';
+  if(!/[<&]/.test(s) && s.length<400 && !NOISE.test(s)) return s.trim();
+  s=s.replace(/<\s*(br|\/p|\/div|\/li|\/h[1-6]|\/tr)\s*\/?>/gi,'\n').replace(/<[^>]*>/g,' ');
+  try{ var ta=document.createElement('textarea'); ta.innerHTML=s; s=ta.value; }catch(e){}
+  s=s.replace(/\r/g,'').replace(/[ \t ]+/g,' ');
+  var out=[];
+  s.split(/\n+/).forEach(function(L){
+    L=L.trim(); if(!L) return;
+    L.split(/(?<=[.!;·])\s+/).forEach(function(S){
+      S=S.trim().replace(/^[-–—•*\s]+/,'');
+      if(S.length<4) return;
+      if(NOISE.test(S)) return;
+      if(PITCH.test(S)) return;
+      out.push(S);
+    });
+  });
+  var seen={},res=[];
+  out.forEach(function(x){ var k=x.toLowerCase().replace(/[^0-9a-zα-ωά-ώ]/g,''); if(!k||seen[k])return; seen[k]=1; res.push(x); });
+  var txt=res.join('\n').replace(/[ \t]{2,}/g,' ').trim();
+  return txt || String(t||'').replace(/<[^>]*>/g,' ').replace(/\s{2,}/g,' ').trim();
+};
+
+/* ---------- 4,6. CSS: no Έφη, and the badges always in the same corner ---------- */
+var st=document.createElement('style'); st.id='hh-polish16-css';
+st.textContent=
+  '.hh-efi{display:none!important}'
+ +'.card>.card-img-wrap>.card-badge{top:auto!important;bottom:10px!important;left:10px!important}'
+ +'.card>.card-img-wrap>.house-id-badge{bottom:auto!important;top:10px!important;left:10px!important}'
+ +'#hh-lo-legend{position:absolute;top:8px;right:8px;z-index:500;background:rgba(20,20,24,.86);color:#e8e6e1;'
+ +'font-size:10.5px;line-height:1.5;padding:6px 9px;border-radius:8px;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.4)}'
+ +'body.light #hh-lo-legend{background:rgba(252,250,244,.93);color:#2b2b2b;border:1px solid rgba(0,0,0,.12)}'
+ +'#hh-lo-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}';
+document.head.appendChild(st);
+
+function killEfi(){
+  try{
+    var c=document.getElementById('hideEfi');
+    if(c){ if(c.checked){c.checked=false; try{applyFilters();}catch(e){}} var L=c.closest('label'); if(L) L.style.display='none'; else c.style.display='none'; }
+    var labs=document.querySelectorAll('.card label, .grouped-card label, .lo-featured label, .modal-body label');
+    [].forEach.call(labs,function(l){
+      if(l.classList.contains('hh-efi')) return;
+      if(/στείλαμε στην Έφη/.test(l.textContent||'')) l.classList.add('hh-efi');
+    });
+  }catch(e){}
+}
+
+/* ---------- 3. legend on the small map inside a listing ---------- */
+function legend(){
+  try{
+    var m=document.getElementById('hh-lo-map'); if(!m) return;
+    if(m.querySelector('#hh-lo-legend')) return;
+    if(getComputedStyle(m).position==='static') m.style.position='relative';
+    var d=document.createElement('div'); d.id='hh-lo-legend';
+    d.innerHTML='<div><i style="background:#15803d"></i>Επιβεβαιωμένη από εμάς</div>'
+               +'<div><i style="background:#2563eb"></i>Ακριβής πινέζα πλατφόρμας</div>'
+               +'<div><i style="background:#ea8a2a"></i>Προσεγγιστική τοποθεσία</div>';
+    m.appendChild(d);
+  }catch(e){}
+}
+
+/* ---------- 1. ask the database for the de-duplicated photo set ---------- */
+var SB16='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1',
+    AK16='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+window.__hhGalLoading=null;
+window.hhLoadGalKeep=function(h){
+  h=String(h||'').trim();
+  if(!h||h==='0') return;
+  if(window.__hhGalKeep && String(window.__hhGalKeep.h)===h) return;
+  if(window.__hhGalLoading===h) return;
+  window.__hhGalLoading=h;
+  fetch(SB16+'/rpc/hh_house_imgs',{method:'POST',
+      headers:{apikey:AK16,Authorization:'Bearer '+AK16,'Content-Type':'application/json'},
+      body:JSON.stringify({p_house:h,p_max:400})})
+   .then(function(r){return r.json();})
+   .then(function(arr){
+      window.__hhGalLoading=null;
+      if(!Array.isArray(arr)||!arr.length) return;
+      var rank={}; arr.forEach(function(u,i){rank[u]=i;});
+      window.__hhGalKeep={h:h,rank:rank,n:arr.length};
+      try{ var c0=document.getElementById('hh-sib0');
+           if(c0 && document.getElementById('hh-grpsum-ov')) c0.click(); }catch(e){}
+   })
+   .catch(function(){ window.__hhGalLoading=null; });
+};
+if(typeof openListingOverlay==='function' && !window.__h16ov){
+  var _o16=openListingOverlay;
+  openListingOverlay=function(ev,houseId,idx){
+    try{
+      var h=houseId;
+      if(!h && ev){ var all=[].concat(allListings||[],extraListings||[]);
+                    var x=all.find(function(y){return y.url===ev;}); if(x) h=x.house_id; }
+      if(h) window.hhLoadGalKeep(h);
+    }catch(e){}
+    return _o16.apply(this,arguments);
+  };
+  window.__h16ov=true;
+}
+
+/* ---------- 5. spread pins that land on exactly the same approximate spot ---------- */
+if(typeof L!=='undefined' && L && L.marker && !window.__h16pin){
+  var _mk=L.marker;
+  L.marker=function(ll,opt){
+    try{
+      if(window.__h16spread && ll && ll.length===2){
+        var k=(+ll[0]).toFixed(5)+','+(+ll[1]).toFixed(5);
+        var n=(window.__h16spread[k]=(window.__h16spread[k]||0)+1);
+        if(n>1){ var r=0.00018*Math.sqrt(n-1), th=(n-1)*2.39996323;
+                 ll=[ll[0]+r*Math.cos(th), ll[1]+r*Math.sin(th)*1.35]; }
+      }
+    }catch(e){}
+    return _mk.call(this,ll,opt);
+  };
+  window.__h16pin=true;
+}
+if(typeof initMap==='function' && !window.__h16map){
+  var _im=initMap;
+  initMap=function(){ window.__h16spread={}; var r=_im.apply(this,arguments); return r; };
+  window.__h16map=true;
+}
+
+/* ---------- 8. half-step zoom on the maps ---------- */
+if(typeof L!=='undefined' && L && L.map && !window.__h16zoom){
+  var _lmap=L.map;
+  L.map=function(el,opt){
+    opt=opt||{};
+    if(opt.zoomSnap==null) opt.zoomSnap=0.5;
+    if(opt.zoomDelta==null) opt.zoomDelta=0.5;
+    if(opt.wheelPxPerZoomLevel==null) opt.wheelPxPerZoomLevel=120;
+    return _lmap.call(this,el,opt);
+  };
+  for(var k16 in _lmap){ try{ L.map[k16]=_lmap[k16]; }catch(e){} }
+  window.__h16zoom=true;
+}
+
+setInterval(function(){ killEfi(); legend(); }, 1000);
+setTimeout(function(){ killEfi(); legend(); }, 600);
+}catch(e){console.warn('hhPolish16',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
