@@ -6095,6 +6095,67 @@ window.hhGeoCluster = function(items){
     }catch(e){}
   }, 500);
 }catch(e){console.warn('hhPolish36',e);}})();</script>
+<script>/*hhPolish37*/(function(){try{
+  /* Στο hover τα αβαθμολόγητα αστέρια έμεναν «☆» — χρωματιζόταν μόνο το
+     περίγραμμα και η μέση έμενε άδεια/λευκή. Τώρα ο χαρακτήρας γίνεται «★»
+     όσο περνάς από πάνω και επιστρέφει μόλις φύγεις. */
+  var st=document.createElement('style'); st.id='hh-polish37';
+  st.textContent=
+    '.hh-star-hov.hh-star-hov.hh-star-hov{'
+    +'color:#e9c35a!important;-webkit-text-fill-color:#e9c35a!important;'
+    +'-webkit-text-stroke:0!important;text-shadow:none!important;'
+    +'background:none!important;-webkit-background-clip:border-box!important;'
+    +'background-clip:border-box!important;opacity:1!important;'
+    +'transform:scale(1.18);transition:transform .08s}';
+  document.head.appendChild(st);
+
+  function isStar(t){
+    if(!t||t.tagName!=='SPAN') return false;
+    return ((t.getAttribute('onclick')||'').indexOf('Rating')>=0) || t.hasAttribute('data-star');
+  }
+  function row(el){
+    var p=el.parentElement; if(!p) return [];
+    return [].filter.call(p.children, function(x){ return isStar(x); });
+  }
+  function fill(el){
+    try{
+      var t=(el.textContent||'').trim();
+      if(t==='☆'||t==='★'){
+        if(el.getAttribute('data-hh37')==null) el.setAttribute('data-hh37', t);
+        el.textContent='★';
+      }
+    }catch(e){}
+  }
+  function restoreAll(){
+    try{
+      document.querySelectorAll('[data-hh37]').forEach(function(el){
+        var o=el.getAttribute('data-hh37');
+        if(o!=null && (el.textContent||'').trim()==='★') el.textContent=o;
+        el.removeAttribute('data-hh37');
+      });
+    }catch(e){}
+  }
+  document.addEventListener('mouseover', function(e){
+    try{
+      var t=e.target; if(!isStar(t)) return;
+      var sib=row(t), i=sib.indexOf(t); if(i<0) return;
+      restoreAll();
+      for(var k=0;k<=i;k++) fill(sib[k]);
+    }catch(x){}
+  }, true);
+  document.addEventListener('mouseout', function(e){
+    try{
+      var t=e.target; if(!isStar(t)) return;
+      var to=e.relatedTarget;
+      if(to && to.tagName==='SPAN' && to.parentElement===t.parentElement && isStar(to)) return;
+      restoreAll();
+    }catch(x){}
+  }, true);
+  /* δικλείδα: αν φύγει ο δείκτης απότομα (scroll, κλείσιμο κάρτας) */
+  setInterval(function(){
+    try{ if(!document.querySelector('.hh-star-hov')) restoreAll(); }catch(e){}
+  }, 1200);
+}catch(e){console.warn('hhPolish37',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
