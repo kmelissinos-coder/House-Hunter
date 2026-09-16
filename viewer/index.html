@@ -5793,6 +5793,44 @@ function label(){
 setInterval(label,900);
 setTimeout(label,900);
 }catch(e){console.warn('hhPolish26',e);}})();</script>
+
+<script>/*hhPolish27*/(function(){try{
+var st=document.createElement('style'); st.id='hh-polish27-css';
+st.textContent='.hh-gs-vrow.hh-gs-link{cursor:pointer}'
+ +'.hh-gs-vrow.hh-gs-link:hover{text-decoration:underline}'
+ +'.hh-gs-vrow.hh-gs-link::after{content:" ↗";opacity:.55;font-size:.9em}';
+document.head.appendChild(st);
+
+function bgOpen(url){
+  try{
+    var a=document.createElement('a');
+    a.href=url; a.target='_blank'; a.rel='noopener noreferrer';
+    a.style.cssText='position:fixed;left:-9999px;top:0';
+    document.body.appendChild(a);
+    /* ctrl/meta + click is what makes Chrome put the tab in the background */
+    var ev=new MouseEvent('click',{bubbles:true,cancelable:true,view:window,ctrlKey:true,metaKey:true});
+    a.dispatchEvent(ev);
+    setTimeout(function(){ try{a.remove();}catch(e){} },0);
+  }catch(e){
+    try{ window.open(url,'_blank','noopener'); }catch(x){}
+  }
+}
+
+document.addEventListener('click',function(e){
+  try{
+    var lk=e.target && e.target.closest ? e.target.closest('.hh-gs-vrow[data-url]') : null;
+    if(!lk) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    var u=lk.getAttribute('data-url')||'';
+    try{ u=decodeURIComponent(u); }catch(x){}
+    if(!/^https?:\/\//i.test(u)) return;
+    bgOpen(u);
+    var pop=document.getElementById('hh-gs-vpop-el'); if(pop) pop.remove();
+  }catch(x){}
+}, true);
+}catch(e){console.warn('hhPolish27',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
