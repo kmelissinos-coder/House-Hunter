@@ -123,6 +123,8 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .mini .diff{color:#ff7a7a;font-weight:700}
 .mini.odd{outline:3px solid #e05252;outline-offset:-1px;box-shadow:0 0 0 4px rgba(224,82,82,.25),0 6px 22px rgba(224,82,82,.25)}
 .mini .oddtag{position:absolute;top:6px;left:6px;z-index:5;background:#e05252;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:7px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+.hbadge.gone{background:rgba(224,43,43,.16)!important;border-color:rgba(224,43,43,.5)!important;color:#ff9a9a!important}
+.hbadge.noph{background:rgba(160,160,160,.14)!important;border-color:rgba(160,160,160,.4)!important;color:#bbb!important}
 .mini .mlinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .mini .mlinks a{color:var(--text);font-size:12px;border:1px solid #444;border-radius:6px;padding:2px 7px;text-decoration:none;opacity:.9}
 .mini .mlinks a:hover{border-color:var(--accent,#d9a441);opacity:1}
@@ -183,13 +185,19 @@ function priceRange(h){const ps=(h.ads||[]).map(a=>+a.price).filter(v=>v>0);
   if(!ps.length)return eur(h.price);
   const lo=Math.min.apply(null,ps),hi=Math.max.apply(null,ps);
   return lo===hi?eur(lo):('€'+lo.toLocaleString('el')+'–'+hi.toLocaleString('el')+'/μήνα');}
-function houseHTML(h,rating,label,key,aligned){if(!h)return '<div>—</div>';/*hhMergeV12*/const imgs=((aligned&&aligned.length?aligned:(h.imgs&&h.imgs.length?h.imgs:(h.img?[h.img]:[])))||[]).filter(Boolean);GALS[key]=imgs;
+function houseHTML(h,rating,label,key,aligned){if(!h)return '<div>—</div>';/*hhMergeV13*/const imgs=((aligned&&aligned.length?aligned:(h.imgs&&h.imgs.length?h.imgs:(h.img?[h.img]:[])))||[]).filter(Boolean);GALS[key]=imgs;
   const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
   return `<div>${galHTML(imgs,key)}
     <div class="hinfo">
       <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span><span class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</span></div>
       <div class="spec"><b>${sq(h.sqm)}</b> · <b>${priceRange(h)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
-      <div class="spec">${esc(h.agencies||'Ιδιώτης')} · <span class="plat">${esc(h.platforms||h.platform||'')}</span><span class="hbadge ${h.n_ads>1?'multi':'single'}">${h.n_ads>1?'🏠 σπίτι με '+h.n_ads+' αγγελίες':'μία αγγελία'}</span></div>
+      <div class="spec">${esc(h.agencies||'Ιδιώτης')} · <span class="plat">${esc(h.platforms||h.platform||'')}</span><span class="hbadge ${h.n_ads>1?'multi':'single'}">${h.n_ads>1?'🏠 σπίτι με '+h.n_ads+' αγγελίες':'μία αγγελία'}</span>${(function(){try{var ads=h.ads||[];var gone=ads.length&&ads.every(function(a){return a.deleted;});
+      var ps=[];ads.forEach(function(a){if(a.deleted&&a.platform&&ps.indexOf(a.platform)<0)ps.push(a.platform);});
+      var out='';
+      if(gone) out+='<span class="hbadge gone">⛔ αφαιρέθηκε από '+esc(ps.join(', ')||(h.platform||'την πλατφόρμα'))+'</span>';
+      else if(ps.length) out+='<span class="hbadge gone">⛔ '+ps.length+' αγγελί'+(ps.length===1?'α':'ες')+' αφαιρέθηκ'+(ps.length===1?'ε':'αν')+'</span>';
+      if(!imgs.length) out+='<span class="hbadge noph">🚫 χωρίς φωτογραφίες</span>';
+      return out;}catch(e){return '';}})()}</div>
       ${adsHTML(h)}
       ${rating?`<div class="stars" title="η δική σου βαθμολογία">${stars(rating)}</div>`:''}${others?`<div class="spec">${others}</div>`:''}
       <div class="descr" id="d_${key}">${esc(cleanDescr(h.descr))}</div><span class="dtog" onclick="dtog('${key}',this)">▾ όλη η περιγραφή</span>
