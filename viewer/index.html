@@ -1277,7 +1277,7 @@ label:has(input[onchange*="seen_it',"]:checked){background:rgba(150,95,130,0.42)
     <option value="αντλία">Αντλία Θέρμανσης</option>
   </select>
   <button onclick="resetFilters()" class="sort-btn" style="border:1px solid var(--text3);border-radius:4px;margin-left:12px;padding:4px 10px;white-space:nowrap;" onmouseover="this.style.borderColor=this.style.color='var(--accent)'" onmouseout="this.style.borderColor=this.style.color='var(--text3)'">↺ Επαναφορά φίλτρων</button>
-  <input type="search" id="numSearch" placeholder="🔎 Αναζήτηση: περιοχή, τύπος, μεσίτης, Αρ. Αγγελίας/Μεσιτικού..." oninput="applyFilters();if(typeof _saveUISoon==='function')_saveUISoon()" style="flex:0 1 480px;min-width:280px;margin:0 10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none">
+  <input type="search" id="numSearch" placeholder="🔎 Αναζήτηση: περιοχή, τύπος, μεσίτης, κωδικός αγγελίας…" oninput="applyFilters();if(typeof _saveUISoon==='function')_saveUISoon()" style="flex:0 1 480px;min-width:280px;margin:0 10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none">
   <div class="upload-zone" id="dropzone"
        onclick="document.getElementById('csvInput').click()"
        ondragover="event.preventDefault();this.classList.add('drag')"
@@ -1897,7 +1897,7 @@ function applyFilters() {
     if (currentProject === 'all' && (h.project||'Fameli') === 'Rent') return false; /*hhRentCatV1*/
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
-    if (q && !`${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating} ${h.platformNr||''} ${h.agencyNr||''}`.toLowerCase().includes(q)) return false;
+    if (q && !(window.hhQMatch ? window.hhQMatch(h,q) : `${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating} ${h.platformNr||''} ${h.agencyNr||''}`.toLowerCase().includes(q))) return false;
     if (h.price > 0 && (h.price < minP || h.price > maxP)) return false;
     if (h.sqm > 0 && (h.sqm < minS || h.sqm > maxS)) return false;
     if (h.year > 0 && (h.year < minY || h.year > maxY)) return false;
@@ -6156,6 +6156,43 @@ window.hhGeoCluster = function(items){
     try{ if(!document.querySelector('.hh-star-hov')) restoreAll(); }catch(e){}
   }, 1200);
 }catch(e){console.warn('hhPolish37',e);}})();</script>
+<script>/*hhPolish38*/(function(){try{
+  /* Η αναζήτηση έψαχνε μόνο περιοχή/τύπο/μεσίτη/σημειώσεις/θέρμανση και τα δύο
+     πεδία κωδικού. Οι περισσότεροι κωδικοί όμως είναι μέσα στην ΠΕΡΙΓΡΑΦΗ
+     («Κωδικός Ακινήτου: 1900775», «ID 2356396», «κωδ. 88-1996») και συχνά
+     υπάρχουν δύο ή τρεις σε μία αγγελία. Τώρα ψάχνονται όλοι — και χωρίς να
+     παίζει ρόλο αν ο μεσίτης σου τον πει με παύλα, τελεία ή κενό. */
+  function norm(x){ return String(x==null?'':x).toLowerCase().replace(/[^a-z0-9α-ω]/gi,''); }
+  var CACHE=new WeakMap();
+  function hay(h){
+    var c=CACHE.get(h);
+    if(c) return c;
+    var plain=[h.location,h.type,h.agency,h.notes,h.heating,h.platformNr,h.agencyNr,
+               h.agency_nr,h.platform_nr,h.house_id,h.hhl_id,h.description,h.address,h.url]
+              .map(function(v){return v==null?'':String(v);}).join(' ').toLowerCase();
+    c={plain:plain, squashed:norm(plain)};
+    CACHE.set(h,c);
+    return c;
+  }
+  window.hhCodesOf=function(h){
+    /* όλοι οι κωδικοί που αναφέρονται στην αγγελία, για debugging/έλεγχο */
+    var out={}, txt=[h.description,h.notes,h.agencyNr,h.agency_nr,h.platformNr,h.platform_nr]
+      .map(function(v){return v==null?'':String(v);}).join(' ');
+    var re=/(?:κωδ(?:ικ[όο]ς)?\.?\s*(?:ακιν[ήη]του)?\s*[:#]?\s*|\bid\b\s*[:#]?\s*|\bref\.?\s*[:#]?\s*)([a-z0-9][a-z0-9\-\/\.]{2,})/gi, m;
+    while((m=re.exec(txt))) out[m[1]]=1;
+    return Object.keys(out);
+  };
+  window.hhQMatch=function(h,q){
+    try{
+      if(!q) return true;
+      var H=hay(h);
+      if(H.plain.indexOf(q)>=0) return true;
+      var qn=norm(q);
+      if(qn.length>=3 && H.squashed.indexOf(qn)>=0) return true;
+      return false;
+    }catch(e){ return true; }
+  };
+}catch(e){console.warn('hhPolish38',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
