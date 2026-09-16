@@ -4710,7 +4710,7 @@ async function load(force){try{
   if(!NICK[uid]) NICK[uid]=(a.user.email||'').split('@')[0];
   var lj=await (await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hd})).json();
   if(Array.isArray(lj)){H={};lj.forEach(function(x){H[x.id]=x.house_id;});}
-  ready=true; paint(); window.hhRatReload=function(){lastLoad=0;load(true);}; window.hhRatPaint=paint;
+  ready=true; paint(); window.hhRatReload=function(){lastLoad=0;load(true);}; window.hhRatPaint=paint; window.hhMyRating=function(hid){try{return (RAT[String(hid)]||{})[uid]||0;}catch(e){return 0;}};
 }catch(e){}finally{loading=false;}}
 
 function hidOf(card){try{
@@ -5635,6 +5635,69 @@ window.fetch=function(u,o){
   return _f.apply(this,arguments);
 };
 }catch(e){console.warn('hhPolish23',e);}})();</script>
+
+<script>/*hhPolish24*/(function(){try{
+var SB24='https://ofvanbbujgcqhbiyihgy.supabase.co',
+    AK24='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+function auth(){ try{ return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null'); }catch(e){ return null; } }
+function mine(hid){ try{ return (window.hhMyRating?window.hhMyRating(String(hid)):0)||0; }catch(e){ return 0; } }
+function hidOfId(id){
+  try{
+    var a=[].concat(allListings||[], extraListings||[]);
+    var m=a.find(function(x){return x.id===id;});
+    var h=m?String(m.house_id||'').trim():'';
+    return (h&&h!=='0')?h:String(id);
+  }catch(e){ return String(id); }
+}
+function blankStars(e){
+  try{
+    var host=(e&&e.currentTarget&&e.currentTarget.parentNode)||null; if(!host) return;
+    host.querySelectorAll('[data-star],[onclick*=setRating],[onclick*=setGroupRating]').forEach(function(sp){
+      sp.textContent='☆'; sp.style.color='rgba(140,140,140,0.4)';
+    });
+  }catch(x){}
+}
+async function clearRating(hid,e){
+  var a=auth(); if(!a||!a.user||!a.access_token) return;
+  blankStars(e);
+  try{
+    await fetch(SB24+'/rest/v1/user_ratings?on_conflict=user_id,house_id',{method:'POST',
+      headers:{apikey:AK24,Authorization:'Bearer '+a.access_token,'Content-Type':'application/json',
+               Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({user_id:a.user.id, house_id:String(hid), rating:0})});
+  }catch(x){}
+  try{ if(window.hhRatReload) window.hhRatReload(); }catch(x){}
+  setTimeout(function(){ try{ if(window.hhRatPaint) window.hhRatPaint(); }catch(x){} },700);
+  try{ if(window.showToast) showToast('☆ Η βαθμολογία αφαιρέθηκε'); }catch(x){}
+}
+function install(){
+  try{
+    if(window.setRating && !window.setRating.__h24){
+      var _o=window.setRating;
+      var w=function(e,id,score){
+        try{
+          var hid=hidOfId(id);
+          if(mine(hid)===score){ if(e&&e.stopPropagation)e.stopPropagation(); clearRating(hid,e); return false; }
+        }catch(x){}
+        return _o.apply(this,arguments);
+      };
+      w.__h24=true; w.__pu=true; window.setRating=w;
+    }
+    if(window.setGroupRating && !window.setGroupRating.__h24){
+      var _g=window.setGroupRating;
+      var wg=function(e,hid,score){
+        try{
+          if(mine(hid)===score){ if(e&&e.stopPropagation)e.stopPropagation(); clearRating(hid,e); return false; }
+        }catch(x){}
+        return _g.apply(this,arguments);
+      };
+      wg.__h24=true; wg.__pu=true; window.setGroupRating=wg;
+    }
+  }catch(e){}
+}
+setInterval(install,800);
+setTimeout(install,900);
+}catch(e){console.warn('hhPolish24',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
