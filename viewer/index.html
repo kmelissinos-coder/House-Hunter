@@ -4918,6 +4918,85 @@ var tries=0,t=setInterval(function(){ tries++;
   else if(tries>60) clearInterval(t);
 },700);
 }catch(e){console.warn('hhPolish12',e);}})();</script>
+
+<script>/*hhPolish13*/(function(){try{
+var st=document.createElement('style');st.id='hh-polish13';st.textContent=
+ '.show-deleted-wrap{display:flex!important;flex-wrap:wrap;align-items:center;gap:8px;row-gap:8px}'
++'.show-deleted-wrap>label,.show-deleted-wrap .hh-f9{display:inline-flex!important;align-items:center;gap:6px;'
++'margin:0!important;padding:5px 10px!important;border:1px solid var(--border)!important;border-radius:8px!important;'
++'background:transparent!important;font-size:12.5px!important;font-weight:500!important;color:var(--text2)!important;'
++'cursor:pointer;white-space:nowrap;line-height:1.2;transition:border-color .12s,background .12s,color .12s}'
++'.show-deleted-wrap>label:hover,.show-deleted-wrap .hh-f9:hover{border-color:var(--accent2)!important;color:var(--text1)!important}'
++'.show-deleted-wrap>label.hh-on,.show-deleted-wrap .hh-f9.hh-on{border-color:var(--accent2)!important;'
++'background:rgba(200,168,75,.14)!important;color:var(--text1)!important}'
++'.show-deleted-wrap input[type=checkbox]{accent-color:var(--accent2)!important;width:14px!important;height:14px!important;margin:0!important;cursor:pointer}'
++'.show-deleted-wrap .hh-f9 label{border:none!important;padding:0!important;margin:0!important;background:none!important;'
++'color:inherit!important;font-size:inherit!important;font-weight:inherit!important;cursor:pointer}'
++'.show-deleted-wrap .hh-f9 .n{opacity:.6}'
++'#hhOnlyPrivWrap{margin-left:0!important;background:none!important}'
++'body.hh-onlypriv #hhOnlyPrivWrap{background:rgba(200,168,75,.14)!important;border-color:var(--accent2)!important;color:var(--text1)!important}'
++'.hh-reset13{display:inline-flex;align-items:center;gap:6px;margin:0 0 0 auto;padding:5px 10px;border:1px solid var(--border);'
++'border-radius:8px;background:transparent;color:var(--text3);font-size:12.5px;cursor:pointer;white-space:nowrap;font-family:inherit}'
++'.hh-reset13:hover{border-color:var(--accent);color:var(--accent)}';
+document.head.appendChild(st);
+
+/* ---------- 1. platform counts, with the project rule applyFilters() actually uses ---------- */
+function inProj(h){try{var p=h.project||'Fameli';return currentProject==='all'?p!=='Rent':p===currentProject;}catch(e){return true;}}
+function recountPlatforms(){try{
+  var bar=document.getElementById('platform-bar'); if(!bar) return;
+  var comb=[].concat(window.allListings||[],window.extraListings||[]);
+  if(!comb.length) return;
+  bar.querySelectorAll('.platform-tab').forEach(function(t){
+    var pl=t.getAttribute('data-platform');
+    var c=(pl==='all')?comb.filter(inProj).length
+                      :comb.filter(function(h){return h.platform===pl&&inProj(h);}).length;
+    var sp=t.querySelector('span'); if(sp) sp.textContent='('+c+')';
+    t.style.display=(pl&&pl!=='all'&&c===0&&!t.classList.contains('active'))?'none':'';
+  });
+}catch(e){}}
+window.hhRecountPlatforms=recountPlatforms;
+
+/* ---------- 2. one tidy row of chips under the line ---------- */
+function chipRow(){try{
+  var wrap=document.querySelector('.show-deleted-wrap'); if(!wrap) return;
+
+  /* the «Μόνο αβαθμολόγητα» group moves out of the filter inputs and into this row */
+  var unr=document.getElementById('hh-unrated9');
+  if(unr){ var g=unr.closest('.range-group')||unr.parentNode;
+    if(g&&g!==wrap&&g.parentNode!==wrap) wrap.insertBefore(g,wrap.firstChild); }
+
+  /* the checkbox of «Εμφάνιση απορριμμένων» sits outside its label — put it inside so it is one chip */
+  var sd=document.getElementById('showDeleted'), lab=wrap.querySelector('label[for="showDeleted"]');
+  if(sd&&lab&&sd.parentNode!==lab) lab.insertBefore(sd,lab.firstChild);
+
+  /* «Επαναφορά φίλτρων» joins the row, on the right */
+  var rs=document.querySelector('.range-filters button[onclick*="resetFilters"]');
+  if(rs&&rs.parentNode!==wrap){ rs.removeAttribute('style'); rs.removeAttribute('onmouseover'); rs.removeAttribute('onmouseout');
+    rs.className='hh-reset13'; wrap.appendChild(rs); }
+
+  /* light up whatever is ticked */
+  wrap.querySelectorAll('label,.hh-f9').forEach(function(el){
+    if(el.parentNode&&el.parentNode.classList&&el.parentNode.classList.contains('hh-f9')) return;
+    var cb=el.querySelector('input[type=checkbox]'); if(!cb) return;
+    el.classList.toggle('hh-on',!!cb.checked);
+    if(!cb.__h13){ cb.__h13=true; cb.addEventListener('change',function(){ el.classList.toggle('hh-on',!!cb.checked); }); }
+  });
+}catch(e){}}
+
+/* reset should also clear the two toggles that were added later */
+if(typeof resetFilters==='function' && !window.__h13reset){
+  var _rf=resetFilters;
+  resetFilters=function(){ var r=_rf.apply(this,arguments);
+    try{ var u=document.getElementById('hh-unrated9'); if(u&&u.checked){u.checked=false;try{localStorage.setItem('hh_unrated_only','0');}catch(e){}}
+         var p=document.getElementById('hhOnlyPriv'); if(p&&p.checked){p.checked=false;document.body.classList.remove('hh-onlypriv');}
+         chipRow(); applyFilters(); }catch(e){}
+    return r; };
+  window.__h13reset=true;
+}
+
+setInterval(function(){ chipRow(); recountPlatforms(); },1200);
+setTimeout(function(){ chipRow(); recountPlatforms(); },500);
+}catch(e){console.warn('hhPolish13',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
