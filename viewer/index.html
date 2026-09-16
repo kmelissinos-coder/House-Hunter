@@ -5921,6 +5921,54 @@ document.addEventListener('click',function(e){
   fix(); setInterval(fix, 700);
   document.addEventListener('click', function(){ setTimeout(fix, 60); }, true);
 }catch(e){console.warn('hhPolish29',e);}})();</script>
+<script>/*hhPolish30*/(function(){try{
+  /* Στο πρώτο φόρτωμα τα επιβεβαιωμένα-αφαιρεμένα σπίτια έμεναν στα αποτελέσματα:
+     ο πρώτος υπολογισμός φίλτρων τρέχει πριν έρθουν τα δεδομένα, και ο δεύτερος
+     πέφτει στο `if(busy) return _af(...)` του hhPolish15, που ΔΕΝ περνάει από το
+     stripDel. Εδώ παρακολουθούμε το αποτέλεσμα και ξανατρέχουμε τα φίλτρα όποτε
+     δούμε επιβεβαιωμένο σπίτι μέσα στα αποτελέσματα με το φίλτρο κλειστό. */
+  function hid(h){ try{ return String((h&&(h.house_id||h.houseId))||'').trim(); }catch(e){ return ''; } }
+  function gcSet(){
+    var s={};
+    try{
+      var a=[];
+      try{ a=[].concat(allListings||[], extraListings||[]); }catch(e){ a=[]; }
+      a.forEach(function(h){ if(h && h.gone_confirmed){ var k=hid(h); if(k) s[k]=1; } });
+    }catch(e){}
+    return s;
+  }
+  function delOn(){ var c=document.getElementById('hh-delh15'); return !!(c&&c.checked); }
+  function leaking(){
+    if(delOn()) return false;
+    var s=gcSet(); var any=false; for(var k in s){ any=true; break; }
+    if(!any) return false;
+    try{ if((filtered||[]).some(function(h){ return s[hid(h)]; })) return true; }catch(e){}
+    try{
+      var els=document.querySelectorAll('.card[data-house], .card[data-hid]');
+      for(var i=0;i<els.length;i++){
+        var k=els[i].getAttribute('data-house')||els[i].getAttribute('data-hid');
+        if(k && s[String(k).trim()]) return true;
+      }
+    }catch(e){}
+    return false;
+  }
+  var fires=0, ticks=0;
+  var iv=setInterval(function(){
+    ticks++;
+    try{
+      if(leaking()){
+        if(fires<60){ fires++; applyFilters(); }
+      } else { fires=0; }
+    }catch(e){}
+    if(ticks>1200) clearInterval(iv);   /* ~30 λεπτά, μετά σταματά */
+  }, 1500);
+  /* και μία φορά νωρίς, μόλις έρθουν τα δεδομένα */
+  var t0=0, w=setInterval(function(){
+    t0++;
+    try{ if((allListings||[]).length>0){ clearInterval(w); setTimeout(function(){ try{applyFilters();}catch(e){} }, 400); } }catch(e){}
+    if(t0>120) clearInterval(w);
+  }, 500);
+}catch(e){console.warn('hhPolish30',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
