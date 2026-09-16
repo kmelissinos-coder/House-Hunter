@@ -4997,6 +4997,41 @@ if(typeof resetFilters==='function' && !window.__h13reset){
 setInterval(function(){ chipRow(); recountPlatforms(); },1200);
 setTimeout(function(){ chipRow(); recountPlatforms(); },500);
 }catch(e){console.warn('hhPolish13',e);}})();</script>
+
+<script>/*hhPolish14*/(function(){try{
+var want=null;
+try{ want=new URL(location.href).searchParams.get('ad'); }catch(e){}
+if(!want) return;
+want=String(want).trim();
+if(!want) return;
+window.__hhAd=want;
+function idxOf(houseId){
+  try{
+    var all=[].concat(typeof allListings!=='undefined'?allListings:[], typeof extraListings!=='undefined'?extraListings:[]);
+    var sibs=all.filter(function(x){return String((x.house_id||'')).trim()===String(houseId);});
+    for(var i=0;i<sibs.length;i++){ if(String(sibs[i].hhl_id||'')===want) return i; }
+  }catch(e){}
+  return -1;
+}
+function hook(){
+  if(window.__h14 || typeof openListingOverlay!=='function') return false;
+  var _o=openListingOverlay;
+  openListingOverlay=function(ev,houseId,startIdx){
+    try{
+      if(window.__hhAd && houseId && (startIdx===undefined||startIdx===0)){
+        var k=idxOf(houseId);
+        if(k>0){ window.__hhAd=null; return _o.call(this,ev,houseId,k); }
+        if(k===0){ window.__hhAd=null; }
+      }
+    }catch(e){}
+    return _o.apply(this,arguments);
+  };
+  window.__h14=true;
+  return true;
+}
+var n=0,iv=setInterval(function(){ n++; if(hook()||n>80) clearInterval(iv); },250);
+hook();
+}catch(e){console.warn('hhPolish14',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
