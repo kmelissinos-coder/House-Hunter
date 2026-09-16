@@ -5886,6 +5886,41 @@ document.addEventListener('click',function(e){
   sweep(); setInterval(sweep, 1500);
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', sweep);
 }catch(e){console.warn('hhPolish28',e);}})();</script>
+<script>/*hhPolish29*/(function(){try{
+  /* Το drop-down «Μεσιτικά» έλειπε όταν όλες οι αγγελίες είχαν το ΙΔΙΟ μεσιτικό
+     (το κουμπί ▾ έμπαινε μόνο για >1 διαφορετική τιμή). Τώρα μπαίνει πάντα, με
+     πλήθος = πόσες αγγελίες έχουν link, ώστε να μπορείς να ανοίξεις οποιαδήποτε. */
+  function fix(){
+    try{
+      var mem = window.__hhGrpMembers;
+      document.querySelectorAll('.hh-gs-grid > div').forEach(function(row){
+        var lab = row.querySelector('span');
+        if(!lab || (lab.textContent||'').trim() !== 'Μεσιτικά') return;
+        if(row.querySelector('.hh-gs-more')) return;           /* έχει ήδη ▾ */
+        var b = row.querySelector('b');
+        if(!b || b.getAttribute('data-hh29')) return;
+        var v = (b.textContent||'').trim();
+        if(!v || v === '—') return;
+        var n = 0;
+        if(mem && mem.length) mem.forEach(function(m){ if(m && m.url && m.agency) n++; });
+        if(n < 1) return;
+        b.setAttribute('data-hh29','1');
+        b.className = 'hh-gs-mv';
+        b.innerHTML = '<span class="hh-gs-mvtxt"></span>';
+        b.firstChild.textContent = v;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'hh-gs-more';
+        btn.setAttribute('data-label','Μεσιτικά');
+        btn.setAttribute('data-vals', encodeURIComponent(v));
+        btn.textContent = n + ' \u25be';
+        b.appendChild(btn);
+      });
+    }catch(e){}
+  }
+  fix(); setInterval(fix, 700);
+  document.addEventListener('click', function(){ setTimeout(fix, 60); }, true);
+}catch(e){console.warn('hhPolish29',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
