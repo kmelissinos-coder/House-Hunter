@@ -1616,6 +1616,7 @@ function parseCSV(text, defaultPlatform) {
       agency:     get('μεσιτικό','agency','μεσιτικο'),
       agencyNr:   get('agency_nr'),
       deleted:    (() => { const _v = get('deleted'); return _v === true || String(_v).toUpperCase() === 'X'; })(),
+      gone_confirmed: (get('gone_confirmed') === true),
       unfavorited: (() => { const _v = get('deleted'); return _v === false; })(),
       imageUrl:   get('image_url','image','thumbnail'),
       published:  get('δημοσίευση_αγγελίας','published'),
@@ -2077,7 +2078,7 @@ function renderGroupedCard(g) {
       <div class="group-id-pill">${shortId(g.houseId)}</div>
       <div class="group-listing-count">🏢 ${g.count}</div>
       <div class="photo-count-pill" data-ph="${g.houseId}" style="display:none">📷 ${g.allImgs.length}</div>
-      ${(function(){try{var ds=(g.items||[]).filter(function(x){return x.deleted;});if(!ds.length)return '';var ps=[];ds.forEach(function(x){var p=x.platform||'';if(p&&ps.indexOf(p)<0)ps.push(p);});var w=ps.length>1?('τις πλατφόρμες '+ps.join(', ')):(ps[0]||'την πλατφόρμα');var txt=(ds.length===g.items.length)?('Αφαιρέθηκε από '+w):(ds.length+' από '+g.items.length+' αγγελίες αφαιρέθηκαν από '+w);return '<div class="hh-gone-ribbon">⛔ '+txt+'</div>';}catch(e){return '';}})()}
+      ${(function(){try{var ds=(g.items||[]).filter(function(x){return x.deleted;});if(!ds.length)return '';var ps=[];ds.forEach(function(x){var p=x.platform||'';if(p&&ps.indexOf(p)<0)ps.push(p);});var w=ps.length>1?('τις πλατφόρμες '+ps.join(', ')):(ps[0]||'την πλατφόρμα');var txt=(ds.length===g.items.length)?('Αφαιρέθηκε από '+w):(ds.length+' από '+g.items.length+' αγγελίες αφαιρέθηκαν από '+w);var dt='';ds.forEach(function(x){var mm=String(x.notes||'').match(/\((\d{1,2}\/\d{1,2}\/\d{4})\)/);if(mm&&!dt)dt=mm[1];});if(dt)txt+=' · '+dt;return '<div class="hh-gone-ribbon">⛔ '+txt+'</div>';}catch(e){return '';}})()}
     </div>
     <div class="grouped-body${(g.items&&g.items.every(function(i){return i.seen_it;}))?' seen-it':''}">
       <div class="grouped-meta">
@@ -2286,7 +2287,7 @@ function renderCard(h) {
       <span class="card-nav-arrow left" onclick="cardPhotoNav(event,'${escJ(h.url)}',-1)">‹</span><span class="card-nav-arrow right" onclick="cardPhotoNav(event,'${escJ(h.url)}',1)">›</span>
       <div class="no-img" ${h.imageUrl?'style="display:none"':''}>🏠</div>
       <div class="card-badge">${h.type || '—'}</div>
-      ${h.deleted?`<div class="hh-gone-ribbon">⛔ Αφαιρέθηκε από ${escH(h.platform||'')}</div>`:''}
+      ${h.deleted?`<div class="hh-gone-ribbon">⛔ Αφαιρέθηκε από ${escH(h.platform||'')}${(function(){var m=String(h.notes||'').match(/\((\d{1,2}\/\d{1,2}\/\d{4})\)/);return m?' · '+m[1]:'';})()}</div>`:''}
       <div class="platform-badge ${platformBadgeClass(h.platform)}">${h.platform||'—'}</div>
       ${h.house_id && h.house_id !== '0' ? `<div class="house-id-badge">${shortId(h.house_id)}</div>` : ''}
       ${h.house_id && h.house_id !== '0' ? `<div class="photo-count-pill" data-ph="${h.house_id}" style="display:none">📷</div>` : ''}
@@ -3314,6 +3315,8 @@ function _featHTML(h){
           <span class="modal-btn" style="cursor:pointer"
             onclick="addToCompare('${escJ(h.url||'')}');closeListingOverlay()">⊕ Σύγκριση</span>
           ${h.deleted ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="unmarkSold('${escJ(key)}')" >↩ Δεν πουλήθηκε</span>` : ''}
+          ${(h.deleted && !h.gone_confirmed) ? `<span class="modal-btn" style="cursor:pointer;border-color:#e02b2b;color:#e02b2b;font-weight:700" onclick="event.stopPropagation();hhConfirmGone('${escJ(String(h.house_id||''))}','${escJ(key)}')">✅ Επιβεβαιώνω ότι αφαιρέθηκε</span>` : ''}
+          ${h.gone_confirmed ? `<span class="modal-btn" style="cursor:pointer;border-color:var(--accent2);color:var(--accent2)" onclick="event.stopPropagation();hhUnconfirmGone('${escJ(String(h.house_id||''))}','${escJ(key)}')">↩ Ακύρωση επιβεβαίωσης</span>` : ''}
         </div>
       </div>
       <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center"><div>
@@ -3653,7 +3656,7 @@ async function unmarkSold(key) {
   const prev = h.deleted;
   h.deleted = false;
   h.unfavorited = false;
-  await sb.update(h._dbId, {deleted: null});
+  await sb.update(h._dbId, {deleted: null, gone_confirmed: false});
   closeModal();
   applyFilters();
   showToast('↩ Επαναφέρθηκε ως ενεργό');
@@ -5072,7 +5075,7 @@ function delMap(){
   var now=Date.now(); if(_dm && now-_dmAt<2500) return _dm;
   var m={},all=[];
   try{ all=[].concat(allListings||[], extraListings||[]); }catch(e){}
-  all.forEach(function(h){ var k=HK(h); if(!(k in m)) m[k]=true; if(!h.deleted) m[k]=false; });
+  all.forEach(function(h){ var k=HK(h); if(!(k in m)) m[k]=false; if(h.gone_confirmed) m[k]=true; });
   _dm=m; _dmAt=now; return m;
 }
 function stripDel(list){ if(delOn()) return list||[]; var m=delMap(); return (list||[]).filter(function(h){return !m[HK(h)];}); }
@@ -5436,6 +5439,58 @@ window.addEventListener('resize',fitSplit);
 setInterval(fitSplit,900);
 setTimeout(fitSplit,500);
 }catch(e){console.warn('hhPolish18',e);}})();</script>
+
+<script>/*hhPolish19*/(function(){try{
+function allRows(){ try{ return [].concat(allListings||[], extraListings||[]); }catch(e){ return []; } }
+function houseRows(hid,url){
+  var a=allRows();
+  hid=String(hid||'').trim();
+  if(hid && hid!=='0') return a.filter(function(x){return String(x.house_id||'').trim()===hid;});
+  return a.filter(function(x){return x.url===url;});
+}
+async function setGone(hid,url,on){
+  var ms=houseRows(hid,url);
+  if(!ms.length){ if(window.showToast)showToast('⚠ Δεν βρέθηκαν αγγελίες'); return; }
+  for(var i=0;i<ms.length;i++){
+    var m=ms[i], patch = on ? {deleted:true, gone_confirmed:true} : {gone_confirmed:false};
+    try{ await sb.update(m._dbId||m.id, patch); m.gone_confirmed=on; if(on) m.deleted=true; }catch(e){}
+  }
+  if(window.showToast) showToast(on?('✅ Επιβεβαιώθηκε — βγήκε από τη λίστα ('+ms.length+' αγγελί'+(ms.length===1?'α':'ες')+')')
+                                   :'↩ Επέστρεψε στη λίστα');
+  try{ closeListingOverlay(); }catch(e){}
+  try{ applyFilters(); }catch(e){}
+}
+window.hhConfirmGone=function(hid,url){ setGone(hid,url,true); };
+window.hhUnconfirmGone=function(hid,url){ setGone(hid,url,false); };
+
+/* the same button inside the grouped-house card, next to the other two */
+function addConfirm(){
+  try{
+    var tools=document.querySelector('.hh-gs-tools'); if(!tools) return;
+    var hid=String(tools.dataset.hhh||'').trim(); if(!hid) return;
+    var ms=houseRows(hid,null);
+    var anyDel=ms.some(function(x){return x.deleted;});
+    var anyCf =ms.some(function(x){return x.gone_confirmed;});
+    var b=tools.querySelector('.hh-gs-cf');
+    if(!anyDel && !anyCf){ if(b) b.remove(); return; }
+    if(!b){ b=document.createElement('span'); b.className='hh-gs-rm hh-gs-cf'; tools.appendChild(b); }
+    if(b.dataset.h!==hid+'|'+(anyCf?'1':'0')){
+      b.dataset.h=hid+'|'+(anyCf?'1':'0');
+      b.innerHTML = anyCf ? '↩ Ακύρωση επιβεβαίωσης' : '✅ Επιβεβαιώνω ότι αφαιρέθηκε';
+      b.title = anyCf ? 'Επιστρέφει το σπίτι στα κανονικά αποτελέσματα'
+                      : 'Βγάζει το σπίτι από τα αποτελέσματα — θα φαίνεται μόνο με το φίλτρο «Εμφάνιση διαγραμμένων σπιτιών»';
+      b.style.cssText = anyCf ? 'border-color:var(--accent2);color:var(--accent2);cursor:pointer'
+                              : 'border-color:#e02b2b;color:#e02b2b;font-weight:700;cursor:pointer';
+      b.onclick=function(ev){ ev.stopPropagation(); setGone(hid,null,!anyCf); };
+    }
+  }catch(e){}
+}
+var st=document.createElement('style'); st.id='hh-polish19-css';
+st.textContent='.hh-gs-tools>.hh-gs-cf{order:5}';
+document.head.appendChild(st);
+setInterval(addConfirm,900);
+setTimeout(addConfirm,700);
+}catch(e){console.warn('hhPolish19',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
