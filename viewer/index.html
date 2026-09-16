@@ -6290,9 +6290,9 @@ window.hhGeoCluster = function(items){
     /* Άδειο αστέρι = ΠΕΡΙΓΡΑΜΜΑ. Γέμισμα στο χρώμα της κάρτας, καθαρό χρυσό
        περίγραμμα — ώστε γεμάτο/άδειο να ξεχωρίζουν με τη μέγιστη αντίθεση. */
     '.hh-star-empty.hh-star-empty.hh-star-empty{'
-    +'-webkit-text-stroke:1px #c8a84b!important;'
-    +'text-shadow:none!important;opacity:1!important}'
-    +'body.light .hh-star-empty.hh-star-empty.hh-star-empty{-webkit-text-stroke:1px #b08d2f!important}';
+    +'color:#c8a84b!important;-webkit-text-fill-color:#c8a84b!important;'
+    +'-webkit-text-stroke:0!important;text-shadow:none!important;opacity:1!important}'
+    +'body.light .hh-star-empty.hh-star-empty.hh-star-empty{color:#b08d2f!important;-webkit-text-fill-color:#b08d2f!important}';
   document.head.appendChild(st);
 
   function bgOf(el){
@@ -6316,12 +6316,11 @@ window.hhGeoCluster = function(items){
         var cs=getComputedStyle(el);
         var empty=(t==='☆') || /transparent|rgba\(0,\s*0,\s*0,\s*0\)/.test(cs.color);
         if(empty){
-          var bg=bgOf(el.parentElement||el);
           el.classList.add('hh-star-empty');
-          if(el.getAttribute('data-hh41')!==bg){
-            el.setAttribute('data-hh41',bg);
-            el.style.setProperty('color',bg,'important');
-            el.style.setProperty('-webkit-text-fill-color',bg,'important');
+          if(!el.getAttribute('data-hh41')){
+            el.setAttribute('data-hh41','1');
+            el.style.removeProperty('color');
+            el.style.removeProperty('-webkit-text-fill-color');
           }
         }else{
           if(el.classList.contains('hh-star-empty')){
