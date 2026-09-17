@@ -4849,7 +4849,9 @@ function zeroButtons(){try{
   var tools=document.querySelector('.hh-gs-tools'); if(!tools) return;
   var hid=String(tools.dataset.hhh||'').trim(); if(!hid) return;
   if(window.hhRole!=='admin') return;
-  if(!tools.querySelector('.hh-gs-rm')){
+  /*hhPolish52: ο φρουρός κοιτάει μόνο τα ΔΙΚΑ ΤΟΥ κουμπιά, ώστε κανένα
+    ξένο '.hh-gs-rm' (hh45-undo, hh-gs-cf, hh47-offm) να μην τον μπλοκάρει.*/
+  if(!tools.querySelector('.hh-gs-rm.gone') && !tools.querySelector('.hh-gs-rm.nope')){
     var g=document.createElement('span'); g.className='hh-gs-rm gone'; g.innerHTML='⛔ Αφαιρέθηκε από την πλατφόρμα';
     g.title='Η αγγελία δεν υπάρχει πια στο site — μπαίνει κόκκινη ταινία και μπορεί να επανέλθει';
     g.onclick=function(ev){ev.stopPropagation();hhGsMarkGone(hid);};
@@ -7699,7 +7701,7 @@ function doUndo(card){
     }
   }catch(e){ T('⚠ Η αναίρεση απέτυχε'); }
 }
-var HOSTS=[['.card-actions','action-btn'],['.group-action-btns','grp-btn'],['.hh-gs-tools','hh-gs-rm']];
+var HOSTS=[['.card-actions','action-btn'],['.group-action-btns','grp-btn'],['.hh-gs-tools','hh45-rm']];/*hhPolish52: ΟΧΙ 'hh-gs-rm' — χάλαγε τον φρουρό του zeroButtons*/
 function sync(){
   try{
     HOSTS.forEach(function(p){
@@ -8657,6 +8659,1163 @@ window.hhPolish47={
   else document.addEventListener('DOMContentLoaded', boot, {once:true});
   window.__hhPolish49={card:{dark:DARK,light:LIGHT}};
 }catch(e){console.warn('hhPolish49',e);}})();</script>
+
+<script>/*hhPolish50*/(function(){try{
+if(window.__hh50) return; window.__hh50=1;
+
+/* ============================================================== 1. CSS =========
+   Τα ταμπελάκια είναι σκούρα με ανοιχτά γράμματα ΚΑΙ στα δύο θέματα, όπως ήδη
+   κάνουν το .hh-src-xe / .hh-src-sp — άρα διαβάζονται και σε light και σε dark.
+   Μέγεθος/σχήμα τα δίνει το υπάρχον .hh-src (float:right;font-size:9px;
+   font-weight:700;padding:1px 6px;border-radius:6px) — εδώ μόνο χρώματα.       */
+(function(){
+  if(document.getElementById('hh-polish50-css')) return;
+  var st=document.createElement('style'); st.id='hh-polish50-css';
+  st.textContent=
+    /* --- νέα ταμπελάκια πλατφόρμας (dark) --- */
+     'body:not(.light) .hh-gs-vpop .hh-src-in{background:#0f5c6e!important;color:#cdf2fb!important}'
+    +'body:not(.light) .hh-gs-vpop .hh-src-pl{background:#3b3a8f!important;color:#dcdcff!important}'
+    +'body:not(.light) .hh-gs-vpop .hh-src-re{background:#6e1f56!important;color:#ffd9f2!important}'
+    +'body:not(.light) .hh-gs-vpop .hh-src-fb{background:#1b4f8f!important;color:#d6e6ff!important}'
+    +'body:not(.light) .hh-gs-vpop .hh-src-ha{background:#8a2230!important;color:#ffd8dc!important}'
+    +'body:not(.light) .hh-gs-vpop .hh-src-na{background:#4a5666!important;color:#e6ecf3!important}'
+    /* --- νέα ταμπελάκια πλατφόρμας (light) --- */
+    +'body.light .hh-gs-vpop .hh-src-in{background:#0b6076!important;color:#e6fbff!important}'
+    +'body.light .hh-gs-vpop .hh-src-pl{background:#43429e!important;color:#efeeff!important}'
+    +'body.light .hh-gs-vpop .hh-src-re{background:#7d2463!important;color:#ffe9f7!important}'
+    +'body.light .hh-gs-vpop .hh-src-fb{background:#1c56a0!important;color:#e8f1ff!important}'
+    +'body.light .hh-gs-vpop .hh-src-ha{background:#9c2634!important;color:#ffe8eb!important}'
+    +'body.light .hh-gs-vpop .hh-src-na{background:#5a6878!important;color:#ffffff!important}'
+    /* --- fallback χωρίς θέμα, αν το body δεν έχει ακόμη κλάση --- */
+    +'.hh-src-in{background:#0f5c6e;color:#cdf2fb}.hh-src-pl{background:#3b3a8f;color:#dcdcff}'
+    +'.hh-src-re{background:#6e1f56;color:#ffd9f2}.hh-src-fb{background:#1b4f8f;color:#d6e6ff}'
+    +'.hh-src-ha{background:#8a2230;color:#ffd8dc}.hh-src-na{background:#4a5666;color:#e6ecf3}'
+    /* --- ΙΔΙΩΤΗΣ: το ΙΔΙΟ χρυσό με το .hh47-priv του hhPolish47 --- */
+    +'.hh-gs-vpop .hh-gs-owner{display:inline-block;font-size:9.5px;font-weight:800;'
+    +'letter-spacing:.4px;padding:1px 7px;border-radius:6px;vertical-align:1px;'
+    +'background:linear-gradient(135deg,#f7de7e,#d4af37)!important;'
+    +'border:1px solid rgba(90,70,0,.35);'
+    +'color:#3a2e00!important;-webkit-text-fill-color:#3a2e00!important;'
+    +'text-shadow:none!important;-webkit-text-stroke:0!important}'
+    +'body.light .hh-gs-vpop .hh-gs-owner{'
+    +'background:linear-gradient(135deg,#f2cf68,#c99b1f)!important;'
+    +'border-color:rgba(90,70,0,.42);'
+    +'color:#2e2400!important;-webkit-text-fill-color:#2e2400!important}'
+    /* --- «άγνωστος μεσίτης (…)»: σβησμένο, όπως το .hh-unknown-ag του hhPolish25 --- */
+    +'.hh-gs-vpop .hh-gs-unk{opacity:.72;font-style:italic;font-size:11px}'
+    +'body:not(.light) .hh-gs-vpop .hh-gs-unk{color:#b8b2a4!important;-webkit-text-fill-color:#b8b2a4!important}'
+    +'body.light .hh-gs-vpop .hh-gs-unk{color:#5d564a!important;-webkit-text-fill-color:#5d564a!important}';
+  (document.head||document.documentElement).appendChild(st);
+})();
+
+/* ================================================= 2. πίνακας πλατφορμών =======
+   ΔΕΔΟΜΕΝΑ, όχι αλυσίδα indexOf. Τα ονόματα είναι όπως τα γράφει η εφαρμογή
+   (και όπως είναι στη βάση): xe.gr, Spitogatos, Indomio, plot.gr, Rentola,
+   Facebook, Housing Anywhere. `nopub:true` = πλατφόρμα που ΔΕΝ δημοσιεύει ποτέ
+   τον διαφημιζόμενο (κανόνας hhPolish25).                                       */
+var PLAT=[
+  {k:'xegr',            sub:'xe',              name:'xe.gr',            cls:'hh-src-xe'},
+  {k:'spitogatos',      sub:'spito',           name:'Spitogatos',       cls:'hh-src-sp'},
+  {k:'indomio',         sub:'indomio',         name:'Indomio',          cls:'hh-src-in'},
+  {k:'plotgr',          sub:'plot',            name:'plot.gr',          cls:'hh-src-pl'},
+  {k:'rentola',         sub:'rentola',         name:'Rentola',          cls:'hh-src-re', nopub:true},
+  {k:'facebook',        sub:'facebook',        name:'Facebook',         cls:'hh-src-fb'},
+  {k:'housinganywhere', sub:'housinganywhere', name:'Housing Anywhere', cls:'hh-src-ha'}
+];
+var EXACT={}, SUBS=PLAT.slice();
+PLAT.forEach(function(e){ EXACT[e.k]=e; });
+/* τα μακρύτερα substrings πρώτα, ώστε το γενικό 'xe' να μην κλέβει άλλη πλατφόρμα */
+SUBS.sort(function(a,b){ return b.sub.length-a.sub.length; });
+function norm(v){ return (''+(v==null?'':v)).toLowerCase().replace(/[^a-z0-9]+/g,''); }
+function plat(raw){
+  var n=norm(raw);
+  if(!n) return null;
+  if(EXACT[n]) return EXACT[n];
+  for(var i=0;i<SUBS.length;i++){ if(n.indexOf(SUBS[i].sub)>=0) return SUBS[i]; }
+  return null;
+}
+function txt(v){ return (''+(v==null?'':v)).replace(/[<>&"]/g,''); }
+function pname(m){
+  var raw=(''+((m&&m.platform)||'')).trim();
+  var e=plat(raw);
+  return e?e.name:(raw||'\u03ac\u03b3\u03bd\u03c9\u03c3\u03c4\u03b7 \u03c0\u03b7\u03b3\u03ae');
+}
+function pill(m){
+  var raw=(''+((m&&m.platform)||'')).trim();
+  if(!raw) return '';                                  /* ό,τι ίσχυε: χωρίς πλατφόρμα, χωρίς ταμπελάκι */
+  var e=plat(raw);
+  return '<span class="hh-src '+(e?e.cls:'hh-src-na')+'">'+txt(e?e.name:raw)+'</span>';
+}
+
+/* ============================================ 3. ο κανόνας του hhPolish25 ======
+   hhPolish25: `else if(String(a.platform||'')==='Rentola') blankRentola=true;`
+   και μετά `if(blankRentola) return false;` — δηλαδή κενό agency από Rentola ΔΕΝ
+   είναι ιδιώτης, είναι απλώς άγνωστο. Ίδια απόφαση, με σημαία πάνω στον πίνακα. */
+function noPublish(m){
+  var e=plat((''+((m&&m.platform)||'')).trim());
+  return !!(e&&e.nopub);
+}
+
+/* ================================================== 4. οι σειρές του popup =====*/
+var LBL={'\u039c\u03b5\u03c3\u03b9\u03c4\u03b9\u03ba\u03ac':'agency',
+         '\u03a4\u03cd\u03c0\u03bf\u03c2':'type',
+         '\u038c\u03c1\u03bf\u03c6\u03bf\u03c2':'floor',
+         '\u0395\u03bd\u03b5\u03c1\u03b3\u03b5\u03b9\u03b1\u03ba\u03ae':'energy',
+         '\u0398\u03ad\u03c1\u03bc\u03b1\u03bd\u03c3\u03b7':'heating'};
+var OWNER='\u0399\u0394\u0399\u03a9\u03a4\u0397\u03a3';          /* ΙΔΙΩΤΗΣ */
+var UNKN='\u03ac\u03b3\u03bd\u03c9\u03c3\u03c4\u03bf\u03c2 \u03bc\u03b5\u03c3\u03af\u03c4\u03b7\u03c2'; /* άγνωστος μεσίτης */
+var T_OWNER='\u0397 \u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1 \u03b5\u03af\u03bd\u03b1\u03b9 \u03b1\u03c0\u03cc \u03b9\u03b4\u03b9\u03ce\u03c4\u03b7 \u03b9\u03b4\u03b9\u03bf\u03ba\u03c4\u03ae\u03c4\u03b7 \u2014 \u03cc\u03c7\u03b9 \u03b1\u03c0\u03cc \u03bc\u03b5\u03c3\u03b9\u03c4\u03b9\u03ba\u03cc \u03b3\u03c1\u03b1\u03c6\u03b5\u03af\u03bf';
+var T_UNKN='\u0397 \u03c0\u03bb\u03b1\u03c4\u03c6\u03cc\u03c1\u03bc\u03b1 \u03b4\u03b5\u03bd \u03b4\u03b7\u03bc\u03bf\u03c3\u03b9\u03b5\u03cd\u03b5\u03b9 \u03c0\u03bf\u03b9\u03bf\u03c2 \u03b4\u03b9\u03b1\u03c6\u03b7\u03bc\u03af\u03b6\u03b5\u03b9\u00b7 \u03c6\u03b1\u03af\u03bd\u03b5\u03c4\u03b1\u03b9 \u03bc\u03cc\u03bd\u03bf \u03b1\u03bd \u03b5\u03c0\u03b9\u03ba\u03bf\u03b9\u03bd\u03c9\u03bd\u03ae\u03c3\u03b5\u03b9\u03c2.';
+
+function rowHtml(m,f){
+  var vv=m?m[f]:null;
+  var blank=(vv==null||(''+vv).trim()==='');
+  /* ΜΟΝΟ το agency κερδίζει σειρές για κενή τιμή· τα άλλα πεδία παραλείπονται όπως πριν */
+  if(blank && f!=='agency') return null;
+  var body, tip='';
+  if(!blank){
+    body=(''+vv).replace(/[<>]/g,'');
+  }else if(noPublish(m)){
+    body='<span class="hh-gs-unk">'+UNKN+' ('+txt(pname(m))+')</span>'; tip=T_UNKN;
+  }else{
+    body='<span class="hh-gs-owner">'+OWNER+'</span>'; tip=T_OWNER;
+  }
+  var lk=!!(f==='agency' && m && m.url);
+  return '<div class="hh-gs-vrow'+(lk?' hh-gs-link':'')+'"'
+        +(lk?' data-url="'+encodeURIComponent(m.url)+'"':'')
+        +(tip?' title="'+tip+'"':'')
+        +'>'+body+pill(m)+'</div>';
+}
+function rowsFor(f,mem){
+  var out=[];
+  try{ (mem||[]).forEach(function(m){ var h=rowHtml(m,f); if(h!=null) out.push(h); }); }catch(e){}
+  return out;
+}
+
+/* ====================================== 5. χτίζουμε εμείς το popup (capture) ====
+   Το αρχικό listener είναι στο document σε bubble· ένα capture listener στο
+   document τρέχει πρώτο και με stopPropagation το bubble δεν φτάνει ποτέ.
+   Ό,τι ΔΕΝ είναι .hh-gs-more το αφήνουμε να περάσει, ώστε το κλείσιμο του popup
+   και τα clicks στις σειρές (hhPolish27) να δουλεύουν όπως δουλεύουν.           */
+document.addEventListener('click',function(e){
+  try{
+    var b=(e.target&&e.target.closest)?e.target.closest('.hh-gs-more'):null;
+    if(!b) return;
+    var lbl=b.getAttribute('data-label')||'';
+    var f=LBL[lbl];
+    var mem=window.__hhGrpMembers;
+    if(!f||!mem||!mem.length) return;                  /* πίσω στην αρχική συμπεριφορά */
+    var rws=rowsFor(f,mem);
+    if(!rws.length) return;                            /* πίσω στην αρχική συμπεριφορά */
+    e.stopPropagation();
+    var old=document.getElementById('hh-gs-vpop-el'); if(old) old.remove();
+    var pop=document.createElement('div');
+    pop.className='hh-gs-vpop'; pop.id='hh-gs-vpop-el';
+    pop.innerHTML='<h5>'+txt(lbl)+'</h5>'+rws.join('');
+    document.body.appendChild(pop);
+    var rc=b.getBoundingClientRect();
+    pop.style.left=Math.max(6,Math.min(rc.left,window.innerWidth-332))+'px';
+    pop.style.top=Math.min(rc.bottom+4,window.innerHeight-140)+'px';
+  }catch(x){}
+},true);
+
+/* ========================================= 6. το n του «n ▾» = πόσες σειρές =====
+   Πριν: showSummary έβαζε parts.length (διαφορετικά μεσιτικά) και το hhPolish29
+   έβαζε «αγγελίες με url ΚΑΙ agency». Τώρα το popup δείχνει μία σειρά ανά αγγελία,
+   οπότε το n είναι το πλήθος των αγγελιών του σπιτιού.                          */
+var T_N='\u038c\u03bb\u03b5\u03c2 \u03bf\u03b9 \u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b5\u03c2 \u03b1\u03c5\u03c4\u03bf\u03cd \u03c4\u03bf\u03c5 \u03c3\u03c0\u03b9\u03c4\u03b9\u03bf\u03cd';
+function syncCount(){
+  try{
+    var mem=window.__hhGrpMembers; if(!mem||!mem.length) return;
+    var n=rowsFor('agency',mem).length; if(!n) return;
+    var want=n+' \u25be';
+    var bs=document.querySelectorAll('.hh-gs-more');
+    for(var i=0;i<bs.length;i++){
+      var b=bs[i];
+      if(LBL[b.getAttribute('data-label')||'']!=='agency') continue;
+      if(b.textContent!==want) b.textContent=want;
+      if(b.title!==T_N) b.title=T_N;
+    }
+  }catch(e){}
+}
+setInterval(syncCount,700);
+setTimeout(syncCount,400);
+document.addEventListener('click',function(){ setTimeout(syncCount,90); },true);
+
+window.__hhPolish50={plat:PLAT,rowsFor:rowsFor,pill:pill,noPublish:noPublish,sync:syncCount};
+}catch(e){console.warn('hhPolish50',e);}})();</script>
+<script>/*hhPolish51*/(function(){try{
+if(window.__hh51) return; window.__hh51=true;
+
+/* ───────── 0. μικροβοηθοί ───────── */
+function T(m){ try{ if(window.showToast) showToast(m); }catch(e){} }
+function rowsAll(){
+  try{ return [].concat(allListings||[], extraListings||[]); }
+  catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }catch(e2){ return []; } }
+}
+function K(u){
+  try{ if(window.__hhKey) return window.__hhKey(u); }catch(e){}
+  return String(u||'').split('?')[0].toLowerCase();
+}
+function refilter(){ try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){} }
+function reOvl(){
+  try{ var o=document.getElementById('listingOverlay');
+       if(o&&o.classList.contains('open')&&typeof _renderOvl==='function') _renderOvl(); }catch(e){}
+}
+function hyp(x,y){ return Math.sqrt(x*x+y*y); }
+
+/* ───────── 0b. στυλ (και για body.light) ───────── */
+try{
+  if(!document.getElementById('hh-polish51-css')){
+    var st=document.createElement('style'); st.id='hh-polish51-css';
+    st.textContent=
+      /* 1 — Google Maps, ίδιο look με το .hh-osm-btn του hhPolish21 */
+       '.hh-gm-btn{position:absolute!important;right:8px;bottom:22px;z-index:650;display:inline-flex;align-items:center;gap:5px;'
+      +'background:rgba(20,20,24,.86);color:#e8e6e1;font-size:11px;font-weight:600;line-height:1;padding:5px 9px;border-radius:7px;'
+      +'border:1px solid rgba(255,255,255,.18);cursor:pointer;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.35)}'
+      +'.hh-gm-btn:hover{background:rgba(20,20,24,.96);color:#fff}'
+      +'body.light .hh-gm-btn{background:rgba(252,250,244,.94);color:#2b2b2b;border-color:rgba(0,0,0,.18)}'
+      /* 2 — κουμπί εξωφύλλου */
+      +'.hh51-cov{position:absolute;top:8px;right:8px;z-index:40;width:38px;height:38px;padding:0;border-radius:50%;'
+      +'display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1;cursor:pointer;'
+      +'background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.22);color:#e8e6e1;'
+      +'filter:grayscale(1);opacity:.72;transition:opacity .15s,filter .15s}'
+      +'.hh51-cov:hover{opacity:1;filter:none;background:rgba(0,0,0,.8)}'
+      +'.hh51-cov.on{opacity:1;filter:none;background:rgba(200,168,75,.92);border-color:#f2e2ad;box-shadow:0 0 0 2px rgba(200,168,75,.45)}'
+      +'.hh51-cov.hh51-lb{top:16px;right:74px;width:42px;height:42px;font-size:21px}'
+      +'body.light .hh51-cov{background:rgba(252,250,244,.92);border-color:rgba(0,0,0,.18);color:#2b2b2b}'
+      +'body.light .hh51-cov.on{background:rgba(200,168,75,.96);border-color:#8a6f1e;color:#20170a}'
+      /* 3 — η γραμμή «Δημοσίευση» κληρονομεί τα .hh-gs-* στυλ */
+      +'.hh-gs-grid>div[data-hh51pub] b{font-variant-numeric:tabular-nums}'
+      /* 4 — δείκτης κατά το σύρσιμο */
+      +'#galleryImgWrap.hh51-drag,#galleryImgWrap.hh51-drag *{cursor:grabbing!important}'
+      +'.hh-lb-stage.hh51-drag,.hh-lb-stage.hh51-drag *{cursor:grabbing!important}';
+    document.head.appendChild(st);
+  }
+}catch(e){}
+
+/* ═════════ 1. GOOGLE MAPS ΔΙΠΛΑ ΣΤΟ OPENSTREETMAP ═════════ */
+function f5(x){ return (+x).toFixed(5); }
+function mapOf(c){
+  try{
+    var A=window.__hhMaps||[];
+    for(var i=A.length-1;i>=0;i--){ var m=A[i];
+      try{ if(m&&m.getContainer&&m.getContainer()===c) return m; }catch(e){} }
+  }catch(e){}
+  return null;
+}
+/* οι αληθινές συντεταγμένες της αγγελίας του μικρού χάρτη, αν υπάρχουν */
+function realCoords(c){
+  try{
+    var k=c.getAttribute&&c.getAttribute('data-k'); if(!k) return null;
+    var rs=rowsAll(), h=null, i;
+    for(i=0;i<rs.length;i++){
+      var r=rs[i];
+      if(String(r.url)===k||String(r._dbId)===k||String(r.id)===k){ h=r; break; }
+    }
+    if(!h) return null;
+    if(h.address&&(''+h.address).trim()&&h.address_lat!=null&&h.address_lng!=null)
+      return [+h.address_lat,+h.address_lng];
+    if(h.platform_lat!=null&&h.platform_lng!=null) return [+h.platform_lat,+h.platform_lng];
+    if(h.address_lat!=null&&h.address_lng!=null) return [+h.address_lat,+h.address_lng];
+  }catch(e){}
+  return null;
+}
+function gmUrl(m,pin,c){
+  var z=15, la=null, ln=null;
+  try{ z=Math.max(1,Math.min(21,Math.round(m.getZoom()))); }catch(e){}
+  if(pin){
+    var rc=realCoords(c);
+    if(rc&&isFinite(rc[0])&&isFinite(rc[1])){ la=f5(rc[0]); ln=f5(rc[1]); }
+  }
+  if(la==null){ var ct=m.getCenter(); la=f5(ct.lat); ln=f5(ct.lng); }
+  /* χωρίς API key: ?q=… ρίχνει πινέζα, /@…,Nz κρατά το ίδιο zoom */
+  if(pin) return 'https://www.google.com/maps?q='+la+','+ln+'&z='+z;
+  return 'https://www.google.com/maps/@'+la+','+ln+','+z+'z';
+}
+function addGm(){
+  try{
+    [].forEach.call(document.querySelectorAll('.leaflet-container'),function(c){
+      var m=mapOf(c); if(!m) return;
+      var osm=null; try{ osm=c.querySelector(':scope > .hh-osm-btn'); }catch(e){}
+      var b=null; try{ b=c.querySelector(':scope > .hh-gm-btn'); }catch(e){}
+      if(!b){
+        b=document.createElement('a');
+        b.className='hh-gm-btn';
+        b.target='_blank'; b.rel='noopener';
+        b.href='https://www.google.com/maps';
+        b.title='Άνοιγμα αυτής της θέσης στο Google Maps, σε νέα καρτέλα';
+        b.innerHTML='📍 Google Maps ↗';
+        var pin=(c.id==='hh-lo-map');
+        b.addEventListener('mousedown',function(ev){ ev.stopPropagation(); });
+        b.addEventListener('click',function(ev){
+          ev.stopPropagation();
+          var u='https://www.google.com/maps';
+          try{ u=gmUrl(m,pin,c); }catch(e){}
+          b.href=u;
+          if(ev.preventDefault) ev.preventDefault();
+          try{ if(window.hhBgOpen){ window.hhBgOpen(u); return; } }catch(e){}
+          try{ window.open(u,'_blank','noopener'); }catch(e){}
+        });
+        c.appendChild(b);
+      }
+      /* «δίπλα» = αριστερά από το κουμπί του OpenStreetMap, ίδια σειρά.
+         Όσο εκείνο δεν έχει μπει ακόμη (hhPolish21 σαρώνει κι αυτό), το κρύβουμε
+         αντί να το ακουμπήσουμε πάνω του. */
+      try{
+        if(osm&&osm.offsetWidth){
+          b.style.right=(osm.offsetWidth+14)+'px';
+          b.style.bottom=(osm.style&&osm.style.bottom)?osm.style.bottom:'22px';
+          b.style.visibility='visible';
+        }else{
+          b.style.right='8px'; b.style.bottom='22px';
+          b.style.visibility=(c.querySelector('.hh-osm-btn')?'hidden':'visible');
+        }
+      }catch(e){}
+    });
+  }catch(e){}
+}
+setTimeout(addGm,800); setInterval(addGm,900);
+
+/* ═════════ 2. ΕΞΩΦΥΛΛΟ ΚΑΡΤΑΣ (📕) ═════════ */
+/* ευρετήριο φωτογραφία → γραμμή, για να μη σκανάρουμε 1300 γραμμές κάθε φορά */
+var IDX=null, IDXn=-1, IDXt=0;
+function index(){
+  var rs=rowsAll(), now=Date.now();
+  if(IDX&&IDXn===rs.length&&(now-IDXt)<15000) return IDX;
+  var m={}, i, j, ex, u;
+  for(i=0;i<rs.length;i++){
+    u=rs[i].imageUrl||rs[i].image_url;
+    if(u&&m[K(u)]==null) m[K(u)]=i;
+    ex=rs[i].extra_images;
+    try{ ex=Array.isArray(ex)?ex:JSON.parse(ex||'[]'); }catch(e){ ex=[]; }
+    if(Array.isArray(ex)) for(j=0;j<ex.length;j++){ if(ex[j]&&m[K(ex[j])]==null) m[K(ex[j])]=i; }
+  }
+  IDX=m; IDXn=rs.length; IDXt=now;
+  return m;
+}
+function rowOwning(url){
+  var k=K(url); if(!k) return null;
+  try{
+    var rs=rowsAll(), m=index(), i=m[k];
+    if(i!=null&&rs[i]) return rs[i];
+  }catch(e){}
+  return null;
+}
+function coverUrlOf(r){ try{ return r?(r.imageUrl||r.image_url||null):null; }catch(e){ return null; } }
+function patchCover(id,url){
+  try{
+    if(typeof sb!=='undefined'&&sb&&typeof sb.update==='function')
+      return Promise.resolve(sb.update(id,{image_url:url}));
+  }catch(e){}
+  try{
+    if(window.sb&&typeof window.sb.update==='function')
+      return Promise.resolve(window.sb.update(id,{image_url:url}));
+  }catch(e){}
+  return Promise.reject(new Error('no-db'));
+}
+function setCover(url,row){
+  try{
+    if(!url){ T('⚠ Δεν βρέθηκε η φωτογραφία'); return; }
+    row=row||rowOwning(url);
+    if(!row){ T('⚠ Δεν βρέθηκε η αγγελία αυτής της φωτογραφίας'); return; }
+    var id=row._dbId||row.id;
+    if(!id){ T('⚠ Η αγγελία δεν έχει εγγραφή στη βάση'); return; }
+    var prev=coverUrlOf(row);
+    if(prev&&K(prev)===K(url)){ T('📕 Είναι ήδη το εξώφυλλο'); paint(); return; }
+    var name=row.location||row.agency||row.platform||('#'+id);
+    var desc='📕 Εξώφυλλο κάρτας — «'+name+'»';
+    function put(u){
+      return patchCover(id,u).then(function(){
+        try{ row.imageUrl=u; row.image_url=u; }catch(e){}
+        try{
+          var g=window.__hhGrpMembers||[];
+          for(var i=0;i<g.length;i++){
+            if(String(g[i].id||g[i]._dbId)===String(id)){ g[i].image_url=u; g[i].imageUrl=u; }
+          }
+        }catch(e){}
+        IDX=null; refilter(); reOvl(); paint();
+      });
+    }
+    /* ίδια σύμβαση με το hhPolish45: label/desc/ids/__hh45/__hh45state + φρουρός */
+    var act={ label:desc, desc:desc, ids:[String(id)], __hh51:1, __hh45:1, __hh45state:'done' };
+    act.undo=function(){
+      if(act.__hh45state!=='done') return Promise.resolve();
+      act.__hh45state='undone';
+      return put(prev).then(function(){},function(){ act.__hh45state='done'; T('⚠ Η αναίρεση απέτυχε'); });
+    };
+    act.redo=function(){
+      if(act.__hh45state!=='undone') return Promise.resolve();
+      act.__hh45state='done';
+      return put(url).then(function(){},function(){ act.__hh45state='undone'; T('⚠ Η επανάληψη απέτυχε'); });
+    };
+    put(url).then(function(){
+      try{
+        if(typeof pushAction==='function') pushAction(act);
+        else if(typeof window.pushAction==='function') window.pushAction(act);
+      }catch(e){}
+      try{ if(typeof _upUndoRedo==='function') _upUndoRedo(); }catch(e){}
+      T('📕 Ορίστηκε ως εξώφυλλο — ↩ για αναίρεση');
+    },function(){ T('⚠ Σφάλμα αποθήκευσης εξωφύλλου'); });
+  }catch(e){}
+}
+function galRow(){
+  try{
+    if(typeof galleryItems!=='undefined'&&galleryItems&&galleryItems[galleryIdx])
+      return galleryItems[galleryIdx].listing||null;
+  }catch(e){}
+  return null;
+}
+function covHosts(){
+  var out=[];
+  try{
+    var g=document.getElementById('galleryOverlay');
+    if(g&&g.classList.contains('open')){
+      var w=document.getElementById('galleryImgWrap'), im=document.getElementById('galleryImg');
+      if(w&&im&&im.getAttribute('src')) out.push({host:w,img:im,cls:'',gal:true});
+    }
+  }catch(e){}
+  try{
+    var s=document.querySelector('#hh-lb .hh-lb-stage');
+    if(s){ var i2=s.querySelector('img'); if(i2&&i2.getAttribute('src')) out.push({host:s,img:i2,cls:' hh51-lb',gal:false}); }
+  }catch(e){}
+  try{
+    [].forEach.call(document.querySelectorAll('.hh-cz-main'),function(mn){
+      var i3=mn.querySelector('img.hh-cz-img');
+      if(i3&&i3.getAttribute('src')) out.push({host:mn,img:i3,cls:'',gal:false});
+    });
+  }catch(e){}
+  return out;
+}
+function paint(){
+  try{
+    covHosts().forEach(function(t){
+      var b=null; try{ b=t.host.querySelector(':scope > .hh51-cov'); }catch(e){ b=null; }
+      if(!b){
+        b=document.createElement('button');
+        b.type='button';
+        b.className='hh51-cov'+t.cls;
+        b.innerHTML='📕';
+        b.setAttribute('data-hh51cov','1');
+        b.addEventListener('mousedown',function(e){ e.stopPropagation(); });
+        b.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+        b.addEventListener('click',function(e){
+          e.stopPropagation(); if(e.preventDefault) e.preventDefault();
+          var u=null; try{ u=t.img&&t.img.getAttribute?t.img.getAttribute('src'):null; }catch(e2){}
+          setCover(u, t.gal?galRow():null);
+        });
+        t.host.appendChild(b);
+      }
+      var url=null; try{ url=t.img.getAttribute('src'); }catch(e){}
+      var row=(t.gal?galRow():null)||rowOwning(url);
+      var on=!!(row&&url&&K(coverUrlOf(row))===K(url));
+      b.className='hh51-cov'+t.cls+(on?' on':'');
+      b.title=on?'Αυτή είναι η φωτογραφία εξωφύλλου της κάρτας'
+                :'Κάνε αυτή τη φωτογραφία εξώφυλλο της κάρτας';
+    });
+  }catch(e){}
+}
+setTimeout(paint,900); setInterval(paint,600);
+
+/* ═════════ 3. «ΔΗΜΟΣΙΕΥΣΗ» ΣΤΟ ΠΛΕΓΜΑ ΠΕΔΙΩΝ ═════════ */
+var MON=['ιαν','φεβ','μαρ','απρ','μαι','ιουν','ιουλ','αυγ','σεπ','οκτ','νοε','δεκ'];
+function noAcc(s){
+  return String(s==null?'':s).toLowerCase()
+    .replace(/ά/g,'α').replace(/έ/g,'ε').replace(/ή/g,'η')
+    .replace(/ί/g,'ι').replace(/ϊ/g,'ι').replace(/ΐ/g,'ι')
+    .replace(/ό/g,'ο').replace(/ύ/g,'υ').replace(/ϋ/g,'υ').replace(/ΰ/g,'υ')
+    .replace(/ώ/g,'ω');
+}
+function p2(n){ n=String(n); return n.length<2?('0'+n):n; }
+function mkDate(y,m,d){
+  y=+y; m=+m; d=+d;
+  if(!(y>=1990&&y<=2100)) return null;
+  if(!(m>=1&&m<=12)) return null;
+  if(!(d>=1&&d<=31)) return null;
+  return { k:y*10000+m*100+d, s:p2(d)+'/'+p2(m)+'/'+y };
+}
+function refDate(m){
+  var v=null;
+  try{ v=m&&(m.created_at||m.createdAt)||null; }catch(e){}
+  var d=v?new Date(v):new Date();
+  if(!d||isNaN(d.getTime())) d=new Date();
+  return d;
+}
+/* listings.published — ΜΟΝΟ αυτή η στήλη (όχι updated, όχι created_at) */
+function fmtPub(raw,ref){
+  var v=String(raw==null?'':raw).trim();
+  if(!v) return null;
+  v=v.replace(/^[^0-9]*?:\s*/,'');          /* «ς:8 Ιουνίου 2026» → «8 Ιουνίου 2026» */
+  v=v.replace(/\s+/g,' ').trim();
+  if(!v) return null;
+  var m;
+  m=v.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);        /* 16/09/2026 */
+  if(m) return mkDate(m[3],m[2],m[1]);
+  m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);                     /* 2026-09-08[T…] */
+  if(m) return mkDate(m[1],m[2],m[3]);
+  m=v.match(/^(\d{1,2})\s+([^\s\d]+)\s+(\d{4})$/);               /* 9 Σεπτεμβρίου 2026 */
+  if(m){
+    var p=noAcc(m[2]), ix=-1, i;
+    for(i=0;i<MON.length;i++){ if(p.indexOf(MON[i])===0){ ix=i; break; } }
+    if(ix>=0) return mkDate(m[3],ix+1,m[1]);
+  }
+  /* σχετικές τιμές του xe.gr: μετρώνται από τη στιγμή της συλλογής */
+  var rel=noAcc(v);
+  m=rel.match(/πριν\s*απο\s*(\d+)\s*(ωρ|λεπτ|ημερ|μερ|εβδομαδ|μην|χρον|ετ)/);
+  if(m){
+    var n=+m[1], u=m[2], DAY=86400000, off=0;
+    if(u==='ωρ') off=n*3600000;
+    else if(u==='λεπτ') off=n*60000;
+    else if(u==='εβδομαδ') off=n*7*DAY;
+    else if(u==='μην') off=n*30*DAY;
+    else if(u==='χρον'||u==='ετ') off=n*365*DAY;
+    else off=n*DAY;
+    var d0=new Date(ref.getTime()-off);
+    return mkDate(d0.getFullYear(),d0.getMonth()+1,d0.getDate());
+  }
+  if(/σημερα|μολις|τωρα/.test(rel)) return mkDate(ref.getFullYear(),ref.getMonth()+1,ref.getDate());
+  if(/χθε/.test(rel)){ var d1=new Date(ref.getTime()-86400000); return mkDate(d1.getFullYear(),d1.getMonth()+1,d1.getDate()); }
+  return null;
+}
+window.hhPubFmt=fmtPub;
+function pubRow(members){
+  var vals=[], seen={}, raws=[], i;
+  for(i=0;i<members.length;i++){
+    var m=members[i];
+    var r0=null; try{ r0=m?m.published:null; }catch(e){}
+    if(r0!=null&&String(r0).trim()) raws.push(String(r0).trim());
+    var v=fmtPub(r0,refDate(m));
+    if(v&&!seen[v.s]){ seen[v.s]=1; vals.push(v); }
+  }
+  vals.sort(function(a,b){ return a.k-b.k; });
+  var LBL='Δημοσίευση';
+  var tip='Ημερομηνία δημοσίευσης στην πλατφόρμα'+(raws.length?(' — όπως δόθηκε: '+raws.slice(0,8).join(' · ')):'');
+  var d=document.createElement('div');
+  d.setAttribute('data-hh51pub','1');
+  var sp=document.createElement('span'); sp.textContent=LBL; d.appendChild(sp);
+  if(!vals.length){
+    var b0=document.createElement('b');
+    b0.textContent='—';
+    b0.title='Η πλατφόρμα δεν έδωσε ημερομηνία δημοσίευσης';
+    d.appendChild(b0); return d;
+  }
+  if(vals.length===1){
+    var b1=document.createElement('b');
+    b1.textContent=vals[0].s; b1.title=tip;
+    d.appendChild(b1); return d;
+  }
+  /* ίδιο markup με ΕΤΟΣ/ΘΕΡΜΑΝΣΗ: εύρος + «n ▾» — το dropdown είναι το υπάρχον */
+  var b=document.createElement('b'); b.className='hh-gs-mv'; b.title=tip;
+  var tx=document.createElement('span'); tx.className='hh-gs-mvtxt';
+  tx.textContent=vals[0].s+' – '+vals[vals.length-1].s;
+  var bt=document.createElement('button');
+  bt.type='button'; bt.className='hh-gs-more';
+  bt.setAttribute('data-label',LBL);
+  bt.setAttribute('data-vals',encodeURIComponent(vals.map(function(x){return x.s;}).join(' · ')));
+  bt.textContent=vals.length+' ▾';
+  b.appendChild(tx); b.appendChild(bt); d.appendChild(b);
+  return d;
+}
+function hash(s){ var h=0,i; s=String(s); for(i=0;i<s.length;i++){ h=((h<<5)-h+s.charCodeAt(i))|0; } return String(h); }
+function pubSweep(){
+  try{
+    var ov=document.getElementById('hh-grpsum-ov'); if(!ov) return;
+    var grid=ov.querySelector('.hh-gs-grid'); if(!grid) return;
+    var mem=null; try{ mem=window.__hhGrpMembers; }catch(e){}
+    if(!mem||!mem.length) return;
+    var key=hash(mem.length+'|'+mem.map(function(m){
+      return (m&&(m.id||m._dbId)||'')+'~'+(m&&m.published!=null?m.published:'');
+    }).join('|'));
+    if(grid.getAttribute('data-hh51key')===key && grid.querySelector('[data-hh51pub]')) return;
+    var old=grid.querySelector('[data-hh51pub]');
+    if(old&&old.parentNode) old.parentNode.removeChild(old);
+    grid.appendChild(pubRow(mem));
+    grid.setAttribute('data-hh51key',key);
+  }catch(e){}
+}
+setTimeout(pubSweep,900); setInterval(pubSweep,700);
+
+/* ═════════ 4. ZOOM / PAN ΠΟΥ ΔΟΥΛΕΥΕΙ ΠΑΝΤΑ ═════════
+   Τι χάλαγε:
+   (α) το hhGalleryFit κρατά δικό του st.z: το _renderGalleryFrame() και το
+       galleryGoTo() γράφουν img.style.transform='scale(galleryZoom)' — και το
+       _sortGalleryByRes() καλεί _renderGalleryFrame() ΑΣΥΓΧΡΟΝΑ αφού μετρήσει
+       τις φωτογραφίες, δηλαδή ΜΕΤΑ το zoom του χρήστη. Οι δύο καταστάσεις
+       ξεσυγχρονίζονται: το mousedown κόβεται στο «if(st.z<=1)return;» παρόλο
+       που η εικόνα φαίνεται μεγεθυμένη (ή σέρνεται ενώ είναι στο 1×).
+   (β) mousedown με έλεγχο ταυτότητας στόχου (e.target!==im&&e.target!==w) —
+       ό,τι κάθεται πάνω από την εικόνα (.gallery-nav, .hh-galfav) ακυρώνει το
+       σύρσιμο.
+   (γ) mouseup στο document χωρίς pointer capture: αν αφήσεις το πλήκτρο έξω
+       από το παράθυρο, st.drag μένει true (η εικόνα ακολουθεί το ποντίκι) και
+       το επόμενο κλικ τρώγεται από το st.moved.
+   (δ) transition:transform .12s πάνω στο σύρσιμο.
+   (ε) καθόλου υποστήριξη αφής και καθόλου zoom στο σημείο του κλικ.
+   Λύση: pointer events + setPointerCapture σε listeners στο window (capture),
+   που προηγούνται των document-capture listeners του hhGalleryFit και τα
+   ακυρώνουν με stopImmediatePropagation· μία κατάσταση, καθρεφτισμένη στα
+   galleryZoom/galleryPanX/galleryPanY ώστε ό,τι γράψει ο παλιός κώδικας να
+   συμφωνεί· MutationObserver που μηδενίζει σε εξωτερική εγγραφή/αλλαγή src. */
+var STEPS=[1,1.6,2.5];
+var CUR=null;
+function isCtl(t){
+  try{ return !!(t&&t.closest&&t.closest('button,a,input,select,textarea,.hh51-cov,.gallery-nav,.gallery-close,.hh-galfav,.hh-lb-nav,.hh-lb-x,.hh-lb-strip,.gallery-thumbs,.gallery-info')); }
+  catch(e){ return false; }
+}
+function vctx(t){
+  try{
+    if(!t||!t.closest) return null;
+    if(isCtl(t)) return null;
+    var w=t.closest('#galleryImgWrap');
+    if(w){ var im=document.getElementById('galleryImg'); return im?{kind:'gal',el:w,img:im}:null; }
+    var s=t.closest('.hh-lb-stage');
+    if(s){ var i2=s.querySelector('img'); return i2?{kind:'lb',el:s,img:i2}:null; }
+  }catch(e){}
+  return null;
+}
+function ctxFor(el){
+  try{
+    if(!el||!el.isConnected) return null;
+    if(el.id==='galleryImgWrap'){ var im=document.getElementById('galleryImg'); return im?{kind:'gal',el:el,img:im}:null; }
+    var i2=el.querySelector('img'); return i2?{kind:'lb',el:el,img:i2}:null;
+  }catch(e){ return null; }
+}
+function S(c){
+  var s=c.el.__hh51s;
+  if(!s){ s=c.el.__hh51s={z:1,tx:0,ty:0,drag:false,moved:false,pts:{},n:0,own:'',sx:0,sy:0,ox:0,oy:0,pd:0,pz:1,pmx:0,pmy:0,ptx:0,pty:0}; }
+  return s;
+}
+function box(c){
+  var r=c.img.getBoundingClientRect();
+  var w=r.width, h=r.height;
+  var nw=0,nh=0;
+  try{ nw=c.img.naturalWidth||0; nh=c.img.naturalHeight||0; }catch(e){}
+  if(nw>0&&nh>0&&r.width>0&&r.height>0){
+    var ar=nw/nh, br=r.width/r.height;
+    if(ar>br){ w=r.width; h=r.width/ar; } else { h=r.height; w=r.height*ar; }
+  }
+  return { x:r.left+(r.width-w)/2, y:r.top+(r.height-h)/2, w:w, h:h, r:r };
+}
+/* το ορατό μέγεθος της φωτογραφίας στο zoom 1 — ΑΝΕΞΑΡΤΗΤΑ από το transform,
+   γιατί το clamp τρέχει πριν γραφτεί το νέο transform στο DOM */
+function layoutBox(c){
+  var lw=0, lh=0;
+  try{ lw=c.img.clientWidth||c.img.offsetWidth||0; lh=c.img.clientHeight||c.img.offsetHeight||0; }catch(e){}
+  if(!(lw>0&&lh>0)){
+    try{ var r=c.img.getBoundingClientRect(), z=S(c).z||1; lw=r.width/z; lh=r.height/z; }catch(e){}
+  }
+  var nw=0, nh=0;
+  try{ nw=c.img.naturalWidth||0; nh=c.img.naturalHeight||0; }catch(e){}
+  if(nw>0&&nh>0&&lw>0&&lh>0){
+    var ar=nw/nh, br=lw/lh;
+    if(ar>br) lh=lw/ar; else lw=lh*ar;      /* object-fit: contain */
+  }
+  return { w:lw, h:lh };
+}
+function clamp(c){
+  var s=S(c);
+  if(s.z<=1){ s.tx=0; s.ty=0; return; }
+  try{
+    var lb=layoutBox(c);
+    var cw=c.el.clientWidth||lb.w, ch=c.el.clientHeight||lb.h;
+    var mx=Math.max(0,(lb.w*s.z-cw)/2), my=Math.max(0,(lb.h*s.z-ch)/2);
+    if(!isFinite(mx)) mx=0;
+    if(!isFinite(my)) my=0;
+    s.tx=Math.max(-mx,Math.min(mx,s.tx));
+    s.ty=Math.max(-my,Math.min(my,s.ty));
+  }catch(e){}
+}
+function norm(v){ return String(v==null?'':v).replace(/\s+/g,''); }
+function apply(c){
+  var s=S(c);
+  var tr='translate('+(Math.round(s.tx*100)/100)+'px,'+(Math.round(s.ty*100)/100)+'px) scale('+s.z+')';
+  s.own=norm(tr);
+  try{
+    c.img.style.transformOrigin='center center';
+    c.img.style.transition=s.drag?'none':'';
+    c.img.style.transform=tr;
+    /* ο φυλλομετρητής ξαναγράφει το string (κενό μετά το κόμμα) — κρατάμε το δικό του */
+    s.own=norm(c.img.style.transform||tr);
+    c.img.draggable=false;
+    c.img.style.cursor=s.z>1?(s.drag?'grabbing':'grab'):'zoom-in';
+    c.el.style.cursor=s.z>1?(s.drag?'grabbing':'grab'):'zoom-in';
+    c.el.style.touchAction='none';
+    if(s.drag) c.el.classList.add('hh51-drag'); else c.el.classList.remove('hh51-drag');
+    if(s.z>1) c.el.classList.add('zoomed'); else c.el.classList.remove('zoomed');
+  }catch(e){}
+  if(c.kind==='gal'){
+    /* καθρέφτισμα στη βάση, ώστε ό,τι γράψει ο παλιός κώδικας να συμφωνεί */
+    try{ galleryZoom=s.z; galleryPanX=s.tx; galleryPanY=s.ty; }catch(e){}
+  }
+}
+function reset(c){
+  var s=S(c);
+  s.z=1; s.tx=0; s.ty=0; s.drag=false; s.moved=false; s.pts={}; s.n=0; s.pd=0;
+  apply(c);
+}
+function watch(c){
+  try{
+    if(!c||!c.img||c.img.__hh51o) return;
+    c.img.__hh51o=1;
+    c.img.draggable=false;
+    c.img.addEventListener('dragstart',function(e){ if(e.preventDefault) e.preventDefault(); });
+    var el=c.el;
+    var mo=new MutationObserver(function(recs){
+      try{
+        var c2=ctxFor(el); if(!c2||c2.img!==c.img) return;
+        var s=S(c2), src=false, sty=false, i;
+        for(i=0;i<recs.length;i++){
+          if(recs[i].attributeName==='src') src=true;
+          else if(recs[i].attributeName==='style') sty=true;
+        }
+        if(src){ reset(c2); return; }
+        if(sty&&!s.drag&&norm(c2.img.style.transform)!==s.own){ reset(c2); }
+      }catch(e){}
+    });
+    mo.observe(c.img,{attributes:true,attributeFilter:['src','style']});
+  }catch(e){}
+}
+/* zoom γύρω από συγκεκριμένο σημείο της οθόνης */
+function zoomFrom(c,px,py,nz,z0,tx0,ty0){
+  var s=S(c);
+  try{
+    var r=box(c).r;
+    var rcx=r.left+r.width/2, rcy=r.top+r.height/2;
+    var lcx=rcx-s.tx, lcy=rcy-s.ty;            /* κέντρο layout (χωρίς translate) */
+    var ux=(px-lcx-tx0)/(z0||1), uy=(py-lcy-ty0)/(z0||1);
+    s.z=nz;
+    if(nz<=1){ s.tx=0; s.ty=0; }
+    else { s.tx=px-lcx-ux*nz; s.ty=py-lcy-uy*nz; }
+    if(!isFinite(s.tx)) s.tx=0;
+    if(!isFinite(s.ty)) s.ty=0;
+  }catch(e){ s.z=nz; if(nz<=1){ s.tx=0; s.ty=0; } }
+  clamp(c); apply(c);
+}
+function zoomAt(c,px,py,nz){ var s=S(c); zoomFrom(c,px,py,nz,s.z,s.tx,s.ty); }
+
+function onDown(e){
+  var c=vctx(e.target); if(!c) return;
+  watch(c);
+  var s=S(c), id=(e.pointerId==null?1:e.pointerId);
+  s.pts[id]={x:e.clientX,y:e.clientY};
+  s.n=0; for(var k in s.pts) s.n++;
+  CUR=c;
+  if(s.n>=2){                                  /* pinch */
+    var ks=[], q; for(q in s.pts) ks.push(q);
+    var a=s.pts[ks[0]], b=s.pts[ks[1]];
+    s.pd=Math.max(1,hyp(b.x-a.x,b.y-a.y));
+    s.pz=s.z; s.pmx=(a.x+b.x)/2; s.pmy=(a.y+b.y)/2; s.ptx=s.tx; s.pty=s.ty;
+    s.drag=false; s.moved=true;
+    if(e.preventDefault) e.preventDefault();
+    return;
+  }
+  if(s.z<=1) return;                           /* 1× → το κλικ κάνει zoom */
+  s.drag=true; s.moved=false;
+  s.sx=e.clientX; s.sy=e.clientY; s.ox=s.tx; s.oy=s.ty;
+  try{ if(c.el.setPointerCapture&&e.pointerId!=null) c.el.setPointerCapture(e.pointerId); }catch(e2){}
+  if(e.preventDefault) e.preventDefault();
+  apply(c);
+}
+function onMove(e){
+  var c=CUR; if(!c) return;
+  if(!c.el||!c.el.isConnected||!c.img||!c.img.isConnected){ CUR=null; return; }
+  var s=S(c), id=(e.pointerId==null?1:e.pointerId);
+  if(s.pts[id]) s.pts[id]={x:e.clientX,y:e.clientY};
+  if(s.n>=2&&s.pd){
+    var ks=[], q; for(q in s.pts) ks.push(q);
+    if(ks.length>=2){
+      var a=s.pts[ks[0]], b=s.pts[ks[1]];
+      var d=Math.max(1,hyp(b.x-a.x,b.y-a.y));
+      var nz=Math.max(1,Math.min(6,s.pz*d/s.pd));
+      zoomFrom(c,s.pmx,s.pmy,nz,s.pz,s.ptx,s.pty);
+      if(e.preventDefault) e.preventDefault();
+    }
+    return;
+  }
+  if(!s.drag){
+    /* αυτοΐαση: αν κανένα πλήκτρο δεν κρατιέται, η χειρονομία τελείωσε */
+    if(e.buttons===0&&s.n<2) CUR=null;
+    return;
+  }
+  var dx=e.clientX-s.sx, dy=e.clientY-s.sy;
+  if(Math.abs(dx)+Math.abs(dy)>4) s.moved=true;
+  s.tx=s.ox+dx; s.ty=s.oy+dy;
+  clamp(c); apply(c);
+  if(e.preventDefault) e.preventDefault();
+  if(e.stopPropagation) e.stopPropagation();
+}
+function onUp(e){
+  var c=CUR||vctx(e&&e.target); if(!c) return;
+  var s=S(c), id=(e&&e.pointerId!=null)?e.pointerId:1;
+  try{ delete s.pts[id]; }catch(e2){}
+  s.n=0; for(var k in s.pts) s.n++;
+  if(s.n<2) s.pd=0;
+  if(s.n===0){
+    if(s.drag){ s.drag=false; apply(c); }
+    CUR=null;
+    /* το «καταπιωμένο κλικ» δεν μένει κολλημένο αν δεν έρθει click */
+    setTimeout(function(){ try{ s.moved=false; }catch(e3){} },450);
+  }
+}
+function onClick(e){
+  var c=CUR||vctx(e.target); if(!c) return;
+  if(isCtl(e.target)) return;
+  watch(c);
+  var s=S(c);
+  if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+  if(e.preventDefault) e.preventDefault();
+  if(s.moved){ s.moved=false; return; }        /* ήταν σύρσιμο */
+  var b, inside=true;
+  try{
+    b=box(c);
+    inside=(e.clientX>=b.x-1&&e.clientX<=b.x+b.w+1&&e.clientY>=b.y-1&&e.clientY<=b.y+b.h+1);
+  }catch(e2){ inside=true; }
+  if(!inside){
+    if(s.z>1){ reset(c); return; }
+    if(c.kind==='gal'){ try{ if(typeof closeGallery==='function') closeGallery(); else if(window.closeGallery) window.closeGallery(); }catch(e3){} }
+    else { try{ var x=document.querySelector('#hh-lb .hh-lb-x'); if(x) x.click(); }catch(e3){} }
+    return;
+  }
+  var i=STEPS.indexOf(s.z), nz=STEPS[((i<0?0:i)+1)%STEPS.length];
+  zoomAt(c,e.clientX,e.clientY,nz);
+}
+/* τα παλιά mouse handlers του hhGalleryFit ακυρώνονται εδώ */
+function kill(e){
+  try{
+    var s=(CUR&&CUR.el)?CUR.el.__hh51s:null;
+    var act=!!(s&&(s.drag||s.n>=2));
+    if(act||vctx(e.target)){
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+      if(e.type==='mousedown'&&e.preventDefault) e.preventDefault();
+    }
+  }catch(e2){}
+}
+try{
+  window.addEventListener('pointerdown',onDown,true);
+  window.addEventListener('pointermove',onMove,true);
+  window.addEventListener('pointerup',onUp,true);
+  window.addEventListener('pointercancel',onUp,true);
+  window.addEventListener('lostpointercapture',onUp,true);
+  window.addEventListener('click',onClick,true);
+  window.addEventListener('mousedown',kill,true);
+  window.addEventListener('mousemove',function(e){ if(CUR) kill(e); },true);
+  window.addEventListener('mouseup',function(e){ kill(e); },true);
+  window.addEventListener('dragstart',function(e){
+    try{ if(CUR||vctx(e.target)){ if(e.preventDefault) e.preventDefault(); } }catch(e2){}
+  },true);
+  window.addEventListener('blur',function(){ try{ if(CUR) onUp({pointerId:1,target:null}); }catch(e){} });
+  /* εφεδρεία για φυλλομετρητές χωρίς PointerEvent */
+  if(!window.PointerEvent){
+    var tw=function(fn){ return function(e){
+      try{
+        var t=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0]);
+        if(!t) return;
+        fn({ target:e.target, clientX:t.clientX, clientY:t.clientY, pointerId:1,
+             preventDefault:function(){ try{ e.preventDefault(); }catch(x){} },
+             stopPropagation:function(){ try{ e.stopPropagation(); }catch(x){} } });
+      }catch(x){}
+    };};
+    window.addEventListener('touchstart',tw(onDown),true);
+    window.addEventListener('touchmove',tw(onMove),true);
+    window.addEventListener('touchend',tw(onUp),true);
+    window.addEventListener('touchcancel',tw(onUp),true);
+  }
+}catch(e){}
+/* draggable=false + παρακολούθηση μόλις εμφανιστεί κάποιος viewer */
+function armViewers(){
+  try{
+    var w=document.getElementById('galleryImgWrap');
+    if(w){ var c1=ctxFor(w); if(c1) watch(c1); }
+    var s=document.querySelector('#hh-lb .hh-lb-stage');
+    if(s){ var c2=ctxFor(s); if(c2) watch(c2); }
+  }catch(e){}
+}
+setTimeout(armViewers,900); setInterval(armViewers,1200);
+
+window.hh51Status=function(){
+  var o={gm:document.querySelectorAll('.hh-gm-btn').length,
+         cov:document.querySelectorAll('.hh51-cov').length,
+         pub:document.querySelectorAll('[data-hh51pub]').length};
+  try{ var w=document.getElementById('galleryImgWrap'); o.gal=w&&w.__hh51s?w.__hh51s:null; }catch(e){}
+  return o;
+};
+}catch(e){console.warn('hhPolish51',e);}})();</script>
+<script>/*hhPolish52*/(function(){try{
+if(window.__hh52) return; window.__hh52=true;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   hhPolish52
+     1. CSS: το «↩ Αναίρεση» της ομαδοποιημένης κάρτας δεν φοράει πια την
+        κλάση 'hh-gs-rm' (χάλαγε τον φρουρό του zeroButtons) — του δίνουμε
+        πίσω, μέσω '.hh45-rm', ΤΟ ΙΔΙΟ ΑΚΡΙΒΩΣ look, και στα δύο θέματα.
+     2. Σειρά κουμπιών στη μπάρα: ⛔ · 👎 · ✅ · 🏷 · ↩  και «Κοινοποίηση»
+        τελείως δεξιά.
+     3. «Το είδαμε» (seen_it) γίνεται αναιρέσιμο — σύμβαση hhPolish45.
+   Όλα αμυντικά: αν λείπει στοιχείο ή συνάρτηση, το block δεν κάνει τίποτα.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---------- 0. μικροβοηθοί (ίδιοι με hhPolish45 / hhPolish47) ---------- */
+function T(m){ try{ if(window.showToast) showToast(m); }catch(e){} }
+function rowsAll(){
+  try{ return [].concat(allListings||[], extraListings||[]); }
+  catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }catch(e2){ return []; } }
+}
+function rid(r){ try{ return String((r&&(r._dbId||r.id))||''); }catch(e){ return ''; } }
+function rowById(id){
+  var a=rowsAll(); id=String(id);
+  for(var i=0;i<a.length;i++){ if(rid(a[i])===id) return a[i]; }
+  return null;
+}
+function hidOf(r){
+  var v=''; try{ v=String((r&&r.house_id)||'').trim(); }catch(e){ v=''; }
+  return (v && v!=='0' && v!=='null' && v!=='undefined') ? v : '';
+}
+function refilter(){ try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){} }
+function upd(){ try{ if(typeof _upUndoRedo==='function') _upUndoRedo(); }catch(e){} }
+function sbUp(id,patch){
+  try{ if(typeof sb!=='undefined' && sb && typeof sb.update==='function')
+         return Promise.resolve(sb.update(id,patch)); }catch(e){}
+  try{ if(window.sb && typeof window.sb.update==='function')
+         return Promise.resolve(window.sb.update(id,patch)); }catch(e){}
+  return Promise.reject(new Error('no-sb'));
+}
+function nz(v){ return v===undefined?null:v; }
+function plur(n){ return n+' αγγελί'+(n===1?'α':'ες'); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1 + 2.  CSS — το '.hh45-rm' ξαναπαίρνει ό,τι του έδινε το '.hh-gs-rm'
+   ══════════════════════════════════════════════════════════════════════════
+   Οι τρεις κανόνες που έχανε το κουμπί όταν άλλαξε κλάση:
+     hhPolish9  '.hh-gs-rm{display:inline-flex;…;border:1px solid transparent}'
+     hhPolish9  '.hh-gs-rm:hover{filter:brightness(1.25)}'
+     hhPolish18 '.hh-gs-tools>.hh-gs-rm{…height:30px…font-size:12px…}'
+   Κανένας από τους τρεις δεν ήταν theme-scoped, οπότε η ίδια γεωμετρία
+   ισχύει και στο σκούρο και στο 'body.light'. Το χρώμα/περίγραμμα έρχεται
+   όπως πάντα από το '.hh45-undo' του hhPolish45 (var(--accent2), !important),
+   που ακολουθεί μόνο του το θέμα — άρα η εμφάνιση είναι ΤΑΥΤΟΣΗΜΗ με πριν. */
+(function(){
+  try{
+    if(document.getElementById('hh-polish52-css')) return;
+    var st=document.createElement('style'); st.id='hh-polish52-css';
+    st.textContent=
+      /* βάση (αντίγραφο του '.hh-gs-rm' του hhPolish9) */
+      '.hh45-rm{display:inline-flex;align-items:center;gap:5px;cursor:pointer;'
+     +'border-radius:7px;padding:5px 11px;font-size:11.5px;font-weight:700;'
+     +'border:1px solid transparent}'
+     +'.hh45-rm:hover{filter:brightness(1.25)}'
+      /* ίδιο μέγεθος με τα άλλα κουμπιά της μπάρας (αντίγραφο hhPolish18) */
+     +'.hh-gs-tools>.hh45-rm{display:inline-flex!important;align-items:center;'
+     +'justify-content:center;height:30px!important;padding:0 12px!important;'
+     +'font-size:12px!important;font-weight:600!important;'
+     +'border-radius:8px!important;white-space:nowrap;line-height:1!important;'
+     +'box-sizing:border-box}'
+      /* και στο ανοιχτό θέμα ό,τι και στο σκούρο — ρητά, για να μην το
+         σκεπάσει κανένας μελλοντικός theme κανόνας */
+     +'body.light .hh-gs-tools>.hh45-rm{height:30px!important;'
+     +'padding:0 12px!important;font-size:12px!important;'
+     +'font-weight:600!important;border-radius:8px!important;'
+     +'line-height:1!important;box-sizing:border-box}'
+      /* ── σειρά: ⛔(3) 👎(4) ✅(5) 🏷(6) ↩(7) … Κοινοποίηση(9, δεξιά) ──
+         Το '.hh47-offm' δεν είχε ποτέ order (έπεφτε στο 0 και θα πήγαινε
+         ΠΡΙΝ τα αστέρια) και το '.hh45-undo' είχε order:9, δηλαδή ΜΕΤΑ το
+         «Κοινοποίηση» που τραβάει margin-left:auto. Τα διορθώνουμε. */
+     +'.hh-gs-tools>.hh-gs-rm.hh47-offm{order:6!important}'
+     +'.hh-gs-tools>.hh45-undo{order:7!important}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+})();
+
+/* Σκούπα ασφαλείας: αν κάποιο ταμπλό έχει ήδη κουμπί «↩ Αναίρεση» με την
+   παλιά κλάση 'hh-gs-rm' (π.χ. cache, ή άλλο layer που το ξαναφτιάχνει),
+   του την αφαιρούμε ώστε ο φρουρός του zeroButtons να ελευθερωθεί — και
+   ταυτόχρονα σπρώχνουμε το zeroButtons να ξαναφτιάξει τα δύο κουμπιά χωρίς
+   να περιμένουμε τα 1200ms του interval του. */
+function unstick(){
+  try{
+    var us=document.querySelectorAll('.hh-gs-tools .hh45-undo');
+    var touched=false;
+    for(var i=0;i<us.length;i++){
+      var b=us[i];
+      if(b.classList && b.classList.contains('hh-gs-rm')){
+        b.classList.remove('hh-gs-rm');
+        if(!b.classList.contains('hh45-rm')) b.classList.add('hh45-rm');
+        touched=true;
+      }
+      if(b.classList && !b.classList.contains('hh45-rm')) b.classList.add('hh45-rm');
+    }
+    var t=null;
+    try{ t=document.querySelector('.hh-gs-tools'); }catch(e){ t=null; }
+    if(t && !t.querySelector('.hh-gs-rm.gone') && !t.querySelector('.hh-gs-rm.nope')){
+      if(typeof window.zeroButtons==='function'){ try{ window.zeroButtons(); }catch(e){} }
+      else if(typeof zeroButtons==='function'){ try{ zeroButtons(); }catch(e){} }
+    }
+    if(touched){ try{ if(window.hhPolish47 && window.hhPolish47.tick) window.hhPolish47.tick(); }catch(e){} }
+  }catch(e){}
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3.  «ΤΟ ΕΙΔΑΜΕ» (seen_it) ΜΕ ΠΡΑΓΜΑΤΙΚΗ ΑΝΑΙΡΕΣΗ
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ---------- 3a. γράψιμο μιας κατάστασης πίσω στη βάση ---------- */
+function applyVals(ch,which){
+  var q=Promise.resolve(), fails=0;
+  ch.forEach(function(c){
+    q=q.then(function(){
+      var v=(which==='b')?c.b:c.a;
+      var patch={ seen_it: (v.seen_it==null?null:!!v.seen_it) };
+      return sbUp(c.id,patch).then(function(){
+        var r=rowById(c.id);
+        if(r) r.seen_it=patch.seen_it;
+      },function(){ fails++; });
+    });
+  });
+  return q.then(function(){ refilter(); return fails; });
+}
+
+/* ---------- 3b. αντικείμενο ενέργειας — ακριβώς η σύμβαση του hhPolish45 ---------- */
+function mkAction(ch,desc,ids){
+  var a={ label:desc, desc:desc, ids:ids, __hh45:1, __hh45state:'done', __hh52:1 };
+  a.undo=function(){
+    if(a.__hh45state!=='done') return Promise.resolve();
+    a.__hh45state='undone';
+    return applyVals(ch,'b').then(function(f){
+      if(f) T('⚠ Μέρος της αναίρεσης δεν αποθηκεύτηκε');
+    },function(){ a.__hh45state='done'; T('⚠ Η αναίρεση απέτυχε — δοκίμασε ξανά'); });
+  };
+  a.redo=function(){
+    if(a.__hh45state!=='undone') return Promise.resolve();
+    a.__hh45state='done';
+    return applyVals(ch,'a').then(function(f){
+      if(f) T('⚠ Μέρος της επανάληψης δεν αποθηκεύτηκε');
+    },function(){ a.__hh45state='undone'; T('⚠ Η επανάληψη απέτυχε'); });
+  };
+  return a;
+}
+
+/* ---------- 3c. ποιες γραμμές αγγίζει η κάθε συνάρτηση ----------
+   Αντίγραφο της λογικής των πρωτοτύπων: η toggleFlag απλώνεται σε όλο το
+   σπίτι (house_id) όταν υπάρχει, αλλιώς μόνο στη μία αγγελία· η
+   toggleGroupFlag πιάνει όλες τις αγγελίες του house_id. */
+function rowsForUrl(u){
+  var a=rowsAll(), h=null, i;
+  if(!u) return [];
+  for(i=0;i<a.length;i++){ if(a[i] && a[i].url===u){ h=a[i]; break; } }
+  if(!h) return [];
+  var k=hidOf(h);
+  if(!k) return [h];
+  var out=[];
+  for(i=0;i<a.length;i++){ if(hidOf(a[i])===k) out.push(a[i]); }
+  return out.length?out:[h];
+}
+function rowsForHid(hid){
+  var a=rowsAll(), out=[], i;
+  hid=String(hid==null?'':hid).trim();
+  if(!hid) return out;
+  for(i=0;i<a.length;i++){
+    var v=''; try{ v=String((a[i]&&a[i].house_id)||'').trim(); }catch(e){ v=''; }
+    if(v===hid) out.push(a[i]);
+  }
+  return out;
+}
+
+/* ---------- 3d. ελληνική περιγραφή ---------- */
+function locOf(rs){
+  try{
+    for(var i=0;i<rs.length;i++){
+      var l=String((rs[i]&&rs[i].location)||'').trim();
+      if(l) return l;
+    }
+    for(i=0;i<rs.length;i++){
+      var p=String((rs[i]&&rs[i].platform)||'').trim();
+      if(p) return p;
+    }
+  }catch(e){}
+  return '#'+((rs[0]&&rid(rs[0]))||'—');
+}
+function describe(on,rs,n){
+  var loc=locOf(rs);
+  return on ? ('👁 Το είδαμε — «'+loc+'» ('+plur(n)+')')
+            : ('Ακύρωση «το είδαμε» — «'+loc+'» ('+plur(n)+')');
+}
+
+/* ---------- 3e. το τύλιγμα ---------- */
+var DEPTH=0;
+function commit(before,rs){
+  try{
+    var ch=[], ids=[], i, on=false;
+    for(i=0;i<before.length;i++){
+      var id=before[i].id, row=rowById(id);
+      if(!row) continue;
+      var now=nz(row.seen_it);
+      if(now===before[i].v) continue;
+      ch.push({ id:id, b:{seen_it:before[i].v}, a:{seen_it:now} });
+      ids.push(id);
+      if(now===true) on=true;
+    }
+    if(!ch.length) return;                     /* τίποτα δεν άλλαξε → άκυρο */
+    var desc=describe(on,rs,ch.length);
+    try{ if(typeof window.pushAction==='function') window.pushAction(mkAction(ch,desc,ids)); }catch(e){}
+    upd();
+  }catch(e){}
+}
+function wrapSeen(name,scope){
+  var f=window[name];
+  if(typeof f!=='function' || f.__hh52) return false;
+  var w=function(){
+    var args=[].slice.call(arguments);
+    var fld=''; try{ fld=String(args[1]==null?'':args[1]); }catch(e){ fld=''; }
+    /* μόνο το seen_it μας αφορά· ό,τι άλλο περνάει άθικτο */
+    if(fld!=='seen_it' || DEPTH>0) return f.apply(this,args);
+
+    var rs=[], before=[];
+    try{ rs=scope(args[0])||[]; }catch(e){ rs=[]; }
+    try{
+      for(var i=0;i<rs.length;i++){
+        var id=rid(rs[i]); if(!id) continue;
+        before.push({ id:id, v:nz(rs[i].seen_it) });
+      }
+    }catch(e){ before=[]; }
+
+    DEPTH++;
+    var closed=false;
+    function finish(ok){
+      if(closed) return; closed=true;
+      DEPTH--;
+      if(ok && before.length){ try{ commit(before,rs); }catch(e){} }
+    }
+    var r;
+    try{ r=f.apply(this,args); }
+    catch(e){ finish(false); T('⚠ Η ενέργεια δεν ολοκληρώθηκε'); return; }
+    if(r && typeof r.then==='function'){
+      return r.then(function(v){ finish(true); return v; },
+                    function(e){ finish(false); T('⚠ Η ενέργεια δεν ολοκληρώθηκε'); });
+    }
+    finish(true);
+    return r;
+  };
+  w.__hh52=1; w.__hh52orig=f; window[name]=w;
+  return true;
+}
+
+/* ---------- 4. εγκατάσταση (και επανεγκατάσταση αν κάποιο layer ξαναγράψει) ---------- */
+function install(){
+  try{ wrapSeen('toggleFlag', rowsForUrl); }catch(e){}
+  try{ wrapSeen('toggleGroupFlag', rowsForHid); }catch(e){}
+}
+window.hh52Status=function(){
+  var o={};
+  try{ o.toggleFlag=!!(window.toggleFlag&&window.toggleFlag.__hh52); }catch(e){ o.toggleFlag=false; }
+  try{ o.toggleGroupFlag=!!(window.toggleGroupFlag&&window.toggleGroupFlag.__hh52); }catch(e){ o.toggleGroupFlag=false; }
+  try{ o.stack=ACTION_STACK.length; o.redo=REDO_STACK.length; }catch(e){ o.stack=-1; o.redo=-1; }
+  return o;
+};
+install(); unstick();
+setInterval(function(){ install(); unstick(); }, 900);
+setTimeout(function(){ install(); unstick(); }, 1500);
+setTimeout(function(){ install(); unstick(); }, 3200);
+}catch(e){console.warn('hhPolish52',e);}})();</script>
+
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
