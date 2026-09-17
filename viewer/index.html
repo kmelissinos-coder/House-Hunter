@@ -3796,7 +3796,7 @@ function saveNotes(id){
   fetch(url,{method:'PATCH',headers:{apikey:'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Authorization':'Bearer sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr','Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({personal_notes:val})}).then(()=>{const btn=ta.nextElementSibling;if(btn){btn.textContent='✓ Αποθηκεύτηκε';setTimeout(()=>btn.textContent='💾 Αποθήκευση',1500);}});
 }
 </script>
-<script>(function(){function fix(){var dz=document.getElementById('dropzone');if(dz)dz.style.display='none';var ub=document.getElementById('hhUserBar');var ns=document.getElementById('numSearch');if(!ub)return;ub.style.background='var(--bg)';ub.style.border='1px solid var(--border)';ub.style.color='var(--text)';ub.style.boxShadow='none';var nm=document.getElementById('hhUserName');if(nm)nm.style.color='var(--text)';var lo=ub.querySelector('button');if(lo){lo.style.background='var(--accent)';lo.style.color='#fff';lo.style.border='none';}if(ns&&ns.parentElement&&ub.parentElement!==ns.parentElement){var row=ns.parentElement;row.style.display='flex';row.style.alignItems='center';row.style.gap='8px';ns.style.flex='1';ns.style.minWidth='0';ub.style.position='static';ub.style.top='';ub.style.right='';ub.style.flex='0 0 auto';row.appendChild(ub);}}var n=0;var iv=setInterval(function(){n++;if(window.hhUser)fix();if(n>40)clearInterval(iv);},400);})();/*uifixBlock*/</script><script>(function(){var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}var H={},R={},NICK={},SEEN={},uid=null,token=null,isAdmin=false,ready=false;function hdr(){return {apikey:AK,Authorization:'Bearer '+token};}async function load(){var s=sess();if(!s||!s.user)return false;uid=s.user.id;token=s.access_token;isAdmin=(s.user.email==='kmelissinos@gmail.com');try{var lj=await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(lj))lj.forEach(function(x){H[x.id]=x.house_id;});var pj=await fetch(SB+'/rest/v1/profiles?select=id,username',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(pj))pj.forEach(function(x){NICK[x.id]=x.username;});var rj=await fetch(SB+'/rest/v1/user_ratings?select=user_id,house_id,rating',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(rj))rj.forEach(function(x){(R[x.house_id]=R[x.house_id]||{})[x.user_id]=x.rating;});window.hhAvgStars=function(hid){try{var u=R[hid]||{},v=[];for(var k in u){if(u[k]>0)v.push(u[k]);}if(!v.length)return '';var avg=v.reduce(function(a,b){return a+b;},0)/v.length,f=Math.round(avg),s='';for(var i=1;i<=5;i++)s+=(i<=f?'★':'☆');return '<div style="color:#c8a84b;font-size:13px;margin:3px 0 2px">'+s+' <span style="color:#8a8a8a;font-size:10px">'+avg.toFixed(1)+' ('+v.length+')</span></div>';}catch(e){return '';}};setInterval(function(){try{var ns=document.querySelectorAll('.hh-poprate:not([data-filled])');for(var q=0;q<ns.length;q++){var el=ns[q],hh=el.getAttribute('data-h'),ht=window.hhAvgStars?window.hhAvgStars(hh):'';if(ht){el.innerHTML=ht;el.setAttribute('data-filled','1');}}}catch(e){}},600);var sj=await fetch(SB+'/rest/v1/user_seen?select=house_id',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(sj))sj.forEach(function(x){SEEN[x.house_id]=true;});}catch(e){return false;}return true;}function hidOfCard(card){var s=card.querySelector('[onclick*=setGroupRating]')||card.querySelector('[onclick*=setRating]');if(!s)return null;var oc=s.getAttribute('onclick')||'';var q=String.fromCharCode(39);var q1=oc.indexOf(q),q2=oc.indexOf(q,q1+1);if(q1<0||q2<0)return null;var v=oc.slice(q1+1,q2);if(oc.indexOf('setGroupRating')>=0)return v;return (H[v]!=null&&H[v]!=='0')?H[v]:v;}function refresh(){if(!ready)return;document.querySelectorAll('.card,.grouped-card').forEach(function(card){var hid=hidOfCard(card);if(!hid)return;var cs=card.querySelector('.card-stars');if(cs){var st=cs.querySelectorAll('[onclick*=setRating],[onclick*=setGroupRating]');var mine=(function(){try{if(window.hhMyRating){var v=+window.hhMyRating(hid)||0;if(v)return v;}}catch(e){}return (R[hid]&&R[hid][uid])||0;})();st.forEach(function(s,i){s.style.color=(i<mine)?'#c8a84b':'transparent';});/*hhPolish9: ratings line moved*/}var nb=card.querySelector('.hh-new');if(!SEEN[hid]){if(!nb){nb=document.createElement('div');nb.className='hh-new';nb.textContent='NEW';nb.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.35);pointer-events:none';if(getComputedStyle(card).position==='static')card.style.position='relative';card.appendChild(nb);}}else{if(nb&&nb.parentNode)nb.parentNode.removeChild(nb);}});}function markSeen(hid){if(!hid||SEEN[hid])return;SEEN[hid]=true;document.querySelectorAll('.card,.grouped-card').forEach(function(card){if(hidOfCard(card)===hid){var nb=card.querySelector('.hh-new');if(nb&&nb.parentNode)nb.parentNode.removeChild(nb);}});try{fetch(SB+'/rest/v1/user_seen?on_conflict=user_id,house_id',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,house_id:hid})});}catch(e){}}async function upsertRating(hid,score){if(!ready||!hid)return;R[hid]=R[hid]||{};R[hid][uid]=score;refresh();try{await fetch(SB+'/rest/v1/user_ratings?on_conflict=user_id,house_id',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,house_id:hid,rating:score})});}catch(e){}}function memberSweep(){if(isAdmin)return;var sel='[onclick*=hideListing],[onclick*=toggleMsSelect],[onclick*=toggleHide],[onclick*=modalToggleHide],[onclick*=loToggleHide],[onclick*=toggleGroupHide],[onclick*=Cover],[onclick*=saveAddress],[onclick*=editAddress],[onclick*=ungroupListing],[onclick*=selectListingForGrouping],[onclick*=toggleFlag],[onclick*=toggleGroupFlag],[onclick*=modalToggleFav],[onclick*=toggleFav],[onclick*=openSyncModal],.admin-check';document.querySelectorAll(sel).forEach(function(el){var b=el.closest('button,label,.action-btn,.fav-btn')||el;b.style.display='none';});}function paintStars(e,score){try{var t=e&&e.target;if(!t||!t.parentNode)return;var stars=t.parentNode.querySelectorAll('[onclick*=setRating],[onclick*=setGroupRating]');for(var i=0;i<stars.length;i++){stars[i].style.color=(i<score)?'#c8a84b':'rgba(140,140,140,0.4)';}}catch(x){}}function installOverrides(){if(window.setRating&&!window.setRating.__pu){window.setRating=function(e,id,score){if(e&&e.stopPropagation)e.stopPropagation();var phid=(H[id]!=null&&H[id]!=='0')?H[id]:id;var fin=(((R[phid]&&R[phid][uid])||0)===score)?0:score;paintStars(e,fin);upsertRating(phid,fin);return false;};window.setRating.__pu=true;}if(window.setGroupRating&&!window.setGroupRating.__pu){window.setGroupRating=function(e,hid,score){if(e&&e.stopPropagation)e.stopPropagation();var fin=(((R[hid]&&R[hid][uid])||0)===score)?0:score;paintStars(e,fin);upsertRating(hid,fin);return false;};window.setGroupRating.__pu=true;}if(window.applyFilters&&!window.applyFilters.__pu){var _af=window.applyFilters;window.applyFilters=function(){var r=_af.apply(this,arguments);setTimeout(function(){refresh();memberSweep();},25);return r;};window.applyFilters.__pu=true;}if(window.openListingOverlay&&!window.openListingOverlay.__pu){var _ol=window.openListingOverlay;window.openListingOverlay=function(uu,hh,ss){var rr=_ol.apply(this,arguments);if(hh!=null)markSeen(String(hh));if(!isAdmin)setTimeout(memberSweep,120);return rr;};window.openListingOverlay.__pu=true;}}document.addEventListener('click',function(e){if(!ready)return;var t=e.target;var card=t&&t.closest?t.closest('.card,.grouped-card'):null;if(card){var hid=hidOfCard(card);if(hid)markSeen(hid);}if(!isAdmin)setTimeout(memberSweep,200);},false);var n=0;var iv=setInterval(async function(){n++;installOverrides();if(window.hhUser&&!ready){var ok=await load();if(ok){ready=true;refresh();memberSweep();}}if(n>40)clearInterval(iv);},400);})();/*puLayer*/</script><script>(function(){function pink(){var ls=document.querySelectorAll('label');for(var i=0;i<ls.length;i++){var t=ls[i].textContent||'';if(t.indexOf('Απόκρυψη')>=0&&t.indexOf('είδαμε')>=0){ls[i].style.background='rgba(236,72,153,0.20)';ls[i].style.padding='3px 10px';ls[i].style.borderRadius='7px';}}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){pink();setTimeout(pink,800);});else{pink();setTimeout(pink,800);}})();/*pinkSeen*/</script><script>(function(){var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}var H={},NICK={},NOTES={},uid=null,token=null,ready=false;function hdr(){return {apikey:AK,Authorization:'Bearer '+token};}async function load(){var s=sess();if(!s||!s.user)return false;uid=s.user.id;token=s.access_token;try{var lj=await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(lj))lj.forEach(function(x){H[x.id]=x.house_id;});var pj=await fetch(SB+'/rest/v1/profiles?select=id,username',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(pj))pj.forEach(function(x){NICK[x.id]=x.username;});var nj=await fetch(SB+'/rest/v1/user_notes?select=user_id,house_id,note_text',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(nj))nj.forEach(function(x){(NOTES[x.house_id]=NOTES[x.house_id]||{})[x.user_id]=x.note_text;});}catch(e){return false;}return true;}function curHouse(){try{var o=JSON.parse(localStorage.getItem('hh_open_v1')||'null');if(o&&o.houseId)return String(o.houseId);}catch(e){}try{if(window.hhOpenHouseId){var h2=window.hhOpenHouseId();if(h2)return String(h2);}}catch(e){}return null;}window.hhNoteSync=function(force){try{if(!ready)return;var hid=curHouse();if(!hid)return;var ta=document.getElementById('loNotesTA');if(!ta)return;var v=(NOTES[hid]&&NOTES[hid][uid])||'';if(force||(!ta.value&&!ta.__hhTouched)){ if(v) ta.value=v; }if(!ta.__hhIn){ta.__hhIn=1;ta.addEventListener('input',function(){ta.__hhTouched=1;});}renderOthers(hid);}catch(e){}};function renderOthers(hid){var ta=document.getElementById('loNotesTA');if(!ta)return;var box=document.getElementById('hh-othernotes');if(!box){box=document.createElement('div');box.id='hh-othernotes';box.style.cssText='margin-top:8px;font-size:13px';ta.parentNode.insertBefore(box,ta.nextSibling);}box.textContent='';var users=NOTES[hid]||{};Object.keys(users).forEach(function(u2){if(u2!==uid&&users[u2]&&(''+users[u2]).trim()){var d=document.createElement('div');d.style.cssText='margin:5px 0;padding:6px 9px;background:rgba(127,127,127,0.12);border-radius:7px;line-height:1.5';var nm=document.createElement('b');nm.style.color='var(--accent)';nm.textContent=(NICK[u2]||'?')+': ';var sp=document.createElement('span');sp.textContent=users[u2];d.appendChild(nm);d.appendChild(sp);box.appendChild(d);}});}function showNote(hid){var ta=document.getElementById('loNotesTA');if(ta&&hid)ta.value=(NOTES[hid]&&NOTES[hid][uid])||'';renderOthers(hid);}async function save(hid){var ta=document.getElementById('loNotesTA');if(!ta||!hid)return;var v=ta.value;NOTES[hid]=NOTES[hid]||{};NOTES[hid][uid]=v;try{await fetch(SB+'/rest/v1/user_notes?on_conflict=user_id,house_id',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,house_id:hid,note_text:v})});}catch(e){}}function hook(){if(window.saveNotes&&!window.saveNotes.__pun){window.saveNotes=function(id){var hid=(H[id]!=null&&H[id]!=='0')?H[id]:(curHouse()||id);var ov=document.getElementById('listingOverlay');var b=(ov&&ov.querySelector('[onclick*=saveNotes]'))||document.querySelector('[onclick*=saveNotes]');var o=b?b.textContent:null;if(b){b.textContent='… αποθήκευση';b.style.opacity='.75';}Promise.resolve(save(hid)).then(function(){try{var ta=document.getElementById('loNotesTA'); if(ta) ta.__hhTouched=0;}catch(e){}if(b){b.textContent='✓ Αποθηκεύτηκε';b.style.opacity='1';setTimeout(function(){b.textContent=o;},1800);}try{if(window.showToast)showToast('✓ Η σημείωση αποθηκεύτηκε');}catch(e){}}).catch(function(){if(b){b.textContent='⚠ δεν αποθηκεύτηκε';b.style.opacity='1';setTimeout(function(){b.textContent=o;},2600);}try{if(window.showToast)showToast('⚠ Η σημείωση ΔΕΝ αποθηκεύτηκε');}catch(e){}});return false;};window.saveNotes.__pun=true;}if(window.openListingOverlay&&!window.openListingOverlay.__pun){var _o=window.openListingOverlay;window.openListingOverlay=function(){var r=_o.apply(this,arguments);setTimeout(function(){var hid=curHouse();if(hid&&ready)showNote(hid);},90);return r;};window.openListingOverlay.__pun=true;}}var n=0;var iv=setInterval(async function(){n++;if(!ready){var ok=await load();if(ok)ready=true;}hook();if(n>40)clearInterval(iv);},400);})();/*notesLayer*/</script><script>(function(){function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}function isAdmin(){var s=sess();return !!(s&&s.user&&s.user.email==='kmelissinos@gmail.com');}function lock(){if(isAdmin())return;var ta=document.getElementById('loNotesTA');if(!ta)return;var ov=ta,d=0;while(ov&&ov.parentElement&&d<15){if(getComputedStyle(ov).position==='fixed')break;ov=ov.parentElement;d++;}if(!ov)return;ov.querySelectorAll('input,textarea,select').forEach(function(el){if(el.id!=='loNotesTA'){if(el.tagName==='SELECT')el.disabled=true;else el.setAttribute('readonly','readonly');el.style.pointerEvents='none';}});}function hook(){if(window.openListingOverlay&&!window.openListingOverlay.__pml){var _o=window.openListingOverlay;window.openListingOverlay=function(){var r=_o.apply(this,arguments);setTimeout(lock,150);return r;};window.openListingOverlay.__pml=true;}}var n=0;var iv=setInterval(function(){n++;hook();if(n>40)clearInterval(iv);},400);})();/*memberOverlayLock*/</script><script>(function(){var ns='http://www.w3.org/2000/svg';function icon(){var s=document.createElementNS(ns,'svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('fill','none');s.setAttribute('stroke','currentColor');s.setAttribute('stroke-width','1.6');s.setAttribute('stroke-linecap','round');s.setAttribute('stroke-linejoin','round');s.style.width='1.05em';s.style.height='1.05em';s.style.verticalAlign='-2px';var c=document.createElementNS(ns,'circle');c.setAttribute('cx','12');c.setAttribute('cy','4.5');c.setAttribute('r','1.3');s.appendChild(c);['M4.5 7 L12 5 L19.5 6.2','M12 5.8 V19.5 M8.5 19.5 H15.5','M2 12.5 L5 9 L8 12.5 M2.8 11.8 V14.5 H7.2 V11.8','M14 11.2 L17 7.7 L20 11.2 M14.8 10.5 V13.2 H19.2 V10.5'].forEach(function(d){var p=document.createElementNS(ns,'path');p.setAttribute('d',d);s.appendChild(p);});return s;}function swap(){document.querySelectorAll('[onclick*=addToCompare],[onclick*=openCompareModal]').forEach(function(e){if(e.getAttribute('data-hhcmp'))return;e.setAttribute('data-hhcmp','1');var txt=(e.textContent||'').split('⊕').join('').trim();e.textContent='';e.appendChild(icon());if(txt){var sp=document.createElement('span');sp.textContent=' '+txt;e.appendChild(sp);}});}function boot(){swap();var pend=false;function sched(){if(pend)return;pend=true;setTimeout(function(){pend=false;swap();},150);}try{new MutationObserver(sched).observe(document.body,{childList:true,subtree:true});}catch(e){}if(window.applyFilters&&!window.applyFilters.__cmpw){var _af=window.applyFilters;window.applyFilters=function(){var r=_af.apply(this,arguments);setTimeout(swap,40);return r;};window.applyFilters.__cmpw=true;}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();})();/*compareIcon*/</script><script>(function(){
+<script>(function(){function fix(){var dz=document.getElementById('dropzone');if(dz)dz.style.display='none';var ub=document.getElementById('hhUserBar');var ns=document.getElementById('numSearch');if(!ub)return;ub.style.background='var(--bg)';ub.style.border='1px solid var(--border)';ub.style.color='var(--text)';ub.style.boxShadow='none';var nm=document.getElementById('hhUserName');if(nm)nm.style.color='var(--text)';var lo=ub.querySelector('button');if(lo){lo.style.background='var(--accent)';lo.style.color='#fff';lo.style.border='none';}if(ns&&ns.parentElement&&ub.parentElement!==ns.parentElement){var row=ns.parentElement;row.style.display='flex';row.style.alignItems='center';row.style.gap='8px';ns.style.flex='1';ns.style.minWidth='0';ub.style.position='static';ub.style.top='';ub.style.right='';ub.style.flex='0 0 auto';row.appendChild(ub);}}var n=0;var iv=setInterval(function(){n++;if(window.hhUser)fix();if(n>40)clearInterval(iv);},400);})();/*uifixBlock*/</script><script>(function(){var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}var H={},R={},NICK={},SEEN={},uid=null,token=null,isAdmin=false,ready=false;function hdr(){return {apikey:AK,Authorization:'Bearer '+token};}async function load(){var s=sess();if(!s||!s.user)return false;uid=s.user.id;token=s.access_token;isAdmin=(s.user.email==='kmelissinos@gmail.com');try{var lj=await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(lj))lj.forEach(function(x){H[x.id]=x.house_id;});var pj=await fetch(SB+'/rest/v1/profiles?select=id,username',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(pj))pj.forEach(function(x){NICK[x.id]=x.username;});var rj=await fetch(SB+'/rest/v1/user_ratings?select=user_id,house_id,rating',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(rj))rj.forEach(function(x){(R[x.house_id]=R[x.house_id]||{})[x.user_id]=x.rating;});window.hhAvgStars=function(hid){try{var u=R[hid]||{},v=[];for(var k in u){if(u[k]>0)v.push(u[k]);}if(!v.length)return '';var avg=v.reduce(function(a,b){return a+b;},0)/v.length,f=Math.round(avg),s='';for(var i=1;i<=5;i++)s+=(i<=f?'★':'☆');return '<div style="color:#c8a84b;font-size:13px;margin:3px 0 2px">'+s+' <span style="color:#8a8a8a;font-size:10px">'+avg.toFixed(1)+' ('+v.length+')</span></div>';}catch(e){return '';}};setInterval(function(){try{var ns=document.querySelectorAll('.hh-poprate:not([data-filled])');for(var q=0;q<ns.length;q++){var el=ns[q],hh=el.getAttribute('data-h'),ht=window.hhAvgStars?window.hhAvgStars(hh):'';if(ht){el.innerHTML=ht;el.setAttribute('data-filled','1');}}}catch(e){}},600);var sj=await fetch(SB+'/rest/v1/user_seen?select=house_id',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(sj))sj.forEach(function(x){SEEN[x.house_id]=true;});}catch(e){return false;}return true;}function hidOfCard(card){var s=card.querySelector('[onclick*=setGroupRating]')||card.querySelector('[onclick*=setRating]');if(!s)return null;var oc=s.getAttribute('onclick')||'';var q=String.fromCharCode(39);var q1=oc.indexOf(q),q2=oc.indexOf(q,q1+1);if(q1<0||q2<0)return null;var v=oc.slice(q1+1,q2);if(oc.indexOf('setGroupRating')>=0)return v;return (H[v]!=null&&H[v]!=='0')?H[v]:v;}function refresh(){if(!ready)return;document.querySelectorAll('.card,.grouped-card').forEach(function(card){var hid=hidOfCard(card);if(!hid)return;var cs=card.querySelector('.card-stars');if(cs){var st=cs.querySelectorAll('[onclick*=setRating],[onclick*=setGroupRating]');var mine=(function(){try{if(window.hhMyRating){var v=+window.hhMyRating(hid)||0;if(v)return v;}}catch(e){}return (R[hid]&&R[hid][uid])||0;})();st.forEach(function(s,i){s.style.color=(i<mine)?'#c8a84b':'transparent';});/*hhPolish9: ratings line moved*/}var nb=card.querySelector('.hh-new');if(!SEEN[hid]){if(!nb){nb=document.createElement('div');nb.className='hh-new';nb.textContent='NEW';nb.style.cssText='position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;background:#16a34a;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.35);pointer-events:none';if(getComputedStyle(card).position==='static')card.style.position='relative';card.appendChild(nb);}}else{if(nb&&nb.parentNode)nb.parentNode.removeChild(nb);}});}function markSeen(hid){if(!hid||SEEN[hid])return;SEEN[hid]=true;document.querySelectorAll('.card,.grouped-card').forEach(function(card){if(hidOfCard(card)===hid){var nb=card.querySelector('.hh-new');if(nb&&nb.parentNode)nb.parentNode.removeChild(nb);}});try{fetch(SB+'/rest/v1/user_seen?on_conflict=user_id,house_id',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,house_id:hid})});}catch(e){}}async function upsertRating(hid,score){if(!ready||!hid)return;R[hid]=R[hid]||{};R[hid][uid]=score;refresh();try{await fetch(SB+'/rest/v1/user_ratings?on_conflict=user_id,house_id',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,house_id:hid,rating:score})});}catch(e){}}function memberSweep(){if(isAdmin)return;var sel='[onclick*=hideListing],[onclick*=toggleMsSelect],[onclick*=toggleHide],[onclick*=modalToggleHide],[onclick*=loToggleHide],[onclick*=toggleGroupHide],[onclick*=Cover],[onclick*=saveAddress],[onclick*=editAddress],[onclick*=ungroupListing],[onclick*=selectListingForGrouping],[onclick*=toggleFlag],[onclick*=toggleGroupFlag],[onclick*=modalToggleFav],[onclick*=toggleFav],[onclick*=openSyncModal],.admin-check';document.querySelectorAll(sel).forEach(function(el){var b=el.closest('button,label,.action-btn,.fav-btn')||el;b.style.display='none';});}function paintStars(e,score){try{var t=e&&e.target;if(!t||!t.parentNode)return;var stars=t.parentNode.querySelectorAll('[onclick*=setRating],[onclick*=setGroupRating]');for(var i=0;i<stars.length;i++){stars[i].style.color=(i<score)?'#c8a84b':'rgba(140,140,140,0.4)';}}catch(x){}}function installOverrides(){if(window.setRating&&!window.setRating.__pu){window.setRating=function(e,id,score){if(e&&e.stopPropagation)e.stopPropagation();var phid=(H[id]!=null&&H[id]!=='0')?H[id]:id;var fin=(((R[phid]&&R[phid][uid])||0)===score)?0:score;paintStars(e,fin);upsertRating(phid,fin);return false;};window.setRating.__pu=true;}if(window.setGroupRating&&!window.setGroupRating.__pu){window.setGroupRating=function(e,hid,score){if(e&&e.stopPropagation)e.stopPropagation();var fin=(((R[hid]&&R[hid][uid])||0)===score)?0:score;paintStars(e,fin);upsertRating(hid,fin);return false;};window.setGroupRating.__pu=true;}if(window.applyFilters&&!window.applyFilters.__pu){var _af=window.applyFilters;window.applyFilters=function(){var r=_af.apply(this,arguments);setTimeout(function(){refresh();memberSweep();},25);return r;};window.applyFilters.__pu=true;}if(window.openListingOverlay&&!window.openListingOverlay.__pu){var _ol=window.openListingOverlay;window.openListingOverlay=function(uu,hh,ss){var rr=_ol.apply(this,arguments);if(hh!=null)markSeen(String(hh));if(!isAdmin)setTimeout(memberSweep,120);return rr;};window.openListingOverlay.__pu=true;}}document.addEventListener('click',function(e){if(!ready)return;var t=e.target;var card=t&&t.closest?t.closest('.card,.grouped-card'):null;if(card){var hid=hidOfCard(card);if(hid)markSeen(hid);}if(!isAdmin)setTimeout(memberSweep,200);},false);var n=0;var iv=setInterval(async function(){n++;installOverrides();if(window.hhUser&&!ready){var ok=await load();if(ok){ready=true;refresh();memberSweep();}}if(n>40)clearInterval(iv);},400);})();/*puLayer*/</script><script>(function(){function pink(){var ls=document.querySelectorAll('label');for(var i=0;i<ls.length;i++){var t=(ls[i].getAttribute&&ls[i].getAttribute('data-hh55'))||ls[i].textContent||'';if(t.indexOf('Απόκρυψη')>=0&&t.indexOf('είδαμε')>=0){ls[i].style.background='rgba(236,72,153,0.20)';ls[i].style.padding='3px 10px';ls[i].style.borderRadius='7px';}}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){pink();setTimeout(pink,800);});else{pink();setTimeout(pink,800);}})();/*pinkSeen*/</script><script>(function(){var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}var H={},NICK={},NOTES={},uid=null,token=null,ready=false;function hdr(){return {apikey:AK,Authorization:'Bearer '+token};}async function load(){var s=sess();if(!s||!s.user)return false;uid=s.user.id;token=s.access_token;try{var lj=await fetch(SB+'/rest/v1/listings?select=id,house_id',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(lj))lj.forEach(function(x){H[x.id]=x.house_id;});var pj=await fetch(SB+'/rest/v1/profiles?select=id,username',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(pj))pj.forEach(function(x){NICK[x.id]=x.username;});var nj=await fetch(SB+'/rest/v1/user_notes?select=user_id,house_id,note_text',{headers:hdr()}).then(function(r){return r.json();});if(Array.isArray(nj))nj.forEach(function(x){(NOTES[x.house_id]=NOTES[x.house_id]||{})[x.user_id]=x.note_text;});}catch(e){return false;}return true;}function curHouse(){try{var o=JSON.parse(localStorage.getItem('hh_open_v1')||'null');if(o&&o.houseId)return String(o.houseId);}catch(e){}try{if(window.hhOpenHouseId){var h2=window.hhOpenHouseId();if(h2)return String(h2);}}catch(e){}return null;}window.hhNoteSync=function(force){try{if(!ready)return;var hid=curHouse();if(!hid)return;var ta=document.getElementById('loNotesTA');if(!ta)return;var v=(NOTES[hid]&&NOTES[hid][uid])||'';if(force||(!ta.value&&!ta.__hhTouched)){ if(v) ta.value=v; }if(!ta.__hhIn){ta.__hhIn=1;ta.addEventListener('input',function(){ta.__hhTouched=1;});}renderOthers(hid);}catch(e){}};function renderOthers(hid){var ta=document.getElementById('loNotesTA');if(!ta)return;var box=document.getElementById('hh-othernotes');if(!box){box=document.createElement('div');box.id='hh-othernotes';box.style.cssText='margin-top:8px;font-size:13px';ta.parentNode.insertBefore(box,ta.nextSibling);}box.textContent='';var users=NOTES[hid]||{};Object.keys(users).forEach(function(u2){if(u2!==uid&&users[u2]&&(''+users[u2]).trim()){var d=document.createElement('div');d.style.cssText='margin:5px 0;padding:6px 9px;background:rgba(127,127,127,0.12);border-radius:7px;line-height:1.5';var nm=document.createElement('b');nm.style.color='var(--accent)';nm.textContent=(NICK[u2]||'?')+': ';var sp=document.createElement('span');sp.textContent=users[u2];d.appendChild(nm);d.appendChild(sp);box.appendChild(d);}});}function showNote(hid){var ta=document.getElementById('loNotesTA');if(ta&&hid)ta.value=(NOTES[hid]&&NOTES[hid][uid])||'';renderOthers(hid);}async function save(hid){var ta=document.getElementById('loNotesTA');if(!ta||!hid)return;var v=ta.value;NOTES[hid]=NOTES[hid]||{};NOTES[hid][uid]=v;try{await fetch(SB+'/rest/v1/user_notes?on_conflict=user_id,house_id',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,house_id:hid,note_text:v})});}catch(e){}}function hook(){if(window.saveNotes&&!window.saveNotes.__pun){window.saveNotes=function(id){var hid=(H[id]!=null&&H[id]!=='0')?H[id]:(curHouse()||id);var ov=document.getElementById('listingOverlay');var b=(ov&&ov.querySelector('[onclick*=saveNotes]'))||document.querySelector('[onclick*=saveNotes]');var o=b?b.textContent:null;if(b){b.textContent='… αποθήκευση';b.style.opacity='.75';}Promise.resolve(save(hid)).then(function(){try{var ta=document.getElementById('loNotesTA'); if(ta) ta.__hhTouched=0;}catch(e){}if(b){b.textContent='✓ Αποθηκεύτηκε';b.style.opacity='1';setTimeout(function(){b.textContent=o;},1800);}try{if(window.showToast)showToast('✓ Η σημείωση αποθηκεύτηκε');}catch(e){}}).catch(function(){if(b){b.textContent='⚠ δεν αποθηκεύτηκε';b.style.opacity='1';setTimeout(function(){b.textContent=o;},2600);}try{if(window.showToast)showToast('⚠ Η σημείωση ΔΕΝ αποθηκεύτηκε');}catch(e){}});return false;};window.saveNotes.__pun=true;}if(window.openListingOverlay&&!window.openListingOverlay.__pun){var _o=window.openListingOverlay;window.openListingOverlay=function(){var r=_o.apply(this,arguments);setTimeout(function(){var hid=curHouse();if(hid&&ready)showNote(hid);},90);return r;};window.openListingOverlay.__pun=true;}}var n=0;var iv=setInterval(async function(){n++;if(!ready){var ok=await load();if(ok)ready=true;}hook();if(n>40)clearInterval(iv);},400);})();/*notesLayer*/</script><script>(function(){function sess(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}function isAdmin(){var s=sess();return !!(s&&s.user&&s.user.email==='kmelissinos@gmail.com');}function lock(){if(isAdmin())return;var ta=document.getElementById('loNotesTA');if(!ta)return;var ov=ta,d=0;while(ov&&ov.parentElement&&d<15){if(getComputedStyle(ov).position==='fixed')break;ov=ov.parentElement;d++;}if(!ov)return;ov.querySelectorAll('input,textarea,select').forEach(function(el){if(el.id!=='loNotesTA'){if(el.tagName==='SELECT')el.disabled=true;else el.setAttribute('readonly','readonly');el.style.pointerEvents='none';}});}function hook(){if(window.openListingOverlay&&!window.openListingOverlay.__pml){var _o=window.openListingOverlay;window.openListingOverlay=function(){var r=_o.apply(this,arguments);setTimeout(lock,150);return r;};window.openListingOverlay.__pml=true;}}var n=0;var iv=setInterval(function(){n++;hook();if(n>40)clearInterval(iv);},400);})();/*memberOverlayLock*/</script><script>(function(){var ns='http://www.w3.org/2000/svg';function icon(){var s=document.createElementNS(ns,'svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('fill','none');s.setAttribute('stroke','currentColor');s.setAttribute('stroke-width','1.6');s.setAttribute('stroke-linecap','round');s.setAttribute('stroke-linejoin','round');s.style.width='1.05em';s.style.height='1.05em';s.style.verticalAlign='-2px';var c=document.createElementNS(ns,'circle');c.setAttribute('cx','12');c.setAttribute('cy','4.5');c.setAttribute('r','1.3');s.appendChild(c);['M4.5 7 L12 5 L19.5 6.2','M12 5.8 V19.5 M8.5 19.5 H15.5','M2 12.5 L5 9 L8 12.5 M2.8 11.8 V14.5 H7.2 V11.8','M14 11.2 L17 7.7 L20 11.2 M14.8 10.5 V13.2 H19.2 V10.5'].forEach(function(d){var p=document.createElementNS(ns,'path');p.setAttribute('d',d);s.appendChild(p);});return s;}function swap(){document.querySelectorAll('[onclick*=addToCompare],[onclick*=openCompareModal]').forEach(function(e){if(e.getAttribute('data-hhcmp'))return;e.setAttribute('data-hhcmp','1');var txt=(e.textContent||'').split('⊕').join('').trim();e.textContent='';e.appendChild(icon());if(txt){var sp=document.createElement('span');sp.textContent=' '+txt;e.appendChild(sp);}});}function boot(){swap();var pend=false;function sched(){if(pend)return;pend=true;setTimeout(function(){pend=false;swap();},150);}try{new MutationObserver(sched).observe(document.body,{childList:true,subtree:true});}catch(e){}if(window.applyFilters&&!window.applyFilters.__cmpw){var _af=window.applyFilters;window.applyFilters=function(){var r=_af.apply(this,arguments);setTimeout(swap,40);return r;};window.applyFilters.__cmpw=true;}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();})();/*compareIcon*/</script><script>(function(){
 var SBASE='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1';
 var SB=SBASE+'/listings';
 var FAV=SBASE+'/photo_favorites';
@@ -4797,7 +4797,7 @@ window.hhRatReady=function(){return ready;};
 
 /* ---------- 2. «Φίλτρα» label on the filters button ---------- */
 function labelFilters(){try{
-  var fb=document.querySelector('.hb-ctrl[title="Φίλτρα"]'); if(!fb) return;
+  var fb=document.querySelector('.hb-ctrl[title="Φίλτρα"],.hb-ctrl[data-hh55-title="Φίλτρα"]'); if(!fb) return;
   if(fb.querySelector('.hh-flab')) return;
   var sv=fb.querySelector('svg');
   var lab=document.createElement('span'); lab.className='hh-flab'; lab.textContent=' Φίλτρα';
@@ -4872,7 +4872,7 @@ function mark(el){ if(!el||el.__idiot) return; el.__idiot=1; el.innerHTML='<span
 function scan(){try{
   /* listing overlay + detail modal: <div class="modal-field"><div class="modal-field-label">Μεσιτικό</div><div class="modal-field-value">…</div></div> */
   document.querySelectorAll('.modal-field').forEach(function(f){
-    var l=f.querySelector('.modal-field-label'); if(!l||!/^\s*Μεσιτικό\s*$/.test(l.textContent||'')) return;
+    var l=f.querySelector('.modal-field-label'); if(!l||!/^\s*Μεσιτικό\s*$/.test((l.getAttribute&&l.getAttribute('data-hh55'))||l.textContent||'')) return;
     var v=f.querySelector('.modal-field-value'); if(!v) return;
     if(v.__idiot){ return; }
     if(empty(v.textContent)) mark(v);
@@ -4880,7 +4880,7 @@ function scan(){try{
   /* zero card summary grid: <div><span>Μεσιτικά</span><b>…</b></div> */
   document.querySelectorAll('.hh-gs-grid > div').forEach(function(r){
     var sp=r.querySelector('span'), b=r.querySelector('b');
-    if(!sp||!b||!/^\s*Μεσιτικ/.test(sp.textContent||'')) return;
+    if(!sp||!b||!/^\s*Μεσιτικ/.test((sp.getAttribute&&sp.getAttribute('data-hh55'))||sp.textContent||'')) return;
     if(b.__idiot) return;
     if(empty(b.textContent)) mark(b);
   });
@@ -5145,7 +5145,7 @@ function paint(base, rejN, delN){
       var btns=document.querySelectorAll('#hh-hb .hb-ctrl');
       var b=null;
       for(var i=0;i<btns.length;i++){ if(btns[i].__h15p){ b=btns[i]; break; } }
-      if(!b){ for(var j=0;j<btns.length;j++){ if(/πλατφόρμ/.test(btns[j].textContent)){ b=btns[j]; b.__h15p=1; break; } } }
+      if(!b){ for(var j=0;j<btns.length;j++){ if(/πλατφόρμ/.test(((btns[j].getAttribute&&btns[j].getAttribute('data-hh55'))||'')+' '+(btns[j].textContent||''))){ b=btns[j]; b.__h15p=1; break; } } }
       if(!b && btns.length>1){ b=btns[1]; b.__h15p=1; }
       if(b) b.textContent=txt+' ▾';
     }
@@ -5290,7 +5290,7 @@ function killEfi(){
     var labs=document.querySelectorAll('.card label, .grouped-card label, .lo-featured label, .modal-body label');
     [].forEach.call(labs,function(l){
       if(l.classList.contains('hh-efi')) return;
-      if(/στείλαμε στην Έφη/.test(l.textContent||'')) l.classList.add('hh-efi');
+      if(/στείλαμε στην Έφη/.test(((l.getAttribute&&l.getAttribute('data-hh55'))||'')+' '+(l.textContent||''))) l.classList.add('hh-efi');
     });
   }catch(e){}
 }
@@ -5928,7 +5928,7 @@ document.addEventListener('click',function(e){
       var mem = window.__hhGrpMembers;
       document.querySelectorAll('.hh-gs-grid > div').forEach(function(row){
         var lab = row.querySelector('span');
-        if(!lab || (lab.textContent||'').trim() !== 'Μεσιτικά') return;
+        if(!lab || (((lab.getAttribute&&lab.getAttribute('data-hh55'))||lab.textContent||'').trim() !== 'Μεσιτικά')) return;
         if(row.querySelector('.hh-gs-more')) return;           /* έχει ήδη ▾ */
         var b = row.querySelector('b');
         if(!b || b.getAttribute('data-hh29')) return;
@@ -6243,7 +6243,7 @@ window.hhGeoCluster = function(items){
   function compact(b){
     if(b.getAttribute('data-hh39')) return;
     var btn=b.querySelector('.hh-gone-restore');
-    var full=(b.textContent||'').replace(/\s+/g,' ').trim();
+    var full=((b.getAttribute&&b.getAttribute('data-hh55'))||b.textContent||'').replace(/\s+/g,' ').trim();
     if(btn) full=full.replace((btn.textContent||'').trim(),'').trim();
     /* «⛔ Αφαιρέθηκε από Indomio — δεν εμφανίζεται … από 15/9/2026. Το σπίτι …» */
     var plat=(full.match(/αφαιρέθηκε από ([^—.]+)/i)||[])[1]||'';
@@ -6266,7 +6266,7 @@ window.hhGeoCluster = function(items){
         /* κάτω από τη σειρά κουμπιών: βρες το κουμπί «Κοινοποίηση» και πάρε τον γονέα του */
         var share=null;
         ov.querySelectorAll('.modal-btn').forEach(function(x){
-          if(!share && /Κοινοποίηση/.test(x.textContent||'')) share=x;
+          if(!share && /Κοινοποίηση/.test(((x.getAttribute&&x.getAttribute('data-hh55'))||'')+' '+(x.textContent||''))) share=x;
         });
         var row=share&&share.parentElement;
         if(row && b.parentElement && row.nextSibling!==b){
@@ -7182,7 +7182,7 @@ function findOrigPlatWrap(bar){
     if(!cand.length) return null;
     var i, pick=null;
     for(i=0;i<cand.length;i++){
-      if(/πλατφόρμ/.test(cand[i].b.textContent||'')){ pick=cand[i]; break; }
+      if(/πλατφόρμ/.test(((cand[i].b.getAttribute&&cand[i].b.getAttribute('data-hh55'))||'')+' '+(cand[i].b.textContent||''))){ pick=cand[i]; break; }
     }
     if(!pick){
       var at=document.querySelector('#platform-bar .platform-tab.active');
@@ -10180,7 +10180,11 @@ function placeMapCount(){
    since Sep 2026» — γι' αυτό υπάρχει εφεδρεία: αν τα πλακίδια απαντήσουν
    με σφάλμα, γυρνάμε στο OSM με σκούρο φίλτρο, ώστε ο χάρτης να μη μείνει
    ποτέ άδειος στο σκούρο θέμα.                                         */
-var DARK_URL='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+/*hhPolish56: to CARTO zhtaei pleon API key kai to grafei PANW sta plakidia
+  (apantaei 200, ara to tileerror den pyrodoteitai pote). Katargeitai teleiws:
+  sto skouro thema menoume se OSM + filtro CSS. */
+var OSM_URL='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+var DARK_URL='';
 var CARTO_ATTR='&copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
 var ERR_LIMIT=6, ERR_GRACE=8000;
 
@@ -10244,9 +10248,12 @@ function applyTiles(){
           l.__hh54light=l._url;                      /* το αρχικό OSM template */
         watchErrors(l,m);
         if(dark){
-          if(l.__hh54degraded) continue;
-          l.__hh54darkAt=l.__hh54darkAt||Date.now();
-          if(setUrl(l,DARK_URL)) touched++;
+          /*hhPolish56*/
+          l.__hh54degraded=1; l.__hh54darkAt=0; l.__hh54err=0;
+          if(typeof l._url==='string' && l._url.indexOf('cartocdn')>=0){
+            if(setUrl(l, l.__hh54light || OSM_URL)) touched++;
+          }
+          if(c && c.classList) c.classList.add('hh54-tilefilter');
         }else{
           l.__hh54darkAt=0; l.__hh54err=0; l.__hh54degraded=0;
           if(l.__hh54light && setUrl(l,l.__hh54light)) touched++;
@@ -10256,8 +10263,7 @@ function applyTiles(){
       try{
         var ac=m.attributionControl;
         if(ac){
-          if(dark){ if(ac.addAttribution) ac.addAttribution(CARTO_ATTR); }
-          else    { if(ac.removeAttribution) ac.removeAttribution(CARTO_ATTR); }
+          if(ac.removeAttribution) ac.removeAttribution(CARTO_ATTR);/*hhPolish56*/
         }
       }catch(e){}
       /* κλάση για την αναγνωσιμότητα των πινεζών */
@@ -10280,7 +10286,7 @@ function hookTileLayer(){
     var w=function(url,opt){
       var u=url;
       try{
-        if(isDarkTheme() && typeof url==='string' && url.indexOf('cartocdn')<0 && /openstreetmap/i.test(url)) u=DARK_URL;
+        if(typeof url==='string' && url.indexOf('cartocdn')>=0) u=OSM_URL;/*hhPolish56*/
       }catch(e){}
       var l=_tl.call(this,u,opt);
       try{ if(u!==url){ l.__hh54light=url; l.__hh54darkAt=Date.now(); } }catch(e){}
@@ -10534,6 +10540,458 @@ window.__hh54api={
 };
 }catch(e){console.warn('hhPolish54',e);}})();</script>
 
+<script>/*hhPolish55*/(function(){try{
+/* ═════════════════════════════════════════════════════════════════════════
+   hhPolish55 — LANGUAGE LAYER.  Ελληνικά = η πηγή, αμετάβλητη.
+   Αγγλικά = επίστρωση πάνω στο DOM (λεξικό + κανόνες + MutationObserver).
+   ═════════════════════════════════════════════════════════════════════════ */
+var KEY='hh_lang', DEF='el';
+var DICT={"Αθήνα Βόρεια · Live από Supabase DB":"Athens North · Live from Supabase DB","Αθήνα Βόρεια":"Athens North","House Hunter — Αθήνα Βόρεια":"House Hunter — Athens North","αγγελίες":"listings","ενεργές":"active","avg €/τ.μ.":"avg €/m²","Επαναφορά":"Reset","Αναίρεση (Ctrl+Z)":"Undo (Ctrl+Z)","Επανάληψη (Ctrl+Y)":"Redo (Ctrl+Y)","Αναίρεση":"Undo","Επανάληψη":"Redo","Φωτεινό / Σκοτεινό θέμα":"Light / Dark theme","Αποσύνδεση":"Sign out","⎋ Έξοδος":"⎋ Exit","Σύνδεση για πρόσβαση":"Sign in for access","Σύνδεση":"Sign in","Email ή όνομα χρήστη":"Email or username","Κωδικός":"Password","Να με θυμάσαι (παραμονή σύνδεσης)":"Remember me (stay signed in)","Δεν έχετε πρόσβαση; Ζητήστε την:":"No access? Request it:","Αίτημα πρόσβασης":"Request access","Όνομα":"Name","Email σας":"Your email","Μήνυμα (προαιρετικό)":"Message (optional)","Στάλθηκε ✓":"Sent ✓","✓ Το αίτημα στάλθηκε! Θα λάβετε email σύντομα.":"✓ Request sent! You will get an email shortly.","Σφάλμα, δοκιμάστε ξανά.":"Something went wrong, please try again.","Συμπληρώστε το email σας.":"Please fill in your email.","Λάθος email ή κωδικός":"Wrong email or password","Άγνωστο όνομα χρήστη ή email":"Unknown username or email","Σφάλμα σύνδεσης":"Sign-in error","❌ Σφάλμα αποσύνδεσης":"❌ Sign-out error","Χρειάζεται σύνδεση":"Sign-in required","Η σύνδεση έληξε — κάνε Έξοδο και ξανά Είσοδο":"Session expired — sign out and sign in again","Η σύνδεση ανανεώθηκε — αποθηκεύτηκε κανονικά":"Session refreshed — saved fine","Όλες οι πλατφόρμες":"All platforms","Όλα τα μεσιτικά":"All agencies","Όλα":"All","Όλες":"All","🏠 Όλες":"🏠 All","Καμία πλατφόρμα":"No platform","Κανένα μεσιτικό":"No agency","Μεσιτικά":"Agencies","Μεσιτικό":"Agency","Αναζήτηση μεσιτικού…":"Search agency…","Ταξινόμηση:":"Sort:","Ταξ:":"Sort:","Φίλτρα":"Filters","Φίλτρα:":"Filters:","Τιμή ↑":"Price ↑","Τιμή ↓":"Price ↓","τ.μ. ↑":"m² ↑","τ.μ. ↓":"m² ↓","€/τ.μ. ↑":"€/m² ↑","€/τ.μ. ↓":"€/m² ↓","Νεότερα":"Newest","Πρόσφατη ενημ.":"Recently updated","★ Σκορ ↓":"★ Score ↓","★ Σκορ ↑":"★ Score ↑","📍 Περιοχή":"📍 Area","🗺 Χάρτης":"🗺 Map","Χάρτης":"Map","Λίστα":"List","Πλέγμα":"Grid","🔀 Ενώσεις":"🔀 Merges","⚠ Ύποπτες":"⚠ Suspicious","Προτάσεις ένωσης αγγελιών (Rent)":"Suggested listing merges (Rent)","Ομάδες που μάλλον δεν έπρεπε να ενωθούν":"Groups that probably should not have been merged","🔎 Αναζήτηση: περιοχή, τύπος, μεσίτης, κωδικός αγγελίας…":"🔎 Search: area, type, agent, listing code…","Αναζήτηση περιοχής, τύπου, μεσίτη...":"Search area, type, agent...","Τιμή":"Price","Έτος":"Year","τ.μ.":"m²","Τ.μ.":"m²","από":"from","έως":"to","Όλες οι περιοχές":"All areas","Όλοι οι τύποι":"All types","Ενεργειακή τάξη":"Energy class","Ενεργειακή Τάξη":"Energy class","Ενεργειακή":"Energy","Θέρμανση":"Heating","Τύπος":"Type","Όροφος":"Floor","Δωμάτια":"Bedrooms","Μπάνια":"Bathrooms","Φυσικό αέριο":"Natural gas","Πετρέλαιο":"Oil","Αντλία Θέρμανσης":"Heat pump","Αντλία θερμότητας":"Heat pump","🏷 Εμφάνιση νοικιασμένων / πουλημένων":"🏷 Show rented / sold","Μόνο αβαθμολόγητα":"Unrated only","👎 Εμφάνιση απορριμμένων":"👎 Show rejected","Απόκρυψη σπιτιών που στείλαμε στην Έφη για ραντεβού":"Hide homes we sent to Efi for a viewing","Απόκρυψη σπιτιών που είδαμε με ραντεβού":"Hide homes we have already viewed","⛔ Εμφάνιση διαγραμμένων σπιτιών":"⛔ Show deleted homes","🏅 Μόνο ιδιώτες":"🏅 Private owners only","↺ Επαναφορά φίλτρων":"↺ Reset filters","Τα σπίτια που σημειώσαμε ως νοικιασμένα ή πουλημένα κρύβονται από τα αποτελέσματα. Τσέκαρέ το για να τα δεις ξανά.":"Homes we marked as rented or sold are hidden from the results. Tick this to see them again.","Φέρνει πίσω τις αγγελίες που απορρίψαμε με το 👎. Οι αγγελίες που αφαιρέθηκαν από την πλατφόρμα φαίνονται πάντα, με κόκκινη ταινία.":"Brings back the listings we rejected with 👎. Listings removed from the platform are always shown, with a red ribbon.","Δείχνει και τα σπίτια που δεν υπάρχουν πλέον σε καμία πλατφόρμα. Ένα σπίτι μετράει ως διαγραμμένο μόνο όταν ΟΛΕΣ οι αγγελίες του έχουν αφαιρεθεί — όχι 3 στις 5.":"Also shows homes that no longer exist on any platform. A home counts as deleted only when ALL of its listings have been removed — not 3 out of 5.","Βγάζει το σπίτι από τα αποτελέσματα — θα φαίνεται μόνο με το φίλτρο «Εμφάνιση διαγραμμένων σπιτιών»":"Takes the home out of the results — it will only show with the “Show deleted homes” filter","Επιστρέφει το σπίτι στα κανονικά αποτελέσματα":"Returns the home to the normal results","Κοινοποίηση":"Share","📤 Κοινοποίηση":"📤 Share","Αντιγραφή link":"Copy link","Απόκρυψη":"Delete","✕ Απόκρυψη":"✕ Delete","Απόκρυψη όλων":"Delete all","Εμφάνιση όλων":"Show all","👎 Δεν μας αρέσει":"👎 Don't like","Δεν μας αρέσει":"Don't like","Σύγκριση":"Compare","Σύγκριση:":"Compare:","Σύγκριση →":"Compare →","Λεπτομέρειες":"Details","Άνοιγμα link":"Open link","Άνοιγμα":"Open","Άνοιγμα αγγελίας":"Open listing","Άνοιγμα κάρτας HH":"Open HH card","★ Αγαπημένο":"★ Favourite","☆ Αγαπημένο":"☆ Favourite","Αγαπημένο":"Favourite","Αφαίρεση":"Remove","☆ Αφαιρέθηκε":"☆ Removed","★ Αγαπημένο για όλες":"★ Favourite for all","Αγαπημένο για όλες":"Favourite for all","Αφαίρεση αγαπημένου":"Remove favourite","↩ Επαναφορά":"↩ Restore","↩ Αναίρεση":"↩ Undo","✕ Κρύφτηκε":"✕ Deleted","👎 Κρύφτηκε":"👎 Deleted","✕ Κρύφτηκαν όλες":"✕ All deleted","Επιλογή για ένωση":"Select for merge","Επιλεγμένο — κλικ για αναίρεση":"Selected — click to undo","Ομαδοποίηση / Σύνδεση":"Group / Link","Ομαδοποίηση":"Group","Επιλογή":"Select","🔗 Ένωση…":"🔗 Merge…","Ένωση εδώ":"Merge here","Σύνδεση εδώ":"Link here","✂️ Αποσύνδεση από group":"✂️ Unlink from group","⛔ Αφαιρέθηκε από την πλατφόρμα":"⛔ Removed from the platform","Η αγγελία δεν υπάρχει πια στο site — μπαίνει κόκκινη ταινία και μπορεί να επανέλθει":"The listing no longer exists on the site — it gets a red ribbon and can come back","Προσωπική απόρριψη — κρύβεται από τη λίστα":"Personal rejection — hidden from the list","🏷 Νοικιάστηκε / Πουλήθηκε":"🏷 Rented / Sold","Δεν πουλήθηκε":"Not sold","Λάθος — δεν αφαιρέθηκε":"Wrong — it was not removed","✅ Επιβεβαιώνω ότι αφαιρέθηκε":"✅ I confirm it was removed","↩ Ακύρωση επιβεβαίωσης":"↩ Cancel confirmation","Το σπίτι νοικιάστηκε ή πουλήθηκε: φεύγει από τα αποτελέσματα. Διαφορετικό από «η αγγελία αφαιρέθηκε από την πλατφόρμα».":"The home was rented or sold: it leaves the results. Different from “the listing was removed from the platform”.","Το σπίτι είναι εκτός αγοράς (νοικιάστηκε ή πουλήθηκε). Δεν είναι το ίδιο με «η αγγελία αφαιρέθηκε από την πλατφόρμα».":"The home is off market (rented or sold). Not the same as “the listing was removed from the platform”.","Το σπίτι είναι σημειωμένο ως εκτός αγοράς (νοικιάστηκε / πουλήθηκε) — κλικ για αναίρεση":"The home is marked off market (rented / sold) — click to undo","Το στείλαμε στην Έφη":"Sent to Efi","Το είδαμε":"We viewed it","📌 Η σημείωσή σου":"📌 Your note","📝 Σημειώσεις":"📝 Notes","📝 Σημειώσεις:":"📝 Notes:","Σημειώσεις των άλλων":"Other people's notes","Προσωπικές Σημειώσεις":"Personal notes","Σημειώσεις Πλατφόρμας:":"Platform notes:","Αποθήκευση":"Save","💾 Αποθήκευση":"💾 Save","… αποθήκευση":"… saving","✓ Αποθηκεύτηκε":"✓ Saved","⚠ δεν αποθηκεύτηκε":"⚠ not saved","✓ Η σημείωση αποθηκεύτηκε":"✓ Note saved","⚠ Η σημείωση ΔΕΝ αποθηκεύτηκε":"⚠ The note was NOT saved","Ιδιώτης":"Private owner","ΙΔΙΩΤΗΣ":"PRIVATE","Η αγγελία είναι από ιδιώτη ιδιοκτήτη — όχι από μεσιτικό γραφείο":"The listing is from a private owner — not from an agency","άγνωστος μεσίτης (Rentola)":"unknown agent (Rentola)","Το Rentola δεν δημοσιεύει ποιος διαφημίζει· φαίνεται μόνο αν επικοινωνήσεις.":"Rentola does not publish who advertises; you only find out if you make contact.","Η αγγελία υπάρχει και στο tospitimou.gr":"The listing is also on tospitimou.gr","Άνοιγμα στο tospitimou.gr":"Open on tospitimou.gr","Τετραγωνικά":"Area","Έτος κατασκευής":"Year built","Όροφος / Επίπεδα":"Floor / Levels","Τελευταία ενημ.":"Last update","Διαθέσιμο από":"Available from","Προσωπικό Σκορ":"Personal score","Αρ. Αγγελίας":"Listing no.","Αρ. Μεσιτικού":"Agency no.","Δημοσίευση":"Published","Ημερομηνία δημοσίευσης στην πλατφόρμα":"Date published on the platform","Η πλατφόρμα δεν έδωσε ημερομηνία δημοσίευσης":"The platform gave no publication date","★ Σκορ σπιτιού":"★ Home score","Σκορ":"Score","Ενέργεια":"Energy","ΠΕΑ υπό έκδοση":"EPC pending","Διεύθυνση":"Address","Επιβεβαιωμένη διεύθυνση":"Confirmed address","Διεύθυνση αγγελίας (μη επιβεβ.)":"Listing address (unconfirmed)","Διεύθυνση από την αγγελία (μη επιβεβαιωμένη)":"Address from the listing (unconfirmed)","Επιβεβαιωμένη θέση":"Confirmed location","Προσεγγιστική θέση":"Approximate location","Προσεγγιστική":"Approximate","Επιβεβαιωμένη από εμάς":"Confirmed by us","Εκτίμηση από τις αγγελίες":"Estimated from the listings","Αγγελία (κλικ = άνοιγμα)":"Listing (click = open)","Εκτός ομάδας (&gt;800 μ.)":"Outside the group (&gt;800 m)","Υπόμνημα":"Legend","Προσεγγιστική θέση (η πλατφόρμα κρύβει την ακριβή διεύθυνση)":"Approximate location (the platform hides the exact address)","Επιβεβαιωμένη περιοχή (χωρίς ακριβή διεύθυνση)":"Confirmed area (no exact address)","Ακριβής θέση από την πλατφόρμα":"Exact location from the platform","Επιβεβαιώνω ότι η θέση/διεύθυνση είναι σωστή → πράσινη πινέζα":"I confirm the location/address is correct → green pin","Αποθήκευση & τοποθέτηση στον χάρτη":"Save & place on the map","Γράψε διεύθυνση (✓) για να μπει ακριβής πινέζα.":"Type an address (✓) to place an exact pin.","π.χ. Ηροδότου 30, Πεύκη 151 21":"e.g. Irodotou 30, Pefki 151 21","Κάνε κλικ σε χρυσή πινέζα για να ανοίξει η αγγελία της σε νέα καρτέλα στο παρασκήνιο.":"Click a gold pin to open its listing in a new background tab.","Άνοιγμα αυτής της θέσης στο Google Maps, σε νέα καρτέλα":"Open this location in Google Maps, in a new tab","Άνοιγμα αυτού του χάρτη στο OpenStreetMap, σε νέα καρτέλα":"Open this map in OpenStreetMap, in a new tab","ΟΜΑΔΟΠΟΙΗΜΕΝΗ ΚΑΡΤΑ":"GROUPED CARD","ΟΜΑΔΟΠΟΙΗΜΕΝΗ":"GROUPED","ΚΑΡΤΑ":"CARD","Σύνοψη":"Summary","Σύνοψη περιγραφής":"Description summary","📉 Ιστορικό τιμής":"📉 Price history","Ημερομηνία":"Date","Αλλαγή τιμής":"Price change","📊 Καμία αλλαγή τιμής":"📊 No price change","Απορριφθέντα / Μη Αγαπημένα":"Rejected / Not favourite","Επιλέχθηκε αγγελία για Ένωση":"Listing selected for merge","✕ Ακύρωση":"✕ Cancel","Ακύρωση":"Cancel","✕ Καθαρισμός":"✕ Clear","Δεν βρέθηκαν αγγελίες με αυτά τα φίλτρα.":"No listings match these filters.","Δεν βρέθηκαν αγγελίες για αυτό το σπίτι":"No listings found for this home","Φόρτωση δεδομένων από τη βάση...":"Loading data from the database...","Φόρτωση δεδομένων από το Supabase...":"Loading data from Supabase...","Φόρτωση…":"Loading…","📷 Φόρτωση φωτογραφιών…":"📷 Loading photos…","Δύο διαφορετικές βαθμολογίες":"Two different ratings","🔗 Ένωση των επιλεγμένων σε ένα σπίτι":"🔗 Merge the selected into one home","🔗 Επιλέξτε τώρα μια άλλη αγγελία ή group για ένωση":"🔗 Now pick another listing or group to merge","Πάτα 🔗 και στο άλλο σπίτι και μετά «Ένωση» — ή ⤵ «Ένωση εδώ» πάνω στην κάρτα-στόχο":"Press 🔗 on the other home too and then “Merge” — or ⤵ “Merge here” on the target card","Μόνο ο διαχειριστής ενώνει σπίτια":"Only the admin can merge homes","Επίλεξε (🔗) τουλάχιστον δύο αγγελίες ή σπίτια":"Select (🔗) at least two listings or homes","Ήδη στο ίδιο σπίτι":"Already in the same home","Ήταν ήδη στο ίδιο σπίτι":"It was already in the same home","Ήδη στη λίστα σύγκρισης":"Already in the compare list","Μέγιστο 4 αγγελίες για σύγκριση":"Maximum 4 listings for comparison","⊕ Προστέθηκε στη σύγκριση":"⊕ Added to compare","Άλλο έργο":"Other project","Η ένωση σταμάτησε — οι υπόλοιπες αγγελίες έμειναν ως έχουν":"The merge stopped — the remaining listings were left as they are","Ποια κρατάμε για το ενωμένο σπίτι;":"Which do we keep for the merged home?","Κρατάω":"Keep","🆕 Δεν τα έχεις βαθμολογήσει":"🆕 You have not rated these","🖼 Εξώφυλλο":"🖼 Cover","↗ Άνοιγμα":"↗ Open","📕 Εξώφυλλο κάρτας":"📕 Card cover","📕 Είναι ήδη το εξώφυλλο":"📕 It is already the cover","Κάνε αυτή τη φωτογραφία εξώφυλλο της κάρτας":"Make this photo the card cover","Κάνε το εξώφυλλο":"Make it the cover","Αυτή είναι η φωτογραφία εξωφύλλου της κάρτας":"This is the card cover photo","Αγαπημένη φωτο — γίνεται εξώφυλλο":"Favourite photo — becomes the cover","✓ Ορίστηκε ως εξώφυλλο":"✓ Set as cover","Φωτογραφία":"Photo","Βίντεο":"Video","🖱 Scroll για επόμενη/προηγούμενη · Click για zoom in/out":"🖱 Scroll for next/previous · Click to zoom in/out","Scroll: ← → εικόνες / zoom · Click: zoom in/out":"Scroll: ← → images / zoom · Click: zoom in/out","⚠ Δεν υπάρχουν φωτογραφίες":"⚠ There are no photos","⚠ Δεν βρέθηκε η φωτογραφία":"⚠ Photo not found","⚠ Δεν βρέθηκε η αγγελία αυτής της φωτογραφίας":"⚠ Could not find the listing for this photo","📷 Φωτογραφία ενημερώθηκε!":"📷 Photo updated!","📷 Άλλαξε μόνο τοπικά (δεν υπάρχει στη DB)":"📷 Changed locally only (not in the DB)","⚠ Σφάλμα αποθήκευσης εξωφύλλου":"⚠ Error saving the cover","📂 Προσθήκη δεδομένων από άλλη πλατφόρμα":"📂 Add data from another platform","Σύρε ή κλίκαρε · CSV από XE, Nodaliste κ.λπ.":"Drag or click · CSV from XE, Nodaliste etc.","❌ Κενό αρχείο":"❌ Empty file","❌ Δεν βρέθηκαν εγγραφές":"❌ No records found","❌ Λάθος format — χρειάζεται url + new_image_url":"❌ Wrong format — needs url + new_image_url","1. Πήγαινε στο":"1. Go to","Spitogatos → Αγαπημένα":"Spitogatos → Favourites","2. Άνοιξε το Console (":"2. Open the Console (","3. Paste το script και Enter":"3. Paste the script and press Enter","4. Περίμενε ~3 λεπτά εώς να τελειώσει":"4. Wait ~3 minutes for it to finish","5. Ανανέωσε το House Hunter":"5. Refresh House Hunter","✖ Κλείσιμο":"✖ Close","Κλείσιμο":"Close","Σύστημα":"System","Χρήστες":"Users","σύστημα":"system","Καμία καταγεγραμμένη ενέργεια.":"No recorded activity.","ΔΙΑΓΡΑΦΗ":"DELETE","αλλαγή":"change","έγραψε σημείωση":"wrote a note","διέγραψε σημείωση":"deleted a note","διέγραψε βαθμολογία":"deleted a rating","Σφάλμα":"Error","⚠ Σφάλμα":"⚠ Error","❌ Σφάλμα":"❌ Error","Σφάλμα αποθήκευσης":"Save error","⚠ Σφάλμα αποθήκευσης":"⚠ Save error","❌ Σφάλμα αποθήκευσης":"❌ Save error","❌ Σφάλμα ενημέρωσης":"❌ Update error","❌ Σφάλμα επαναφοράς":"❌ Restore error","❌ Σφάλμα ένωσης":"❌ Merge error","❌ Σφάλμα κατά την ένωση":"❌ Error during the merge","❌ Η ένωση απέτυχε":"❌ The merge failed","❌ Σφάλμα κατά τη δημιουργία Group":"❌ Error creating the group","✓ Συνδέθηκαν!":"✓ Linked!","⚠ Δεν βρέθηκαν αγγελίες":"⚠ No listings found","Δεν βρέθηκαν αγγελίες":"No listings found","⚠ Δεν βρέθηκε η αγγελία":"⚠ Listing not found","Δεν βρέθηκε η αγγελία":"Listing not found","⚠ Δεν βρέθηκε σπίτι":"⚠ Home not found","⚠ Η αγγελία δεν έχει εγγραφή στη βάση":"⚠ The listing has no record in the database","⚠ Η ενέργεια δεν ολοκληρώθηκε":"⚠ The action did not complete","Η ενέργεια δεν ολοκληρώθηκε":"The action did not complete","⚠ Η αναίρεση απέτυχε":"⚠ Undo failed","Η αναίρεση απέτυχε":"Undo failed","⚠ Η αναίρεση απέτυχε — δοκίμασε ξανά":"⚠ Undo failed — try again","Η αναίρεση απέτυχε — δοκίμασε ξανά":"Undo failed — try again","⚠ Η επανάληψη απέτυχε":"⚠ Redo failed","Η επανάληψη απέτυχε":"Redo failed","⚠ Μέρος της αναίρεσης δεν αποθηκεύτηκε":"⚠ Part of the undo was not saved","Μέρος της αναίρεσης δεν αποθηκεύτηκε":"Part of the undo was not saved","⚠ Μέρος της επανάληψης δεν αποθηκεύτηκε":"⚠ Part of the redo was not saved","Μέρος της επανάληψης δεν αποθηκεύτηκε":"Part of the redo was not saved","⚠ Η αναίρεση δεν είναι διαθέσιμη":"⚠ Undo is not available","Δεν υπάρχει ενέργεια προς αναίρεση σε αυτή την κάρτα":"There is nothing to undo on this card","❌ Δεν αποθηκεύτηκε — δοκίμασε ξανά":"❌ Not saved — try again","τίποτα δεν άλλαξε":"nothing changed","✓ Το link αντιγράφηκε":"✓ Link copied","☆ Η βαθμολογία αφαιρέθηκε":"☆ Rating removed","⛔ Σημειώθηκε ως αφαιρεμένη":"⛔ Marked as removed","⛔ Σημειώθηκε ως αφαιρεμένο από την πλατφόρμα":"⛔ Marked as removed from the platform","↩ Επαναφέρθηκε — δεν θεωρείται πλέον αφαιρεμένη":"↩ Restored — no longer counted as removed","↩ Επαναφέρθηκε ως ενεργό":"↩ Restored as active","↩ Εμφανίζεται ξανά":"↩ Shown again","↩ Εμφανίζονται ξανά":"↩ Shown again","↩ Επανήλθε στη λίστα":"↩ Back in the list","↩ Επέστρεψε στη λίστα":"↩ Back in the list","↩ Επέστρεψε στα ενεργά":"↩ Back in the active ones","↩ Επαναφορά (κρυμμένο)":"↩ Restore (hidden)","✓ Επιβεβαιώθηκε η θέση":"✓ Location confirmed","✓ Επιβεβαιωμένη θέση — πράσινη πινέζα στον χάρτη":"✓ Location confirmed — green pin on the map","Αφαιρέθηκε η επιβεβαίωση":"Confirmation removed","✓ Αποθηκεύτηκε & μπήκε στον χάρτη":"✓ Saved & placed on the map","⚠ Δεν βρέθηκε στον χάρτη — αποθηκεύεται μόνο το κείμενο":"⚠ Not found on the map — only the text is saved","✂️ Αποσυνδέθηκε — διεύθυνση & βαθμολογία επαναφέρθηκαν!":"✂️ Unlinked — address & rating restored!","🏷 Σημειώθηκε: Νοικιάστηκε / Πουλήθηκε":"🏷 Marked: Rented / Sold","⚠ Λείπουν οι στήλες address στη βάση — τρέξε το add_address_columns.sql":"⚠ The address columns are missing from the database — run add_address_columns.sql","🔥 Αέριο":"🔥 Gas","♨️ Αντλία":"♨️ Heat pump","🔥 φυσικό αέριο":"🔥 natural gas","♨️ αντλία θερμότητας":"♨️ heat pump","♨️ αυτόνομη θέρμανση":"♨️ independent heating","🌄 θέα":"🌄 view","🌳 κήπος":"🌳 garden","🔥 τζάκι":"🔥 fireplace","🤫 ήσυχο":"🤫 quiet","🪟 σίτες":"🪟 insect screens","🪟 διπλά τζάμια":"🪟 double glazing","🏊 πισίνα":"🏊 pool","🏙 ρετιρέ":"🏙 penthouse","🏠 σοφίτα":"🏠 attic","⛱ τέντες":"⛱ awnings","⛱ ημιυπαίθριος":"⛱ covered veranda","🏫 σχολεία":"🏫 schools","📦 αποθήκη":"📦 storage","🔆 φωτεινό":"🔆 bright","🛗 ασανσέρ":"🛗 lift","🪨 μάρμαρα":"🪨 marble","☀️ ηλιακός":"☀️ solar heater","✨ νεόδμητο":"✨ newly built","🏘 μεζονέτα":"🏘 maisonette","🏡 μονοκατοικία":"🏡 detached house","🔒 ασφάλεια":"🔒 security","🚗 πάρκινγκ":"🚗 parking","↔️ διαμπερές":"↔️ through-apartment","🐾 κατοικίδια":"🐾 pets allowed","🛋 επιπλωμένο":"🛋 furnished","❄️ κλιματισμός":"❄️ air conditioning","🚇 κοντά σε ΜΜΜ":"🚇 near public transport","🛠 ανακαινισμένο":"🛠 renovated","🪵 ξύλινα δάπεδα":"🪵 wooden floors","💼 χώρος γραφείου":"💼 office space","💶 χωρίς κοινόχρηστα":"💶 no communal charges","🌤 βεράντα/μπαλκόνι":"🌤 veranda/balcony","🎮 υπόγειο/playroom":"🎮 basement/playroom","🚪 ανεξάρτητη είσοδος":"🚪 private entrance","Άνοιξε το αρχείο στον browser σου":"Open the file in your browser","Άλλο…":"Other…","Ισόγειο":"Ground floor","Ρετιρέ":"Penthouse","Εξαιρείται":"Excluded","Πλήρης περιγραφή":"Full description","Αέριο":"Gas","Αντλία":"Heat pump"};
+
+/* ---------- 0. γλώσσα ---------- */
+function get(){ try{ var v=localStorage.getItem(KEY); return (v==='en'||v==='el')?v:DEF; }catch(e){ return DEF; } }
+var LANG=get();
+function isEn(){ return LANG==='en'; }
+window.hhLang=function(){ return LANG; };
+
+var GR=/[Ͱ-Ͽἀ-῿]/;
+function norm(x){ return String(x==null?'':x).replace(/\s+/g,' ').trim(); }
+
+/* ---------- 1. κανόνες: σύνθετα κείμενα, τα ΔΕΔΟΜΕΝΑ περνούν αυτούσια ----
+   Κάθε κανόνας δοκιμάζεται σε ΟΛΟΚΛΗΡΟ το normalised κείμενο (^…$), ώστε να
+   μην αγγίζουμε ποτέ περιγραφές ή ονόματα που απλώς περιέχουν μια λέξη.     */
+var RULES=[
+  /* pickers με πλήθος */
+  [/^Όλες οι πλατφόρμες(?: \((\d+)\))?( ▾)?$/,        function(m){ return 'All platforms'+(m[1]?' ('+m[1]+')':'')+(m[2]||''); }],
+  [/^Όλα τα μεσιτικά(?: \((\d+)\))?( ▾)?$/,           function(m){ return 'All agencies'+(m[1]?' ('+m[1]+')':'')+(m[2]||''); }],
+  [/^Καμία πλατφόρμα \((\d+)\)( ▾)?$/,                function(m){ return 'No platform ('+m[1]+')'+(m[2]||''); }],
+  [/^Κανένα μεσιτικό \((\d+)\)( ▾)?$/,                function(m){ return 'No agency ('+m[1]+')'+(m[2]||''); }],
+  /* «2 πλατφόρμες (31)» / «3 μεσιτικά (57)» στα κουμπιά επιλογής */
+  [/^(\d+) πλατφόρμες \((\d+)\)( ▾)?$/,               function(m){ return m[1]+' platforms ('+m[2]+')'+(m[3]||''); }],
+  [/^(\d+) μεσιτικά \((\d+)\)( ▾)?$/,                 function(m){ return m[1]+' agencies ('+m[2]+')'+(m[3]||''); }],
+  /* ταξινόμηση: «Ταξ: ★ Σκορ ↓ ▾» — το ↓/↑ ΜΕΝΕΙ (hhPolish30 το ελέγχει) */
+  [/^Ταξ: (.+?)( ▾)?$/,                               function(m){ return 'Sort: '+trx(m[1])+(m[2]||''); }],
+  [/^Ταξινόμηση: (.+?)( ▾)?$/,                        function(m){ return 'Sort: '+trx(m[1])+(m[2]||''); }],
+  /* φίλτρα με πλήθος */
+  [/^Φίλτρα \((\d+)\)$/,                              function(m){ return 'Filters ('+m[1]+')'; }],
+  /* πλήθος αποτελεσμάτων */
+  [/^(\d+) αγγελίες εμφανίζονται$/,                   function(m){ return m[1]+' listings shown'; }],
+  [/^(\d+) αγγελίες$/,                                function(m){ return m[1]+' listings'; }],
+  [/^(\d+) αγγελία$/,                                 function(m){ return m[1]+' listing'; }],
+  [/^(\d+) εγγραφές$/,                                function(m){ return m[1]+' records'; }],
+  [/^(\d+) ψήφοι$/,                                   function(m){ return m[1]+' votes'; }],
+  [/^(\d+) ψήφος$/,                                   function(m){ return m[1]+' vote'; }],
+  /* ΤΑ ΜΕΙΚΤΑ ΤΟΥ REMOVAL BANNER — ονόματα πλατφορμών & ημερομηνία αυτούσια */
+  [/^(\d+) από (\d+) αγγελίες αφαιρέθηκαν από τις πλατφόρμες (.+?)( · .+)?$/,
+     function(m){ return m[1]+' of '+m[2]+' listings removed from platforms '+m[3]+(m[4]||''); }],
+  [/^(\d+) από (\d+) αγγελίες αφαιρέθηκαν από την πλατφόρμα (.+?)( · .+)?$/,
+     function(m){ return m[1]+' of '+m[2]+' listings removed from platform '+m[3]+(m[4]||''); }],
+  /* ΠΡΟΣΟΧΗ ΣΤΗ ΣΕΙΡΑ: πρώτα η ΜΕΓΑΛΗ πρόταση, μετά η σύντομη — αλλιώς το
+     «(.+?)» της σύντομης καταπίνει όλη την υπόλοιπη ελληνική πρόταση και
+     βγαίνει μισομεταφρασμένο κείμενο. Το όνομα της πλατφόρμας δεν περιέχει
+     ποτέ «—» ούτε τελεία, άρα το περιορίζουμε σε [^—.]+.               */
+  [/^⛔ Αφαιρέθηκε από ([^—.]+?) — δεν εμφανίζεται στα αποτελέσματα από ([^.]+?)\.\s*(.*)$/,
+     function(m){ return '⛔ Removed from '+m[1]+' — not shown in the results since '+m[2]+'.'
+                         +(m[3]?' '+trParts(m[3]):''); }],
+  [/^Αφαιρέθηκε από ([^—.]+?) — δεν εμφανίζεται στα αποτελέσματα από ([^.]+?)\.\s*(.*)$/,
+     function(m){ return 'Removed from '+m[1]+' — not shown in the results since '+m[2]+'.'
+                         +(m[3]?' '+trParts(m[3]):''); }],
+  [/^⛔ Αφαιρέθηκε από ([^—.]+?)( · [^—]+)?$/,
+     function(m){ return '⛔ Removed from '+m[1]+(m[2]||''); }],
+  [/^Αφαιρέθηκε από ([^—.]+?)( · [^—]+)?$/,
+     function(m){ return 'Removed from '+m[1]+(m[2]||''); }],
+  [/^Η αγγελία αφαιρέθηκε από ([^—.]+?)\.?$/,
+     function(m){ return 'The listing was removed from '+m[1]; }],
+  [/^ — δεν εμφανίζεται στα αποτελέσματα από (.+)$/,
+     function(m){ return ' — not shown in the results since '+m[1]; }],
+  [/^Δεν εμφανίζεται πλέον στα αποτελέσματα \((.+)\)$/,
+     function(m){ return 'No longer shown in the results ('+m[1]+')'; }],
+  [/^Το σπίτι μάλλον νοικιάστηκε ή η αγγελία αποσύρθηκε\.?$/,
+     function(){ return 'The home was probably rented, or the listing was withdrawn.'; }],
+  /* μονάδες στα πεδία της κάρτας: το νούμερο είναι ΔΕΔΟΜΕΝΟ */
+  [/^(\d+) επίπεδα$/,        function(m){ return m[1]+' levels'; }],
+  [/^(\d+) επίπ\.$/,         function(m){ return m[1]+' lv.'; }],
+  [/^· (\d+) επίπεδα$/,      function(m){ return '· '+m[1]+' levels'; }],
+  [/^· (\d+) επίπ\.$/,       function(m){ return '· '+m[1]+' lv.'; }],
+  [/^· (\d+) μπ$/,           function(m){ return '· '+m[1]+' ba'; }],
+  [/^(\d+) μπ$/,             function(m){ return m[1]+' ba'; }],
+  /* Οι τιμές του field-grid έρχονται ΜΑΖΙ με τα δεδομένα σε ένα text node:
+     «3 · 2 μπ» (δωμάτια · μπάνια) και «4ος · 4 επίπεδα» (όροφος · επίπεδα).
+     Ο όροφος και τα νούμερα είναι ΔΕΔΟΜΕΝΑ και περνούν αυτούσια.          */
+  [/^(.+?) · (\d+) μπ$/,      function(m){ return m[1]+' · '+m[2]+' ba'; }],
+  [/^(.+?) · (\d+) επίπεδα$/, function(m){ return m[1]+' · '+m[2]+' levels'; }],
+  [/^(.+?) · (\d+) επίπ\.$/,  function(m){ return m[1]+' · '+m[2]+' lv.'; }],
+  /* €/τ.μ. — μόνο όταν ο κόμβος είναι ΟΛΟΣ τιμή ανά τετραγωνικό */
+  [/^€\s*([\d.,]+)\s*\/τ\.μ\.$/,  function(m){ return '€'+num(m[1])+'/m²'; }],
+  [/^([\d.,]+)\s*€\s*\/τ\.μ\.$/,  function(m){ return num(m[1])+' €/m²'; }],
+  [/^avg €\/τ\.μ\.$/,             function(){ return 'avg €/m²'; }],
+  /* σκορ */
+  [/^★ ([\d.,]+)\/5 για όλο το σπίτι$/, function(m){ return '★ '+m[1]+'/5 for the whole home'; }],
+  /* σπίτι #id — το id είναι ΔΕΔΟΜΕΝΟ */
+  [/^Το σπίτι #(.+)$/,                  function(m){ return 'Home #'+m[1]; }],
+  [/^Αφαίρεση αγγελίας #(.+)$/,         function(m){ return 'Remove listing #'+m[1]; }],
+  [/^Επαναφορά αγγελίας #(.+)$/,        function(m){ return 'Restore listing #'+m[1]; }],
+  [/^Ακύρωση αφαίρεσης αγγελίας #(.+)$/,function(m){ return 'Cancel removal of listing #'+m[1]; }],
+  [/^✓ Ενώθηκαν στο σπίτι #(.+)$/,      function(m){ return '✓ Merged into home #'+m[1]; }],
+  [/^🔗 Συνδέθηκαν σε ένα σπίτι \((.+)\)$/, function(m){ return '🔗 Linked into one home ('+m[1]+')'; }],
+  /* tooltip αναίρεσης: «Αναίρεση: <περιγραφή>» */
+  [/^Αναίρεση: (.+)$/,                  function(m){ return 'Undo: '+trx(m[1]); }],
+  [/^Επανάληψη: (.+)$/,                 function(m){ return 'Redo: '+trx(m[1]); }],
+  /* επιβεβαιώσεις με «…» γύρω από ΔΕΔΟΜΕΝΟ (περιοχή/τίτλο) */
+  [/^Επιβεβαίωση αφαίρεσης — «(.+)»$/,  function(m){ return 'Confirm removal — “'+m[1]+'”'; }],
+  [/^Ακύρωση επιβεβαίωσης αφαίρεσης — «(.+)»$/, function(m){ return 'Cancel removal confirmation — “'+m[1]+'”'; }],
+  [/^Ακύρωση «το είδαμε» — «(.+)»$/,    function(m){ return 'Undo “we viewed it” — “'+m[1]+'”'; }],
+  [/^👁 Το είδαμε — «(.+)»$/,           function(m){ return '👁 We viewed it — “'+m[1]+'”'; }],
+  [/^🏷 Νοικιάστηκε \/ Πουλήθηκε — «(.+)»$/, function(m){ return '🏷 Rented / Sold — “'+m[1]+'”'; }],
+  [/^Ακύρωση «νοικιάστηκε \/ πουλήθηκε» — «(.+)»$/, function(m){ return 'Undo “rented / sold” — “'+m[1]+'”'; }],
+  [/^📕 Εξώφυλλο κάρτας — «(.+)»$/,     function(m){ return '📕 Card cover — “'+m[1]+'”'; }],
+  [/^🗺 Θέση στον χάρτη — «?(.+?)»?$/,  function(m){ return '🗺 Location on the map — “'+m[1]+'”'; }],
+  [/^«(.+)» από την πλατφόρμα$/,        function(m){ return '“'+m[1]+'” from the platform'; }],
+  /* «Άλλο έργο · Fameli» — το όνομα έργου είναι ΔΕΔΟΜΕΝΟ */
+  [/^Άλλο έργο · (.+)$/,                function(m){ return 'Other project · '+m[1]; }],
+  [/^Η αγγελία ανήκει σε άλλο έργο \((.+)\)\. Η τιμή δεν είναι συγκρίσιμη με το τρέχον έργο\.$/,
+     function(m){ return 'The listing belongs to another project ('+m[1]+'). Its price is not comparable with the current project.'; }],
+  /* εκτίμηση / εκτός ομάδας */
+  [/^εκτίμηση από (.+)$/,               function(m){ return 'estimated from '+m[1]; }],
+  [/^⚠ εκτός ομάδας — (.+)$/,           function(m){ return '⚠ outside the group — '+m[1]; }],
+  [/^Εκτός ομάδας \(&gt;800 μ\.\)$/,    function(){ return 'Outside the group (&gt;800 m)'; }],
+  [/^(.+) εκτός ομάδας$/,               function(m){ return m[1]+' outside the group'; }],
+  /* μεικτά «… αγγελίες …» */
+  [/^Να σημειωθούν και οι (\d+) αγγελίες του σπιτιού #(.+?) ως αφαιρεμένες από την πλατφόρμα;$/,
+     function(m){ return 'Mark all '+m[1]+' listings of home #'+m[2]+' as removed from the platform?'; }],
+  [/^Μπορείς να το αναιρέσεις από το κουμπί «Λάθος — δεν αφαιρέθηκε»\.$/,
+     function(){ return 'You can undo this from the “Wrong — it was not removed” button.'; }],
+  [/^Να κρυφτεί το σπίτι #(.+?) \(«δεν μας αρέσει»\);$/,
+     function(m){ return 'Delete home #'+m[1]+' (“don’t like”)?'; }],
+  [/^Να κρυφτεί το σπίτι #(.+?) και οι (\d+) αγγελίες του \(«δεν μας αρέσει»\);$/,
+     function(m){ return 'Delete home #'+m[1]+' and its '+m[2]+' listings (“don’t like”)?'; }],
+  [/^Μένει στη βάση και το ξαναβρίσκεις με το φίλτρο των κρυμμένων\.$/,
+     function(){ return 'It stays in the database and you find it again with the hidden filter.'; }],
+  [/^Μένει στη βάση — επανέρχεται με το φίλτρο «👎 Εμφάνιση απορριμμένων»\.$/,
+     function(){ return 'It stays in the database — it comes back with the “👎 Show rejected” filter.'; }],
+  [/^Να σημειωθεί η αγγελία ως αφαιρεμένη από την πλατφόρμα;$/,
+     function(){ return 'Mark the listing as removed from the platform?'; }],
+  [/^Μένει στη λίστα με κόκκινη ταινία μέχρι να πατήσεις «Επιβεβαιώνω ότι αφαιρέθηκε»\.$/,
+     function(){ return 'It stays in the list with a red ribbon until you press “I confirm it was removed”.'; }],
+  [/^Να σημειωθεί το σπίτι #(.+?) \(«(.+?)»\) ως ΝΟΙΚΙΑΣΤΗΚΕ \/ ΠΟΥΛΗΘΗΚΕ;$/,
+     function(m){ return 'Mark home #'+m[1]+' (“'+m[2]+'”) as RENTED / SOLD?'; }],
+  [/^Το σπίτι #(.+?) \(«(.+?)»\) είναι σημειωμένο ως ΝΟΙΚΙΑΣΤΗΚΕ \/ ΠΟΥΛΗΘΗΚΕ\.$/,
+     function(m){ return 'Home #'+m[1]+' (“'+m[2]+'”) is marked as RENTED / SOLD.'; }],
+  [/^Είναι ΔΙΑΦΟΡΕΤΙΚΟ από το «η αγγελία αφαιρέθηκε από την πλατφόρμα»\.$/,
+     function(){ return 'This is DIFFERENT from “the listing was removed from the platform”.'; }],
+  [/^Το ξαναβρίσκεις με το φίλτρο «🏷 Εμφάνιση νοικιασμένων \/ πουλημένων» — ή με ↩ Αναίρεση\.$/,
+     function(){ return 'You find it again with the “🏷 Show rented / sold” filter — or with ↩ Undo.'; }],
+  [/^Να αναιρεθεί και να επιστρέψει στα ενεργά \((.+)\)$/,
+     function(m){ return 'Undo and return it to the active ones ('+m[1]+')'; }],
+  [/^✅ Επιβεβαιώθηκε — βγήκε από τη λίστα \((.+)\)$/,
+     function(m){ return '✅ Confirmed — removed from the list ('+m[1]+')'; }],
+  [/^(\d+) αγγελίες δεν αποθηκεύτηκαν$/, function(m){ return m[1]+' listings were not saved'; }],
+  [/^(\d+) επιλεγμένες αγγελίες\/σπίτια$/, function(m){ return m[1]+' selected listings/homes'; }],
+  [/^(\d+) επιλεγμένη αγγελία$/,        function(m){ return m[1]+' selected listing'; }],
+  [/^(\d+) επιλεγμένα — κλικ σε κάρτες για σύνδεση$/,
+     function(m){ return m[1]+' selected — click cards to link'; }],
+  [/^Θα ενημερωθούν και οι (\d+) αγγελίες του σπιτιού #(.+)$/,
+     function(m){ return 'All '+m[1]+' listings of home #'+m[2]+' will be updated'; }],
+  [/^Να σημειωθούν και οι (\d+) αγγελίες$/, function(m){ return 'Mark all '+m[1]+' listings'; }],
+  /* Πλήρης περιγραφή (η πιο αναλυτική αγγελία, N χαρ.) */
+  [/^Πλήρης περιγραφή \(η πιο αναλυτική αγγελία, (\d+) χαρ\.\)$/,
+     function(m){ return 'Full description (the most detailed listing, '+m[1]+' chars)'; }],
+  [/^⚠ Οι αγγελίες διαφέρουν:?$/,       function(){ return '⚠ The listings differ:'; }],
+  [/^⚠ Λείπει η στήλη (.+)$/,           function(m){ return '⚠ Missing column '+m[1]; }],
+  [/^(.+) — τρέξε το add_efi_seen\.sql$/, function(m){ return trx(m[1])+' — run add_efi_seen.sql'; }],
+  /* τιμή σε ελληνικό format, ΜΟΝΟ όταν ο κόμβος είναι ολόκληρος τιμή */
+  [/^€\s*(\d{1,3}(?:\.\d{3})+(?:,\d+)?)$/,      function(m){ return '€'+num(m[1]); }],
+  [/^(\d{1,3}(?:\.\d{3})+(?:,\d+)?)\s*€$/,      function(m){ return num(m[1])+' €'; }],
+  [/^(\d{1,3}(?:\.\d{3})+(?:,\d+)?)\s*€\s*\/μήνα$/, function(m){ return num(m[1])+' €/mo'; }],
+  [/^Τιμή: €(\d{1,3}(?:\.\d{3})+(?:,\d+)?)\.?$/, function(m){ return 'Price: €'+num(m[1]); }],
+  [/^📅 διαθέσιμο (.+)$/,               function(m){ return '📅 available '+m[1]; }],
+  [/^διαθέσιμο από (.+)$/,              function(m){ return 'available from '+m[1]; }]
+];
+
+/* 1.150,50 → 1,150.50  (ελληνικό → αγγλικό format· η σειρά των ημερομηνιών
+   ΔΕΝ αλλάζει πουθενά — ο Dusty είναι Έλληνας, όχι US month-first) */
+function num(x){
+  var t=String(x);
+  if(!/^\d{1,3}(?:\.\d{3})+(?:,\d+)?$/.test(t)) return t;
+  var p=t.split(','), ip=p[0].split('.').join(',');
+  return p.length>1 ? ip+'.'+p[1] : ip;
+}
+
+/* Οι σκέτες τιμές («€320.000», «1.350 €», «1.350 €/μήνα») δεν περιέχουν
+   ελληνικά, άρα δεν τις πιάνει το tr(). Τις χειριζόμαστε χωριστά — και ΜΟΝΟ
+   όταν ο κόμβος είναι ΟΛΟΚΛΗΡΟΣ τιμή, ώστε να μην αγγίξουμε ποτέ αριθμούς
+   μέσα σε περιγραφή. Είναι idempotent: το «1,350 €» δεν ταιριάζει πια.
+   Οι ΗΜΕΡΟΜΗΝΙΕΣ (17/09/2026) δεν αγγίζονται καθόλου, σε καμία γλώσσα.   */
+var MONEY=/^(€\s*)?(\d{1,3}(?:\.\d{3})+(?:,\d+)?)(\s*€)?(\s*\/\s*(?:μήνα|mo))?$/;
+function money(core){
+  var m=MONEY.exec(core);
+  if(!m) return null;
+  if(!m[1] && !m[3]) return null;            /* χρειάζεται € για να είναι τιμή */
+  var per=m[4] ? '/mo' : '';
+  return (m[1]?'€':'')+num(m[2])+(m[3]?' €':'')+per;
+}
+
+/* ---------- 2. tr(): λεξικό → κανόνες. Επιστρέφει null αν δεν ξέρει ------- */
+function tr(raw){
+  if(raw==null) return null;
+  var k=norm(raw);
+  if(!k || !GR.test(k)) return null;      /* χωρίς ελληνικά → τίποτα (idempotent) */
+  var d=DICT[k];
+  if(d!=null) return d;
+  for(var i=0;i<RULES.length;i++){
+    var m=RULES[i][0].exec(k);
+    if(m){ var out=RULES[i][1](m); if(out!=null && out!==k) return out; }
+  }
+  /* τα κουμπιά των dropdown κουβαλούν « ▾» — δοκίμασε χωρίς αυτό */
+  var t=/^(.*?)\s*(▾|▴|▼|▲)$/.exec(k);
+  if(t){ var b=tr(t[1]); if(b!=null) return b+' '+t[2]; }
+  return null;
+}
+/* trx(): σαν tr() αλλά ΠΟΤΕ null — επιστρέφει το αρχικό αν δεν ξέρει.
+   Χρησιμοποιείται μέσα στους κανόνες, ώστε ένα άγνωστο κομμάτι να μένει
+   ελληνικό αντί να γίνεται το string «null». */
+function trx(x){ var o=tr(x); return o==null ? String(x==null?'':x) : o; }
+
+/* trParts(): μεταφράζει ΠΡΟΤΑΣΗ-ΠΡΟΤΑΣΗ. Το hhPolish39 φτιάχνει το tooltip
+   του banner κολλώντας κομμάτια («…αποσύρθηκε.» + «Λάθος — δεν αφαιρέθηκε»),
+   και το σύνολο δεν είναι ποτέ κλειδί του λεξικού. Χωρίς αυτό, όλη η ουρά
+   έμενε ελληνική· τώρα ό,τι ξέρουμε μεταφράζεται, ό,τι δεν ξέρουμε μένει.  */
+function trParts(x){
+  var t=String(x==null?'':x);
+  if(!GR.test(t)) return t;
+  var whole=tr(t); if(whole!=null) return whole;
+  var parts=t.match(/[^.]+\.?\s*/g);
+  if(!parts) return t;
+  return parts.map(function(seg){
+    var core=seg.trim(); if(!core) return seg;
+    var r=tr(core);
+    if(r==null){
+      var noDot=core.replace(/\.$/,''), r2=tr(noDot);
+      if(r2!=null) r=r2+(/\.$/.test(core)?'.':'');
+    }
+    return r==null ? seg : seg.replace(core,r);
+  }).join('');
+}
+window.hhTr=tr;
+
+/* ---------- 3. επίστρωση πάνω στο DOM ----------------------------------- */
+var ATTRS=['title','placeholder','aria-label','alt'];
+/* ΠΟΤΕ δεν αγγίζουμε data-label / data-vals / onclick: το hh-gs-vpop και το
+   hhPolish29 κλειδώνουν σε αυτά (_LBL={'Μεσιτικά':'agency',…}).             */
+var ORIG=new WeakMap();      /* text node  → αρχικό nodeValue */
+var SKIP={SCRIPT:1,STYLE:1,NOSCRIPT:1,TEXTAREA:1};
+var BUSY=false;
+
+function trTextNode(n){
+  var v=n.nodeValue; if(!v) return;
+  var core=v.trim(); if(!core) return;
+  var out;
+  if(GR.test(core)) out=tr(core);
+  else out=money(core);            /* σκέτη τιμή: 1.350 € → 1,350 € */
+  if(out==null) return;
+  var p=n.parentElement;
+  if(p && SKIP[p.nodeName]) return;
+  /* δείκτης: το ΑΡΧΙΚΟ ελληνικό textContent του στοιχείου, μία φορά */
+  if(p && !p.hasAttribute('data-hh55')){
+    try{ p.setAttribute('data-hh55', norm(p.textContent)); }catch(e){}
+  }
+  var i=v.indexOf(core);
+  if(!ORIG.has(n)) ORIG.set(n,v);
+  n.nodeValue = v.slice(0,i)+out+v.slice(i+core.length);
+}
+
+function trEl(el){
+  if(!el || el.nodeType!==1) return;
+  for(var i=0;i<ATTRS.length;i++){
+    var a=ATTRS[i], v=el.getAttribute(a);
+    if(!v || !GR.test(v)) continue;
+    var out=tr(v); if(out==null) continue;
+    var mk='data-hh55-'+a;
+    if(!el.hasAttribute(mk)){ try{ el.setAttribute(mk, norm(v)); }catch(e){} }
+    try{ el.setAttribute(a,out); }catch(e){}
+  }
+}
+
+function sweep(root){
+  if(!isEn()) return;
+  root=root||document.body; if(!root) return;
+  BUSY=true;
+  try{
+    if(root.nodeType===3){ trTextNode(root); }
+    else if(root.nodeType===1){
+      trEl(root);
+      if(!SKIP[root.nodeName]){
+        var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null,false), n;
+        while((n=w.nextNode())) trTextNode(n);
+        var els=root.querySelectorAll('[title],[placeholder],[aria-label],[alt]');
+        for(var i=0;i<els.length;i++) trEl(els[i]);
+      }
+    }
+  }catch(e){}
+  BUSY=false;
+}
+
+/* επιστροφή στα Ελληνικά: ό,τι αλλάξαμε και ζει ακόμα, επανέρχεται ακριβώς */
+function revert(){
+  BUSY=true;
+  try{
+    var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false), n;
+    while((n=w.nextNode())){ if(ORIG.has(n)){ n.nodeValue=ORIG.get(n); ORIG.delete(n); } }
+    var m=document.querySelectorAll('[data-hh55]');
+    for(var i=0;i<m.length;i++) m[i].removeAttribute('data-hh55');
+    for(var j=0;j<ATTRS.length;j++){
+      var a=ATTRS[j], mk='data-hh55-'+a, els=document.querySelectorAll('['+mk+']');
+      for(var k=0;k<els.length;k++){
+        try{ els[k].setAttribute(a, els[k].getAttribute(mk)); els[k].removeAttribute(mk); }catch(e){}
+      }
+    }
+  }catch(e){}
+  BUSY=false;
+}
+
+/* ---------- 4. MutationObserver: κρατά τα Αγγλικά πάνω από τα repaints ----
+   Η δουλειά γίνεται ΜΕΣΑ στο callback του observer — δηλαδή σε microtask, στο
+   τέλος του τρέχοντος task και ΠΡΙΝ ζωγραφίσει ο browser. Έτσι, όταν κάποιο
+   παλιό patch ξαναγράφει ελληνικά σε timer (labelFilters ανά 1200ms, hh44
+   refresh ανά 1500ms, hhPolish15 ανά 600ms), ο χρήστης ΔΕΝ βλέπει αναλαμπή.
+   ΟΧΙ requestAnimationFrame: δεν τρέχει σε καρτέλα στο παρασκήνιο, οπότε τα
+   Αγγλικά θα «γύριζαν» στα Ελληνικά όσο ο Dusty κοιτάζει άλλη καρτέλα.      */
+var Q=[], SCHED=false, OBS=null;
+function drain(){
+  SCHED=false;
+  if(!isEn()){ Q.length=0; return; }
+  if(BUSY) return;                 /* τρέχει ήδη sweep: θα τα πάρει ο βρόχος */
+  var guard=0;
+  while(Q.length && guard++<64){
+    var q=Q; Q=[];
+    for(var i=0;i<q.length && i<4000;i++) sweep(q[i]);
+  }
+}
+function push(n){ if(n) Q.push(n); }
+function schedule(){ if(!SCHED){ SCHED=true; setTimeout(drain,0); } }
+try{
+  OBS=new MutationObserver(function(recs){
+    if(!isEn()) return;
+    for(var i=0;i<recs.length;i++){
+      var r=recs[i];
+      if(r.type==='childList'){
+        for(var j=0;j<r.addedNodes.length;j++){
+          var a=r.addedNodes[j];
+          if(a.nodeType===1 || a.nodeType===3) push(a);
+        }
+      } else push(r.target);
+    }
+    drain();                       /* ΤΩΡΑ, πριν το paint */
+    if(Q.length) schedule();       /* ό,τι έμεινε λόγω BUSY */
+  });
+  OBS.observe(document.documentElement,{childList:true,subtree:true,characterData:true,
+    attributes:true,attributeFilter:ATTRS});
+}catch(e){}
+
+/* Εφεδρικό sweep — ζώνη και τιράντες για ό,τι δεν παράγει record που πιάνουμε.
+   Είναι φθηνό: κάθε κόμβος χωρίς ελληνικά κόβεται με ένα regex test.        */
+setInterval(function(){ if(isEn()) sweep(document.body); }, 500);
+
+/* ---------- 5. window.confirm / alert: native, δεν τα πιάνει DOM --------- */
+var _conf=window.confirm, _al=window.alert;
+function trMsg(msg){
+  if(!isEn()) return msg;
+  var t=String(msg==null?'':msg);
+  if(!GR.test(t)) return t;
+  return t.split('\n').map(function(line){
+    var core=line.trim(); if(!core) return line;
+    var o=tr(core); if(o==null) o=trParts(core);
+    return (o==null||o===core) ? line : line.replace(core,o);
+  }).join('\n');
+}
+try{ window.confirm=function(m){ return _conf.call(window, trMsg(m)); }; }catch(e){}
+try{ window.alert  =function(m){ return _al.call(window, trMsg(m)); }; }catch(e){}
+
+/* ---------- 6. CSS που δεν φτάνει MutationObserver (::after content) ----- */
+try{
+  var st=document.createElement('style'); st.id='hh55-css';
+  st.textContent=
+    'html[data-hh-lang="en"] body.hh-rent .card-price::after,'
+   +'html[data-hh-lang="en"] body.hh-rent .list-price::after,'
+   +'html[data-hh-lang="en"] body.hh-rent .modal-price::after,'
+   +'html[data-hh-lang="en"] body.hh-rent .price-range-main::after{content:"/mo"}'
+   /* ο διακόπτης, ίδιο look με τα .hb-ctrl και στα δύο θέματα */
+   +'.hh55-lang{display:inline-flex;align-items:stretch;gap:0;padding:0;overflow:hidden;'
+   +'user-select:none;-webkit-user-select:none}'
+   +'.hh55-lang .hh55-seg{padding:5px 8px;font-size:12px;font-weight:600;cursor:pointer;'
+   +'line-height:1.3;opacity:.55;letter-spacing:.3px}'
+   +'.hh55-lang .hh55-seg.on{opacity:1;color:#c8a84b}'
+   +'body.light .hh55-lang .hh55-seg.on{color:#8a6f1e}'
+   +'.hh55-lang .hh55-sep{width:1px;background:#8884;margin:4px 0}';
+  (document.head||document.documentElement).appendChild(st);
+}catch(e){}
+
+/* ---------- 7. ο διακόπτης «ΕΛ | EN» στην μπάρα εργαλείων --------------- */
+function paintSw(){
+  try{
+    var el=document.getElementById('hh55-sw'); if(!el) return;
+    var a=el.querySelector('[data-l="el"]'), b=el.querySelector('[data-l="en"]');
+    if(a) a.className='hh55-seg'+(LANG==='el'?' on':'');
+    if(b) b.className='hh55-seg'+(LANG==='en'?' on':'');
+    el.title = LANG==='en' ? 'Interface language: English' : 'Γλώσσα διεπαφής: Ελληνικά';
+  }catch(e){}
+}
+function mkSw(){
+  var d=document.createElement('div');
+  d.id='hh55-sw'; d.className='hb-ctrl hh55-lang';
+  var el=document.createElement('span'); el.className='hh55-seg'; el.setAttribute('data-l','el'); el.textContent='ΕΛ';
+  var sp=document.createElement('span'); sp.className='hh55-sep';
+  var en=document.createElement('span'); en.className='hh55-seg'; en.setAttribute('data-l','en'); en.textContent='EN';
+  d.appendChild(el); d.appendChild(sp); d.appendChild(en);
+  d.addEventListener('click',function(ev){
+    var t=ev.target&&ev.target.closest?ev.target.closest('.hh55-seg'):null;
+    if(!t) return;
+    ev.stopPropagation();
+    setLang(t.getAttribute('data-l'));
+  },false);
+  return d;
+}
+/* πάντα ΤΕΛΕΥΤΑΙΟ στη μπάρα: το hhPolish15 έχει fallback «btns[1]» για το
+   κουμπί πλατφορμών — αν μπαίναμε μπροστά, θα του χαλούσαμε τους δείκτες. */
+function ensureSw(){
+  try{
+    var bar=document.getElementById('hh-hb'); if(!bar) return;
+    var sw=document.getElementById('hh55-sw');
+    if(!sw){ sw=mkSw(); bar.appendChild(sw); paintSw(); return; }
+    if(sw.parentElement!==bar) bar.appendChild(sw);
+  }catch(e){}
+}
+setInterval(ensureSw,700); ensureSw();
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',ensureSw);
+
+/* ---------- 8. αλλαγή γλώσσας: άμεση, χωρίς reload ---------------------- */
+function setLang(l){
+  l=(l==='en')?'en':'el';
+  if(l===LANG){ paintSw(); return; }
+  LANG=l;
+  try{ localStorage.setItem(KEY,l); }catch(e){}
+  try{ document.documentElement.setAttribute('data-hh-lang',l); }catch(e){}
+  try{ document.documentElement.setAttribute('lang', l==='en'?'en':'el'); }catch(e){}
+  if(l==='en') sweep(document.body); else revert();
+  paintSw();
+  try{ window.dispatchEvent(new CustomEvent('hh55lang',{detail:{lang:l}})); }catch(e){}
+}
+window.hhSetLang=setLang;
+
+/* ---------- 9. εκκίνηση ------------------------------------------------- */
+try{ document.documentElement.setAttribute('data-hh-lang',LANG); }catch(e){}
+try{ document.documentElement.setAttribute('lang', LANG==='en'?'en':'el'); }catch(e){}
+if(isEn()){
+  sweep(document.body);
+  setTimeout(function(){ sweep(document.body); },300);
+  setTimeout(function(){ sweep(document.body); },1200);
+  setTimeout(function(){ sweep(document.body); },2500);
+}
+
+/* εκτεθειμένα για έλεγχο */
+window.__hh55={ tr:tr, sweep:sweep, revert:revert, dict:DICT, rules:RULES,
+                lang:function(){return LANG;}, set:setLang, num:num };
+}catch(e){console.warn('hhPolish55',e);}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
