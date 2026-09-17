@@ -10570,6 +10570,15 @@ window.hhLang=function(){ return LANG; };
 
 var GR=/[Ͱ-Ͽἀ-῿]/;
 function norm(x){ return String(x==null?'':x).replace(/\s+/g,' ').trim(); }
+/* hhPolish60: «Αφαιρέθηκε από τις πλατφόρμες X, Y» — το «τις πλατφόρμες»
+   είναι κείμενο της εφαρμογής, ΔΕΝ είναι όνομα πλατφόρμας. Έμενε ελληνικό
+   μέσα σε αγγλική πρόταση. */
+function plat60(x){
+  return String(x==null?'':x)
+    .replace(/^τις πλατφόρμες /,'platforms ')
+    .replace(/^την πλατφόρμα /,'platform ')
+    .replace(/^τη πλατφόρμα /,'platform ');
+}
 
 /* ---------- 1. κανόνες: σύνθετα κείμενα, τα ΔΕΔΟΜΕΝΑ περνούν αυτούσια ----
    Κάθε κανόνας δοκιμάζεται σε ΟΛΟΚΛΗΡΟ το normalised κείμενο (^…$), ώστε να
@@ -10605,15 +10614,15 @@ var RULES=[
      βγαίνει μισομεταφρασμένο κείμενο. Το όνομα της πλατφόρμας δεν περιέχει
      ποτέ «—» ούτε τελεία, άρα το περιορίζουμε σε [^—.]+.               */
   [/^⛔ Αφαιρέθηκε από ([^—.]+?) — δεν εμφανίζεται στα αποτελέσματα από ([^.]+?)\.\s*(.*)$/,
-     function(m){ return '⛔ Removed from '+m[1]+' — not shown in the results since '+m[2]+'.'
+     function(m){ return '⛔ Removed from '+plat60(m[1])+' — not shown in the results since '+m[2]+'.'
                          +(m[3]?' '+trParts(m[3]):''); }],
   [/^Αφαιρέθηκε από ([^—.]+?) — δεν εμφανίζεται στα αποτελέσματα από ([^.]+?)\.\s*(.*)$/,
-     function(m){ return 'Removed from '+m[1]+' — not shown in the results since '+m[2]+'.'
+     function(m){ return 'Removed from '+plat60(m[1])+' — not shown in the results since '+m[2]+'.'
                          +(m[3]?' '+trParts(m[3]):''); }],
   [/^⛔ Αφαιρέθηκε από ([^—.]+?)( · [^—]+)?$/,
-     function(m){ return '⛔ Removed from '+m[1]+(m[2]||''); }],
+     function(m){ return '⛔ Removed from '+plat60(m[1])+(m[2]||''); }],
   [/^Αφαιρέθηκε από ([^—.]+?)( · [^—]+)?$/,
-     function(m){ return 'Removed from '+m[1]+(m[2]||''); }],
+     function(m){ return 'Removed from '+plat60(m[1])+(m[2]||''); }],
   [/^Η αγγελία αφαιρέθηκε από ([^—.]+?)\.?$/,
      function(m){ return 'The listing was removed from '+m[1]; }],
   [/^ — δεν εμφανίζεται στα αποτελέσματα από (.+)$/,
@@ -10813,7 +10822,9 @@ var D58={
   'Επιπλωμένο':'Furnished','Νεόδμητο':'Newly built','Θέα':'View','Κήπος':'Garden',
   'Τζάκι':'Fireplace','Πάρκινγκ':'Parking','Αποθήκη':'Storage','Ασανσέρ':'Lift',
   'Κατοικίδια':'Pets allowed','Πισίνα':'Pool','Ασφάλεια':'Security',
-  'Θέρμανση':'Heating','θέρμανση':'heating','Ψήφοι':'Votes','Ψήφος':'Vote'
+  'Θέρμανση':'Heating','θέρμανση':'heating','Ψήφοι':'Votes','Ψήφος':'Vote',
+  /*hhPolish60*/
+  'Ημιυπόγειο':'Semi-basement','Δώμα':'Roof level','Μεσοπάτωμα':'Mezzanine'
 };
 for(var k58 in D58){ if(DICT[k58]==null) DICT[k58]=D58[k58]; }
 
@@ -10838,6 +10849,8 @@ function part58(p){
   var o=ord58(t); if(o!=null) return o;
   var q=sqm58(t); if(q!=null) return q;
   var r=tr(t); if(r!=null) return r;
+  /*hhPolish60: «Ημιυπόγειο, Ισόγειο» — σύνθετο κομμάτι με κόμμα */
+  if(t.indexOf(', ')>0){ var c=split58(t,', '); if(c!=null) return c; }
   return null;
 }
 function split58(t,sep){
@@ -10860,6 +10873,11 @@ RULES.push(
      function(m){ return (m[1]||'')+m[2]+' of '+m[3]+' listings removed from platforms '+m[4]+(m[5]||''); }],
   [/^(⛔\s*)?(\d+) από (\d+) αγγελίες αφαιρέθηκαν από την πλατφόρμα (.+?)( · .+)?$/,
      function(m){ return (m[1]||'')+m[2]+' of '+m[3]+' listings removed from platform '+m[4]+(m[5]||''); }],
+  /*hhPolish60: «⛔ 2 από 4 αγγελίες αφαιρέθηκαν από Spitogatos · 17/09/2026» */
+  [/^(⛔\s*)?(\d+) από (\d+) αγγελίες αφαιρέθηκαν από (.+?)( · .+)?$/,
+     function(m){ return (m[1]||'')+m[2]+' of '+m[3]+' listings removed from '+plat60(m[4])+(m[5]||''); }],
+  [/^(⛔\s*)?(\d+) από (\d+) αγγελία αφαιρέθηκε από (.+?)( · .+)?$/,
+     function(m){ return (m[1]||'')+m[2]+' of '+m[3]+' listings removed from '+plat60(m[4])+(m[5]||''); }],
   /* θέρμανση: σύνθεση «τρόπος (καύσιμο)» / «τρόπος – καύσιμο» */
   [/^(.+?) \((.+)\)$/, function(m){
      var a=part58(m[1]), b=split58(m[2],', ')||part58(m[2]);
