@@ -7492,7 +7492,8 @@ function describe(name,ch){
     return 'Επαναφορά αγγελίας #'+id+' ως ενεργή';
   if(name==='hhRestoreListing')
     return 'Ακύρωση αφαίρεσης αγγελίας #'+id;
-  if(name==='loToggleHide'||name==='hhGsReject')
+  if(name==='hideListing'||name==='toggleGroupHide'||name==='modalToggleHide'||
+     name==='loToggleHide'||name==='hhGsReject')
     return (a0.hidden===true?'Απόκρυψη ':'Επαναφορά ')+'«'+locOf(id)+'»'+(n>1?(' ('+plur(n)+')'):'');
   return 'Αλλαγή σε '+plur(n);
 }
@@ -7530,7 +7531,12 @@ var SCOPE={
   loToggleHide:    function(x){ return urlGroup(x[0]); },
   hhGsReject:      function(x){ return byHouse(x[0]); },
   unmarkSold:      function(x){ return byUrl(x[0]); },
-  hhRestoreListing:function(x){ return byRowId(x[0]); }
+  hhRestoreListing:function(x){ return byRowId(x[0]); },
+  /*hhPolish57: to X tis kartas, to X tis omadas kai to koumpi mesa sto modal
+     egrafan kateutheian sti vasi xwris pushAction — to koumpi anaireshs emene gkri. */
+  hideListing:     function(x){ return urlGroup(x[0]); },
+  toggleGroupHide: function(x){ return byHouse(x[0]); },
+  modalToggleHide: function(x){ return urlGroup(x[0]); }
 };
 /* unmarkSold γράφει {deleted:null, gone_confirmed:false} αλλά τοπικά πειράζει
    μόνο το deleted — συμπληρώνουμε το gone_confirmed ώστε η αναίρεση να το
@@ -7635,7 +7641,14 @@ function wrap(name){
 /* ---------- 7. κουμπί «↩ Αναίρεση» μέσα στην κάρτα ---------- */
 var st=document.createElement('style'); st.id='hh-polish45';
 st.textContent=
-  '.hh45-undo{cursor:pointer;white-space:nowrap;'
+  /*hhPolish57: enas energos koumpi prepei na fainetai energo*/
+  '#undoBtn:disabled,#redoBtn:disabled{opacity:.3;cursor:default;filter:grayscale(1)}'
+ +'#undoBtn:not(:disabled),#redoBtn:not(:disabled){cursor:pointer;opacity:1;'
+ +'border:1px solid var(--accent2)!important;color:var(--accent2)!important;'
+ +'background:rgba(126,184,154,.12)!important;border-radius:8px}'
+ +'#undoBtn:not(:disabled):hover,#redoBtn:not(:disabled):hover{'
+ +'background:rgba(126,184,154,.28)!important}'
+ +'.hh45-undo{cursor:pointer;white-space:nowrap;'
  +'border-color:var(--accent2)!important;color:var(--accent2)!important}'
  +'.hh45-undo:hover{background:rgba(126,184,154,.16)!important}'
  +'.hh-gs-tools>.hh45-undo{order:9}';
@@ -7725,7 +7738,8 @@ function sync(){
 
 /* ---------- 8. εγκατάσταση (και επανεγκατάσταση αν κάποιο layer ξαναγράψει) ---------- */
 var NAMES=['hhMarkGoneOne','hhGsMarkGone','hhConfirmGone','hhUnconfirmGone',
-           'loToggleHide','hhGsReject','unmarkSold','hhRestoreListing'];
+           'loToggleHide','hhGsReject','unmarkSold','hhRestoreListing',
+           /*hhPolish57*/'hideListing','toggleGroupHide','modalToggleHide'];
 function install(){
   hookPush();
   for(var i=0;i<NAMES.length;i++){ try{ wrap(NAMES[i]); }catch(e){} }
