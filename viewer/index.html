@@ -3830,7 +3830,7 @@ reorder();buildStrip();if(items.length)show(0);else main.style.display='none';
 if(vids.length){var vb=document.createElement('div');vb.className='hh-cz-vids';vids.forEach(function(v){var b=document.createElement('a');b.href=v.url;b.target='_blank';b.className='hh-cz-vid';b.innerHTML='\u25b6 \u0392\u03af\u03bd\u03c4\u03b5\u03bf'+(v.agency?' · '+esc(v.agency):'');vb.appendChild(b);});wrap.appendChild(vb);}
 host.appendChild(wrap);}
 function showSummary(){if(!members||members.length<2)return;var feat=document.querySelector('.lo-featured');if(!feat)return;var h=hid();document.querySelectorAll('.lo-sib-card').forEach(function(c){c.classList.remove('lo-sib-active');});var c0=document.getElementById('hh-sib0');if(c0)c0.classList.add('lo-sib-active');removeSummary();if(c0)c0.classList.add('lo-sib-active');feat.style.position='relative';[].forEach.call(feat.children,function(c){if(c.id!=='hh-grpsum-ov'){if(!c.hasAttribute('data-hhhid'))c.setAttribute('data-hhhid',c.style.display||'_');c.style.display='none';}});window.__hhGrpMembers=members;var col=function(k){return members.map(function(m){return m[k];});};var rows=[['Τιμή',rng(col('price'),'',eur)],['€/τ.μ.',rng(members.map(function(m){return (m.price>0&&m.sqm>0)?Math.round(m.price/m.sqm):null;}),'',eur)],['Τ.μ.',rng(col('sqm'),' τ.μ.')],['Έτος',rng(col('year'))],['Δωμάτια',rng(col('rooms'))],['Μπάνια',rng(col('baths'))],['Τύπος',dist(col('type'))],['Όροφος',dist(col('floor'))],['Ενεργειακή',dist(col('energy'))],['Θέρμανση',dist(col('heating'))],['Μεσιτικά',dist(col('agency'))]];var desc='';members.forEach(function(m){if(m.description&&m.description.length>desc.length)desc=m.description;});desc=desc?desc.replace(/<\/?[a-zA-Z][^>]*>/g,'').slice(0,700):'';var la=[],ln=[];var _seen={};members.forEach(function(m){var a=(m.platform_lat!=null?+m.platform_lat:(m.address_lat!=null?+m.address_lat:null)),bb=(m.platform_lng!=null?+m.platform_lng:(m.address_lng!=null?+m.address_lng:null));if(a!=null&&bb!=null){var _k=a.toFixed(5)+','+bb.toFixed(5);_seen[_k]=(_seen[_k]||0)+1;var _n=_seen[_k];if(_n>1){var _rr=0.0006*Math.sqrt(_n),_tt=_n*2.39996323;a+=_rr*Math.cos(_tt);bb+=_rr*Math.sin(_tt)*1.35;}m.__mlat=a;m.__mlng=bb;la.push(a);ln.push(bb);}});var _mA=members.filter(function(m){return m.address&&(''+m.address).trim()&&m.address_lat!=null;})[0];var lat=null,lng=null;if(_mA){lat=+_mA.address_lat;lng=+_mA.address_lng;}else if(la.length){lat=la.reduce(function(a,b){return a+b;},0)/la.length;lng=ln.reduce(function(a,b){return a+b;},0)/ln.length;}var ad=dist(col('agency'));var nAg=ad==='—'?0:ad.split(' · ').length;var ov=document.createElement('div');ov.id='hh-grpsum-ov';if(!window.__hhVpop){window.__hhVpop=1;var _st=document.createElement('style');_st.textContent='.hh-gs-grid{max-width:100%}.hh-gs-grid>div{min-width:0}.hh-gs-mv{max-width:100%}.hh-gs-grid .hh-gs-mv{display:flex;align-items:center;gap:4px;min-width:0}.hh-gs-mv .hh-gs-mvtxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.hh-gs-more{flex:none;background:#c8a84b;color:#20170a;border:none;border-radius:8px;font-size:9px;font-weight:700;padding:1px 5px;cursor:pointer}.hh-gs-vpop{position:fixed;z-index:2147483600;background:#1b1710;border:1px solid #c8a84b;border-radius:8px;padding:8px 10px;max-width:320px;max-height:60vh;overflow:auto;box-shadow:0 6px 24px rgba(0,0,0,.6)}.hh-gs-vpop h5{margin:0 0 5px;color:#e9cf86;font-size:12px}.hh-gs-vpop .hh-gs-vrow{color:#e7e2d6;font-size:12px;padding:2px 0;border-top:1px solid rgba(200,168,75,.18)}.hh-src{float:right;font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;margin-left:10px}.hh-src-xe{background:#1f6f3d;color:#d8f5e2}.hh-src-sp{background:#7a3d10;color:#ffe0c2}.hh-gs-vpop .hh-gs-link{cursor:pointer}.hh-gs-vpop .hh-gs-link:hover{background:rgba(200,168,75,.16)}';document.head.appendChild(_st);document.addEventListener('click',function(e){var _lk=e.target.closest?e.target.closest('.hh-gs-link[data-url]'):null;if(_lk){e.stopPropagation();var _uu=_lk.getAttribute('data-url');var _oo=document.getElementById('hh-gs-vpop-el');if(_oo)_oo.remove();if(window.openModal)openModal(decodeURIComponent(_uu));return;}var b=e.target.closest?e.target.closest('.hh-gs-more'):null;var op=document.getElementById('hh-gs-vpop-el');if(op&&!b)op.remove();if(!b)return;e.stopPropagation();if(op)op.remove();var vals=decodeURIComponent(b.getAttribute('data-vals')).split(' \u00b7 ');var pop=document.createElement('div');pop.className='hh-gs-vpop';pop.id='hh-gs-vpop-el';var _lbl=b.getAttribute('data-label');var _LBL={'Μεσιτικά':'agency','Τύπος':'type','Όροφος':'floor','Ενεργειακή':'energy','Θέρμανση':'heating'};var _mem=window.__hhGrpMembers,_rows='';if(_LBL[_lbl]&&_mem){var _f=_LBL[_lbl];_mem.forEach(function(m){var vv=m[_f];if(vv==null||vv==='')return;var pl=(''+(m.platform||'')).toLowerCase();var bd=pl.indexOf('xe')>=0?'<span class=\"hh-src hh-src-xe\">xe.gr</span>':(pl.indexOf('spito')>=0?'<span class=\"hh-src hh-src-sp\">Spitogatos</span>':'');_rows+='<div class=\"hh-gs-vrow'+(_f==='agency'&&m.url?' hh-gs-link':'')+'\"'+(_f==='agency'&&m.url?' data-url=\"'+encodeURIComponent(m.url)+'\"':'')+'>'+(''+vv).replace(/[<>]/g,'')+bd+'</div>';});}if(!_rows){_rows=vals.map(function(x){return '<div class=\"hh-gs-vrow\">'+x.replace(/[<>]/g,'')+'</div>';}).join('');}pop.innerHTML='<h5>'+_lbl+'</h5>'+_rows;document.body.appendChild(pop);var rc=b.getBoundingClientRect();pop.style.left=Math.max(6,Math.min(rc.left,window.innerWidth-332))+'px';pop.style.top=Math.min(rc.bottom+4,window.innerHeight-140)+'px';});}
-var rowsHtml=rows.map(function(r){var v=r[1]==null?'':String(r[1]);var parts=v.split(' \u00b7 ');if(parts.length>1){return '<div><span>'+r[0]+'</span><b class=\"hh-gs-mv\"><span class=\"hh-gs-mvtxt\">'+esc(r[0]!=='Μεσιτικά'&&parts.length>1?(parts[0]+' \u2013 '+parts[parts.length-1]):parts[0])+'</span><button type=\"button\" class=\"hh-gs-more\" data-label=\"'+esc(r[0])+'\" data-vals=\"'+encodeURIComponent(v)+'\">'+parts.length+' \u25be</button></b></div>';}return '<div><span>'+r[0]+'</span><b>'+esc(v)+'</b></div>';}).join('');ov.innerHTML='<div class="hh-gs-head"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.14em;margin-right:2px" fill="#e3b341"><path d="M12 3L2 12h3v9h6v-6h2v6h6v-9h3z"/></svg> ΟΜΑΔΟΠΟΙΗΜΕΝΗ ΚΑΡΤΑ — '+members.length+' αγγελίες · '+nAg+' μεσιτικά</div>'+(function(){/*hhPolish3*/try{var sc=Math.max.apply(null,[0].concat(members.map(function(m){return +m.personal_score||0;})));var hh=String(h||'');var st=[1,2,3,4,5].map(function(i){return '<span data-star="'+i+'" onclick="event.stopPropagation();setGroupRating(event,\''+hh.replace(/'/g,'')+'\','+i+')" style="cursor:pointer;font-size:22px;line-height:1;color:'+(sc>=i?'#d4a853':'rgba(255,255,255,0.2)')+'">'+(sc>=i?'★':'☆')+'</span>';}).join('');return '<div class="hh-gs-tools" data-hhh="'+esc(hh)+'"><div class="card-stars" style="display:flex;align-items:center;gap:2px">'+st+'</div><span class="modal-btn" style="cursor:pointer" title="Κοινοποίηση" onclick="event.stopPropagation();hhShare(event,\''+hh.replace(/'/g,'')+'\',\'\')">📤 Κοινοποίηση</span></div>';}catch(e){return '';}})()+'<div class="hh-gs-carwrap"><div class="hh-gs-loading">📷 Φόρτωση φωτογραφιών…</div></div>'+'<div class="hh-gs-grid">'+rowsHtml+'</div>'+(window.hhGsSummaryHTML?window.hhGsSummaryHTML(members):(desc?'<div class="hh-gs-desc-t">Σύνοψη περιγραφής</div><div class="hh-gs-desc">'+esc(desc)+'</div>':''))+(lat!=null?'<div id="hh-gs-map"></div>':'')+'<div class="hh-gs-notes-slot"></div>';feat.appendChild(ov);try{if(window.hhGsMoveNotes)hhGsMoveNotes(ov);}catch(e){}if(lat!=null&&window.L){var _mem=members.slice();setTimeout(function(){try{if(!document.getElementById('hh-gs-leg-css')){var lc=document.createElement('style');lc.id='hh-gs-leg-css';lc.textContent='.hh-gs-leg{background:rgba(20,17,10,0.92);border:1px solid #c8a84b;border-radius:6px;padding:6px 9px;font-size:10px;color:#e9cf86;line-height:1.7}.hh-gs-leg b{display:block;margin-bottom:2px}.hh-gs-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle;font-style:normal}';document.head.appendChild(lc);}var _hasAddr=_mem.some(function(m){return m&&m.address&&(''+m.address).trim();});var confirmed=_mem.some(function(m){return m&&m.address_confirmed===true;});var _mCol=confirmed?'#15803d':(_hasAddr?'#2563eb':'#ea8a2a');var _mRing=confirmed?'#0b5a2b':(_hasAddr?'#1e40af':'#a85a10');var _mTip=confirmed?'Επιβεβαιωμένη θέση':(_hasAddr?'Διεύθυνση από την αγγελία (μη επιβεβαιωμένη)':'Προσεγγιστική θέση');var mp=L.map('hh-gs-map',{zoomControl:true,attributionControl:false}).setView([lat,lng],14);var _pts=[];var _CL=(window.hhGeoCluster?window.hhGeoCluster(_mem.map(function(m){return {lat:m.__mlat,lng:m.__mlng,r:+m.geo_radius_m||0,dead:!!m.deleted};})):null);var _in=function(i){ return !_CL || !_CL.keepSet || _CL.keepSet[i]; };L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mp);_mem.forEach(function(m,_mi){if(m.__mlat!=null&&m.__mlng!=null){var _ok=_in(_mi); if(_ok) _pts.push([m.__mlat,m.__mlng]);var _mk=L.circleMarker([m.__mlat,m.__mlng],{radius:_ok?10:8,color:_ok?'#333':'#7a2f2f',weight:2,fillColor:(_ok?(m.url?'#c8a84b':'#9aa0a6'):'#5b5b5b'),fillOpacity:_ok?0.85:0.55,dashArray:_ok?null:'3,3',className:(m.url?'hh-gs-pin hh-gs-pin-l':'hh-gs-pin')}).addTo(mp);var _tp=(m.agency||'αγγελία'); if(!_ok) _tp='⚠ εκτός ομάδας — '+_tp;try{ if(m.platform) _tp+=' · '+m.platform; if(m.price>0) _tp+=' · €'+Number(m.price).toLocaleString('el'); if(m.url) _tp+=' ↗'; }catch(e){}_mk.bindTooltip(_tp,{direction:'top'});if(m.url){ _mk.on('click',function(ev){ try{ if(ev&&ev.originalEvent){ ev.originalEvent.preventDefault(); ev.originalEvent.stopPropagation(); } }catch(e){} try{ if(window.hhBgOpen) window.hhBgOpen(m.url); }catch(e){} }); }}});L.circleMarker([lat,lng],{radius:6,color:_mRing,weight:2,fillColor:_mCol,fillOpacity:1}).addTo(mp).bindTooltip(_mTip,{direction:'top'});try{ if(_CL&&_CL.centre){ _pts.push(_CL.centre);try{ var _dm=Math.sqrt(Math.pow((lat-_CL.centre[0])*111320,2)+Math.pow((lng-_CL.centre[1])*111320*Math.cos(lat*Math.PI/180),2));if(confirmed || _dm<=800) _pts.push([lat,lng]); }catch(e){ _pts.push([lat,lng]); }if(_CL.spread>60){ L.circle(_CL.centre,{radius:_CL.spread,color:'#ea8a2a',weight:1,fillColor:'#ea8a2a',fillOpacity:.08,interactive:false}).addTo(mp); }L.circleMarker(_CL.centre,{radius:6,color:'#a85a10',weight:2,fillColor:'#ea8a2a',fillOpacity:.95}).addTo(mp).bindTooltip('εκτίμηση από '+_CL.n+' αγγελίες (±'+_CL.spread+' μ.)'+(_CL.out.length?' · '+_CL.out.length+' εκτός ομάδας':''),{direction:'top'});} }catch(e){}try{ if(!_pts.length) _pts.push([lat,lng]); if(_pts.length>1){ mp.fitBounds(L.latLngBounds(_pts).pad(0.12),{animate:false,maxZoom:16}); } }catch(e){}var lg=L.control({position:'topright'});lg.onAdd=function(){var d=L.DomUtil.create('div','hh-gs-leg');d.innerHTML='<b>Υπόμνημα</b><div><i style="background:#15803d"></i>Επιβεβαιωμένη από εμάς</div><div><i style="background:#2563eb"></i>Διεύθυνση αγγελίας (μη επιβεβ.)</div><div><i style="background:#ea8a2a"></i>Εκτίμηση από τις αγγελίες</div><div><i style="background:#c8a84b"></i>Αγγελία (κλικ = άνοιγμα)</div><div><i style="background:#5b5b5b"></i>Εκτός ομάδας (&gt;800 μ.)</div>';return d;};lg.addTo(mp);setTimeout(function(){mp.invalidateSize();},120);}catch(e){}},60);}var vids=collectVideos();var token=(window.__grpTok=(window.__grpTok||0)+1);var carwrap=ov.querySelector('.hh-gs-carwrap');function render(list){if(token!==window.__grpTok||!carwrap)return;carwrap.innerHTML='';buildCarousel(carwrap,list,vids);}if(window.__grpImgCache[h]){render(window.__grpImgCache[h]);}else{var imgs=collectImgs();if(imgs.length>1&&imgs.length<=200){Promise.all(imgs.map(function(o){return measure(o.url);})).then(function(ar){imgs.forEach(function(o,i){o.__a=ar[i];});var sorted=imgs.slice().sort(function(a,b){return (b.__a||0)-(a.__a||0);});window.__grpImgCache[h]=sorted;render(sorted);});}else{window.__grpImgCache[h]=imgs;render(imgs);}}}
+var rowsHtml=rows.map(function(r){var v=r[1]==null?'':String(r[1]);var parts=v.split(' \u00b7 ');if(parts.length>1){return '<div><span>'+r[0]+'</span><b class=\"hh-gs-mv\"><span class=\"hh-gs-mvtxt\">'+esc(r[0]!=='Μεσιτικά'&&parts.length>1?(parts[0]+' \u2013 '+parts[parts.length-1]):parts[0])+'</span><button type=\"button\" class=\"hh-gs-more\" data-label=\"'+esc(r[0])+'\" data-vals=\"'+encodeURIComponent(v)+'\">'+parts.length+' \u25be</button></b></div>';}return '<div><span>'+r[0]+'</span><b>'+esc(v)+'</b></div>';}).join('');ov.innerHTML='<div class="hh-gs-head"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.14em;margin-right:2px" fill="#e3b341"><path d="M12 3L2 12h3v9h6v-6h2v6h6v-9h3z"/></svg> ΟΜΑΔΟΠΟΙΗΜΕΝΗ ΚΑΡΤΑ — '+members.length+' αγγελίες · '+nAg+' μεσιτικά</div>'+(function(){/*hhPolish3*/try{var sc=Math.max.apply(null,[0].concat(members.map(function(m){return +m.personal_score||0;})));var hh=String(h||'');var st=[1,2,3,4,5].map(function(i){return '<span data-star="'+i+'" onclick="event.stopPropagation();setGroupRating(event,\''+hh.replace(/'/g,'')+'\','+i+')" style="cursor:pointer;font-size:22px;line-height:1;color:'+(sc>=i?'#d4a853':'rgba(255,255,255,0.2)')+'">'+(sc>=i?'★':'☆')+'</span>';}).join('');return '<div class="hh-gs-tools" data-hhh="'+esc(hh)+'"><div class="card-stars" style="display:flex;align-items:center;gap:2px">'+st+'</div><span class="modal-btn" style="cursor:pointer" title="Κοινοποίηση" onclick="event.stopPropagation();hhShare(event,\''+hh.replace(/'/g,'')+'\',\'\')">📤 Κοινοποίηση</span></div>';}catch(e){return '';}})()+'<div class="hh-gs-carwrap"><div class="hh-gs-loading">📷 Φόρτωση φωτογραφιών…</div></div>'+'<div class="hh-gs-grid">'+rowsHtml+'</div>'+(window.hhGsSummaryHTML?window.hhGsSummaryHTML(members):(desc?'<div class="hh-gs-desc-t">Σύνοψη περιγραφής</div><div class="hh-gs-desc">'+esc(desc)+'</div>':''))+(lat!=null?'<div id="hh-gs-map"></div>':'')+'<div class="hh-gs-notes-slot"></div>';feat.appendChild(ov);try{if(window.hhGsMoveNotes)hhGsMoveNotes(ov);}catch(e){}if(lat!=null&&window.L){var _mem=members.slice();setTimeout(function(){try{if(!document.getElementById('hh-gs-leg-css')){var lc=document.createElement('style');lc.id='hh-gs-leg-css';lc.textContent='.hh-gs-leg{background:rgba(20,17,10,0.92);border:1px solid #c8a84b;border-radius:6px;padding:6px 9px;font-size:10px;color:#e9cf86;line-height:1.7}.hh-gs-leg b{display:block;margin-bottom:2px}.hh-gs-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle;font-style:normal}';document.head.appendChild(lc);}var _hasAddr=_mem.some(function(m){return m&&m.address&&(''+m.address).trim();});var confirmed=_mem.some(function(m){return m&&m.address_confirmed===true;});var _mCol=confirmed?'#15803d':(_hasAddr?'#2563eb':'#ea8a2a');var _mRing=confirmed?'#0b5a2b':(_hasAddr?'#1e40af':'#a85a10');var _mTip=confirmed?'Επιβεβαιωμένη θέση':(_hasAddr?'Διεύθυνση από την αγγελία (μη επιβεβαιωμένη)':'Προσεγγιστική θέση');var mp=L.map('hh-gs-map',{zoomControl:true,attributionControl:false}).setView([lat,lng],14);var _pts=[];var _CL=(window.hhGeoCluster?window.hhGeoCluster(_mem.map(function(m){return {lat:m.__mlat,lng:m.__mlng,r:+m.geo_radius_m||0,dead:!!m.deleted};})):null);var _in=function(i){ return !_CL || !_CL.keepSet || _CL.keepSet[i]; };L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mp);_mem.forEach(function(m,_mi){if(m.__mlat!=null&&m.__mlng!=null){var _ok=_in(_mi); if(_ok) _pts.push([m.__mlat,m.__mlng]);var _mk=L.circleMarker([m.__mlat,m.__mlng],{radius:_ok?10:8,color:_ok?'#333':'#7a2f2f',weight:2,fillColor:(_ok?(m.url?'#c8a84b':'#9aa0a6'):'#5b5b5b'),fillOpacity:_ok?0.85:0.55,dashArray:_ok?null:'3,3',className:(m.url?'hh-gs-pin hh-gs-pin-l':'hh-gs-pin')}).addTo(mp);var _tp=(m.agency||'αγγελία'); if(!_ok) _tp='⚠ εκτός ομάδας — '+_tp;try{ if(m.platform) _tp+=' · '+m.platform; if(m.price>0) _tp+=' · €'+Number(m.price).toLocaleString('el'); if(m.url) _tp+=' ↗'; }catch(e){}try{/*hhPolish53*/var _h53d=_mk._path||(_mk.getElement&&_mk.getElement());if(_h53d&&_h53d.setAttribute){_h53d.setAttribute('data-hh-lat',+m.__mlat);_h53d.setAttribute('data-hh-lng',+m.__mlng);}}catch(e){}_mk.bindTooltip(_tp,{direction:'top'});if(m.url){ _mk.on('click',function(ev){ try{ if(ev&&ev.originalEvent){ ev.originalEvent.preventDefault(); ev.originalEvent.stopPropagation(); } }catch(e){} try{ if(window.hhBgOpen) window.hhBgOpen(m.url); }catch(e){} }); }}});try{/*hhPolish53*/mp.__hhPt=[+lat,+lng];var _h53b=mp.getContainer&&mp.getContainer();if(_h53b&&_h53b.setAttribute)_h53b.setAttribute('data-hh-pt',(+lat)+','+(+lng));}catch(e){}L.circleMarker([lat,lng],{radius:6,color:_mRing,weight:2,fillColor:_mCol,fillOpacity:1}).addTo(mp).bindTooltip(_mTip,{direction:'top'});try{ if(_CL&&_CL.centre){ _pts.push(_CL.centre);try{ var _dm=Math.sqrt(Math.pow((lat-_CL.centre[0])*111320,2)+Math.pow((lng-_CL.centre[1])*111320*Math.cos(lat*Math.PI/180),2));if(confirmed || _dm<=800) _pts.push([lat,lng]); }catch(e){ _pts.push([lat,lng]); }if(_CL.spread>60){ L.circle(_CL.centre,{radius:_CL.spread,color:'#ea8a2a',weight:1,fillColor:'#ea8a2a',fillOpacity:.08,interactive:false}).addTo(mp); }try{/*hhPolish53*/mp.__hhEst=[+_CL.centre[0],+_CL.centre[1]];mp.__hhEstSpread=+_CL.spread||0;var _h53a=mp.getContainer&&mp.getContainer();if(_h53a&&_h53a.setAttribute)_h53a.setAttribute('data-hh-est',(+_CL.centre[0])+','+(+_CL.centre[1]));}catch(e){}L.circleMarker(_CL.centre,{radius:6,color:'#a85a10',weight:2,fillColor:'#ea8a2a',fillOpacity:.95}).addTo(mp).bindTooltip('εκτίμηση από '+_CL.n+' αγγελίες (±'+_CL.spread+' μ.)'+(_CL.out.length?' · '+_CL.out.length+' εκτός ομάδας':''),{direction:'top'});} }catch(e){}try{ if(!_pts.length) _pts.push([lat,lng]); if(_pts.length>1){ mp.fitBounds(L.latLngBounds(_pts).pad(0.12),{animate:false,maxZoom:16}); } }catch(e){}var lg=L.control({position:'topright'});lg.onAdd=function(){var d=L.DomUtil.create('div','hh-gs-leg');d.innerHTML='<b>Υπόμνημα</b><div><i style="background:#15803d"></i>Επιβεβαιωμένη από εμάς</div><div><i style="background:#2563eb"></i>Διεύθυνση αγγελίας (μη επιβεβ.)</div><div><i style="background:#ea8a2a"></i>Εκτίμηση από τις αγγελίες</div><div><i style="background:#c8a84b"></i>Αγγελία (κλικ = άνοιγμα)</div><div><i style="background:#5b5b5b"></i>Εκτός ομάδας (&gt;800 μ.)</div>';return d;};lg.addTo(mp);setTimeout(function(){mp.invalidateSize();},120);}catch(e){}},60);}var vids=collectVideos();var token=(window.__grpTok=(window.__grpTok||0)+1);var carwrap=ov.querySelector('.hh-gs-carwrap');function render(list){if(token!==window.__grpTok||!carwrap)return;carwrap.innerHTML='';buildCarousel(carwrap,list,vids);}if(window.__grpImgCache[h]){render(window.__grpImgCache[h]);}else{var imgs=collectImgs();if(imgs.length>1&&imgs.length<=200){Promise.all(imgs.map(function(o){return measure(o.url);})).then(function(ar){imgs.forEach(function(o,i){o.__a=ar[i];});var sorted=imgs.slice().sort(function(a,b){return (b.__a||0)-(a.__a||0);});window.__grpImgCache[h]=sorted;render(sorted);});}else{window.__grpImgCache[h]=imgs;render(imgs);}}}
 function ensureCard(){var carousel=document.querySelector('.lo-carousel');if(!carousel)return;var real=carousel.querySelectorAll('.lo-sib-card:not(#hh-sib0)');if(real.length<2||!members||members.length<2){var e=document.getElementById('hh-sib0');if(e)e.remove();return;}if(document.getElementById('hh-sib0'))return;var card=document.createElement('div');card.id='hh-sib0';card.className='lo-sib-card hh-grpsib';card.onclick=showSummary;card.innerHTML='<div class="lo-sib-num">0</div><div class="hh-grpsib-in"><div class="hh-grpsib-star"><svg viewBox="0 0 24 24" width="1em" height="1em" style="vertical-align:-0.14em;margin-right:2px" fill="#e3b341"><path d="M12 3L2 12h3v9h6v-6h2v6h6v-9h3z"/></svg></div><div class="hh-grpsib-lbl">ΟΜΑΔΟΠΟΙΗΜΕΝΗ<br>ΚΑΡΤΑ</div></div>';carousel.insertBefore(card,carousel.firstChild);}
 function load(){var h=hid();if(!h){members=null;return;}fetch(SB+'?house_id=eq.'+encodeURIComponent(h)+'&select=*',{headers:AH}).then(function(r){return r.json();}).then(function(rows){members=rows||[];ensureCard();if(window.__grpAuto&&document.getElementById('hh-sib0')){window.__grpAuto=false;showSummary();}}).catch(function(){});}
 var _ls=window.loSelectSibling;if(_ls&&!_ls.__g){window.loSelectSibling=function(){removeSummary();var r=_ls.apply(this,arguments);setTimeout(ensureCard,40);return r;};window.loSelectSibling.__g=1;}
@@ -4459,7 +4459,7 @@ function drawMap(){try{
  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(mp);
  var col=cfm?'#15803d':(exact?'#2563eb':'#ea8a2a'); /*hhPolish2*/
  if(!exact){L.circle([lat,lng],{radius:Math.max(150,+h.geo_radius_m||600),color:col,weight:1,fillColor:col,fillOpacity:.12}).addTo(mp);}
- L.circleMarker([lat,lng],{radius:8,color:'#222',weight:2,fillColor:col,fillOpacity:1}).addTo(mp).bindTooltip((h.agency||h.platform||'αγγελία'),{direction:'top'});
+ try{/*hhPolish53*/mp.__hhPt=[+lat,+lng];var _h53c=mp.getContainer&&mp.getContainer();if(_h53c&&_h53c.setAttribute)_h53c.setAttribute('data-hh-pt',(+lat)+','+(+lng));}catch(e){}L.circleMarker([lat,lng],{radius:8,color:'#222',weight:2,fillColor:col,fillOpacity:1}).addTo(mp).bindTooltip((h.agency||h.platform||'αγγελία'),{direction:'top'});
  sib.forEach(function(m,i){if(i===idx||!m||m.platform_lat==null)return;L.circleMarker([+m.platform_lat,+m.platform_lng],{radius:6,color:'#333',weight:1,fillColor:'#9aa0a6',fillOpacity:.9}).addTo(mp).bindTooltip((m.agency||m.platform||'')+' (#'+(i+1)+')',{direction:'top'});});
  setTimeout(function(){try{mp.invalidateSize();}catch(e){}},250);
 }catch(e){}}
@@ -4675,34 +4675,30 @@ setTimeout(function(){fixBadges();load(true);},900);
 <script>/*hhPolish8*/(function(){try{
 var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
 var st=document.createElement('style');st.id='hh-polish8';st.textContent=
-'.hh-tsp-badge{position:absolute;top:32px;right:10px;padding:2px 7px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:#f2b632;color:#1b1710;z-index:3;box-shadow:0 1px 3px rgba(0,0,0,.35)}'
-+'.lo-sib-card .hh-tsp-badge{top:29px;right:7px}'
-+'.grouped-specs .hh-tsp-inline{margin-left:0}'
-+'.hh-tsp-inline{display:inline-block;margin-left:4px;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;background:#f2b632;color:#1b1710;vertical-align:middle}'
-+'.hh-tsp-logo img{height:100%}';
+/*hhPolish54: ο κίτρινος τίτλος «tospitimou» φεύγει — μένει μόνο το
+  στυλ του δεύτερου λογότυπου (.hh-tsp-logo), που είναι άλλο στοιχείο.*/
+'.hh-tsp-logo img{height:100%}';
 document.head.appendChild(st);
 var KEYS={},lastLoad=0,loading=false;
 function tok(){try{var o=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');return o&&o.access_token?o.access_token:AK;}catch(e){return AK;}}
 async function load(force){try{if(loading)return;if(!force&&Date.now()-lastLoad<5*60*1000)return;loading=true;lastLoad=Date.now();var r=await fetch(SB+'/rest/v1/listings?select=id,house_id,platform_nr,url&also_on=cs.{tospitimou}',{headers:{apikey:AK,Authorization:'Bearer '+tok()}});if(!r.ok)return;var j=await r.json();if(!Array.isArray(j))return;KEYS={};j.forEach(function(x){var v=x.platform_nr||true;KEYS[String(x.id)]=v;if(x.url)KEYS[String(x.url)]=v;var h=String(x.house_id==null?'':x.house_id).trim();if(h&&h!=='0')KEYS[h]=v;});paint();}catch(e){}finally{loading=false;}}
 function keyOf(card){try{if(card.classList.contains('lo-sib-card')){var f=card.querySelector('[onclick*=toggleFav]');if(!f)return null;var o=f.getAttribute('onclick')||'';var a=o.indexOf("'"),b=o.indexOf("'",a+1);return (a<0||b<0)?null:o.slice(a+1,b);}if(card.classList.contains('grouped-card'))return String(card.dataset.hhh||'');var hh=String(card.dataset.hhh||'').trim();if(hh&&hh!=='0')return hh;var s=card.querySelector('[onclick*=setRating]');if(!s)return null;var oc=s.getAttribute('onclick')||'';var q1=oc.indexOf("'"),q2=oc.indexOf("'",q1+1);if(q1<0||q2<0)return null;return oc.slice(q1+1,q2);}catch(e){return null;}}
 function paint(){try{
-  document.querySelectorAll('.card,.grouped-card,.lo-sib-card').forEach(function(card){
-    var k=keyOf(card);var hit=k&&KEYS[k]!==undefined;
-    var old=card.querySelector(':scope .hh-tsp-badge, :scope .hh-tsp-inline');
-    if(!hit){if(old)old.remove();return;}
-    if(old)return;
-    if(card.classList.contains('grouped-card')){var gs=card.querySelector('.grouped-specs');if(!gs)return;var sp=document.createElement('span');sp.className='spec-tag hh-tsp-inline';sp.title='Η αγγελία υπάρχει και στο tospitimou.gr';sp.textContent='tospitimou';gs.appendChild(sp);return;}
-    var b=card.querySelector('.platform-badge');if(!b)return;
-    if(!/spitogatos/i.test(b.textContent||''))return;
-    var inline=(getComputedStyle(b).position!=='absolute');
-    var d=document.createElement(inline?'span':'div');d.className=inline?'hh-tsp-inline':'platform-badge hh-tsp-badge';d.textContent='tospitimou';
-    b.parentNode.insertBefore(d,b.nextSibling);
+  /*hhPolish54: ΤΟ ΤΑΜΠΕΛΑΚΙ ΕΦΥΓΕ. Ο Dusty το βρήκε πιο φωναχτό από τα
+    πραγματικά στοιχεία. Δεν φτιάχνουμε πια ούτε .hh-tsp-badge (mini
+    κάρτες) ούτε .spec-tag.hh-tsp-inline (ομαδοποιημένες) — μόνο
+    σκουπίζουμε ό,τι τυχόν έχει μείνει από προηγούμενο render.
+    ΜΕΝΟΥΝ ΑΘΙΚΤΑ: η στήλη also_on στη βάση (τη διαβάζει το καθημερινό
+    run για την ανίχνευση αφαιρέσεων) και το δεύτερο λογότυπο
+    .hh-tsp-logo, που το βάζει το hookLogo() — άλλο στοιχείο. */
+  document.querySelectorAll('.hh-tsp-badge,.hh-tsp-inline').forEach(function(n){
+    try{ n.parentNode.removeChild(n); }catch(e){}
   });
 }catch(e){}}
 function hookLogo(){try{if(window.hhLogoBtn&&!window.hhLogoBtn.__p8){var _o=window.hhLogoBtn;window.hhLogoBtn=function(h,cls){var r=_o.apply(this,arguments);try{var ao=h&&h.also_on;if(ao&&ao.indexOf('tospitimou')>=0){var nr=h.platform_nr||h.platformNr;if(nr&&window.HH_LOGOS&&window.HH_LOGOS.tospitimou){var u='https://en.tospitimou.gr/property/'+String(nr).replace(/[^0-9]/g,'');r+='<span class="'+cls+' hh-logo-btn hh-tsp-logo" title="Άνοιγμα στο tospitimou.gr" onmousedown="handleLinkClick(event,\''+u+'\')" onclick="event.stopPropagation();handleLinkClick(event,\''+u+'\')"><img src="'+window.HH_LOGOS.tospitimou+'" alt="tospitimou" draggable="false"></span>';}}}catch(e){}return r;};window.hhLogoBtn.__p8=true;}}catch(e){}}
 window.hhRefreshTsp=function(){load(true);};
-setInterval(function(){hookLogo();load(false);paint();},1500);
-setTimeout(function(){hookLogo();load(true);},700);
+setInterval(function(){hookLogo();paint();},1500);/*hhPolish54: το load() τροφοδοτούσε μόνο το ταμπελάκι*/
+setTimeout(function(){hookLogo();paint();},700);/*hhPolish54*/
 }catch(e){console.warn('hhPolish8',e);}})();</script>
 
 <script>/*hhPolish9*/(function(){try{
@@ -4852,7 +4848,7 @@ function zeroButtons(){try{
   /*hhPolish52: ο φρουρός κοιτάει μόνο τα ΔΙΚΑ ΤΟΥ κουμπιά, ώστε κανένα
     ξένο '.hh-gs-rm' (hh45-undo, hh-gs-cf, hh47-offm) να μην τον μπλοκάρει.*/
   if(!tools.querySelector('.hh-gs-rm.gone') && !tools.querySelector('.hh-gs-rm.nope')){
-    var g=document.createElement('span'); g.className='hh-gs-rm gone'; g.innerHTML='⛔ Αφαιρέθηκε από την πλατφόρμα';
+    var g=document.createElement('span'); g.className='hh-gs-rm gone'; g.innerHTML='⛔ Αφαιρέθηκε';/*hhPolish54: η πλήρης πρόταση μένει στο title (επόμενη γραμμή)*/
     g.title='Η αγγελία δεν υπάρχει πια στο site — μπαίνει κόκκινη ταινία και μπορεί να επανέλθει';
     g.onclick=function(ev){ev.stopPropagation();hhGsMarkGone(hid);};
     var n=document.createElement('span'); n.className='hh-gs-rm nope'; n.innerHTML='👎 Δεν μας αρέσει';
@@ -5514,7 +5510,7 @@ function addConfirm(){
     if(!b){ b=document.createElement('span'); b.className='hh-gs-rm hh-gs-cf'; tools.appendChild(b); }
     if(b.dataset.h!==hid+'|'+(anyCf?'1':'0')){
       b.dataset.h=hid+'|'+(anyCf?'1':'0');
-      b.innerHTML = anyCf ? '↩ Ακύρωση επιβεβαίωσης' : '✅ Επιβεβαιώνω ότι αφαιρέθηκε';
+      b.innerHTML = anyCf ? '↩ Ακύρωση επιβ.' : '✅ Επιβεβαιώνω';/*hhPolish54: η πλήρης πρόταση μένει στο title*/
       b.title = anyCf ? 'Επιστρέφει το σπίτι στα κανονικά αποτελέσματα'
                       : 'Βγάζει το σπίτι από τα αποτελέσματα — θα φαίνεται μόνο με το φίλτρο «Εμφάνιση διαγραμμένων σπιτιών»';
       b.style.cssText = anyCf ? 'border-color:var(--accent2);color:var(--accent2);cursor:pointer'
@@ -8382,7 +8378,7 @@ window.hhGsOffMarket=function(hid){
 };
 
 /* ---------- 3e. το κουμπί, αμέσως ΜΕΤΑ το «👎 Δεν μας αρέσει» ---------- */
-var BTN_LBL='🏷 Νοικιάστηκε / Πουλήθηκε';
+var BTN_LBL='🏷 Νοικιάστηκε/Πουλήθηκε';/*hhPolish54: η πλήρης πρόταση μένει στο title*/
 function offButtons(){
   try{
     var list=document.querySelectorAll('.hh-gs-tools');
@@ -8929,9 +8925,9 @@ function gmUrl(m,pin,c){
     if(rc&&isFinite(rc[0])&&isFinite(rc[1])){ la=f5(rc[0]); ln=f5(rc[1]); }
   }
   if(la==null){ var ct=m.getCenter(); la=f5(ct.lat); ln=f5(ct.lng); }
-  /* χωρίς API key: ?q=… ρίχνει πινέζα, /@…,Nz κρατά το ίδιο zoom */
-  if(pin) return 'https://www.google.com/maps?q='+la+','+ln+'&z='+z;
-  return 'https://www.google.com/maps/@'+la+','+ln+','+z+'z';
+  /* hhPolish53: ΠΑΝΤΑ ?q=… — ρίχνει πινέζα. Η μορφή /@…,Nz κεντράρει
+     χωρίς δείκτη και δεν χρησιμοποιείται πουθενά πια. */
+  return 'https://www.google.com/maps?q='+la+','+ln+'&z='+z;
 }
 function addGm(){
   try{
@@ -9815,6 +9811,728 @@ setInterval(function(){ install(); unstick(); }, 900);
 setTimeout(function(){ install(); unstick(); }, 1500);
 setTimeout(function(){ install(); unstick(); }, 3200);
 }catch(e){console.warn('hhPolish52',e);}})();</script>
+
+<script>/*hhPolish53*/(function(){try{
+if(window.__hh53on) return; window.__hh53on=true;
+
+/* ───────── βοηθοί ───────── */
+function f5(x){ return (+x).toFixed(5); }
+function num(x){ var v=parseFloat(x); return isFinite(v)?v:null; }
+function pair(sv){
+  try{ if(!sv) return null; var p=String(sv).split(',');
+       var a=num(p[0]), b=num(p[1]);
+       if(a!=null&&b!=null) return [a,b]; }catch(e){}
+  return null;
+}
+function mapOf(c){
+  try{
+    var A=window.__hhMaps||[];
+    for(var i=A.length-1;i>=0;i--){ var m=A[i];
+      try{ if(m&&m.getContainer&&m.getContainer()===c) return m; }catch(e){} }
+  }catch(e){}
+  return null;
+}
+function rowsAll(){
+  try{ return [].concat(allListings||[], extraListings||[]); }
+  catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }
+            catch(e2){ return []; } }
+}
+/* Εφεδρεία για τον μικρό χάρτη αγγελίας, με την ίδια σειρά προτίμησης που
+   ακολουθεί το drawMap(): διεύθυνση → πινέζα πλατφόρμας → διεύθυνση. */
+function rowCoords(c){
+  try{
+    var k=c.getAttribute&&c.getAttribute('data-k'); if(!k) return null;
+    var rs=rowsAll(), i, r;
+    for(i=0;i<rs.length;i++){
+      r=rs[i];
+      if(String(r.url)===k||String(r._dbId)===k||String(r.id)===k){
+        if(r.address&&(''+r.address).trim()&&r.address_lat!=null&&r.address_lng!=null)
+          return [+r.address_lat,+r.address_lng];
+        if(r.platform_lat!=null&&r.platform_lng!=null) return [+r.platform_lat,+r.platform_lng];
+        if(r.address_lat!=null&&r.address_lng!=null) return [+r.address_lat,+r.address_lng];
+        return null;
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+/* ───────── ΤΟ ΣΗΜΕΙΟ ΠΟΥ ΔΕΙΧΝΕΙ Ο ΧΑΡΤΗΣ ─────────
+   Σειρά: χρυσή πινέζα αγγελίας → πορτοκαλί εκτίμηση hhGeoCluster →
+   πινέζα θέσης ακινήτου → γραμμή της αγγελίας → κέντρο προβολής. */
+function pointOf(c,m,btn){
+  var v;
+  /* 1. το κουμπί κρέμεται πάνω σε πινέζα συγκεκριμένης αγγελίας */
+  try{
+    var n=btn;
+    while(n && n!==c && n.getAttribute){
+      var la=num(n.getAttribute('data-hh-lat')), ln=num(n.getAttribute('data-hh-lng'));
+      if(la!=null&&ln!=null) return {lat:la,lng:ln,approx:false,src:'ad'};
+      n=n.parentNode;
+    }
+  }catch(e){}
+  /* 2. πορτοκαλί εκτίμηση της ομαδοποιημένης κάρτας — ό,τι βλέπει ο χρήστης */
+  try{ v=m&&m.__hhEst; if(v&&isFinite(v[0])&&isFinite(v[1]))
+       return {lat:+v[0],lng:+v[1],approx:false,src:'est'}; }catch(e){}
+  try{ v=pair(c.getAttribute&&c.getAttribute('data-hh-est'));
+       if(v) return {lat:v[0],lng:v[1],approx:false,src:'est'}; }catch(e){}
+  /* 3. η πινέζα θέσης του ακινήτου */
+  try{ v=m&&m.__hhPt; if(v&&isFinite(v[0])&&isFinite(v[1]))
+       return {lat:+v[0],lng:+v[1],approx:false,src:'pt'}; }catch(e){}
+  try{ v=pair(c.getAttribute&&c.getAttribute('data-hh-pt'));
+       if(v) return {lat:v[0],lng:v[1],approx:false,src:'pt'}; }catch(e){}
+  /* 4. από τη γραμμή της αγγελίας (data-k) */
+  try{ v=rowCoords(c); if(v) return {lat:v[0],lng:v[1],approx:false,src:'row'}; }catch(e){}
+  /* 5. καμία καταγεγραμμένη θέση: κέντρο προβολής, και το λέμε στο tooltip */
+  try{ var ct=m&&m.getCenter&&m.getCenter();
+       if(ct&&isFinite(ct.lat)&&isFinite(ct.lng))
+         return {lat:+ct.lat,lng:+ct.lng,approx:true,src:'center'}; }catch(e){}
+  return null;
+}
+function zoomOf(m,lo,hi,dflt){
+  try{ var z=Math.round(m.getZoom()); if(isFinite(z)) return Math.max(lo,Math.min(hi,z)); }catch(e){}
+  return dflt;
+}
+
+/* ───────── URL — ΠΑΝΤΑ με πινέζα ───────── */
+function gmUrl(p,m){
+  /* Χωρίς API key, μόνο το ?q=<lat>,<lng> ρίχνει δείκτη.
+     Το /@<lat>,<lng>,<z>z κεντράρει χωρίς δείκτη — δεν το χρησιμοποιούμε. */
+  return 'https://www.google.com/maps?q='+f5(p.lat)+','+f5(p.lng)+'&z='+zoomOf(m,1,21,15);
+}
+function osmUrl(p,m){
+  var la=f5(p.lat), ln=f5(p.lng), z=zoomOf(m,1,19,15);
+  return 'https://www.openstreetmap.org/?mlat='+la+'&mlon='+ln+'#map='+z+'/'+la+'/'+ln;
+}
+
+var TIP = {
+  gm  : 'Άνοιγμα αυτής της θέσης στο Google Maps, σε νέα καρτέλα',
+  gmA : 'Άνοιγμα στο Google Maps, σε νέα καρτέλα — κατά προσέγγιση: δεν υπάρχει '
+       +'καταγεγραμμένη θέση, χρησιμοποιείται το κέντρο του χάρτη',
+  osm : 'Άνοιγμα αυτού του χάρτη στο OpenStreetMap, σε νέα καρτέλα',
+  osmA: 'Άνοιγμα στο OpenStreetMap, σε νέα καρτέλα — κατά προσέγγιση: δεν υπάρχει '
+       +'καταγεγραμμένη θέση, χρησιμοποιείται το κέντρο του χάρτη'
+};
+
+/* Υπολογισμός για ένα κουμπί: {url,title} ή null */
+function forBtn(btn){
+  try{
+    var gm=btn.classList.contains('hh-gm-btn');
+    var c=btn.closest?btn.closest('.leaflet-container'):null;
+    if(!c) return null;
+    var m=mapOf(c);
+    var p=pointOf(c,m,btn);
+    if(!p) return null;
+    return {
+      url  : gm?gmUrl(p,m):osmUrl(p,m),
+      title: gm?(p.approx?TIP.gmA:TIP.gm):(p.approx?TIP.osmA:TIP.osm),
+      point: p, gm:gm
+    };
+  }catch(e){}
+  return null;
+}
+
+/* ───────── κρατάμε το href σωστό (μεσαίο κλικ / αντιγραφή συνδέσμου) ───────── */
+function refresh(){
+  try{
+    [].forEach.call(document.querySelectorAll('.hh-gm-btn,.hh-osm-btn'),function(b){
+      var r=forBtn(b); if(!r) return;
+      if(b.getAttribute('href')!==r.url) b.setAttribute('href',r.url);
+      if(b.getAttribute('title')!==r.title) b.setAttribute('title',r.title);
+    });
+  }catch(e){}
+}
+
+/* ───────── το κλικ ─────────
+   Συλλαμβάνουμε στη φάση capture, πριν φτάσει στους χειριστές των
+   hhPolish21/hhPolish51, και κάνουμε ό,τι έκαναν εκείνοι — με το σωστό URL.
+   Θέση, στυλ και άνοιγμα σε καρτέλα παρασκηνίου μένουν ακριβώς ίδια. */
+document.addEventListener('click',function(ev){
+  try{
+    var t=ev.target;
+    if(t&&t.nodeType===3) t=t.parentNode;
+    if(!t||!t.closest) return;
+    var btn=t.closest('.hh-gm-btn')||t.closest('.hh-osm-btn');
+    if(!btn) return;
+    var r=forBtn(btn);
+    if(!r) return;                                   /* άσε το παλιό να παίξει */
+    btn.setAttribute('href',r.url);
+    btn.setAttribute('title',r.title);
+    try{ ev.stopImmediatePropagation(); }catch(e){}
+    try{ ev.stopPropagation(); }catch(e){}
+    if(r.gm){
+      /* το hhPolish51 άνοιγε μόνο του, σε καρτέλα παρασκηνίου */
+      try{ if(ev.preventDefault) ev.preventDefault(); }catch(e){}
+      try{ if(window.hhBgOpen){ window.hhBgOpen(r.url); return; } }catch(e){}
+      try{ window.open(r.url,'_blank','noopener'); }catch(e){}
+    }
+    /* OpenStreetMap: όπως και πριν, στο hhPolish21, το target="_blank" του
+       ίδιου του συνδέσμου κάνει το άνοιγμα — δεν ακυρώνουμε το default. */
+  }catch(e){}
+},true);
+
+/* ενημέρωση href και όσο το ποντίκι πλησιάζει, για το μεσαίο κλικ */
+['mouseover','mousedown','pointerdown','focusin'].forEach(function(t){
+  document.addEventListener(t,function(ev){
+    try{
+      var n=ev.target;
+      if(n&&n.nodeType===3) n=n.parentNode;
+      if(!n||!n.closest) return;
+      var b=n.closest('.hh-gm-btn')||n.closest('.hh-osm-btn');
+      if(!b) return;
+      var r=forBtn(b); if(!r) return;
+      b.setAttribute('href',r.url); b.setAttribute('title',r.title);
+    }catch(e){}
+  },true);
+});
+
+setTimeout(refresh,950); setTimeout(refresh,1600); setInterval(refresh,900);
+
+/* εκτεθειμένα για έλεγχο */
+window.__hh53={refresh:refresh,forBtn:forBtn,pointOf:pointOf,gmUrl:gmUrl,osmUrl:osmUrl,mapOf:mapOf};
+}catch(e){console.warn('hhPolish53',e);}})();</script>
+<script>/*hhPolish54*/(function(){try{
+if(window.__hh54) return; window.__hh54=1;
+
+/* ╔══════════════════════════════════════════════════════════════════════╗
+   ║ hhPolish54 — πέντε διορθώσεις από screenshots του Dusty              ║
+   ║  2. μπάρα κουμπιών ομαδοποιημένης κάρτας σε μία γραμμή               ║
+   ║  3. στοίβαγμα πίνακα φίλτρων / controls χάρτη + υπόμνημα vs μπαλόνι  ║
+   ║  4. σκούρα πλακίδια χάρτη στο σκούρο θέμα                            ║
+   ║  5. ειδοποιήσεις αναίρεσης κάτω δεξιά (20s, παλμός, στοίβα)          ║
+   ║ (Η 1η — αφαίρεση του ταμπελάκιου «tospitimou» — έγινε στην πηγή.)    ║
+   ║ Όλα αμυντικά: αν λείπει στοιχείο ή συνάρτηση, δεν γίνεται τίποτα.    ║
+   ╚══════════════════════════════════════════════════════════════════════╝ */
+
+/* ─────────────────────────── μικροβοηθοί ─────────────────────────────── */
+function $(id){ try{ return document.getElementById(id); }catch(e){ return null; } }
+function isLight(){ try{ return !!(document.body && document.body.classList.contains('light')); }catch(e){ return false; } }
+function isDarkTheme(){ return !isLight(); }
+function reduced(){
+  try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+  catch(e){ return false; }
+}
+/* ACTION_STACK / REDO_STACK είναι const στο global lexical scope: προσβάσιμα
+   με σκέτο όνομα από επόμενο block, αλλά ΟΧΙ ως window.* (όπως στο hhPolish45). */
+function stacks(){
+  try{ if(Array.isArray(ACTION_STACK)&&Array.isArray(REDO_STACK)) return {U:ACTION_STACK,R:REDO_STACK}; }catch(e){}
+  return null;
+}
+function upd(){ try{ if(typeof _upUndoRedo==='function') _upUndoRedo(); }catch(e){} }
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   0.  ΦΥΛΛΟ ΣΤΥΛ — ένα, για τις διορθώσεις 2, 3, 4 και 5
+   ══════════════════════════════════════════════════════════════════════ */
+function css(){
+  try{
+    if($('hh-polish54-css')) return;
+    var st=document.createElement('style'); st.id='hh-polish54-css';
+    st.textContent=
+
+/* ── 2. Η ΜΠΑΡΑ ΤΗΣ ΟΜΑΔΟΠΟΙΗΜΕΝΗΣ ΚΑΡΤΑΣ ΣΕ ΜΙΑ ΓΡΑΜΜΗ ───────────────
+      Το πλάτος της .lo-featured είναι σταθερό (820px → 778px καθαρά), άρα
+      το σπάσιμο ΔΕΝ εξαρτιόταν από το πλάτος του παραθύρου: τα πέντε
+      κουμπιά ζητούσαν 789px. Κοντύτερες ετικέτες (στην πηγή) + στενότερο
+      padding/gap εδώ. Το «Κοινοποίηση» κρατά το margin-left:auto του
+      hhPolish18, δηλαδή μένει καρφωμένο δεξιά. */
+      '.hh-gs-tools{column-gap:7px!important}'
+     +'.hh-gs-tools>.modal-btn,.hh-gs-tools>.hh-gs-rm,.hh-gs-tools>.hh45-rm{'
+     +'padding:0 9px!important;white-space:nowrap!important;flex:0 0 auto!important}'
+     +'body.light .hh-gs-tools>.hh45-rm{padding:0 9px!important}'
+     +'body.light .hh-gs-tools>.hh-gs-rm,body.light .hh-gs-tools>.modal-btn{padding:0 9px!important}'
+      /* Όταν εμφανίζεται και το «✅ Επιβεβαιώνω» (σπίτι σημειωμένο ως
+         αφαιρεμένο) τα κουμπιά γίνονται έξι και μαζί με τα αστέρια δεν
+         χωρούν. Τότε — και ΜΟΝΟ τότε — τα αστέρια παίρνουν δική τους
+         γραμμή, όπως κάνουν ήδη όποτε υπάρχει το .hh-rv (width:100%),
+         και η σειρά των κουμπιών μένει πάλι μία. */
+     +'.hh-gs-tools:has(>.hh-gs-cf)>.card-stars{flex:0 0 100%!important}'
+      /* πραγματικά στενό παράθυρο (ίδιο breakpoint με το .lo-featured):
+         η σειρά κυλάει οριζόντια, δεν σπάει σε δεύτερη γραμμή */
+     +'@media (max-width:900px){'
+     +'.hh-gs-tools.hh-gs-tools{flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;'
+     +'-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:3px}'
+     +'.hh-gs-tools.hh-gs-tools>.hh-rv{width:auto!important;flex:0 0 auto!important;margin-top:0!important}'
+     +'.hh-gs-tools.hh-gs-tools>.card-stars{flex:0 0 auto!important}'
+     +'}'
+
+/* ── 3α. ΣΤΟΙΒΑΓΜΑ: Ο ΠΙΝΑΚΑΣ ΦΙΛΤΡΩΝ ΠΑΝΩ ΑΠΟ ΤΑ CONTROLS ΤΟΥ ΧΑΡΤΗ ──
+      #hh-fpanel-real → z-index:940 (position:fixed).
+      Leaflet .leaflet-top/.leaflet-bottom → z-index:1000 (leaflet.min.css).
+      Ο .leaflet-container παίρνει από το Leaflet inline position:relative
+      ΧΩΡΙΣ z-index, άρα δεν είναι stacking context και το 1000 των γωνιών
+      συναγωνίζεται τον πίνακα στο root — και κερδίζει.
+      Σωστή λύση: απομονώνουμε τον χάρτη (isolation:isolate). Το 1000 μένει
+      ΜΕΣΑ στον χάρτη, ο πίνακας στο 940 του root είναι πάντα πιο πάνω.
+      Κανένα αυθαίρετο τεράστιο νούμερο. */
+     +'.leaflet-container,#map,#hh-gs-map,#hh-lo-map{isolation:isolate}'
+
+/* ── 3β. ΥΠΟΜΝΗΜΑ vs ΜΠΑΛΟΝΙ «n κατοικίες στην προβολή» ────────────────
+      Το .map-legend είναι Leaflet control (topright). Το #hhMapCount ήταν
+      position:absolute;top:8px;left:50%  →  σε πλατύ υπόμνημα ακουμπούσαν.
+      Τα βάζουμε στην ΙΔΙΑ γωνία (πάνω δεξιά): το Leaflet στοιβάζει τα
+      controls κατακόρυφα (float:right;clear:both), άρα σύγκρουση ΔΕΝ γίνεται
+      εξ ορισμού. Το μπαλόνι μπαίνει πρώτο, δηλαδή πάνω από το υπόμνημα. */
+     +'#hhMapCount.hh54-inflow{position:relative!important;top:auto!important;'
+     +'left:auto!important;right:auto!important;bottom:auto!important;'
+     +'transform:none!important;pointer-events:none!important;'
+     +'max-width:100%;box-sizing:border-box;text-align:center;white-space:nowrap}'
+     +'.leaflet-top.leaflet-right{max-width:min(66%,340px)}'
+     +'.map-legend{max-width:100%;box-sizing:border-box}'
+
+/* ── 4. ΣΚΟΥΡΟΣ ΧΑΡΤΗΣ — αναγνωσιμότητα πινεζών πάνω στο dark_matter ───
+      Οι πινέζες των μικρών χαρτών είναι L.circleMarker, δηλαδή <path> στο
+      .leaflet-overlay-pane με fill/stroke ως attributes — άρα οι CSS
+      κανόνες κερδίζουν. Χρυσό (#c8a84b, 7.7:1) και πορτοκαλί (#ea8a2a,
+      6.9:1) διαβάζονται άνετα και μένουν ΩΣ ΕΧΟΥΝ. Αλλάζουν μόνο:
+        • το γκρι περίγραμμα #333 (γινόταν αόρατο στο μαύρο),
+        • το #7a2f2f των «εκτός ομάδας»,
+        • το #5b5b5b γέμισμα των νεκρών αγγελιών,
+        • μπλε #2563eb και πράσινο #15803d ανεβαίνουν λίγο (≈3.4:1 → ≈5:1).
+      Οι πινέζες του κύριου χάρτη είναι L.divIcon με λευκά γράμματα πάνω σε
+      συμπαγές χρώμα — δεν χάνουν αντίθεση, δεν τις αγγίζουμε. */
+     +'.hh54-darkmap .leaflet-overlay-pane path[stroke="#333"]{stroke:#ded8c8!important;stroke-opacity:.8!important}'
+     +'.hh54-darkmap .leaflet-overlay-pane path[stroke="#7a2f2f"]{stroke:#e39a9a!important}'
+     +'.hh54-darkmap .leaflet-overlay-pane path[fill="#5b5b5b"]{fill:#8e8e8e!important}'
+     +'.hh54-darkmap .leaflet-overlay-pane path[fill="#2563eb"]{fill:#5b8cf2!important}'
+     +'.hh54-darkmap .leaflet-overlay-pane path[fill="#15803d"]{fill:#2ea85c!important}'
+      /* εφεδρεία, αν το CARTO απαντήσει με σφάλμα: OSM + σκούρο φίλτρο
+         ΜΟΝΟ στα πλακίδια (οι πινέζες ζουν σε άλλα panes) */
+     +'.hh54-tilefilter .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) '
+     +'brightness(.92) contrast(.88) saturate(.72)}'
+
+/* ── 5. ΕΙΔΟΠΟΙΗΣΕΙΣ ΑΝΑΙΡΕΣΗΣ — ΚΑΤΩ ΔΕΞΙΑ, ΣΤΟΙΒΑ ───────────────────
+      z-index 2147483050: κάτω από το μενού «Κοινοποίηση» (#hh-share-menu,
+      2147483100) ώστε να μην το σκεπάζει ποτέ, πάνω από το .toast (3000).
+      Τα zoom controls του Leaflet είναι πάνω αριστερά μέσα στον χάρτη —
+      η στοίβα είναι κάτω δεξιά, άρα δεν τα ακουμπά· και ο περιέκτης έχει
+      pointer-events:none ώστε να μη «τρώει» κλικ πουθενά. */
+     +'#hh54-notes{position:fixed;right:20px;bottom:14px;z-index:2147483050;'
+     +'display:flex;flex-direction:column;align-items:flex-end;gap:8px;'
+     +'pointer-events:none;max-width:min(380px,calc(100vw - 40px))}'
+     +'.hh54-note{position:relative;pointer-events:auto;box-sizing:border-box;'
+     +'display:flex;align-items:center;gap:9px;max-width:100%;'
+     +'background:var(--surface2,#222119);border:1px solid var(--accent2,#7eb89a);'
+     +'color:var(--text,#e8e4dc);border-radius:10px;padding:9px 11px;'
+     +'font-size:12.5px;line-height:1.35;box-shadow:0 6px 22px rgba(0,0,0,.5);'
+     +'animation:hh54-in .18s ease-out both}'
+     +'body.light .hh54-note{background:#fffdf7;border-color:var(--accent2,#4e8a6c);'
+     +'color:var(--text,#23211c);box-shadow:0 6px 20px rgba(0,0,0,.18)}'
+      /* ο απαλός παλμός ζει σε ::after, ώστε να μην πειράζει το box-shadow
+         και να ακολουθεί μόνο του το χρώμα του θέματος */
+     +'.hh54-note::after{content:"";position:absolute;inset:-1px;border-radius:11px;'
+     +'border:1px solid var(--accent2,#7eb89a);opacity:0;pointer-events:none;'
+     +'animation:hh54-ring 2.4s ease-in-out infinite}'
+     +'.hh54-note-tx{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}'
+     +'.hh54-note-btn{flex:0 0 auto;cursor:pointer;white-space:nowrap;'
+     +'background:none;font:inherit;font-weight:700;font-size:12px;'
+     +'border:1px solid var(--accent2,#7eb89a);color:var(--accent2,#7eb89a);'
+     +'border-radius:7px;padding:4px 9px}'
+     +'.hh54-note-btn:hover{background:rgba(126,184,154,.16)}'
+     +'body.light .hh54-note-btn:hover{background:rgba(78,138,108,.14)}'
+     +'.hh54-note-btn[disabled]{opacity:.45;cursor:default}'
+     +'.hh54-note-x{flex:0 0 auto;cursor:pointer;background:none;border:0;'
+     +'font:inherit;font-size:13px;line-height:1;padding:2px 3px;'
+     +'color:var(--text3,#5c5a55)}'
+     +'.hh54-note-x:hover{color:var(--text,#e8e4dc)}'
+     +'body.light .hh54-note-x:hover{color:#23211c}'
+     +'.hh54-note.hh54-out{animation:hh54-out .28s ease-in forwards}'
+     +'.hh54-note.hh54-out::after{animation:none;opacity:0}'
+     +'@keyframes hh54-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}'
+     +'@keyframes hh54-out{to{opacity:0;transform:translateY(6px)}}'
+     +'@keyframes hh54-ring{0%,100%{opacity:0;transform:scale(1)}'
+     +'50%{opacity:.55;transform:scale(1.035)}}'
+      /* σεβασμός στο prefers-reduced-motion: ο παλμός φεύγει τελείως */
+     +'@media (prefers-reduced-motion: reduce){'
+     +'.hh54-note,.hh54-note.hh54-out{animation:none!important}'
+     +'.hh54-note::after{animation:none!important;opacity:0!important}'
+     +'}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+}
+css();
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   3β.  ΤΟ ΜΠΑΛΟΝΙ ΜΠΑΙΝΕΙ ΠΑΝΩ ΑΠΟ ΤΟ ΥΠΟΜΝΗΜΑ, ΣΤΗΝ ΙΔΙΑ ΣΤΗΛΗ
+   ══════════════════════════════════════════════════════════════════════ */
+function placeMapCount(){
+  try{
+    var b=$('hhMapCount'); if(!b) return;
+    var mp=$('map'); if(!mp) return;
+    var corner=null;
+    try{ corner=mp.querySelector('.leaflet-control-container .leaflet-top.leaflet-right'); }catch(e){}
+    if(!corner) return;
+    if(b.parentNode===corner) return;
+    if(!b.classList.contains('leaflet-control')) b.classList.add('leaflet-control');
+    if(!b.classList.contains('hh54-inflow')) b.classList.add('hh54-inflow');
+    corner.insertBefore(b, corner.firstChild);   /* πρώτο = πιο πάνω */
+  }catch(e){}
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   4.  ΣΚΟΥΡΑ ΠΛΑΚΙΔΙΑ ΣΤΟ ΣΚΟΥΡΟ ΘΕΜΑ
+   ══════════════════════════════════════════════════════════════════════
+   Πάροχος χωρίς κλειδί: CARTO dark_matter (dark_all). Η αναφορά του
+   μπαίνει ΔΙΠΛΑ στην υπάρχουσα αναφορά OpenStreetMap, όπως απαιτεί.
+   ΣΗΜΕΙΩΣΗ: το hhPolish1 είχε σημειώσει «CARTO basemaps need an API key
+   since Sep 2026» — γι' αυτό υπάρχει εφεδρεία: αν τα πλακίδια απαντήσουν
+   με σφάλμα, γυρνάμε στο OSM με σκούρο φίλτρο, ώστε ο χάρτης να μη μείνει
+   ποτέ άδειος στο σκούρο θέμα.                                         */
+var DARK_URL='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+var CARTO_ATTR='&copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
+var ERR_LIMIT=6, ERR_GRACE=8000;
+
+function isTileLayer(l){
+  try{
+    if(!l) return false;
+    if(typeof window.L!=='undefined' && L && L.TileLayer && (l instanceof L.TileLayer)) return true;
+    return (typeof l.setUrl==='function' && typeof l._url==='string');
+  }catch(e){ return false; }
+}
+function tileLayersOf(m){
+  var out=[];
+  try{
+    if(m && typeof m.eachLayer==='function'){ m.eachLayer(function(l){ if(isTileLayer(l)) out.push(l); }); return out; }
+    if(m && m._layers){ for(var k in m._layers){ if(isTileLayer(m._layers[k])) out.push(m._layers[k]); } }
+  }catch(e){}
+  return out;
+}
+function containerOf(m){
+  try{ return (m && typeof m.getContainer==='function') ? m.getContainer() : null; }catch(e){ return null; }
+}
+function setUrl(l,u){
+  try{ if(l._url===u) return false; l.setUrl(u); return true; }
+  catch(e){ try{ l._url=u; if(l.redraw) l.redraw(); return true; }catch(e2){ return false; } }
+}
+function degrade(l,m){
+  try{
+    if(l.__hh54degraded) return;
+    l.__hh54degraded=1;
+    if(l.__hh54light) setUrl(l,l.__hh54light);
+    var c=containerOf(m); if(c && c.classList) c.classList.add('hh54-tilefilter');
+    try{ if(m.attributionControl && m.attributionControl.removeAttribution) m.attributionControl.removeAttribution(CARTO_ATTR); }catch(e){}
+  }catch(e){}
+}
+function watchErrors(l,m){
+  try{
+    if(l.__hh54watch || typeof l.on!=='function') return;
+    l.__hh54watch=1;
+    l.on('tileerror', function(){
+      try{
+        if(window.__hh54ForceCarto) return;          /* διακόπτης για δοκιμές */
+        if(l.__hh54degraded || !l.__hh54darkAt) return;
+        l.__hh54err=(l.__hh54err||0)+1;
+        if(l.__hh54err>=ERR_LIMIT && (Date.now()-l.__hh54darkAt)>ERR_GRACE) degrade(l,m);
+      }catch(e){}
+    });
+  }catch(e){}
+}
+function applyTiles(){
+  var dark=isDarkTheme(), touched=0;
+  try{
+    var A=window.__hhMaps||[];
+    for(var i=0;i<A.length;i++){
+      var m=A[i]; if(!m) continue;
+      var c=containerOf(m);
+      if(c && !c.parentNode) continue;               /* χάρτης που αφαιρέθηκε */
+      var ls=tileLayersOf(m);
+      for(var j=0;j<ls.length;j++){
+        var l=ls[j];
+        if(typeof l.__hh54light!=='string' && typeof l._url==='string' && l._url.indexOf('cartocdn')<0)
+          l.__hh54light=l._url;                      /* το αρχικό OSM template */
+        watchErrors(l,m);
+        if(dark){
+          if(l.__hh54degraded) continue;
+          l.__hh54darkAt=l.__hh54darkAt||Date.now();
+          if(setUrl(l,DARK_URL)) touched++;
+        }else{
+          l.__hh54darkAt=0; l.__hh54err=0; l.__hh54degraded=0;
+          if(l.__hh54light && setUrl(l,l.__hh54light)) touched++;
+        }
+      }
+      /* αναφορά CARTO δίπλα στην OSM (όπου υπάρχει attributionControl) */
+      try{
+        var ac=m.attributionControl;
+        if(ac){
+          if(dark){ if(ac.addAttribution) ac.addAttribution(CARTO_ATTR); }
+          else    { if(ac.removeAttribution) ac.removeAttribution(CARTO_ATTR); }
+        }
+      }catch(e){}
+      /* κλάση για την αναγνωσιμότητα των πινεζών */
+      try{
+        if(c && c.classList){
+          if(dark) c.classList.add('hh54-darkmap');
+          else { c.classList.remove('hh54-darkmap'); c.classList.remove('hh54-tilefilter'); }
+        }
+      }catch(e){}
+    }
+  }catch(e){}
+  return touched;
+}
+/* Νέο tile layer που φτιάχνεται ΕΝΩ το θέμα είναι σκούρο: ξεκινά κατευθείαν
+   σκούρο, χωρίς να αναβοσβήσει λευκό μέχρι το επόμενο tick. */
+function hookTileLayer(){
+  try{
+    if(typeof window.L==='undefined' || !L || typeof L.tileLayer!=='function' || L.tileLayer.__hh54) return;
+    var _tl=L.tileLayer;
+    var w=function(url,opt){
+      var u=url;
+      try{
+        if(isDarkTheme() && typeof url==='string' && url.indexOf('cartocdn')<0 && /openstreetmap/i.test(url)) u=DARK_URL;
+      }catch(e){}
+      var l=_tl.call(this,u,opt);
+      try{ if(u!==url){ l.__hh54light=url; l.__hh54darkAt=Date.now(); } }catch(e){}
+      return l;
+    };
+    for(var k in _tl){ try{ w[k]=_tl[k]; }catch(e){} }
+    w.__hh54=1;
+    L.tileLayer=w;
+  }catch(e){}
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   5.  ΕΙΔΟΠΟΙΗΣΕΙΣ ΑΝΑΙΡΕΣΗΣ
+   ══════════════════════════════════════════════════════════════════════ */
+var LIFE=20000, HOLD=6000, MAXN=4, lastNoticeAt=0;
+
+function box(){
+  var b=$('hh54-notes');
+  if(!b){
+    try{
+      b=document.createElement('div'); b.id='hh54-notes';
+      b.setAttribute('aria-live','polite');
+      (document.body||document.documentElement).appendChild(b);
+    }catch(e){ return null; }
+  }
+  return b;
+}
+/* Κάτω δεξιά — αλλά όχι πάνω στα κουμπιά χάρτη (.hh-gm-btn/.hh-osm-btn,
+   right:8px;bottom:22px μέσα στον χάρτη) όταν ο χάρτης φτάνει ως κάτω δεξιά.
+   Και το .toast (bottom:80px;right:20px) ανεβαίνει όσο η στοίβα ζει. */
+function place(){
+  try{
+    var b=$('hh54-notes'); if(!b) return;
+    var bot=14;
+    try{
+      var mp=$('map');
+      if(mp && mp.offsetParent!==null){
+        var r=mp.getBoundingClientRect();
+        var vw=window.innerWidth||0, vh=window.innerHeight||0;
+        if(r.width>0 && r.bottom>vh-90 && r.right>vw-90 && r.top<vh) bot=62;
+      }
+    }catch(e){}
+    b.style.bottom=bot+'px';
+    var t=$('toast');
+    if(t){
+      var n=b.children.length;
+      if(n){ t.style.bottom=(bot+Math.round(b.getBoundingClientRect().height)+16)+'px'; }
+      else { t.style.bottom=''; }
+    }
+  }catch(e){}
+}
+function drop(el){
+  try{
+    if(!el||el.__hh54gone) return; el.__hh54gone=1;
+    if(el.__hh54t){ clearTimeout(el.__hh54t); el.__hh54t=0; }
+    if(reduced()){ if(el.parentNode) el.parentNode.removeChild(el); place(); return; }
+    el.classList.add('hh54-out');
+    setTimeout(function(){ try{ if(el.parentNode) el.parentNode.removeChild(el); }catch(e){} place(); },300);
+  }catch(e){}
+}
+function arm(el,ms){
+  try{
+    if(el.__hh54t) clearTimeout(el.__hh54t);
+    el.__hh54t=setTimeout(function(){ drop(el); }, ms);
+  }catch(e){}
+}
+/* Η ΣΤΟΙΒΑ: ο περιέκτης είναι flex-column αγκυρωμένος κάτω δεξιά, οπότε
+   κάθε νέα ειδοποίηση μπαίνει ΤΕΛΕΥΤΑΙΑ — εμφανίζεται στην αρχική θέση,
+   κάτω, και οι προηγούμενες ανεβαίνουν. Τρεις ή περισσότερες: η παλαιότερη
+   πάντα πιο ψηλά.                                                       */
+function notice(text, btnLabel, btnTitle, onClick){
+  try{
+    var b=box(); if(!b) return null;
+    while(b.children.length>=MAXN){ try{ b.removeChild(b.firstChild); }catch(e){ break; } }
+    var el=document.createElement('div');
+    el.className='hh54-note'; el.setAttribute('role','status');
+    var tx=document.createElement('span'); tx.className='hh54-note-tx';
+    tx.textContent=String(text==null?'':text);
+    el.appendChild(tx);
+    if(btnLabel && typeof onClick==='function'){
+      var bt=document.createElement('button');
+      bt.type='button'; bt.className='hh54-note-btn';
+      bt.textContent=btnLabel;
+      bt.title=btnTitle||btnLabel;
+      bt.onclick=function(ev){
+        try{ if(ev){ ev.stopPropagation(); if(ev.preventDefault) ev.preventDefault(); } }catch(e){}
+        try{ bt.disabled=true; onClick(); }catch(e){}
+        drop(el);
+      };
+      el.appendChild(bt);
+    }
+    var x=document.createElement('button');
+    x.type='button'; x.className='hh54-note-x'; x.textContent='✕';
+    x.title='Κλείσιμο';
+    x.onclick=function(ev){ try{ if(ev){ ev.stopPropagation(); if(ev.preventDefault) ev.preventDefault(); } }catch(e){} drop(el); };
+    el.appendChild(x);
+    el.onmouseenter=function(){ try{ if(el.__hh54t){ clearTimeout(el.__hh54t); el.__hh54t=0; } }catch(e){} };
+    el.onmouseleave=function(){ if(!el.__hh54gone) arm(el,HOLD); };
+    b.appendChild(el);
+    arm(el,LIFE);
+    place();
+    lastNoticeAt=Date.now();
+    return el;
+  }catch(e){ return null; }
+}
+window.hhNotice=function(text,btnLabel,onClick,btnTitle){ return notice(text,btnLabel,btnTitle,onClick); };
+
+/* ---------- αναίρεση / επανάληψη ΣΥΓΚΕΚΡΙΜΕΝΗΣ ενέργειας ----------
+   Ίδια σύμβαση με το doUndo του hhPolish45: αν η ενέργεια είναι η κορυφή
+   της στοίβας περνάμε από το κανονικό undoAction (ώστε να δουλέψει το ↪),
+   αλλιώς τη βγάζουμε από τη στοίβα μόνοι μας.                         */
+function undoOne(a){
+  try{
+    var S=stacks(); if(!S||!a) { notice('⚠ Η αναίρεση δεν είναι διαθέσιμη'); return; }
+    var i=S.U.indexOf(a);
+    if(i<0){ notice('Η ενέργεια δεν είναι πια διαθέσιμη για αναίρεση'); return; }
+    if(a.__hh45busy) return;
+    a.__hh45busy=1;
+    var fin=function(){ a.__hh45busy=0; upd(); };
+    if(i===S.U.length-1 && typeof window.undoAction==='function'){
+      Promise.resolve(window.undoAction()).then(fin,function(){ notice('⚠ Η αναίρεση απέτυχε'); fin(); });
+    }else{
+      S.U.splice(i,1); S.R.push(a);
+      Promise.resolve(a.undo&&a.undo()).then(fin,function(){ notice('⚠ Η αναίρεση απέτυχε'); fin(); });
+    }
+  }catch(e){ notice('⚠ Η αναίρεση απέτυχε'); }
+}
+function redoOne(a){
+  try{
+    var S=stacks(); if(!S||!a){ notice('⚠ Η επανάληψη δεν είναι διαθέσιμη'); return; }
+    var i=S.R.indexOf(a);
+    if(i<0){ notice('Η ενέργεια δεν είναι πια διαθέσιμη για επανάληψη'); return; }
+    if(a.__hh45busy) return;
+    a.__hh45busy=1;
+    var fin=function(){ a.__hh45busy=0; upd(); };
+    if(i===S.R.length-1 && typeof window.redoAction==='function'){
+      Promise.resolve(window.redoAction()).then(fin,function(){ notice('⚠ Η επανάληψη απέτυχε'); fin(); });
+    }else{
+      S.R.splice(i,1); S.U.push(a);
+      Promise.resolve(a.redo&&a.redo()).then(fin,function(){ notice('⚠ Η επανάληψη απέτυχε'); fin(); });
+    }
+  }catch(e){ notice('⚠ Η επανάληψη απέτυχε'); }
+}
+function nameOf(a){
+  var s='';
+  try{ s=String((a&&(a.desc||a.label))||''); }catch(e){ s=''; }
+  return s||'Ενέργεια';
+}
+function fire(a,kind){
+  try{
+    if(!a) return;
+    var nm=nameOf(a);
+    if(kind==='undone'){
+      notice('↩ Αναιρέθηκε — '+nm,
+             (typeof a.redo==='function')?'↪ Επανάληψη':'',
+             'Επανάληψη: '+nm,
+             function(){ redoOne(a); });
+      return;
+    }
+    var pre=(kind==='redo')?'↪ Επανάληψη — ':'✔ ';
+    notice(pre+nm,
+           (typeof a.undo==='function')?'↩ Αναίρεση':'',
+           'Αναίρεση: '+nm,
+           function(){ undoOne(a); });
+  }catch(e){}
+}
+
+/* ---------- ΑΝΙΧΝΕΥΣΗ: παρακολουθούμε τις ΣΤΟΙΒΕΣ, δεν τυλίγουμε ----------
+   Το hhPolish45 ξανατυλίγει μόνο του το pushAction κάθε 700ms· ένα δικό μας
+   τύλιγμα θα γινόταν πόλεμος από wrappers που μεγαλώνει στο άπειρο. Αντ' αυτού
+   διαβάζουμε τις ACTION_STACK / REDO_STACK — έτσι ΚΑΘΕ καταχωρημένη ενέργεια
+   αναίρεσης (hhPolish45, hhPolish47, hhPolish52, ή ο πυρήνας) βγάζει
+   ειδοποίηση, χωρίς να πειράζουμε καμία συνάρτηση.
+     push  →  U+1, R=0 και νέα κορυφή
+     undo  →  U-1, R+1        (και το doUndo του hhPolish45 με splice)
+     redo  →  U+1, R-1        */
+var primed=false, lastU=0, lastR=0, lastTop=null;
+function pollStacks(){
+  try{
+    var S=stacks(); if(!S) return;
+    var u=S.U.length, r=S.R.length;
+    var top=u?S.U[u-1]:null;
+    if(!primed){ primed=true; lastU=u; lastR=r; lastTop=top; return; }
+    if(r>lastR){
+      fire(S.R[r-1],'undone');
+    }else if(top && top!==lastTop){
+      fire(top,(u===lastU+1 && r===lastR-1)?'redo':'done');
+    }
+    lastU=u; lastR=r; lastTop=top;
+  }catch(e){}
+}
+
+/* ---------- ΣΥΝΕΡΓΑΣΙΑ ΜΕ ΤΟ showToast ----------
+   Τα hhPolish45 / hhPolish47 / hhPolish52 ειδοποιούν μέσω showToast. Τα
+   μηνύματα αναίρεσης («↩ …», «↪ …») περνούν πλέον στο νέο κανάλι: αν μόλις
+   βγήκε πλούσια ειδοποίηση (με κουμπί) τα σιωπούμε ώστε να μη διπλασιάζονται,
+   αλλιώς γίνονται ειδοποίηση κειμένου. Κάθε άλλο toast μένει ΑΚΡΙΒΩΣ ως ήταν. */
+function hookToast(){
+  try{
+    if(typeof window.showToast!=='function' || window.showToast.__hh54) return;
+    var _o=window.showToast;
+    var w=function(msg){
+      try{
+        var m=String(msg==null?'':msg);
+        if(/^[↩↪]/.test(m)){
+          if(Date.now()-lastNoticeAt<1500) return;   /* ήδη ειδοποιήθηκε */
+          notice(m); return;
+        }
+      }catch(e){}
+      return _o.apply(this,arguments);
+    };
+    w.__hh54=1; w.__hh54orig=_o;
+    window.showToast=w;
+  }catch(e){}
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ΡΟΛΟΙ
+   ══════════════════════════════════════════════════════════════════════ */
+function themeTick(){ css(); hookTileLayer(); applyTiles(); placeMapCount(); }
+
+function boot(){
+  try{
+    css(); hookTileLayer(); hookToast();
+    applyTiles(); placeMapCount(); box(); place();
+    try{
+      if(window.MutationObserver && document.body){
+        new MutationObserver(function(){ applyTiles(); }).observe(document.body,
+          {attributes:true, attributeFilter:['class']});
+      }
+    }catch(e){}
+    try{ window.addEventListener('resize', place, {passive:true}); }catch(e){}
+  }catch(e){}
+}
+if(document.body) boot();
+else document.addEventListener('DOMContentLoaded', boot, {once:true});
+
+setInterval(function(){ hookToast(); pollStacks(); }, 200);
+setInterval(themeTick, 1200);
+setTimeout(themeTick, 700);
+setTimeout(themeTick, 2200);
+
+/* εκτεθειμένα για έλεγχο */
+window.__hh54api={
+  notice:notice, applyTiles:applyTiles, placeMapCount:placeMapCount,
+  tileLayersOf:tileLayersOf, isDarkTheme:isDarkTheme, place:place,
+  pollStacks:pollStacks, undoOne:undoOne, redoOne:redoOne,
+  DARK_URL:DARK_URL, CARTO_ATTR:CARTO_ATTR, LIFE:LIFE
+};
+}catch(e){console.warn('hhPolish54',e);}})();</script>
 
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
