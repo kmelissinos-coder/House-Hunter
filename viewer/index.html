@@ -11125,6 +11125,134 @@ if(isEn()){
 window.__hh55={ tr:tr, sweep:sweep, revert:revert, dict:DICT, rules:RULES,
                 lang:function(){return LANG;}, set:setLang, num:num };
 }catch(e){console.warn('hhPolish55',e);}})();</script>
+<script>/*hhPolish61*/(function(){try{
+/* ══════════════════════════════════════════════════════════════════════
+   hhPolish61 — ΤΑ ΑΣΤΕΡΙΑ, ΜΙΑ ΚΑΙ ΚΑΛΗ
+   ══════════════════════════════════════════════════════════════════════
+   ΤΙ ΕΦΤΑΙΓΕ (από μέτρηση στο ζωντανό DOM, όχι εικασία):
+     • Και τα 5 σύμβολα ήταν «★» — ΠΟΤΕ «☆». Το «άδειο» αστέρι γινόταν με
+       color:transparent, δηλαδή αόρατο αντί για περίγραμμα.
+     • Το transparent το έγραφε inline το puLayer κάθε 600 ms.
+     • Το hhStarFix είχε κανόνα MONO για φωτεινό θέμα και MONO για
+       [onclick*="setRating"] — το «setGroupRating» ΔΕΝ περιέχει «setRating»,
+       άρα οι ομαδοποιημένες κάρτες δεν τον έπιαναν ποτέ.
+     • Στο σκούρο θέμα υπερίσχυε ένα rgba(255,255,255,.16) — εξ ου «μόνο το
+       περίγραμμα, μαύρο μέσα».
+   ΤΙ ΚΑΝΟΥΜΕ: ένας ζωγράφος. Γεμάτο = ★ χρυσό, άδειο = ☆ σβησμένο, ίδια
+   συμπεριφορά και στα δύο θέματα, με hover preview. Το inline color
+   αφαιρείται σε κάθε πέρασμα και οι κλάσεις γράφονται διπλές (.a.a) ώστε να
+   κερδίζουν σε specificity τους παλιούς !important κανόνες.            */
+
+var GOLD='#c8a84b', HOVER='#e8c65c';
+var st=document.createElement('style'); st.id='hh-polish61';
+st.textContent=
+  'body .hh61-on.hh61-on{color:'+GOLD+'!important;-webkit-text-stroke:0!important;opacity:1!important}'
+ +'body.light .hh61-on.hh61-on{color:'+GOLD+'!important}'
+ +'body .hh61-off.hh61-off{color:rgba(255,255,255,.30)!important;-webkit-text-stroke:0!important;opacity:1!important}'
+ +'body.light .hh61-off.hh61-off{color:rgba(0,0,0,.26)!important}'
+ +'body .hh61-pre.hh61-pre{color:'+HOVER+'!important}'
+ +'body .hh61-star{cursor:pointer;transition:color .08s linear}';
+(document.head||document.documentElement).appendChild(st);
+
+var SEL='[onclick*="setRating"],[onclick*="setGroupRating"]';
+var RX=/set(Group)?Rating\(\s*event\s*,\s*'([^']*)'\s*,\s*(\d+)/;
+
+function info(el){
+  var m=RX.exec(el.getAttribute('onclick')||'');
+  if(!m) return null;
+  return { group:!!m[1], key:m[2], idx:+m[3] };
+}
+function houseOf(el){
+  var i=info(el); if(!i) return null;
+  if(i.group) return i.key;
+  try{
+    var a=[].concat(allListings||[], extraListings||[]);
+    for(var j=0;j<a.length;j++){
+      var r=a[j];
+      if(String(r.url)===i.key||String(r.id)===i.key||String(r._dbId)===i.key){
+        var h=String(r.house_id||'').trim();
+        return (h&&h!=='0')?h:i.key;
+      }
+    }
+  }catch(e){}
+  return i.key;
+}
+function mine(hid){
+  try{ var v=+window.hhMyRating(hid); return (v>0&&v<=5)?v:0; }catch(e){ return 0; }
+}
+function starsOf(row){
+  var out=[], k=row.querySelectorAll(SEL);
+  for(var i=0;i<k.length;i++) out.push(k[i]);
+  out.sort(function(a,b){ var ia=info(a),ib=info(b); return ((ia&&ia.idx)||0)-((ib&&ib.idx)||0); });
+  return out;
+}
+function paint(row,n,pre){
+  var k=starsOf(row);
+  for(var i=0;i<k.length;i++){
+    var el=k[i], on=(i<n);
+    if(el.textContent!==(on?'★':'☆')) el.textContent=(on?'★':'☆');
+    el.classList.add('hh61-star');
+    el.classList.toggle('hh61-on', on);
+    el.classList.toggle('hh61-off', !on);
+    el.classList.toggle('hh61-pre', !!pre && on);
+    try{ if(el.style&&el.style.color) el.style.removeProperty('color'); }catch(e){}
+  }
+}
+function rowsNow(){
+  var m=[], k=document.querySelectorAll(SEL);
+  for(var i=0;i<k.length;i++){
+    var p=k[i].parentElement; if(!p) continue;
+    if(m.indexOf(p)<0) m.push(p);
+  }
+  return m;
+}
+function sweep(){
+  var rs=rowsNow();
+  for(var i=0;i<rs.length;i++){
+    var row=rs[i];
+    if(row.__hh61pre) continue;              /* το ποντίκι είναι πάνω του */
+    var k=starsOf(row); if(!k.length) continue;
+    paint(row, mine(houseOf(k[0])), false);
+  }
+}
+/* hover preview */
+document.addEventListener('mouseover', function(e){
+  var t=e.target; if(!t||!t.closest) return;
+  var el=t.closest(SEL); if(!el) return;
+  var row=el.parentElement; if(!row) return;
+  var i=info(el); if(!i) return;
+  row.__hh61pre=1;
+  paint(row, i.idx, true);
+}, true);
+document.addEventListener('mouseout', function(e){
+  var t=e.target; if(!t||!t.closest) return;
+  var el=t.closest(SEL); if(!el) return;
+  var row=el.parentElement; if(!row) return;
+  var to=e.relatedTarget;
+  if(to && row.contains(to)) return;         /* μετακίνηση σε διπλανό αστέρι */
+  row.__hh61pre=0;
+  paint(row, mine(houseOf(el)), false);
+}, true);
+/* κλικ: ζωγραφίζουμε αμέσως (toggle όπως το puLayer), μετά ξανασυγχρονίζουμε */
+document.addEventListener('click', function(e){
+  var t=e.target; if(!t||!t.closest) return;
+  var el=t.closest(SEL); if(!el) return;
+  var row=el.parentElement, i=info(el); if(!row||!i) return;
+  var hid=houseOf(el), cur=mine(hid);
+  var fin=(cur===i.idx)?0:i.idx;
+  row.__hh61pre=0;
+  paint(row, fin, false);
+  setTimeout(function(){ paint(row, mine(hid), false); }, 350);
+  setTimeout(function(){ paint(row, mine(hid), false); }, 1200);
+}, true);
+
+sweep();
+setInterval(sweep, 700);
+try{ new MutationObserver(function(){ if(!window.__hh61t){ window.__hh61t=setTimeout(function(){ window.__hh61t=0; sweep(); },160); } })
+       .observe(document.body,{childList:true,subtree:true}); }catch(e){}
+window.__hh61={ sweep:sweep, mine:mine, houseOf:houseOf };
+}catch(e){console.warn('hhPolish61',e);}})();</script>
+
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
