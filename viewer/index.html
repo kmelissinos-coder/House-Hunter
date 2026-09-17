@@ -10786,6 +10786,105 @@ function trParts(x){
     return r==null ? seg : seg.replace(core,r);
   }).join('');
 }
+
+/* ---------- 2b. hhPolish58: ό,τι ξέφυγε στην πρώτη σάρωση --------------
+   Πηγή: πραγματική σάρωση του ζωντανού DOM στα EN + οι τιμές της βάσης
+   (type / floor / heating / energy). Τα ΟΝΟΜΑΤΑ (περιοχές, μεσιτικά) δεν
+   μπαίνουν ΠΟΤΕ εδώ — είναι δεδομένα, μένουν ελληνικά.                  */
+var D58={
+  'Διαμέρισμα':'Apartment','Μεζονέτα':'Maisonette','Μονοκατοικία':'Detached house',
+  'Οροφοδιαμέρισμα':'Floor apartment','Γκαρσονιέρα':'Studio','Βίλα':'Villa',
+  'Κτίριο':'Building','Loft':'Loft','Studio':'Studio',
+  'Ισόγειο':'Ground floor','Ημιόροφος':'Mezzanine','Ημιώροφος':'Mezzanine',
+  'Υπερυψωμένο':'Raised ground floor','Υπόγειο':'Basement','Ρετιρέ':'Penthouse',
+  'Πετρέλαιο':'Oil','πετρέλαιο':'oil','πετρελαίου':'oil','Πετρελαίου':'oil',
+  'Φυσικό αέριο':'Natural gas','φυσικό αέριο':'natural gas',
+  'Υγραέριο':'LPG','υγραέριο':'LPG','Ρεύμα':'Electricity','ρεύμα':'electricity',
+  'Αντλία θερμότητας':'Heat pump','αντλία θερμότητας':'heat pump',
+  'Κλιματιστικό':'Air conditioning','κλιματιστικό':'air conditioning',
+  'Αυτόνομη':'Independent','αυτόνομη':'independent',
+  'Κεντρική':'Central','κεντρική':'central',
+  'Κεντρική θέρμανση':'Central heating','Αυτόνομη θέρμανση':'Independent heating',
+  'Ατομική θέρμανση':'Individual heating','Κεντρική με αυτονομία':'Central, per-flat control',
+  'Πλήρως αυτόνομη':'Fully independent','Χωρίς θέρμανση':'No heating',
+  'Υπό έκδοση':'Pending','Εξαιρείται':'Exempt',
+  'Βεράντα':'Veranda','Σοφίτα':'Attic','Διαμπερές':'Through-apartment',
+  'Φωτεινό':'Bright','Ήσυχο':'Quiet','Ανακαινισμένο':'Renovated',
+  'Επιπλωμένο':'Furnished','Νεόδμητο':'Newly built','Θέα':'View','Κήπος':'Garden',
+  'Τζάκι':'Fireplace','Πάρκινγκ':'Parking','Αποθήκη':'Storage','Ασανσέρ':'Lift',
+  'Κατοικίδια':'Pets allowed','Πισίνα':'Pool','Ασφάλεια':'Security',
+  'Θέρμανση':'Heating','θέρμανση':'heating','Ψήφοι':'Votes','Ψήφος':'Vote'
+};
+for(var k58 in D58){ if(DICT[k58]==null) DICT[k58]=D58[k58]; }
+
+/* «1ος» → «1st floor» */
+function ord58(t){
+  var m=/^(\d+)ος$/.exec(t); if(!m) return null;
+  var n=+m[1], r=n%100, d=n%10;
+  var sfx=(r>=11&&r<=13)?'th':(d===1?'st':(d===2?'nd':(d===3?'rd':'th')));
+  return n+sfx+' floor';
+}
+/* «📐 170 τ.μ.» / «127–130τ.μ.» → m² */
+function sqm58(t){
+  var m=/^(📐\s*)?([0-9][0-9.,]*(?:\s*[\u2013\u2014-]\s*[0-9][0-9.,]*)?)\s*τ\.?\s?μ\.?$/.exec(t);
+  return m ? (m[1]||'')+m[2]+' m²' : null;
+}
+/* ένα κομμάτι: null = ΔΕΝ το ξέρω, άρα ο κανόνας ματαιώνεται ολόκληρος */
+function part58(p){
+  var t=norm(p);
+  if(!t) return p;
+  if(!GR.test(t)) return p;                 /* «2 lv.», αριθμοί, λατινικά */
+  if(DICT[t]!=null) return DICT[t];
+  var o=ord58(t); if(o!=null) return o;
+  var q=sqm58(t); if(q!=null) return q;
+  var r=tr(t); if(r!=null) return r;
+  return null;
+}
+function split58(t,sep){
+  var parts=t.split(sep), out=[], any=false;
+  for(var i=0;i<parts.length;i++){
+    var v=part58(parts[i]);
+    if(v==null) return null;
+    if(norm(v)!==norm(parts[i])) any=true;
+    out.push(v);
+  }
+  return any ? out.join(sep) : null;
+}
+RULES.push(
+  /* ψήφοι μέσα σε παρένθεση: «(1 ψήφος)» */
+  [/^\((\d+) ψήφ(?:ος|οι)\)$/, function(m){ return '('+m[1]+' vote'+(m[1]==='1'?'':'s')+')'; }],
+  [/^(\d+) ψήφ(?:ος|οι)$/,       function(m){ return m[1]+' vote'+(m[1]==='1'?'':'s'); }],
+  /* τετραγωνικά και όροφοι μόνοι τους */
+  /* το banner με το ⛔ μπροστά — ο αρχικός κανόνας ξεκινούσε με ψηφίο */
+  [/^(⛔\s*)?(\d+) από (\d+) αγγελίες αφαιρέθηκαν από τις πλατφόρμες (.+?)( · .+)?$/,
+     function(m){ return (m[1]||'')+m[2]+' of '+m[3]+' listings removed from platforms '+m[4]+(m[5]||''); }],
+  [/^(⛔\s*)?(\d+) από (\d+) αγγελίες αφαιρέθηκαν από την πλατφόρμα (.+?)( · .+)?$/,
+     function(m){ return (m[1]||'')+m[2]+' of '+m[3]+' listings removed from platform '+m[4]+(m[5]||''); }],
+  /* θέρμανση: σύνθεση «τρόπος (καύσιμο)» / «τρόπος – καύσιμο» */
+  [/^(.+?) \((.+)\)$/, function(m){
+     var a=part58(m[1]), b=split58(m[2],', ')||part58(m[2]);
+     if(a==null||b==null) return null;
+     return a+' ('+b+')'; }],
+  [/^(.+?) \u2013 (.+)$/, function(m){
+     var a=part58(m[1]), b=split58(m[2],', ')||part58(m[2]);
+     if(a==null||b==null) return null;
+     return a+' \u2013 '+b; }],
+  [/^(κεντρική|αυτόνομη), τροφοδοσία (?:με )?(.+)$/, function(m){
+     var a=part58(m[1]), b=part58(m[2]);
+     if(a==null||b==null) return null;
+     return a+', '+b+' supply'; }],
+  [/^(κεντρική|αυτόνομη) - (.+)$/, function(m){
+     var a=part58(m[1]), b=part58(m[2]);
+     if(a==null||b==null) return null;
+     return a+' - '+b; }],
+  /* σύνθετα με « · » ή « / »: «Διαμέρισμα · 1ος · 2 lv.», «2ος / 3ος» */
+  [/ · /, function(m,k){ return split58(m.input!=null?m.input:m[0],' · '); }],
+  [/^[^\/]+ \/ [^\/]+$/, function(m){ return split58(m[0],' / '); }],
+  /* μόνο του: όροφος ή τετραγωνικά */
+  [/^\d+ος$/,   function(m){ return ord58(m[0]); }],
+  [/τ\.?\s?μ\.?$/, function(m){ return sqm58(m[0]); }]
+);
+
 window.hhTr=tr;
 
 /* ---------- 3. επίστρωση πάνω στο DOM ----------------------------------- */
