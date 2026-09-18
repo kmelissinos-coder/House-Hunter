@@ -71,9 +71,14 @@ function script(src){
   });
 }
 
-window.__rmState={stage:'boot', done:0, fail:0, err:null, counts:{}};
+window.__rmState={stage:'boot', done:0, fail:0, err:null, counts:{}, hidden:document.hidden};
+window.__rmStop=false;
 
-window.__rmGo=async function(limit){
+// ⚠ ΤΟ ΠΑΡΑΘΥΡΟ ΠΡΕΠΕΙ ΝΑ ΕΙΝΑΙ ΜΠΡΟΣΤΑ. 18 Σεπ: με document.hidden===true το
+// WebGL readback του TF.js γονάτισε σε ~100 δευτερόλεπτα ανά φωτογραφία (και το
+// ίδιο το κατέβασμα του tfjs από το CDN κόλλησε). Με το παράθυρο ορατό τρέχει
+// ~0,4 φωτογραφίες/δευτερόλεπτο. Το __rmState.hidden το δείχνει.
+window.__rmGo=async function(limit, backend){
   var S=window.__rmState;
   var SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1';
   var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
@@ -81,6 +86,8 @@ window.__rmGo=async function(limit){
   try{
     if(!window.tf){ S.stage='tfjs'; await script('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js'); }
     if(!window.mobilenet){ S.stage='model-js'; await script('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js'); }
+    if(backend){ S.stage='backend'; try{ await tf.setBackend(backend); await tf.ready(); }catch(e){} }
+    S.backend=(window.tf&&tf.getBackend)?tf.getBackend():null;
     if(!window.__rmModel){ S.stage='model'; window.__rmModel=await mobilenet.load({version:2,alpha:1.0}); }
     S.stage='todo';
     var r=await fetch(SB+'/rpc/img_room_todo',{method:'POST',headers:HD,body:JSON.stringify({n:limit||400})});
@@ -89,7 +96,14 @@ window.__rmGo=async function(limit){
     S.total=urls.length; S.stage='run';
     if(!urls.length){ S.stage='empty'; return 0; }
     var buf=[], saved=0;
+    var flush=async function(){
+      if(!buf.length) return;
+      try{ await fetch(SB+'/rpc/img_room_set',{method:'POST',headers:HD,body:JSON.stringify({p:buf})}); saved+=buf.length; buf=[]; }
+      catch(e){ S.err='save '+e.message; }
+    };
     for(var i=0;i<urls.length;i++){
+      if(window.__rmStop){ S.stage='stopped'; break; }
+      S.hidden=document.hidden;
       var u=urls[i];
       try{
         var t=u.replace('/image/upload/','/image/upload/w_224,h_224,c_fill,g_center,f_jpg,q_80/');
@@ -100,15 +114,14 @@ window.__rmGo=async function(limit){
         S.counts[c.c]=(S.counts[c.c]||0)+1;
         S.done++;
       }catch(e){ S.fail++; }
-      if(buf.length>=60){
-        try{ await fetch(SB+'/rpc/img_room_set',{method:'POST',headers:HD,body:JSON.stringify({p:buf})}); saved+=buf.length; }catch(e){ S.err='save '+e.message; }
-        buf=[];
-      }
+      /* μικρές παρτίδες: 18 Σεπ μια διακοπή στις 16 φωτογραφίες πέταξε όλη τη
+         δουλειά, γιατί το flush γινόταν κάθε 60. */
+      if(buf.length>=20) await flush();
+      S.saved=saved;
     }
-    if(buf.length){
-      try{ await fetch(SB+'/rpc/img_room_set',{method:'POST',headers:HD,body:JSON.stringify({p:buf})}); saved+=buf.length; }catch(e){ S.err='save '+e.message; }
-    }
-    S.stage='finished'; S.saved=saved;
+    await flush();
+    if(S.stage!=='stopped') S.stage='finished';
+    S.saved=saved;
     return saved;
   }catch(e){ S.stage='error'; S.err=String(e&&e.message||e); throw e; }
 };
