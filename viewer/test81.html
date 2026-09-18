@@ -12529,19 +12529,35 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   var wCover=mkWrap('setCoverImage', C_COV, M_COV,
       function(h){ return 'Αλλαγή εξωφύλλου — '+nameOf(h); },
       function(key){ return byUrl(key); });
-  var wNotes=mkWrap('saveNotes', C_NOT, M_NOT,
-      function(h){ return 'Σημειώσεις — '+nameOf(h); },
-      function(id){ return grp(byId(id)); });
+  /* Τις σημειώσεις ΔΕΝ τις τυλίγουμε: hhPolish7 και hhPolish46 ξαναγράφουν το
+     saveNotes σε interval και είτε μας πετάνε είτε φτιάχνουμε ατέλειωτο ντύσιμο.
+     Πιάνουμε το κλικ του κουμπιού σε capture και κρατάμε πριν/μετά μόνοι μας. */
+  document.addEventListener('click', function(e){
+    try{
+      var b=(e.target&&e.target.closest)?e.target.closest('[onclick]'):null; if(!b) return;
+      var m=String(b.getAttribute('onclick')||'').match(/saveNotes\(\s*'([^']+)'/);
+      if(!m) return;
+      var rec=byId(m[1]), mem=grp(rec); if(!mem.length) return;
+      var before=snap(mem, C_NOT);
+      setTimeout(function(){
+        try{
+          var after=snap(before.map(function(x){return x.row;}), C_NOT);
+          if(!differs(before,after,C_NOT)) return;
+          push('\u03a3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2 \u2014 '+nameOf(rec), before, after, C_NOT, M_NOT);
+        }catch(err){ try{ window.__hh81err.push('notes check: '+err.message); }catch(_){} }
+      },350);
+    }catch(err){}
+  }, true);
   var wAddr=mkWrap('saveAddress', C_ADR, M_ADR,
       function(h){ return 'Διεύθυνση — '+nameOf(h); },
       function(key){ return grp(byUrl(key)); });
 
-  function install(){ wCover(); wNotes(); wAddr(); }
+  function install(){ wCover(); wAddr(); }
   install();
   setInterval(install, 700);
   window.hh81Status=function(){
     return {cover:!!(window.setCoverImage&&window.setCoverImage.__hh81),
-            notes:!!(window.saveNotes&&window.saveNotes.__hh81),
+            notes:'click-hook',
             address:!!(window.saveAddress&&window.saveAddress.__hh81),
             err:window.__hh81err};
   };
