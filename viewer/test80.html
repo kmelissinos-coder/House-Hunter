@@ -12325,17 +12325,21 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   function ovlOpen(){ var o=document.getElementById('listingOverlay'); return !!(o && o.classList.contains('open')); }
 
   /* ---- η σειρά των σπιτιών = η σειρά των καρτών στη λίστα από πίσω ---- */
+  /* ΟΧΙ offsetParent/getClientRects: στην προβολή χάρτη το #mapList κόβει ό,τι
+     είναι εκτός οθόνης και θα μετρούσαμε 21 από 140. Και ΟΧΙ μόνο τις ορατές:
+     στην προβολή χάρτη η λίστα κρύβει με inline display όσες κάρτες δεν έχουν
+     πινέζα στο τρέχον κάδρο, οπότε το σπίτι που κοιτάς μπορεί να μην είναι εκεί
+     μέσα. Κρατάμε τις ορατές ΜΟΝΟ αν το τρέχον σπίτι είναι ανάμεσά τους. */
   function cards(){
-    var c=document.getElementById('main-content'); if(!c) return [];
-    var all=[].slice.call(c.querySelectorAll('[data-hhh]'));
-    return all.filter(function(el){
+    var c=document.getElementById('main-content'); if(!c) return {all:[],vis:[]};
+    var raw=[].slice.call(c.querySelectorAll('[data-hhh]'));
+    var all=raw.filter(function(el){
       var p=el.parentElement;
       while(p && p!==c){ if(p.hasAttribute && p.hasAttribute('data-hhh')) return false; p=p.parentElement; }
-      /* ΟΧΙ offsetParent/getClientRects: στην προβολή χάρτη το #mapList κόβει
-         ό,τι είναι εκτός οθόνης (content-visibility) και θα βλέπαμε 21 από 140.
-         Αρκεί να πετάξουμε όσες κάρτες έκρυψαν τα φίλτρα με inline display. */
-      return el.style.display!=='none';
+      return true;
     });
+    var vis=all.filter(function(el){ return el.style.display!=='none'; });
+    return {all:all, vis:vis};
   }
   function keyOf(el){
     var h=el.getAttribute('data-hhh')||'';
@@ -12389,9 +12393,11 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
     try{
       if(!ovlOpen()){ hide(); return; }
       var cur=current(); if(!cur){ hide(); return; }
-      list=cards();
-      idx=-1;
-      for(var i=0;i<list.length;i++){ if(same(keyOf(list[i]),cur)){ idx=i; break; } }
+      var cc=cards();
+      function findIn(arr){ for(var i=0;i<arr.length;i++){ if(same(keyOf(arr[i]),cur)) return i; } return -1; }
+      idx=findIn(cc.vis);
+      if(idx>=0 && cc.vis.length>1){ list=cc.vis; }
+      else { list=cc.all; idx=findIn(cc.all); }
       if(idx<0 || list.length<2){ hide(); return; }
       prev.style.display='flex'; next.style.display='flex'; cnt.style.display='block';
       prev.classList.toggle('hh80-off', idx<=0);
