@@ -11660,6 +11660,191 @@ try{ new MutationObserver(function(){ markSeenLabels(); })
 window.__hh70={ why:why, rowsFor:rowsFor, render:render, sync:syncViewButtons };
 }catch(e){console.warn('hhPolish70',e);}})();</script>
 
+<script>/*hhPolish74*/(function(){try{
+
+/* ══════════════════════════════════════════════════════════════════════
+   hhPolish74 — 18/9, τρία από τη λίστα του Dusty
+   1. ΣΥΝΤΕΤΑΓΜΕΝΕΣ ΣΤΟ ΠΕΔΙΟ ΔΙΕΥΘΥΝΣΗΣ. Το saveAddress καταλάβαινε μόνο
+      «lat, lng» και link του Google με @lat,lng. Οι μοίρες-λεπτά-δευτερόλεπτα
+      (38°07'15.2"N 23°50'05.3"E) — ό,τι δίνει το «Copy coordinates» του
+      Google — έπεφταν στον geocoder, που τις «κατάλαβε» σαν κείμενο και
+      έβαλε πινέζα 110 μέτρα παραδίπλα (#1191).
+   2. ΠΡΟΒΟΛΗ ΧΑΡΤΗ: η σελίδα δεν κυλάει πια πίσω από τον χάρτη — κυλάει
+      μόνο η λίστα. Το #map-split παίρνει ακριβώς τον ελεύθερο χώρο.
+   3. ΒΕΛΑΚΙΑ ΣΤΙΣ ΟΜΑΔΟΠΟΙΗΜΕΝΕΣ ΚΑΡΤΕΣ. Έδειχναν τις ΔΥΟ πρώτες
+      φωτογραφίες και τέλος· τα βελάκια υπήρχαν μόνο στις μονές κάρτες.  */
+
+var st=document.createElement('style'); st.id='hh-polish74';
+st.textContent=
+  '.photo-strip{position:relative}'
+ +'.hh74-nav{position:absolute;top:50%;transform:translateY(-50%);width:28px;height:46px;'
+ +'display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;'
+ +'background:rgba(0,0,0,.5);border-radius:8px;cursor:pointer;opacity:0;'
+ +'transition:opacity .15s;z-index:6;user-select:none}'
+ +'.hh74-nav.l{left:6px}.hh74-nav.r{right:6px}'
+ +'.photo-strip:hover .hh74-nav{opacity:1}'
+ +'.hh74-dot{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);z-index:6;'
+ +'background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:999px;'
+ +'opacity:0;transition:opacity .15s}'
+ +'.photo-strip:hover .hh74-dot{opacity:1}'
+ +'body.hh74-maplock{overflow:hidden!important}';
+(document.head||document.documentElement).appendChild(st);
+
+/* ---------- 1. συντεταγμένες στο πεδίο διεύθυνσης ---------- */
+function dms(t){
+  /* 38°07'15.2"N 23°50'05.3"E  ·  38 07 15.2 N, 23 50 05.3 E */
+  var re=/(\d{1,3})\s*[°:\s]\s*(\d{1,2})\s*['\u2032:\s]\s*([\d.]+)\s*["\u2033]?\s*([NSns])[,;\s]+(\d{1,3})\s*[°:\s]\s*(\d{1,2})\s*['\u2032:\s]\s*([\d.]+)\s*["\u2033]?\s*([EWew])/;
+  var m=re.exec(String(t||'').trim());
+  if(!m) return null;
+  var la=(+m[1])+(+m[2])/60+(parseFloat(m[3])||0)/3600;
+  var lo=(+m[5])+(+m[6])/60+(parseFloat(m[7])||0)/3600;
+  if(/[Ss]/.test(m[4])) la=-la;
+  if(/[Ww]/.test(m[8])) lo=-lo;
+  return {lat:+la.toFixed(7), lng:+lo.toFixed(7)};
+}
+function plain(t){
+  /* 38.120889, 23.834806 — και με λίγα δεκαδικά, που το αρχικό regex απαιτούσε 3+ */
+  var m=/^\s*(-?\d{1,2}(?:[.,]\d+)?)\s*[,;\s]\s*(-?\d{1,3}(?:[.,]\d+)?)\s*$/.exec(String(t||''));
+  if(!m) return null;
+  var la=parseFloat(String(m[1]).replace(',','.')), lo=parseFloat(String(m[2]).replace(',','.'));
+  if(!isFinite(la)||!isFinite(lo)) return null;
+  if(Math.abs(la)>90||Math.abs(lo)>180) return null;
+  if(String(m[1]).indexOf('.')<0 && String(m[1]).indexOf(',')<0) return null;   /* «160, 3» δεν είναι θέση */
+  return {lat:la, lng:lo};
+}
+window.hhCoordsOf=function(t){ return dms(t)||plain(t); };
+
+function wrapSave(){
+  if(typeof window.saveAddress!=='function' || window.saveAddress.__hh74) return;
+  var orig=window.saveAddress;
+  window.saveAddress=async function(key){
+    try{
+      var el=document.getElementById('loAddress');
+      var txt=el?String(el.value||'').trim():'';
+      var c=window.hhCoordsOf(txt);
+      if(!c) return orig.apply(this,arguments);          /* κανονική διεύθυνση → ως είχε */
+      var all=[]; try{ all=[].concat(allListings||[], extraListings||[]); }catch(e){}
+      var h=null; for(var i=0;i<all.length;i++){ if(all[i].url===key){ h=all[i]; break; } }
+      if(!h) return orig.apply(this,arguments);
+      var hid=String(h.house_id||'').trim();
+      var grp=(hid&&hid!=='0')?all.filter(function(x){return String(x.house_id||'').trim()===hid;}):[h];
+      var body=JSON.stringify({address:txt, address_lat:c.lat, address_lng:c.lng, address_confirmed:true});
+      var okAll=true;
+      for(var j=0;j<grp.length;j++){
+        var m=grp[j];
+        m.address=txt; m.address_lat=c.lat; m.address_lng=c.lng; m.address_confirmed=true;
+        if(!m._dbId) continue;
+        try{
+          var r=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+m._dbId,
+            {method:'PATCH',headers:Object.assign({},sb.headers(),{'Content-Type':'application/json','Prefer':'return=minimal'}),body:body});
+          if(!r.ok) okAll=false;
+        }catch(e){ okAll=false; }
+      }
+      try{ if(typeof _renderOvl==='function' && document.getElementById('listingOverlay').classList.contains('open')) _renderOvl(); }catch(e){}
+      try{ if(typeof showToast==='function') showToast(okAll
+        ? ('✓ Συντεταγμένες αποθηκεύτηκαν ακριβώς — πράσινη πινέζα')
+        : ('⚠ Μέρος της αποθήκευσης δεν πέρασε')); }catch(e){}
+      try{ if(typeof currentView!=='undefined' && currentView==='map' && typeof initMap==='function') initMap(); }catch(e){}
+      return false;
+    }catch(e){ try{ return orig.apply(this,arguments); }catch(e2){} }
+  };
+  window.saveAddress.__hh74=1;
+}
+
+/* ---------- 2. προβολή χάρτη: τίποτα δεν μεγαλώνει ---------- */
+function mapFrame(){
+  try{
+    var sp=document.getElementById('map-split');
+    var isMap=!!sp && !!document.getElementById('mapList');
+    document.body.classList.toggle('hh74-maplock', isMap);
+    if(!sp) return;
+    var top=sp.getBoundingClientRect().top + (window.scrollY||0);
+    var h=Math.max(360, Math.round(window.innerHeight - top - 10));
+    if(sp.__hh74h!==h){ sp.__hh74h=h; sp.style.height=h+'px'; sp.style.minHeight='0'; }
+    try{ if(window._hhMap && window._hhMap.invalidateSize) {
+      if(!sp.__hh74inv || Math.abs(sp.__hh74inv-h)>2){ sp.__hh74inv=h; window._hhMap.invalidateSize(); }
+    } }catch(e){}
+  }catch(e){}
+}
+
+/* ---------- 3. βελάκια στις ομαδοποιημένες κάρτες ---------- */
+function imgsOfHouse(hid){
+  var out=[], seen={};
+  try{
+    var all=[].concat(allListings||[], extraListings||[]);
+    for(var i=0;i<all.length;i++){
+      var h=all[i];
+      if(String(h.house_id||'').trim()!==String(hid)) continue;
+      var push=function(u){ if(!u) return; u=String(u); if(seen[u]) return; seen[u]=1; out.push(u); };
+      push(h.image_url);
+      try{
+        var ex=h.extra_images;
+        if(typeof ex==='string' && ex.trim()) ex=JSON.parse(ex);
+        if(Array.isArray(ex)) ex.forEach(function(x){ push(typeof x==='string'?x:(x&&(x.url||x.jpeg))); });
+      }catch(e){}
+    }
+  }catch(e){}
+  return out;
+}
+function hidOfStrip(strip){
+  try{
+    var card=strip.closest('.grouped-card'); if(!card) return null;
+    var el=card.querySelector('[onclick*="openListingOverlay(null,"]');
+    var m=el && /openListingOverlay\(null,'([^']+)'/.exec(el.getAttribute('onclick')||'');
+    if(m) return m[1];
+    var t=card.querySelector('[data-hhh]');
+    return t?t.getAttribute('data-hhh'):null;
+  }catch(e){ return null; }
+}
+function equipStrips(){
+  try{
+    var strips=document.querySelectorAll('.grouped-card .photo-strip');
+    for(var i=0;i<strips.length;i++){
+      var sp=strips[i];
+      if(sp.__hh74) continue;
+      var imgs=sp.querySelectorAll('img.photo-strip-img');
+      if(imgs.length<1) continue;
+      var hid=hidOfStrip(sp); if(!hid) continue;
+      var pool=imgsOfHouse(hid);
+      if(pool.length<=imgs.length) continue;        /* δεν υπάρχουν κι άλλες */
+      sp.__hh74=1; sp.__hh74i=0; sp.__hh74pool=pool; sp.__hh74n=imgs.length;
+      var L=document.createElement('span'); L.className='hh74-nav l'; L.textContent='‹';
+      var R=document.createElement('span'); R.className='hh74-nav r'; R.textContent='›';
+      var D=document.createElement('span'); D.className='hh74-dot';
+      sp.appendChild(L); sp.appendChild(R); sp.appendChild(D);
+      (function(sp,L,R,D){
+        function paint(){
+          var im=sp.querySelectorAll('img.photo-strip-img');
+          for(var k=0;k<im.length;k++){
+            var u=sp.__hh74pool[(sp.__hh74i+k)%sp.__hh74pool.length];
+            if(u && im[k].getAttribute('src')!==u){ im[k].setAttribute('src',u); im[k].style.display=''; }
+          }
+          D.textContent=((sp.__hh74i%sp.__hh74pool.length)+1)+'–'
+            +(((sp.__hh74i+sp.__hh74n-1)%sp.__hh74pool.length)+1)+' / '+sp.__hh74pool.length;
+        }
+        function step(d,ev){
+          if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+          var n=sp.__hh74pool.length;
+          sp.__hh74i=((sp.__hh74i + d*sp.__hh74n) % n + n) % n;
+          paint();
+        }
+        L.onclick=function(e){ step(-1,e); };
+        R.onclick=function(e){ step(1,e); };
+        paint();
+      })(sp,L,R,D);
+    }
+  }catch(e){}
+}
+
+function tick(){ wrapSave(); mapFrame(); equipStrips(); }
+tick();
+setInterval(tick, 700);
+window.addEventListener('resize', mapFrame);
+try{ new MutationObserver(function(){ equipStrips(); })
+       .observe(document.body,{childList:true,subtree:true}); }catch(e){}
+window.__hh74={ coords:window.hhCoordsOf, imgsOfHouse:imgsOfHouse, mapFrame:mapFrame };
+}catch(e){console.warn('hhPolish74',e);}})();</script>
+
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
