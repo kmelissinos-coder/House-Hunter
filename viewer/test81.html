@@ -12423,6 +12423,7 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   sync();
 }catch(e){}})();</script>
 <script>/*hhPolish81*/(function(){try{
+  window.__hh81err=[];
   function rowsAll(){
     try{ return [].concat(allListings||[], extraListings||[]); }
     catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }catch(e2){ return []; } }
@@ -12447,7 +12448,6 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   }
   function toast(m){ try{ if(typeof showToast==='function') showToast(m); }catch(e){} }
 
-  /* snap = [{id, row, v:{col:value}}] ; cols = τα ΤΟΠΙΚΑ ονόματα, map = τοπικό->στήλη βάσης */
   function snap(list, cols){
     return list.map(function(r){
       var v={}; cols.forEach(function(c){ v[c] = (r[c]===undefined ? null : r[c]); });
@@ -12471,7 +12471,7 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
         });
         cols.forEach(function(c){ x.row[c]=x.v[c]; });
         if(!any) return;
-        return put(x.id,patch).catch(function(){ toast('\u26a0 \u039c\u03ad\u03c1\u03bf\u03c2 \u03c4\u03b7\u03c2 \u03b1\u03bd\u03b1\u03af\u03c1\u03b5\u03c3\u03b7\u03c2 \u03b4\u03b5\u03bd \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03cd\u03c4\u03b7\u03ba\u03b5'); });
+        return put(x.id,patch).catch(function(){ toast('⚠ Μέρος της αναίρεσης δεν αποθηκεύτηκε'); });
       });
     });
     return q.then(repaint);
@@ -12485,80 +12485,67 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
       redo: function(){ if(state!=='undone') return Promise.resolve(); state='done';   return restore(after,cols,map); }
     });
   }
-  function nameOf(h){ return (h && (h.location || h.platform)) || '\u03b7 \u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1'; }
+  function nameOf(h){ return (h && (h.location || h.platform)) || 'η αγγελία'; }
 
-  /* ---------- 1. εξώφυλλο ---------- */
   var C_COV=['imageUrl','image_url'], M_COV={imageUrl:'image_url', image_url:'image_url'};
-  (function(){
-    var orig=window.setCoverImage;
-    if(typeof orig!=='function' || orig.__hh81) return;
-    var w=function(key,ix){
-      var h=byUrl(key);
-      var before = h ? snap([h], C_COV) : null;
-      var r;
-      try{ r=orig.apply(this,arguments); }catch(e){ throw e; }
-      Promise.resolve(r).then(function(){
-        try{
-          var h2=byUrl(key); if(!h2||!before) return;
-          var after=snap([h2], C_COV);
-          if(!differs(before,after,C_COV)) return;
-          push('\u0391\u03bb\u03bb\u03b1\u03b3\u03ae \u03b5\u03be\u03c9\u03c6\u03cd\u03bb\u03bb\u03bf\u03c5 \u2014 '+nameOf(h2), before, after, C_COV, M_COV);
-        }catch(e){}
-      },function(){});
-      return r;
-    };
-    w.__hh81=1; try{ window.setCoverImage=w; }catch(e){}
-  })();
-
-  /* ---------- 2. προσωπικές σημειώσεις ---------- */
   var C_NOT=['personal_notes'], M_NOT={personal_notes:'personal_notes'};
-  (function(){
-    var orig=window.saveNotes;
-    if(typeof orig!=='function' || orig.__hh81) return;
-    var w=function(id){
-      var rec=byId(id), mem=grp(rec);
-      var before = mem.length ? snap(mem, C_NOT) : null;
-      var r=orig.apply(this,arguments);
-      setTimeout(function(){
-        try{
-          if(!before || !before.length) return;
-          var after=snap(before.map(function(x){return x.row;}), C_NOT);
-          if(!differs(before,after,C_NOT)) return;
-          push('\u03a3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2 \u2014 '+nameOf(rec), before, after, C_NOT, M_NOT);
-        }catch(e){}
-      },0);
-      return r;
-    };
-    w.__hh81=1; try{ window.saveNotes=w; }catch(e){}
-  })();
-
-  /* ---------- 3. διεύθυνση ---------- */
   var C_ADR=['address','address_lat','address_lng','address_confirmed'];
   var M_ADR={address:'address',address_lat:'address_lat',address_lng:'address_lng',address_confirmed:'address_confirmed'};
-  (function(){
-    function wrapAddr(){
-      var orig=window.saveAddress;
-      if(typeof orig!=='function' || orig.__hh81) return;
-      var w=function(key){
-        var h=byUrl(key), mem=grp(h);
-        var before = mem.length ? snap(mem, C_ADR) : null;
-        var r=orig.apply(this,arguments);
-        Promise.resolve(r).then(function(){
-          try{
-            if(!before || !before.length) return;
-            var after=snap(before.map(function(x){return x.row;}), C_ADR);
-            if(!differs(before,after,C_ADR)) return;
-            push('\u0394\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7 \u2014 '+nameOf(h), before, after, C_ADR, M_ADR);
-          }catch(e){}
-        },function(){});
-        return r;
-      };
-      w.__hh81=1; try{ window.saveAddress=w; }catch(e){}
-    }
-    /* το hhPolish74 ξανατυλίγει το saveAddress· ξαναπερνάμε από πάνω περιοδικά */
-    wrapAddr(); setInterval(wrapAddr, 1500);
-  })();
-}catch(e){}})();</script>
+
+  /* Το κάθε στρώμα φτιάχνει τον δικό του wrapper· άλλα στρώματα (hhPolish46 για
+     τις σημειώσεις, hhPolish74 για τη διεύθυνση) ξανατυλίγουν τις ίδιες
+     συναρτήσεις όποτε θέλουν. Γι' αυτό ΞΑΝΑ-εγκαθιστούμε περιοδικά, όπως το
+     hhPolish45, και κρατάμε τα λάθη σε window.__hh81err ώστε να φαίνονται. */
+  function mkWrap(name, cols, map, labelFn, scopeFn){
+    return function(){
+      try{
+        var orig=window[name];
+        if(typeof orig!=='function' || orig.__hh81) return;
+        var w=function(){
+          var args=arguments;
+          var subject=null, mem=[];
+          try{ subject=scopeFn.apply(null,args); mem=subject? (Array.isArray(subject)?subject:[subject]) : []; }catch(e){}
+          var before = mem.length ? snap(mem, cols) : null;
+          var r;
+          try{ r=orig.apply(this,args); }catch(e){ throw e; }
+          var check=function(){
+            try{
+              if(!before || !before.length) return;
+              var after=snap(before.map(function(x){return x.row;}), cols);
+              if(!differs(before,after,cols)) return;
+              push(labelFn(mem[0]), before, after, cols, map);
+            }catch(e){ try{ window.__hh81err.push('check '+name+': '+e.message); }catch(_){} }
+          };
+          try{ Promise.resolve(r).then(function(){ setTimeout(check,0); },function(){ setTimeout(check,0); }); }
+          catch(e){ setTimeout(check,0); }
+          return r;
+        };
+        w.__hh81=1;
+        window[name]=w;
+      }catch(e){ try{ window.__hh81err.push('wrap '+name+': '+e.message); }catch(_){} }
+    };
+  }
+
+  var wCover=mkWrap('setCoverImage', C_COV, M_COV,
+      function(h){ return 'Αλλαγή εξωφύλλου — '+nameOf(h); },
+      function(key){ return byUrl(key); });
+  var wNotes=mkWrap('saveNotes', C_NOT, M_NOT,
+      function(h){ return 'Σημειώσεις — '+nameOf(h); },
+      function(id){ return grp(byId(id)); });
+  var wAddr=mkWrap('saveAddress', C_ADR, M_ADR,
+      function(h){ return 'Διεύθυνση — '+nameOf(h); },
+      function(key){ return grp(byUrl(key)); });
+
+  function install(){ wCover(); wNotes(); wAddr(); }
+  install();
+  setInterval(install, 700);
+  window.hh81Status=function(){
+    return {cover:!!(window.setCoverImage&&window.setCoverImage.__hh81),
+            notes:!!(window.saveNotes&&window.saveNotes.__hh81),
+            address:!!(window.saveAddress&&window.saveAddress.__hh81),
+            err:window.__hh81err};
+  };
+}catch(e){ try{ (window.__hh81err=window.__hh81err||[]).push('top: '+e.message); }catch(_){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
