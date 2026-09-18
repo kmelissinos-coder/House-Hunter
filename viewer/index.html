@@ -10996,6 +10996,20 @@ RULES.push(  /*hhPolish68*/
   [/^(\d+) σπίτια · (\d+) αγγελίες$/, function(m){ return m[1]+' homes · '+m[2]+' listings'; }],
   [/^(\d+) σπίτι · (\d+) αγγελίες$/,  function(m){ return m[1]+' home · '+m[2]+' listings'; }]
 );
+
+/* ---------- 2d. hhPolish71: το νέο ταμπλό «Πού βρέθηκε» ---------- */
+var D71={
+  'Πού βρέθηκε':'Where it matched','Σπίτι':'Home','Μέγεθος':'Size','Πλατφόρμα':'Platform',
+  'Κωδικός σπιτιού':'Home code','Κωδικός αγγελίας':'Listing code','Σύνδεσμος':'Link',
+  'Περιγραφή':'Description','Σημειώσεις':'Notes','Τετραγωνικά':'Area',
+  '✕ Κλείσιμο':'✕ Close',
+  'Καμία αγγελία δεν περιέχει αυτό το κείμενο.':'No listing contains that text.'
+};
+for(var k71 in D71){ if(DICT[k71]==null) DICT[k71]=D71[k71]; }
+RULES.push(
+  [/^🔎 Πού βρέθηκε «(.+)»$/, function(m){ return '🔎 Where “'+m[1]+'” matched'; }]
+);
+
 window.hhTr=tr;
 
 /* ---------- 3. επίστρωση πάνω στο DOM ----------------------------------- */
@@ -11404,6 +11418,247 @@ function tick(){
 }
 setInterval(tick,500); tick();
 }catch(e){console.warn('hhPolish68',e);}})();</script>
+
+<script>/*hhPolish70*/(function(){try{
+
+/* ══════════════════════════════════════════════════════════════════════
+   hhPolish70 — τρία που ζήτησε ο Dusty στις 18/9
+   ══════════════════════════════════════════════════════════════════════
+   1. «Το είδαμε» φεύγει από τις κάρτες της λίστας — μένει ΜΟΝΟ μέσα στην
+      ανοιγμένη κάρτα. (Δεν αγγίζουμε το φίλτρο «Απόκρυψη σπιτιών που
+      είδαμε», που είναι επίσης label με «είδαμε».)
+   2. Τα κουμπιά προβολής της μπάρας είναι ΑΝΤΙΓΡΑΦΑ των αρχικών και
+      συγχρονίζονταν μόνο όταν τα πατούσες. Μετά από refresh σε προβολή
+      χάρτη, το setView() άναβε το αρχικό κουμπί αλλά το αντίγραφο έμενε
+      στο «⊞». Τώρα ακολουθούν τα αρχικά.
+   3. Νέα προβολή «Πού βρέθηκε»: όταν γράφεις στην αναζήτηση, από πάνω
+      εμφανίζεται ΚΕΙΜΕΝΟ — μια γραμμή ανά αγγελία με το ΠΟΙΟ πεδίο
+      ταίριαξε και ένα απόσπασμα. Έτσι το «2005» του μεσίτη φαίνεται
+      αμέσως αν είναι Αρ. Μεσιτικού, έτος, ή απλώς μέσα στο κείμενο.   */
+
+var st=document.createElement('style'); st.id='hh-polish70';
+st.textContent=
+  '#hh70-why{margin:10px 12px 0;border:1px solid var(--border,#2e2c27);border-radius:12px;'
+ +'background:var(--surface,#1a1916);overflow:hidden;font-size:13px}'
+ +'#hh70-why .hh70-head{display:flex;align-items:center;gap:10px;padding:9px 12px;'
+ +'background:rgba(200,168,75,.12);border-bottom:1px solid var(--border,#2e2c27);'
+ +'font-weight:700;color:var(--accent,#c8a84b)}'
+ +'#hh70-why .hh70-head .hh70-sp{flex:1 1 auto}'
+ +'#hh70-why .hh70-x{cursor:pointer;border:1px solid var(--border,#2e2c27);background:transparent;'
+ +'color:inherit;border-radius:7px;padding:2px 9px;font-size:12px}'
+ +'#hh70-why table{width:100%;border-collapse:collapse}'
+ +'#hh70-why th{position:sticky;top:0;text-align:left;font-size:11px;letter-spacing:.3px;'
+ +'text-transform:uppercase;color:var(--muted,#8a8a8a);padding:7px 10px;'
+ +'background:var(--surface2,#222119);border-bottom:1px solid var(--border,#2e2c27);white-space:nowrap}'
+ +'#hh70-why td{padding:8px 10px;border-bottom:1px solid rgba(127,127,127,.16);vertical-align:top}'
+ +'#hh70-why tr:hover td{background:rgba(200,168,75,.07)}'
+ +'#hh70-why .hh70-id{font-weight:700;color:var(--accent,#c8a84b);white-space:nowrap;cursor:pointer}'
+ +'#hh70-why .hh70-num{white-space:nowrap;font-variant-numeric:tabular-nums}'
+ +'#hh70-why .hh70-chip{display:inline-block;margin:2px 5px 2px 0;padding:2px 8px;border-radius:999px;'
+ +'background:rgba(127,127,127,.16);font-size:11.5px;white-space:nowrap}'
+ +'#hh70-why .hh70-chip b{color:var(--accent,#c8a84b);font-weight:700}'
+ +'#hh70-why .hh70-snip{display:block;margin:3px 0 0;color:var(--text2,#b9b3a6);font-size:12px;'
+ +'line-height:1.5;max-width:60ch}'
+ +'#hh70-why mark{background:rgba(200,168,75,.38);color:inherit;border-radius:3px;padding:0 2px}'
+ +'#hh70-why .hh70-wrap{max-height:52vh;overflow:auto}'
+ +'#hh70-why tr.hh73-code td{background:rgba(200,168,75,.10)}'
+ +'#hh70-why tr.hh73-code td:first-child{box-shadow:inset 3px 0 0 var(--accent,#c8a84b)}'
+ +'#hh70-why .hh70-empty{padding:14px 12px;color:var(--text2,#b9b3a6)}'
+ +'body.light #hh70-why{background:#fffdf7}'
+ /* 1. «Το είδαμε» μόνο μέσα στην ανοιγμένη κάρτα */
+ +'.card label.hh70-seen,.grouped-card label.hh70-seen{display:none!important}';
+(document.head||document.documentElement).appendChild(st);
+
+/* ---------- 1. «Το είδαμε» έξω από τις κάρτες της λίστας ---------- */
+function markSeenLabels(root){
+  try{
+    var cards=(root||document).querySelectorAll('.card,.grouped-card');
+    for(var i=0;i<cards.length;i++){
+      var ls=cards[i].querySelectorAll('label');
+      for(var j=0;j<ls.length;j++){
+        var lb=ls[j];
+        if(lb.classList.contains('hh70-seen')) continue;
+        var cb=lb.querySelector('input.admin-check');
+        if(!cb) continue;
+        var oc=cb.getAttribute('onchange')||'';
+        if(oc.indexOf('seen_it')<0) continue;      /* ΜΟΝΟ το «Το είδαμε» */
+        lb.classList.add('hh70-seen');
+      }
+    }
+  }catch(e){}
+}
+
+/* ---------- 2. τα αντίγραφα των κουμπιών προβολής ---------- */
+function syncViewButtons(){
+  try{
+    var orig=document.querySelector('.view-toggle');
+    var bar=document.getElementById('hh-hb');
+    if(!orig||!bar) return;
+    var ob=orig.querySelectorAll('button');
+    var mirrors=[];
+    [].forEach.call(bar.querySelectorAll('.hb-ctrl'),function(b){
+      var t=(b.textContent||'').trim();
+      if(t==='⊞'||t==='≡'||t==='🗺') mirrors.push(b);
+    });
+    if(mirrors.length!==ob.length) return;
+    for(var i=0;i<ob.length;i++){
+      var on=/\bactive\b/.test(ob[i].className);
+      var has=/\bhb-active\b/.test(mirrors[i].className);
+      if(on!==has) mirrors[i].className='hb-ctrl'+(on?' hb-active':'');
+    }
+  }catch(e){}
+}
+
+/* ---------- 3. «Πού βρέθηκε» ---------- */
+/*hhPolish73: ο βαθμός 0 = κωδικός. Ο μεσίτης στο τηλέφωνο λέει έναν κωδικό·
+  αυτός πρέπει να είναι η ΠΡΩΤΗ γραμμή, όχι θαμμένος κάτω από 50 «έτος 2005». */
+var FIELDS=[
+  ['agencyNr','Αρ. Μεσιτικού',0], ['agency_nr','Αρ. Μεσιτικού',0],
+  ['platformNr','Αρ. Αγγελίας',0], ['platform_nr','Αρ. Αγγελίας',0],
+  ['house_id','Κωδικός σπιτιού',0], ['hhl_id','Κωδικός αγγελίας',0],
+  ['location','Περιοχή',1], ['address','Διεύθυνση',1], ['type','Τύπος',1],
+  ['agency','Μεσιτικό',1], ['heating','Θέρμανση',1], ['year','Έτος',1],
+  ['price','Τιμή',1], ['sqm','Τετραγωνικά',1],
+  ['notes','Σημειώσεις',2], ['description','Περιγραφή',2], ['url','Σύνδεσμος',3]
+];
+function esc(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function snip(val,q){
+  var v=String(val), lv=v.toLowerCase(), i=lv.indexOf(q);
+  if(i<0) return null;
+  var a=Math.max(0,i-45), b=Math.min(v.length,i+q.length+45);
+  return (a>0?'…':'')+esc(v.slice(a,i))+'<mark>'+esc(v.slice(i,i+q.length))+'</mark>'
+        +esc(v.slice(i+q.length,b))+(b<v.length?'…':'');
+}
+function why(h,q){
+  var out=[], seen={};
+  for(var i=0;i<FIELDS.length;i++){
+    var k=FIELDS[i][0], label=FIELDS[i][1], rank=FIELDS[i][2], v=h[k];
+    if(v==null||v==='') continue;
+    var sn=snip(v,q);
+    if(!sn) continue;
+    var key=label+'|'+String(v);
+    if(seen[key]) continue; seen[key]=1;
+    var short=(String(v).length<=28);
+    out.push({label:label, val:String(v), snip:sn, short:short, rank:rank});
+  }
+  out.sort(function(a,b){ return a.rank-b.rank; });
+  return out;
+}
+function rowsFor(q){
+  var all=[];
+  try{ all=[].concat(allListings||[], extraListings||[]); }catch(e){ return []; }
+  var out=[];
+  for(var i=0;i<all.length;i++){
+    var h=all[i];
+    if(!h) continue;
+    var w=why(h,q);
+    if(!w.length) continue;
+    out.push({h:h, w:w, best:w[0].rank});
+    if(out.length>=300) break;
+  }
+  out.sort(function(a,b){
+    if(a.best!==b.best) return a.best-b.best;              /*hhPolish73*/
+    return String(a.h.location||'').localeCompare(String(b.h.location||''),'el');
+  });
+  return out;
+}
+function host(){
+  var el=document.getElementById('hh70-why');
+  /*hhPolish72: στην προβολή χάρτη ΔΕΝ υπάρχει .grid-container — οι κάρτες
+    ζουν στο #mapList — οπότε το ταμπλό έπεφτε στο τέλος του body, εκτός
+    οθόνης. Το κολλάμε πάντα κάτω από τη μπάρα, σε όποια προβολή κι αν είμαστε. */
+  var bar=document.getElementById('hh-hb');
+  var anchorParent=null, anchorNext=null;
+  if(bar&&bar.parentNode){ anchorParent=bar.parentNode; anchorNext=bar.nextSibling; }
+  else{
+    var grid=document.querySelector('.grid-container')||document.getElementById('map-container');
+    if(grid&&grid.parentNode){ anchorParent=grid.parentNode; anchorNext=grid; }
+  }
+  if(el){
+    /* αν κάποιο repaint το πέταξε αλλού, ξαναμπαίνει στη θέση του */
+    if(anchorParent && el.parentNode!==anchorParent){
+      try{ anchorParent.insertBefore(el, anchorNext); }catch(e){}
+    }
+    return el;
+  }
+  el=document.createElement('div'); el.id='hh70-why';
+  if(anchorParent){ try{ anchorParent.insertBefore(el, anchorNext); }catch(e){ document.body.appendChild(el); } }
+  else document.body.appendChild(el);
+  return el;
+}
+function open1(h){
+  try{
+    if(typeof openListingOverlay==='function')
+      openListingOverlay(h.url||'', String(h.house_id||'').trim()||'', 0);
+  }catch(e){}
+}
+var LAST='';
+function render(){
+  try{
+    var box=document.getElementById('numSearch');
+    var q=box?String(box.value||'').trim().toLowerCase():'';
+    if(q.length<1){
+      var old=document.getElementById('hh70-why');
+      if(old&&old.parentNode) old.parentNode.removeChild(old);
+      LAST=''; return;
+    }
+    if(q===LAST && document.getElementById('hh70-why')) return;
+    LAST=q;
+    var rows=rowsFor(q), el=host();
+    var head='<div class="hh70-head"><span>🔎 Πού βρέθηκε «'+esc(q)+'»</span>'
+      +'<span class="hh70-sp"></span><span>'+(function(){
+          var c=0; for(var i=0;i<rows.length;i++) if(rows[i].best===0) c++;
+          return (c?('<b>'+c+' σε κωδικό</b> · '):'')+rows.length+' αγγελίες';
+        })()+'</span>'
+      +'<button type="button" class="hh70-x">✕ Κλείσιμο</button></div>';
+    if(!rows.length){ el.innerHTML=head+'<div class="hh70-empty">Καμία αγγελία δεν περιέχει αυτό το κείμενο.</div>'; }
+    else{
+      var body=rows.map(function(r,ix){
+        var h=r.h;
+        var chips=r.w.map(function(x){
+          return '<span class="hh70-chip"><b>'+esc(x.label)+'</b>'
+                 +(x.short?(': '+x.snip):'')+'</span>'
+                 +(x.short?'':'<span class="hh70-snip">'+x.snip+'</span>');
+        }).join('');
+        var price=(h.price>0)?('€'+Number(h.price).toLocaleString('el')):'—';
+        return '<tr data-ix="'+ix+'"'+(r.best===0?' class="hh73-code"':'')+'>'
+          +'<td class="hh70-id">#'+esc(String(h.house_id||h.hhl_id||''))+'</td>'
+          +'<td>'+esc(h.location||'—')+'</td>'
+          +'<td class="hh70-num">'+price+'</td>'
+          +'<td class="hh70-num">'+(h.sqm>0?(h.sqm+' τ.μ.'):'—')+'</td>'
+          +'<td>'+esc(h.platform||'—')+'</td>'
+          +'<td>'+esc(h.agency||'—')+'</td>'
+          +'<td>'+chips+'</td></tr>';
+      }).join('');
+      el.innerHTML=head+'<div class="hh70-wrap"><table><thead><tr>'
+        +'<th>Σπίτι</th><th>Περιοχή</th><th>Τιμή</th><th>Μέγεθος</th>'
+        +'<th>Πλατφόρμα</th><th>Μεσιτικό</th><th>Πού βρέθηκε</th>'
+        +'</tr></thead><tbody>'+body+'</tbody></table></div>';
+      el.__rows=rows;
+    }
+    var x=el.querySelector('.hh70-x');
+    if(x) x.onclick=function(){ if(el.parentNode) el.parentNode.removeChild(el); LAST='__closed__'; };
+    el.onclick=function(ev){
+      var tr=ev.target&&ev.target.closest?ev.target.closest('tr[data-ix]'):null;
+      if(!tr||!el.__rows) return;
+      var r=el.__rows[+tr.getAttribute('data-ix')];
+      if(r) open1(r.h);
+    };
+  }catch(e){}
+}
+
+function tick(){ markSeenLabels(); syncViewButtons(); render(); }
+tick();
+setInterval(tick, 700);
+try{
+  var box=document.getElementById('numSearch');
+  if(box) box.addEventListener('input', function(){ setTimeout(render,120); });
+}catch(e){}
+try{ new MutationObserver(function(){ markSeenLabels(); })
+       .observe(document.body,{childList:true,subtree:true}); }catch(e){}
+window.__hh70={ why:why, rowsFor:rowsFor, render:render, sync:syncViewButtons };
+}catch(e){console.warn('hhPolish70',e);}})();</script>
 
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
