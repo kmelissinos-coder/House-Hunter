@@ -8857,7 +8857,7 @@ function rowHtml(m,f){
   }else{
     body='<span class="hh-gs-owner">'+OWNER+'</span>'; tip=T_OWNER;
   }
-  var lk=!!(f==='agency' && m && m.url);
+  var lk=!!(m && m.url);
   return '<div class="hh-gs-vrow'+(lk?' hh-gs-link':'')+'"'
         +(lk?' data-url="'+encodeURIComponent(m.url)+'"':'')
         +(tip?' title="'+tip+'"':'')
