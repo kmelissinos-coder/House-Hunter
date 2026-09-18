@@ -6866,6 +6866,10 @@ function qbox(){ try{ var n=$('numSearch'); return n?String(n.value||'').trim():
 var PSEL=new Set(), ASEL=new Set();
 var pInit=false, aInit=false, lastPlatCount=0;
 var roster=[], rosterSig='', agCount={}, agAll=true;
+/*hhPolish67: οι αριθμοί στα κουμπιά διαβάζονταν από τα σηματάκια της μπάρας
+  πλατφορμών — που δεν είναι πλήθος αγγελιών (έδειχναν 6, 1, 0, 5…). Τώρα
+  μετριούνται από τα ΔΕΔΟΜΕΝΑ, όπως το «702 listings shown». */
+var PCNT={}, PBASE=0;
 window.hhPlatformSet=PSEL; window.hhAgencySet=ASEL;
 
 function loadLS(k){
@@ -6883,12 +6887,14 @@ function platTabs(){
       if(!p || p==='all') return;
       var sp=t.querySelector('span');
       var m=String(sp?sp.textContent:'').match(/(\d+)/);
-      out.push({p:p, n:m?parseInt(m[1],10):0});
+      var n=(PCNT && PCNT[p]!=null) ? PCNT[p] : (m?parseInt(m[1],10):0);  /*hhPolish67*/
+      out.push({p:p, n:n});
     });
   }catch(e){}
   return out;
 }
 function platAllCount(){
+  if(PBASE) return PBASE;                       /*hhPolish67*/
   try{
     var t=document.querySelector('#platform-bar .platform-tab[data-platform="all"]');
     var sp=t?t.querySelector('span'):null;
@@ -7165,6 +7171,10 @@ function paintAgMenu(){
     });
   }catch(e){}
 }
+function agTotal(){                             /*hhPolish67*/
+  var s=0; try{ for(var k in agCount) s+=(agCount[k]||0); }catch(e){}
+  return s;
+}
 function agLabel(){
   var tot=roster.length, n=ASEL.size;
   var ALL='Όλα τα μεσιτικά';
@@ -7172,7 +7182,8 @@ function agLabel(){
   if(n===0) return 'Κανένα μεσιτικό (0) ▾';
   var s=0, one=null;
   roster.forEach(function(x){ if(ASEL.has(x.key)){ s+=(agCount[x.key]||0); if(one===null) one=x; } });
-  if(n>=tot) return ALL+' ('+s+') ▾';
+  if(n>=tot) return ALL+' ('+agTotal()+') ▾';   /*hhPolish67: και οι αγγελίες
+      χωρίς μεσιτικό (ιδιώτες, κενά Rentola) μετράνε — έλειπαν ~180 */
   if(n===1 && one) return one.label+' ('+(agCount[one.key]||0)+') ▾';
   return n+' μεσιτικά ('+s+') ▾';
 }
@@ -7258,6 +7269,13 @@ function postFilter(){
   var q=qbox();
   /* hhPolish41: while something is typed in the search box every filter steps aside */
   var pf = q ? base : base.filter(platPass);
+  /*hhPolish67: πλήθη ανά πλατφόρμα ΠΡΙΝ το φίλτρο πλατφόρμας, ώστε το μενού
+    να δείχνει πόσα θα δεις αν την επιλέξεις */
+  try{
+    var pc={};
+    base.forEach(function(h){ var p=String((h&&h.platform)||'').trim(); if(p) pc[p]=(pc[p]||0)+1; });
+    PCNT=pc; PBASE=base.length;
+  }catch(e){}
   /* live agency counts: project + platforms + every other filter, WITHOUT the agency filter */
   try{
     initAg(false);
@@ -10974,6 +10992,10 @@ RULES.push(
      var t=tr(m[1]); return t==null?null:(t+' '+m[2]); }]
 );
 
+RULES.push(  /*hhPolish68*/
+  [/^(\d+) σπίτια · (\d+) αγγελίες$/, function(m){ return m[1]+' homes · '+m[2]+' listings'; }],
+  [/^(\d+) σπίτι · (\d+) αγγελίες$/,  function(m){ return m[1]+' home · '+m[2]+' listings'; }]
+);
 window.hhTr=tr;
 
 /* ---------- 3. επίστρωση πάνω στο DOM ----------------------------------- */
@@ -11351,6 +11373,32 @@ try{ new MutationObserver(function(){ if(!window.__hh61t){ window.__hh61t=setTim
        .observe(document.body,{childList:true,subtree:true}); }catch(e){}
 window.__hh61={ sweep:sweep, mine:mine, houseOf:houseOf };
 }catch(e){console.warn('hhPolish61',e);}})();</script>
+
+<script>/*hhPolish68*/(function(){try{
+/* Η πινακίδα «αγγελίες εμφανίζονται» γραφόταν από ΠΕΝΤΕ σημεία, το καθένα με
+   το δικό του στιγμιότυπο του «filtered». Το τελευταίο που έγραφε κέρδιζε,
+   κι έτσι έμενε το σύνολο του έργου (702) αντί για όσα όντως βλέπεις (523).
+   Τώρα διαβάζεται κάθε 500 ms η ΤΡΕΧΟΥΣΑ τιμή και γράφονται και τα σπίτια. */
+function nList(){
+  try{ if(typeof filtered!=='undefined' && filtered && filtered.length!=null) return filtered.length; }catch(e){}
+  return 0;
+}
+function nHouse(){ try{ return document.querySelectorAll('.card,.grouped-card').length; }catch(e){ return 0; } }
+function tick(){
+  try{
+    var rc=document.getElementById('resultsCount'); if(!rc) return;
+    if(rc.querySelector('span')) return;          /* οι πίλοι Fameli/2xFam/Rent: δικοί τους */
+    var l=nList(); if(!l) return;
+    var h=nHouse();
+    var want=h ? (h+(h===1?' σπίτι · ':' σπίτια · ')+l+' αγγελίες') : (l+' αγγελίες εμφανίζονται');
+    var cur=(rc.getAttribute('data-hh55')||rc.textContent||'').replace(/\s+/g,' ').trim();
+    if(cur===want) return;
+    rc.textContent=want;
+    try{ rc.removeAttribute('data-hh55'); }catch(e){}
+  }catch(e){}
+}
+setInterval(tick,500); tick();
+}catch(e){console.warn('hhPolish68',e);}})();</script>
 
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
