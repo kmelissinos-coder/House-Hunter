@@ -69,6 +69,13 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .btn.merge{background:var(--accent2);color:#0f1a14}
 .btn.no{background:rgba(224,90,90,.18);color:#f0a0a0;border:1px solid rgba(224,90,90,.4)}
 .btn.later{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
+.btn.nuke{background:transparent;color:#e06c6c;border:1px solid #7a2f2f;border-radius:8px;padding:2px 9px;font-size:11.5px;cursor:pointer;margin-right:8px}
+.btn.nuke:hover{background:#7a2f2f;color:#fff}
+.reason.later{background:rgba(200,168,75,.18);border-color:#c8a84b;color:#e9cf86}
+#nukeBox{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:9999}
+#nukeBox .box{background:var(--card,#1a1916);border:1px solid #7a2f2f;border-radius:14px;padding:22px 24px;max-width:520px;line-height:1.65}
+#nukeBox h3{margin:0 0 8px;color:#e06c6c}
+#nukeBox .acts{margin-top:16px;display:flex;gap:10px;justify-content:flex-end}
 .btn.ok{background:rgba(126,184,154,.2);color:#bfe4cf;border:1px solid rgba(126,184,154,.5)}
 .btn.split{background:rgba(224,90,90,.14);color:#f0a0a0;border:1px solid rgba(224,90,90,.35);padding:4px 9px;font-size:12px}
 .btn:disabled{opacity:.5;cursor:default}
@@ -189,7 +196,7 @@ function houseHTML(h,rating,label,key,aligned){if(!h)return '<div>—</div>';/*h
   const others=(h.ratings||[]).map(r=>esc((r.email||'').split('@')[0])+' '+stars(r.rating)).join(' · ');
   return `<div>${galHTML(imgs,key)}
     <div class="hinfo">
-      <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span><span class="links"><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</span></div>
+      <div class="top"><span class="hid">${label} #${esc(h.house_id)}</span> <span class="loc">${esc(h.location||'—')}</span><span class="links"><button type="button" class="btn nuke" onclick="hardDelete('${esc(h.house_id)}',this)" title="Σβήνει το σπίτι και όλες τις αγγελίες του από τη βάση, οριστικά">🗑 Οριστική διαγραφή</button><a href="index.html?house=${encodeURIComponent(h.house_id)}" target="_blank">🏡 Άνοιγμα στο HH</a>${h.url?`<a href="${esc(h.url)}" target="_blank" rel="noopener">↗ Αγγελία</a>`:''}</span></div>
       <div class="spec"><b>${sq(h.sqm)}</b> · <b>${priceRange(h)}</b> · ${h.year?'🏗 '+h.year:''} ${h.rooms?'· 🛏 '+esc(h.rooms):''} ${h.floor!=null?'· όροφος '+esc(h.floor):''}</div>
       <div class="spec">${esc(h.agencies||'Ιδιώτης')} · <span class="plat">${esc(h.platforms||h.platform||'')}</span><span class="hbadge ${h.n_ads>1?'multi':'single'}">${h.n_ads>1?'🏠 σπίτι με '+h.n_ads+' αγγελίες':'μία αγγελία'}</span>${(function(){try{var ads=h.ads||[];var gone=ads.length&&ads.every(function(a){return a.deleted;});
       var ps=[];ads.forEach(function(a){if(a.deleted&&a.platform&&ps.indexOf(a.platform)<0)ps.push(a.platform);});
@@ -220,7 +227,7 @@ function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/
     <div class="ptop"><span class="score${p.score>=75?' hi':''}" title="Σκορ ομοιότητας 0–100: πόσο μοιάζουν τα δύο σπίτια">Σκορ ομοιότητας ${p.score}</span>
       ${(p.reasons||[]).filter(r=>!/φωτογραφί/.test(r)).map(r=>`<span class="reason${neg(r)?' neg':''}">${esc(r)}</span>`).join('')}
       ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}% ίδια</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτογραφία</span>':''}${photoChip(p)}
-      <span class="keep">📍 ${dist}</span></div>
+      <span class="keep">📍 ${dist}</span>${p.postponed?`<span class="reason later" title="Το είχες αφήσει για αργότερα${p.postponed_at?' στις '+new Date(p.postponed_at).toLocaleString('el-GR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}">⏳ αναβλήθηκε</span>`:''}</div>
     <div class="acts top">
       <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
       <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
@@ -278,7 +285,45 @@ async function load(){const el=document.getElementById('list');el.className='msg
   render();showFreshness();}
 async function showFreshness(){/*mergeV6*/try{var st=await rpc('rent_pairs_status',{});var el=document.getElementById('freshness');if(!el||!st)return;var d=st.built_at?new Date(st.built_at):null;var mins=d?Math.round((Date.now()-d.getTime())/60000):null;var when=!d?'—':(mins<1?'μόλις τώρα':(mins<60?('πριν '+mins+'′'):d.toLocaleString('el-GR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})));el.innerHTML='ζεύγη: <b>'+(st.n_pairs||0)+'</b> · υπολογίστηκαν '+when+(st.dirty?' · <b>άλλαξαν αγγελίες — ανανεώνεται</b>':'');}catch(e){}}
 function advance(i){const arr=items();arr.splice(i,1);if(VIEW==='one'){IDX=Math.min(i,arr.length-1);render();}else{const el=document.getElementById('p'+i)||document.getElementById('g'+i);if(el)el.classList.add('done');document.getElementById('count').textContent=arr.length+(TAB==='pairs'?' ζευγάρια':' ομάδες');setTimeout(render,600);}}
-async function verdict(i,v){const p=PAIRS[i];try{await rpc('merge_verdict',{p_h1:p.h1,p_h2:p.h2,p_verdict:v});toast(v==='no'?'✓ Σημειώθηκε ως διαφορετικά σπίτια':'✓ Για αργότερα');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
+/* ── mergeV14: οριστική διαγραφή σπιτιού ─────────────────────────────
+   Σβήνει αγγελίες, βαθμολογίες, σημειώσεις, ιστορικό τιμών και τα σχετικά.
+   Κρατιέται ΕΝΑ αντίγραφο JSON στον πίνακα hh_deleted_houses — μόνο για
+   την περίπτωση λάθους κλικ· δεν φαίνεται πουθενά στην εφαρμογή.        */
+function nukeAsk(house){
+  return new Promise(function(res){
+    var b=document.getElementById('nukeBox');
+    if(!b){ b=document.createElement('div'); b.id='nukeBox';
+      b.innerHTML='<div class="box"><h3>Οριστική διαγραφή σπιτιού</h3>'
+        +'<div id="nukeTxt"></div>'
+        +'<div class="acts"><button class="btn later" data-a="0">Άκυρο</button>'
+        +'<button class="btn no" data-a="1">🗑 Ναι, διάγραψέ το οριστικά</button></div></div>';
+      document.body.appendChild(b);
+    }
+    document.getElementById('nukeTxt').innerHTML=
+      'Θα σβηστεί το σπίτι <b>#'+house+'</b> με <b>όλες τις αγγελίες του</b>, '
+      +'τις βαθμολογίες, τις σημειώσεις και το ιστορικό τιμών.<br><br>'
+      +'Δεν θα ξαναεμφανιστεί ούτε στις προτάσεις ένωσης. Αν η αγγελία υπάρχει ακόμα '
+      +'στην πλατφόρμα, η επόμενη καθημερινή σάρωση <b>θα την ξαναφέρει</b> ως νέο σπίτι.';
+    b.style.display='flex';
+    b.querySelectorAll('button[data-a]').forEach(function(x){
+      x.onclick=function(){ b.style.display='none'; res(x.getAttribute('data-a')==='1'); };
+    });
+  });
+}
+async function hardDelete(house,btn){
+  if(!(await nukeAsk(house))) return;
+  if(btn){ btn.disabled=true; btn.textContent='… διαγραφή'; }
+  try{
+    var msg=await rpc('hh_hard_delete_house',{p_house:String(house)});
+    toast('🗑 '+msg);
+    PAIRS=PAIRS.filter(function(q){ return q.h1!==house && q.h2!==house; });
+    render();
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='🗑 Οριστική διαγραφή'; }
+    toast('Σφάλμα: '+e.message,true);
+  }
+}
+async function verdict(i,v){const p=PAIRS[i];try{await rpc('merge_verdict',{p_h1:p.h1,p_h2:p.h2,p_verdict:v});toast(v==='no'?'✓ Σημειώθηκε ως διαφορετικά σπίτια':'⏳ Για αργότερα — θα ξαναεμφανιστεί στο επόμενο φόρτωμα');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
 function askRating(p,keep){return new Promise(res=>{const m=document.getElementById('modal'),b=document.getElementById('mbox');const rk=keep==='a'?p.rating_a:p.rating_b,ro=keep==='a'?p.rating_b:p.rating_a,idk=keep==='a'?p.h1:p.h2,ido=keep==='a'?p.h2:p.h1;let nv=0;
   b.innerHTML=`<h3>Και τα δύο έχουν βαθμολογία</h3><div style="color:var(--muted);font-size:13px">Ποια να κρατήσω για το ενωμένο σπίτι #${esc(idk)};</div>
     <button class="opt" data-c="keep_new">Κρατάω του #${esc(idk)}: <b class="stars">${stars(rk)}</b></button>
