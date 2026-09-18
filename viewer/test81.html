@@ -12548,17 +12548,38 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
       },350);
     }catch(err){}
   }, true);
-  var wAddr=mkWrap('saveAddress', C_ADR, M_ADR,
-      function(h){ return 'Διεύθυνση — '+nameOf(h); },
-      function(key){ return grp(byUrl(key)); });
+  /* Ίδια ιστορία με τη διεύθυνση: το hhPolish74 ξαναγράφει το saveAddress από
+     τη ΒΑΣΙΚΗ συνάρτηση, οπότε ό,τι τυλίγουμε πετιέται. Κλικ σε capture. */
+  document.addEventListener('click', function(e){
+    try{
+      var b=(e.target&&e.target.closest)?e.target.closest('[onclick]'):null; if(!b) return;
+      var m=String(b.getAttribute('onclick')||'').match(/saveAddress\(\s*'([^']+)'/);
+      if(!m) return;
+      var key=m[1]; try{ key=key.replace(/\\'/g,"'"); }catch(_){}
+      var h=byUrl(key), mem=grp(h); if(!mem.length) return;
+      var before=snap(mem, C_ADR);
+      var tries=0;
+      var tick=function(){
+        try{
+          var after=snap(before.map(function(x){return x.row;}), C_ADR);
+          if(differs(before,after,C_ADR)){
+            push('\u0394\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7 \u2014 '+nameOf(h), before, after, C_ADR, M_ADR);
+            return;
+          }
+          if(++tries<12) setTimeout(tick,500);   /* το geocoding αργεί */
+        }catch(err){ try{ window.__hh81err.push('addr check: '+err.message); }catch(_){} }
+      };
+      setTimeout(tick,400);
+    }catch(err){}
+  }, true);
 
-  function install(){ wCover(); wAddr(); }
+  function install(){ wCover(); }
   install();
   setInterval(install, 700);
   window.hh81Status=function(){
     return {cover:!!(window.setCoverImage&&window.setCoverImage.__hh81),
             notes:'click-hook',
-            address:!!(window.saveAddress&&window.saveAddress.__hh81),
+            address:'click-hook',
             err:window.__hh81err};
   };
 }catch(e){ try{ (window.__hh81err=window.__hh81err||[]).push('top: '+e.message); }catch(_){} }})();</script>
