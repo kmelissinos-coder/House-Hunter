@@ -12236,7 +12236,7 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   (document.head||document.documentElement).appendChild(st);
 }catch(e){}})();</script>
 <script>/*hhPolish79*/(function(){try{
-  var KV='hh79_view', KS='hh79_scroll';
+  var KV='hh79_view', KS='hh79_scroll', GRACE=9000;
   function lget(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
   function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
   function view(){ try{ return (typeof currentView!=='undefined')?currentView:'grid'; }catch(e){ return 'grid'; } }
@@ -12250,56 +12250,57 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
     w.__hh79=1; try{ window.setView=w; }catch(e){}
   })();
 
-  /* ---- 2. θυμήσου το σημείο της λίστας ---- */
+  /* ---- 2. τι θέλουμε να επαναφέρουμε (διαβάζεται ΠΡΙΝ το πειράξει τίποτα) ---- */
+  var want=lget(KV), target=null;
+  try{ var raw=lget(KS); if(raw){ var p=JSON.parse(raw); if(p&&p.y>0) target=p; } }catch(e){}
+
+  var live=false;              /* live = επιτρέπεται πλέον να γράφουμε τη θέση */
+  var moved=false;
+  ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){
+    try{ window.addEventListener(ev,function(){ moved=true; },true); }catch(e){}
+  });
+
+  /* ---- 3. αποθήκευση (μόνο αφού τελειώσει η επαναφορά) ---- */
   var last=0;
   function save(){
     try{
-      if(!done) return;            /* μέχρι να γίνει η επαναφορά ΔΕΝ γράφουμε:
-                                      τα scroll events του πρώτου render είναι 0
-                                      και θα έσβηναν την αποθηκευμένη θέση */
+      if(!live) return;
       var now=Date.now(); if(now-last<250) return; last=now;
-      var m=mapList(), p;
-      if(m) p={v:'map', y:Math.round(m.scrollTop)};
-      else   p={v:view(), y:Math.round(window.scrollY||document.documentElement.scrollTop||0)};
-      lset(KS, JSON.stringify(p));
+      var m=mapList(), q;
+      if(m) q={v:'map', y:Math.round(m.scrollTop)};
+      else   q={v:view(), y:Math.round(window.scrollY||document.documentElement.scrollTop||0)};
+      lset(KS, JSON.stringify(q));
     }catch(e){}
   }
-  window.addEventListener('scroll', save, true);   /* capture: πιάνει και το #mapList */
-  window.addEventListener('beforeunload', function(){ last=0; save(); });
+  try{ window.addEventListener('scroll', save, true); }catch(e){}   /* capture: πιάνει και το #mapList */
+  try{ window.addEventListener('beforeunload', function(){ last=0; save(); }); }catch(e){}
 
-  /* ---- 3. επανάφερε μετά το πρώτο render ---- */
-  var done=false, want=lget(KV), tries=0;
-  var saved0=lget(KS);             /* το κρατάμε πριν το πειράξει οτιδήποτε */
+  /* ---- 4. επαναφορά, επίμονα ---- */
   function ready(){
-    var c=document.getElementById('main-content');
-    if(!c) return false;
+    var c=document.getElementById('main-content'); if(!c) return false;
     return !!(mapList() || c.querySelector('.card, .list-row, .empty'));
   }
-  function restore(){
-    if(done) return;
-    var raw=saved0; if(!raw){ done=true; return; }
-    var p=null; try{ p=JSON.parse(raw); }catch(e){}
-    if(!p || !p.y){ done=true; return; }
-    if(p.v!==view()) return;                       /* περίμενε να μπει η σωστή προβολή */
-    if(p.v==='map'){
+  function apply(){
+    if(!target) return;
+    if(target.v!==view()) return;
+    if(target.v==='map'){
       var m=mapList(); if(!m) return;
-      if(m.scrollHeight - m.clientHeight < p.y - 4) return;   /* δεν φορτώθηκαν ακόμη κάρτες */
-      m.scrollTop=p.y;
+      if(m.scrollHeight - m.clientHeight < target.y - 4) return;
+      if(Math.abs(m.scrollTop-target.y)>4) m.scrollTop=target.y;
     }else{
-      if((document.body.scrollHeight||0) - window.innerHeight < p.y - 4) return;
-      window.scrollTo(0,p.y);
+      if((document.body.scrollHeight||0) - window.innerHeight < target.y - 4) return;
+      var cur=window.scrollY||document.documentElement.scrollTop||0;
+      if(Math.abs(cur-target.y)>4) window.scrollTo(0,target.y);
     }
-    done=true;
   }
+  var until=Date.now()+GRACE;
   var iv=setInterval(function(){
-    tries++;
     try{
-      if(want && ready() && view()!==want && typeof setView==='function'){ setView(want); want=null; }
-      if(want && ready() && view()===want) want=null;
-      if(!want) restore();
+      if(moved){ live=true; clearInterval(iv); return; }
+      if(want && ready() && typeof setView==='function' && view()!==want) setView(want);
+      if(!want || view()===want){ want=null; apply(); }
     }catch(e){}
-    if(tries>80){ done=true; }
-    if(done) clearInterval(iv);
+    if(Date.now()>until){ live=true; clearInterval(iv); }
   },250);
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
