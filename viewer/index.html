@@ -11845,6 +11845,162 @@ try{ new MutationObserver(function(){ equipStrips(); })
 window.__hh74={ coords:window.hhCoordsOf, imgsOfHouse:imgsOfHouse, mapFrame:mapFrame };
 }catch(e){console.warn('hhPolish74',e);}})();</script>
 
+<script>/*hhPolish75*/(function(){try{
+
+/* ══════════════════════════════════════════════════════════════════════
+   hhPolish75 — «κανένα αποτέλεσμα» χωρίς να χάνεται ο χάρτης
+   ──────────────────────────────────────────────────────────────────────
+   Το L39 REAL ESTATE έδειχνε (0) και «καμία αγγελία»: η ΜΟΝΗ του αγγελία
+   (#741 Σταμάτα) είναι ΚΡΥΜΜΕΝΗ. Κρυμμένες/αφαιρεμένες αγγελίες βγαίνουν
+   από τα αποτελέσματα, άρα και από τους μετρητές — και δεν έλεγε κανείς
+   γιατί. Και στην προβολή χάρτη το μήνυμα «καμία αγγελία» αντικαθιστούσε
+   ΟΛΟ το περιεχόμενο, δηλαδή έσβηνε και τον χάρτη: δεν είχες πια τρόπο να
+   κάνεις zoom out για να δεις πού είναι τα ακίνητα του μεσιτικού.
+   Τώρα: ο χάρτης μένει πάντα, το μήνυμα λέει ΤΙ κρύβεται και δίνει κουμπί
+   να εμφανιστεί, και όταν διαλέγεις ένα μεσιτικό ο χάρτης πάει πάνω του. */
+
+var st=document.createElement('style'); st.id='hh-polish75';
+st.textContent=
+  '.hh75-why{margin:10px;padding:14px 16px;border:1px solid var(--accent,#c8a84b);'
+ +'border-radius:12px;background:rgba(200,168,75,.10);font-size:13.5px;line-height:1.7}'
+ +'.hh75-why b{color:var(--accent,#c8a84b)}'
+ +'.hh75-why .hh75-btn{display:inline-block;margin-top:9px;padding:6px 13px;border-radius:9px;'
+ +'border:1px solid var(--accent,#c8a84b);background:var(--accent,#c8a84b);color:#101010;'
+ +'font-weight:700;cursor:pointer;font-size:12.5px}'
+ +'.hh75-why .hh75-btn.ghost{background:transparent;color:var(--accent,#c8a84b);margin-left:6px}';
+(document.head||document.documentElement).appendChild(st);
+
+function rows(){ try{ return [].concat(allListings||[], extraListings||[]); }catch(e){ return []; } }
+/* ποιο μεσιτικό/πλατφόρμα είναι επιλεγμένο: το διαβάζουμε από το κουμπί */
+function pickLabel(){
+  try{
+    var bar=document.getElementById('hh-hb'); if(!bar) return null;
+    var out={ag:null, plat:null};
+    [].forEach.call(bar.querySelectorAll('.hb-ctrl'),function(b){
+      var t=(b.getAttribute('data-hh55')||b.textContent||'').replace(/\s*▾\s*$/,'').trim();
+      if(!t) return;
+      if(/^(Όλα τα μεσιτικά|All agencies|Κανένα μεσιτικό|No agency)/.test(t)) return;
+      if(/^(Όλες οι πλατφόρμες|All platforms|Καμία πλατφόρμα|No platform)/.test(t)) return;
+      var m=/^(.*?)\s*\((\d+)\)$/.exec(t);
+      if(!m) return;
+      if(b.__hh44 || /agenc|μεσιτ/i.test(b.title||'')) { if(!out.ag) out.ag={name:m[1], n:+m[2]}; }
+    });
+    return out;
+  }catch(e){ return null; }
+}
+function hiddenFor(name){
+  var r=rows(), out={hidden:0, deleted:0, off:0, houses:{}};
+  if(!name) return out;
+  var n=String(name).toLowerCase();
+  for(var i=0;i<r.length;i++){
+    var h=r[i];
+    if(String(h.agency||'').toLowerCase().indexOf(n)<0) continue;
+    var any=false;
+    if(h.hidden){ out.hidden++; any=true; }
+    if(h.deleted){ out.deleted++; any=true; }
+    if(h.off_market){ out.off++; any=true; }
+    if(any) out.houses[String(h.house_id||h.hhl_id||'')]=1;
+  }
+  out.nHouses=Object.keys(out.houses).length;
+  return out;
+}
+function reveal(){
+  try{
+    var sd=document.getElementById('showDeleted');
+    if(sd && !sd.checked){ sd.checked=true; sd.dispatchEvent(new Event('change',{bubbles:true})); }
+    var off=document.getElementById('hh47ShowOff')||document.querySelector('[id*="offmarket" i],[id*="OffMarket"]');
+    if(off && off.type==='checkbox' && !off.checked){ off.checked=true; off.dispatchEvent(new Event('change',{bubbles:true})); }
+    if(typeof applyFilters==='function') applyFilters();
+  }catch(e){}
+}
+function banner(info, label){
+  var bits=[];
+  if(info.hidden) bits.push(info.hidden+' κρυμμένες');
+  if(info.deleted) bits.push(info.deleted+' αφαιρεμένες από την πλατφόρμα');
+  if(info.off) bits.push(info.off+' νοικιασμένες/πουλημένες');
+  var d=document.createElement('div'); d.className='hh75-why';
+  if(bits.length){
+    d.innerHTML='Καμία <b>ορατή</b> αγγελία με αυτά τα φίλτρα — αλλά '
+      +(label?('το <b>'+label+'</b> έχει '):'υπάρχουν ')
+      +'<b>'+bits.join(' + ')+'</b>'+(info.nHouses?(' σε '+info.nHouses+' σπίτι'+(info.nHouses>1?'α':'')):'')+'.'
+      +'<br><span class="hh75-btn" data-act="show">👁 Εμφάνισέ τες</span>'
+      +'<span class="hh75-btn ghost" data-act="clear">↺ Καθάρισε τα φίλτρα</span>';
+  }else{
+    d.innerHTML='Καμία αγγελία με αυτά τα φίλτρα.'
+      +'<br><span class="hh75-btn ghost" data-act="clear">↺ Καθάρισε τα φίλτρα</span>';
+  }
+  d.addEventListener('click',function(e){
+    var a=e.target&&e.target.getAttribute&&e.target.getAttribute('data-act');
+    if(a==='show') reveal();
+    if(a==='clear'){ try{ var r=document.querySelector('[onclick*="resetFilters"]'); if(r) r.click();
+      else { var ns=document.getElementById('numSearch'); if(ns){ ns.value=''; ns.dispatchEvent(new Event('input',{bubbles:true})); } } }catch(x){} }
+  });
+  return d;
+}
+
+function emptyFix(){
+  try{
+    var c=document.getElementById('main-content'); if(!c) return;
+    var isMap=(typeof currentView!=='undefined' && currentView==='map');
+    var empty=c.querySelector(':scope > .empty');
+    if(!empty){ c.__hh75=0; return; }
+    if(c.__hh75===1 && c.querySelector('.hh75-why')) return;
+    var pick=pickLabel();
+    var label=(pick&&pick.ag)?pick.ag.name:null;
+    /* το κουμπί μπορεί να είναι της πλατφόρμας: δέξου το όνομα ΜΟΝΟ αν
+       υπάρχει όντως μεσιτικό που το περιέχει */
+    if(label){
+      var ln=String(label).toLowerCase(), okName=false, rr=rows();
+      for(var q=0;q<rr.length;q++){ if(String(rr[q].agency||'').toLowerCase().indexOf(ln)>=0){ okName=true; break; } }
+      if(!okName) label=null;
+    }
+    var info=hiddenFor(label);
+    if(isMap){
+      /* ο χάρτης ΠΡΕΠΕΙ να μείνει: ξαναχτίζουμε το split με άδεια λίστα */
+      c.innerHTML='<div id="map-split"><div id="mapList"></div><div id="map"></div></div>';
+      document.getElementById('mapList').appendChild(banner(info,label));
+      try{ if(typeof initMap==='function') setTimeout(initMap,40); }catch(e){}
+    }else{
+      empty.textContent='';
+      empty.appendChild(banner(info,label));
+    }
+    c.__hh75=1;
+  }catch(e){}
+}
+
+/* όταν διαλέγεις ΕΝΑ μεσιτικό, ο χάρτης πάει πάνω στις αγγελίες του */
+var lastAg=null;
+function fitToAgency(){
+  try{
+    if(typeof currentView==='undefined' || currentView!=='map') return;
+    var pick=pickLabel(); var name=(pick&&pick.ag)?pick.ag.name:null;
+    if(name===lastAg) return;
+    lastAg=name;
+    if(!name || !window._hhMap || !window.L) return;
+    var pts=[], r=rows(), n=String(name).toLowerCase();
+    for(var i=0;i<r.length;i++){
+      var h=r[i];
+      if(String(h.agency||'').toLowerCase().indexOf(n)<0) continue;
+      var la=(h.address_lat!=null?+h.address_lat:(h.platform_lat!=null?+h.platform_lat:null));
+      var ln=(h.address_lng!=null?+h.address_lng:(h.platform_lng!=null?+h.platform_lng:null));
+      if(la!=null&&!isNaN(la)&&ln!=null&&!isNaN(ln)) pts.push([la,ln]);
+    }
+    if(!pts.length) return;
+    setTimeout(function(){
+      try{
+        if(pts.length===1) window._hhMap.setView(pts[0], 15, {animate:false});
+        else window._hhMap.fitBounds(L.latLngBounds(pts).pad(0.25), {animate:false, maxZoom:15});
+      }catch(e){}
+    }, 260);
+  }catch(e){}
+}
+
+function tick(){ emptyFix(); fitToAgency(); }
+tick();
+setInterval(tick, 600);
+window.__hh75={ hiddenFor:hiddenFor, pick:pickLabel, fit:fitToAgency };
+}catch(e){console.warn('hhPolish75',e);}})();</script>
+
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
