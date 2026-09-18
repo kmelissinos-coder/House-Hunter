@@ -12235,6 +12235,74 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
    +'.hh-gs-vpop .hh-gs-vrow[data-url]:hover{background:rgba(200,168,75,.16)}';
   (document.head||document.documentElement).appendChild(st);
 }catch(e){}})();</script>
+<script>/*hhPolish79*/(function(){try{
+  var KV='hh79_view', KS='hh79_scroll', GRACE=9000;
+  function lget(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lset(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function view(){ try{ return (typeof currentView!=='undefined')?currentView:'grid'; }catch(e){ return 'grid'; } }
+  function mapList(){ return document.getElementById('mapList'); }
+
+  /* ---- 1. θυμήσου την προβολή ---- */
+  (function(){
+    var o=window.setView;
+    if(typeof o!=='function' || o.__hh79) return;
+    var w=function(v){ var r=o.apply(this,arguments); try{ lset(KV,String(v)); }catch(e){} return r; };
+    w.__hh79=1; try{ window.setView=w; }catch(e){}
+  })();
+
+  /* ---- 2. τι θέλουμε να επαναφέρουμε (διαβάζεται ΠΡΙΝ το πειράξει τίποτα) ---- */
+  var want=lget(KV), target=null;
+  try{ var raw=lget(KS); if(raw){ var p=JSON.parse(raw); if(p&&p.y>0) target=p; } }catch(e){}
+
+  var live=false;              /* live = επιτρέπεται πλέον να γράφουμε τη θέση */
+  var moved=false;
+  ['wheel','touchstart','keydown','mousedown'].forEach(function(ev){
+    try{ window.addEventListener(ev,function(){ moved=true; },true); }catch(e){}
+  });
+
+  /* ---- 3. αποθήκευση (μόνο αφού τελειώσει η επαναφορά) ---- */
+  var last=0;
+  function save(){
+    try{
+      if(!live) return;
+      var now=Date.now(); if(now-last<250) return; last=now;
+      var m=mapList(), q;
+      if(m) q={v:'map', y:Math.round(m.scrollTop)};
+      else   q={v:view(), y:Math.round(window.scrollY||document.documentElement.scrollTop||0)};
+      lset(KS, JSON.stringify(q));
+    }catch(e){}
+  }
+  try{ window.addEventListener('scroll', save, true); }catch(e){}   /* capture: πιάνει και το #mapList */
+  try{ window.addEventListener('beforeunload', function(){ last=0; save(); }); }catch(e){}
+
+  /* ---- 4. επαναφορά, επίμονα ---- */
+  function ready(){
+    var c=document.getElementById('main-content'); if(!c) return false;
+    return !!(mapList() || c.querySelector('.card, .list-row, .empty'));
+  }
+  function apply(){
+    if(!target) return;
+    if(target.v!==view()) return;
+    if(target.v==='map'){
+      var m=mapList(); if(!m) return;
+      if(m.scrollHeight - m.clientHeight < target.y - 4) return;
+      if(Math.abs(m.scrollTop-target.y)>4) m.scrollTop=target.y;
+    }else{
+      if((document.body.scrollHeight||0) - window.innerHeight < target.y - 4) return;
+      var cur=window.scrollY||document.documentElement.scrollTop||0;
+      if(Math.abs(cur-target.y)>4) window.scrollTo(0,target.y);
+    }
+  }
+  var until=Date.now()+GRACE;
+  var iv=setInterval(function(){
+    try{
+      if(moved){ live=true; clearInterval(iv); return; }
+      if(want && ready() && typeof setView==='function' && view()!==want) setView(want);
+      if(!want || view()===want){ want=null; apply(); }
+    }catch(e){}
+    if(Date.now()>until){ live=true; clearInterval(iv); }
+  },250);
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
