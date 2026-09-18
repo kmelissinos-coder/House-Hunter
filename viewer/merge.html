@@ -295,6 +295,9 @@ function nukeAsk(house){
     if(!b){ b=document.createElement('div'); b.id='nukeBox';
       b.innerHTML='<div class="box"><h3>Οριστική διαγραφή σπιτιού</h3>'
         +'<div id="nukeTxt"></div>'
+        +'<label id="nukeBlockL" style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px;line-height:1.45;cursor:pointer">'
+        +'<input type="checkbox" id="nukeBlock" style="margin-top:3px;flex:none">'
+        +'<span>Και στη <b>λίστα αποκλεισμού</b> — να μην το ξαναφέρει ποτέ η καθημερινή σάρωση.</span></label>'
         +'<div class="acts"><button class="btn later" data-a="0">Άκυρο</button>'
         +'<button class="btn no" data-a="1">🗑 Ναι, διάγραψέ το οριστικά</button></div></div>';
       document.body.appendChild(b);
@@ -303,19 +306,32 @@ function nukeAsk(house){
       'Θα σβηστεί το σπίτι <b>#'+house+'</b> με <b>όλες τις αγγελίες του</b>, '
       +'τις βαθμολογίες, τις σημειώσεις και το ιστορικό τιμών.<br><br>'
       +'Δεν θα ξαναεμφανιστεί ούτε στις προτάσεις ένωσης. Αν η αγγελία υπάρχει ακόμα '
-      +'στην πλατφόρμα, η επόμενη καθημερινή σάρωση <b>θα την ξαναφέρει</b> ως νέο σπίτι.';
+      +'στην πλατφόρμα, η επόμενη καθημερινή σάρωση <b>θα την ξαναφέρει</b> ως νέο σπίτι — '
+      +'εκτός αν διαλέξεις και τη λίστα αποκλεισμού.';
+    var cb=document.getElementById('nukeBlock'); if(cb) cb.checked=false;
     b.style.display='flex';
     b.querySelectorAll('button[data-a]').forEach(function(x){
-      x.onclick=function(){ b.style.display='none'; res(x.getAttribute('data-a')==='1'); };
+      x.onclick=function(){
+        b.style.display='none';
+        var c=document.getElementById('nukeBlock');
+        res({ok:x.getAttribute('data-a')==='1', block:!!(c&&c.checked)});
+      };
     });
   });
 }
 async function hardDelete(house,btn){
-  if(!(await nukeAsk(house))) return;
+  var ans=await nukeAsk(house);
+  if(!ans||!ans.ok) return;
   if(btn){ btn.disabled=true; btn.textContent='… διαγραφή'; }
   try{
+    /* ΠΡΩΤΑ ο αποκλεισμός: μετά τη διαγραφή δεν υπάρχουν αγγελίες να διαβάσει. */
+    var blocked=0;
+    if(ans.block){
+      try{ blocked=await rpc('hh_blocklist_house',{p_house:String(house)}); }
+      catch(e){ toast('⚠ Δεν μπήκε στη λίστα αποκλεισμού: '+e.message,true); }
+    }
     var msg=await rpc('hh_hard_delete_house',{p_house:String(house)});
-    toast('🗑 '+msg);
+    toast('🗑 '+msg+(blocked?(' · '+blocked+' αγγελί'+(blocked===1?'α':'ες')+' στη λίστα αποκλεισμού'):''));
     PAIRS=PAIRS.filter(function(q){ return q.h1!==house && q.h2!==house; });
     render();
   }catch(e){
