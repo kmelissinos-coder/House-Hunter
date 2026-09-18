@@ -12001,6 +12001,109 @@ setInterval(tick, 600);
 window.__hh75={ hiddenFor:hiddenFor, pick:pickLabel, fit:fitToAgency };
 }catch(e){console.warn('hhPolish75',e);}})();</script>
 
+<script>/*hhPolish76*/(function(){try{
+
+/* ══════════════════════════════════════════════════════════════════════
+   hhPolish76 — ΤΕΛΟΣ ΣΤΙΣ ΔΙΠΛΕΣ ΦΩΤΟΓΡΑΦΙΕΣ ΣΤΗ ΜΕΓΑΛΗ ΓΚΑΛΕΡΙ
+   ──────────────────────────────────────────────────────────────────────
+   Ένα σπίτι που το διαφημίζουν 8 μεσιτικά έχει τις ΙΔΙΕΣ λήψεις 8 φορές,
+   η καθεμιά ανεβασμένη ξεχωριστά — άλλο URL, άλλη υδατογραφία. Το #483
+   έχει 771 φωτογραφίες· οι πραγματικά διαφορετικές είναι 224.
+   Η βάση ΞΕΡΕΙ ήδη ποιες είναι ίδιες: η hh_house_imgs() ομαδοποιεί με τα
+   αποτυπώματα (rent_photo_link), κρατά την καθαρότερη κάθε λήψης και τις
+   ταξινομεί ανά δωμάτιο. Η σύνοψη της ομαδοποιημένης κάρτας τη χρησιμοποιεί
+   ΗΔΗ (window.__hhGalKeep) — η μεγάλη γκαλερί όμως όχι: έχτιζε τη λίστα
+   από τα σκέτα URL. Εδώ τη συνδέουμε. Τίποτα δεν διαγράφεται· υπάρχει
+   κουμπί «Δείξε όλες».                                                  */
+
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1',
+    AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var NOTE=null;
+
+var st=document.createElement('style'); st.id='hh-polish76';
+st.textContent=
+  '#hh76-note{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:2147483200;'
+ +'background:rgba(20,17,10,.94);border:1px solid var(--accent,#c8a84b);color:#e9cf86;'
+ +'border-radius:999px;padding:7px 16px;font-size:12.5px;display:flex;align-items:center;gap:10px;'
+ +'box-shadow:0 6px 22px rgba(0,0,0,.45)}'
+ +'body.light #hh76-note{background:#fffdf7;color:#6b5312}'
+ +'#hh76-note button{background:transparent;border:1px solid currentColor;color:inherit;'
+ +'border-radius:8px;padding:3px 10px;font-size:12px;cursor:pointer}';
+(document.head||document.documentElement).appendChild(st);
+
+function houseOfKey(key){
+  try{
+    var all=[].concat(allListings||[], extraListings||[]);
+    for(var i=0;i<all.length;i++) if(all[i].url===key){
+      var h=String(all[i].house_id||'').trim();
+      return (h&&h!=='0')?h:null;
+    }
+  }catch(e){}
+  return null;
+}
+async function keepSet(h){
+  try{
+    if(window.__hhGalKeep && String(window.__hhGalKeep.h)===String(h)) return window.__hhGalKeep;
+    var r=await fetch(SB+'/rpc/hh_house_imgs',{method:'POST',
+      headers:{apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json'},
+      body:JSON.stringify({p_house:String(h), p_max:400})});
+    var arr=await r.json();
+    if(!Array.isArray(arr)||!arr.length) return null;
+    var rank={}; arr.forEach(function(u,i){ rank[u]=i; });
+    window.__hhGalKeep={h:String(h), rank:rank, n:arr.length};
+    return window.__hhGalKeep;
+  }catch(e){ return null; }
+}
+function note(dropped, onAll){
+  try{
+    if(NOTE&&NOTE.parentNode) NOTE.parentNode.removeChild(NOTE);
+    if(!dropped) return;
+    NOTE=document.createElement('div'); NOTE.id='hh76-note';
+    NOTE.innerHTML='<span>🖼 '+dropped+' διπλές λήψεις κρύφτηκαν</span>'
+                  +'<button type="button">Δείξε όλες</button>';
+    NOTE.querySelector('button').onclick=function(){
+      try{ onAll(); }catch(e){}
+      if(NOTE&&NOTE.parentNode) NOTE.parentNode.removeChild(NOTE);
+    };
+    document.body.appendChild(NOTE);
+    setTimeout(function(){ if(NOTE&&NOTE.parentNode&&NOTE.id==='hh76-note') NOTE.parentNode.removeChild(NOTE); }, 10000);
+  }catch(e){}
+}
+function refresh(){
+  try{ if(typeof _renderGalleryFrame==='function') _renderGalleryFrame(); }catch(e){}
+  try{ if(typeof _buildGalleryThumbs==='function') _buildGalleryThumbs(); }catch(e){}
+}
+function hook(){
+  if(typeof window.openHouseGallery!=='function' || window.openHouseGallery.__hh76) return;
+  var orig=window.openHouseGallery;
+  window.openHouseGallery=function(key){
+    var r=orig.apply(this,arguments);
+    (async function(){
+      try{
+        var full=null;
+        try{ full=galleryItems.slice(); }catch(e){ return; }
+        if(!full || full.length<4) return;
+        var h=houseOfKey(key); if(!h) return;
+        var K=await keepSet(h); if(!K||!K.rank) return;
+        var kept=full.filter(function(x){ return K.rank[x.url]!=null; });
+        if(kept.length<3 || kept.length>=full.length) return;
+        kept.sort(function(a,b){ return K.rank[a.url]-K.rank[b.url]; });
+        var dropped=full.length-kept.length;
+        try{ galleryItems=kept; galleryIdx=0; }catch(e){ return; }
+        refresh();
+        note(dropped, function(){
+          try{ galleryItems=full; galleryIdx=0; refresh(); }catch(e){}
+        });
+      }catch(e){}
+    })();
+    return r;
+  };
+  window.openHouseGallery.__hh76=1;
+}
+setInterval(hook, 600); hook();
+window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
+}catch(e){console.warn('hhPolish76',e);}})();</script>
+
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
