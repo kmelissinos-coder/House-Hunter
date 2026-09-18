@@ -11055,6 +11055,12 @@ for(var k77 in D77){ if(DICT[k77]==null) DICT[k77]=D77[k77]; }
 /* ---------- 2f. hhPolish80: βελάκια σπίτι-σπίτι ---------- */
 var D80={'Προηγούμενο σπίτι':'Previous home','Επόμενο σπίτι':'Next home'};
 for(var k80 in D80){ if(DICT[k80]==null) DICT[k80]=D80[k80]; }
+/* ---------- 2g. hhPolish81: οι νέες αναιρέσεις ---------- */
+RULES.push(
+  [/^\u0391\u03bb\u03bb\u03b1\u03b3\u03ae \u03b5\u03be\u03c9\u03c6\u03cd\u03bb\u03bb\u03bf\u03c5 \u2014 (.+)$/, function(m){ return 'Cover photo \u2014 '+m[1]; }],
+  [/^\u03a3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2 \u2014 (.+)$/, function(m){ return 'Notes \u2014 '+m[1]; }],
+  [/^\u0394\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7 \u2014 (.+)$/, function(m){ return 'Address \u2014 '+m[1]; }]
+);
 RULES.push(
   [/^σε (\d+) αγγελίες$/, function(m){ return 'on '+m[1]+' listings'; }]
 );
@@ -12416,6 +12422,204 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   setInterval(sync,400);
   sync();
 }catch(e){}})();</script>
+<script>/*hhPolish81*/(function(){try{
+  window.__hh81err=[];
+  function rowsAll(){
+    try{ return [].concat(allListings||[], extraListings||[]); }
+    catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }catch(e2){ return []; } }
+  }
+  function rid(r){ return (r && (r._dbId || r.id)) || null; }
+  function byUrl(u){ var a=rowsAll(); for(var i=0;i<a.length;i++){ if(a[i].url===u) return a[i]; } return null; }
+  function byId(id){ var a=rowsAll(); for(var i=0;i<a.length;i++){ if(String(a[i].id)===String(id)||String(a[i]._dbId)===String(id)) return a[i]; } return null; }
+  function grp(h){
+    if(!h) return [];
+    var hid=String(h.house_id||'').trim();
+    if(!hid || hid==='0') return [h];
+    return rowsAll().filter(function(x){ return String(x.house_id||'').trim()===hid; });
+  }
+  function put(id,patch){
+    try{ if(typeof sb!=='undefined' && sb && typeof sb.update==='function') return Promise.resolve(sb.update(id,patch)); }catch(e){}
+    return Promise.reject(new Error('no-sb'));
+  }
+  function repaint(){
+    try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){}
+    try{ var o=document.getElementById('listingOverlay');
+         if(o && o.classList.contains('open') && typeof _renderOvl==='function') _renderOvl(); }catch(e){}
+  }
+  function toast(m){ try{ if(typeof showToast==='function') showToast(m); }catch(e){} }
+
+  function snap(list, cols){
+    return list.map(function(r){
+      var v={}; cols.forEach(function(c){ v[c] = (r[c]===undefined ? null : r[c]); });
+      return {id:rid(r), row:r, v:v};
+    }).filter(function(x){ return !!x.id; });
+  }
+  function differs(a,b,cols){
+    for(var i=0;i<a.length;i++){
+      for(var j=0;j<cols.length;j++){ if(a[i].v[cols[j]] !== b[i].v[cols[j]]) return true; }
+    }
+    return false;
+  }
+  function restore(snapshot, cols, map){
+    var q=Promise.resolve();
+    snapshot.forEach(function(x){
+      q=q.then(function(){
+        var patch={}, any=false;
+        cols.forEach(function(c){
+          var d=map[c]; if(!d) return;
+          if(patch[d]===undefined){ patch[d]=x.v[c]; any=true; }
+        });
+        cols.forEach(function(c){ x.row[c]=x.v[c]; });
+        if(!any) return;
+        return put(x.id,patch).catch(function(){ toast('⚠ Μέρος της αναίρεσης δεν αποθηκεύτηκε'); });
+      });
+    });
+    return q.then(repaint);
+  }
+  function push(label, before, after, cols, map){
+    if(typeof pushAction!=='function') return;
+    var state='done';
+    pushAction({
+      label: label, desc: label,
+      undo: function(){ if(state!=='done') return Promise.resolve(); state='undone'; return restore(before,cols,map); },
+      redo: function(){ if(state!=='undone') return Promise.resolve(); state='done';   return restore(after,cols,map); }
+    });
+  }
+  function nameOf(h){ return (h && (h.location || h.platform)) || 'η αγγελία'; }
+
+  var C_COV=['imageUrl','image_url'], M_COV={imageUrl:'image_url', image_url:'image_url'};
+  var C_NOT=['personal_notes'], M_NOT={personal_notes:'personal_notes'};
+  var C_ADR=['address','address_lat','address_lng','address_confirmed'];
+  var M_ADR={address:'address',address_lat:'address_lat',address_lng:'address_lng',address_confirmed:'address_confirmed'};
+
+  /* Το κάθε στρώμα φτιάχνει τον δικό του wrapper· άλλα στρώματα (hhPolish46 για
+     τις σημειώσεις, hhPolish74 για τη διεύθυνση) ξανατυλίγουν τις ίδιες
+     συναρτήσεις όποτε θέλουν. Γι' αυτό ΞΑΝΑ-εγκαθιστούμε περιοδικά, όπως το
+     hhPolish45, και κρατάμε τα λάθη σε window.__hh81err ώστε να φαίνονται. */
+  function mkWrap(name, cols, map, labelFn, scopeFn){
+    return function(){
+      try{
+        var orig=window[name];
+        if(typeof orig!=='function' || orig.__hh81) return;
+        var w=function(){
+          var args=arguments;
+          var subject=null, mem=[];
+          try{ subject=scopeFn.apply(null,args); mem=subject? (Array.isArray(subject)?subject:[subject]) : []; }catch(e){}
+          var before = mem.length ? snap(mem, cols) : null;
+          var r;
+          try{ r=orig.apply(this,args); }catch(e){ throw e; }
+          var check=function(){
+            try{
+              if(!before || !before.length) return;
+              var after=snap(before.map(function(x){return x.row;}), cols);
+              if(!differs(before,after,cols)) return;
+              push(labelFn(mem[0]), before, after, cols, map);
+            }catch(e){ try{ window.__hh81err.push('check '+name+': '+e.message); }catch(_){} }
+          };
+          try{ Promise.resolve(r).then(function(){ setTimeout(check,0); },function(){ setTimeout(check,0); }); }
+          catch(e){ setTimeout(check,0); }
+          return r;
+        };
+        w.__hh81=1;
+        window[name]=w;
+      }catch(e){ try{ window.__hh81err.push('wrap '+name+': '+e.message); }catch(_){} }
+    };
+  }
+
+  var wCover=mkWrap('setCoverImage', C_COV, M_COV,
+      function(h){ return 'Αλλαγή εξωφύλλου — '+nameOf(h); },
+      function(key){ return byUrl(key); });
+  /* ---------- σημειώσεις ----------
+     Οι προσωπικές σημειώσεις ΔΕΝ ζουν στο listings.personal_notes: από το
+     hhPolish46 και μετά γράφονται στον πίνακα user_notes (μία γραμμή ανά
+     χρήστη και σπίτι, upsert σε user_id+house_id). Άρα ούτε wrapper βοηθάει
+     ούτε το snapshot των στηλών — κρατάμε μόνοι μας το κείμενο πριν την
+     αλλαγή και το ξαναγράφουμε με τον ίδιο τρόπο. */
+  var SBR='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1';
+  var AKEY='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+  function sess(){ try{ return JSON.parse(localStorage.getItem('hh_auth')||'null'); }catch(e){ return null; } }
+  function curHouseKey(){
+    try{ var o=JSON.parse(localStorage.getItem('hh_open_v1')||'null'); if(o&&o.houseId) return String(o.houseId); }catch(e){}
+    return null;
+  }
+  function writeNote(key, text){
+    var a=sess(); if(!a||!a.user||!a.access_token||!key) return Promise.resolve();
+    return fetch(SBR+'/user_notes?on_conflict=user_id,house_id',{
+      method:'POST',
+      headers:{apikey:AKEY,Authorization:'Bearer '+a.access_token,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify({user_id:a.user.id, house_id:String(key), note_text:(text==null?'':text)})
+    }).then(function(){
+      try{ if(typeof window.hhRefreshNotes==='function') window.hhRefreshNotes(); }catch(e){}
+      var ta=document.getElementById('loNotesTA');
+      if(ta && curHouseKey()===String(key) && document.activeElement!==ta) ta.value=(text==null?'':text);
+    });
+  }
+  /* το κείμενο όπως ήταν πριν αρχίσει να γράφει ο χρήστης */
+  var KNOWN={key:null, text:null};
+  setInterval(function(){
+    try{
+      var ta=document.getElementById('loNotesTA'); if(!ta) return;
+      if(document.activeElement===ta) return;
+      var k=curHouseKey(); if(!k) return;
+      KNOWN={key:String(k), text:ta.value};
+    }catch(e){}
+  }, 400);
+  document.addEventListener('click', function(e){
+    try{
+      var b=(e.target&&e.target.closest)?e.target.closest('[onclick]'):null; if(!b) return;
+      if(String(b.getAttribute('onclick')||'').indexOf('saveNotes(')<0) return;
+      var ta=document.getElementById('loNotesTA'); if(!ta) return;
+      var key=curHouseKey(); if(!key) return;
+      if(KNOWN.key!==String(key)) return;          /* δεν ξέρουμε το «πριν» — δεν ρισκάρουμε */
+      var before=KNOWN.text, after=ta.value;
+      if(String(before)===String(after)) return;
+      var loc=null;
+      try{ var r0=rowsAll().filter(function(x){ return String(x.house_id||'')===String(key); })[0]; loc=nameOf(r0); }catch(_){ }
+      var state='done';
+      if(typeof pushAction==='function') pushAction({
+        label:'Σημειώσεις — '+(loc||('#'+key)),
+        desc:'Σημειώσεις',
+        undo:function(){ if(state!=='done') return Promise.resolve(); state='undone'; return writeNote(key, before); },
+        redo:function(){ if(state!=='undone') return Promise.resolve(); state='done';  return writeNote(key, after); }
+      });
+      KNOWN={key:String(key), text:after};
+    }catch(err){ try{ window.__hh81err.push('notes: '+err.message); }catch(_){} }
+  }, true);
+  /* Ίδια ιστορία με τη διεύθυνση: το hhPolish74 ξαναγράφει το saveAddress από
+     τη ΒΑΣΙΚΗ συνάρτηση, οπότε ό,τι τυλίγουμε πετιέται. Κλικ σε capture. */
+  document.addEventListener('click', function(e){
+    try{
+      var b=(e.target&&e.target.closest)?e.target.closest('[onclick]'):null; if(!b) return;
+      var m=String(b.getAttribute('onclick')||'').match(/saveAddress\(\s*'([^']+)'/);
+      if(!m) return;
+      var key=m[1]; try{ key=key.replace(/\\'/g,"'"); }catch(_){}
+      var h=byUrl(key), mem=grp(h); if(!mem.length) return;
+      var before=snap(mem, C_ADR);
+      var tries=0;
+      var tick=function(){
+        try{
+          var after=snap(before.map(function(x){return x.row;}), C_ADR);
+          if(differs(before,after,C_ADR)){
+            push('\u0394\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7 \u2014 '+nameOf(h), before, after, C_ADR, M_ADR);
+            return;
+          }
+          if(++tries<12) setTimeout(tick,500);   /* το geocoding αργεί */
+        }catch(err){ try{ window.__hh81err.push('addr check: '+err.message); }catch(_){} }
+      };
+      setTimeout(tick,400);
+    }catch(err){}
+  }, true);
+
+  function install(){ wCover(); }
+  install();
+  setInterval(install, 700);
+  window.hh81Status=function(){
+    return {cover:!!(window.setCoverImage&&window.setCoverImage.__hh81),
+            notes:'click-hook',
+            address:'click-hook',
+            err:window.__hh81err};
+  };
+}catch(e){ try{ (window.__hh81err=window.__hh81err||[]).push('top: '+e.message); }catch(_){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
