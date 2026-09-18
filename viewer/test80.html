@@ -12331,7 +12331,10 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
     return all.filter(function(el){
       var p=el.parentElement;
       while(p && p!==c){ if(p.hasAttribute && p.hasAttribute('data-hhh')) return false; p=p.parentElement; }
-      return el.offsetParent!==null || el.getClientRects().length>0;
+      /* ΟΧΙ offsetParent/getClientRects: στην προβολή χάρτη το #mapList κόβει
+         ό,τι είναι εκτός οθόνης (content-visibility) και θα βλέπαμε 21 από 140.
+         Αρκεί να πετάξουμε όσες κάρτες έκρυψαν τα φίλτρα με inline display. */
+      return el.style.display!=='none';
     });
   }
   function keyOf(el){
