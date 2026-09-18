@@ -12226,9 +12226,36 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
 }catch(e){}})();</script>
 <script>/*hhPolish78*/(function(){try{
   var st=document.createElement('style'); st.id='hh78-css';
-  st.textContent='.hh-gs-vpop .hh-gs-link{position:relative;padding-right:16px}'
-   +'.hh-gs-vpop .hh-gs-link::after{content:"\\2197";position:absolute;right:2px;top:2px;font-size:10px;opacity:.55}';
+  st.textContent='.hh-gs-vpop .hh-gs-vrow[data-url]{position:relative;padding-right:16px;cursor:pointer}'
+   +'.hh-gs-vpop .hh-gs-vrow[data-url]::after{content:"\2197";position:absolute;right:2px;top:2px;font-size:10px;opacity:.55}'
+   +'.hh-gs-vpop .hh-gs-vrow[data-url]:hover{background:rgba(200,168,75,.16)}';
   (document.head||document.documentElement).appendChild(st);
+
+  /* Το κλικ σε σειρά του pop-up ΔΕΝ άνοιγε την αγγελία ούτε στο «Μεσιτικά»:
+     ο αρχικός listener καλούσε openModal() με stopPropagation (όχι immediate),
+     οπότε ο επόμενος listener του ίδιου click έκλεινε αμέσως ό,τι άνοιξε.
+     Εδώ το πιάνουμε σε capture, κόβουμε τελείως το event και ανοίγουμε την
+     αγγελία ΜΕΣΑ στην ίδια κάρτα (φεύγει η σύνοψη, μπαίνει η αγγελία). */
+  document.addEventListener('click', function(e){
+    var r = (e.target && e.target.closest) ? e.target.closest('.hh-gs-vpop .hh-gs-vrow[data-url]') : null;
+    if(!r) return;
+    e.preventDefault(); e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    var u=''; try{ u=decodeURIComponent(r.getAttribute('data-url')||''); }catch(x){ u=r.getAttribute('data-url')||''; }
+    var pop=document.getElementById('hh-gs-vpop-el'); if(pop) pop.remove();
+    if(!u) return;
+    setTimeout(function(){
+      try{
+        var sib=null;
+        try{ if(typeof _loSiblings!=='undefined') sib=_loSiblings; }catch(x){}
+        if(sib && sib.length && typeof loSelectSibling==='function'){
+          for(var i=0;i<sib.length;i++){ if(sib[i] && sib[i].url===u){ loSelectSibling(i); return; } }
+        }
+        if(typeof openListingOverlay==='function'){ openListingOverlay(u); return; }
+        if(typeof openModal==='function') openModal(u);
+      }catch(err){}
+    },0);
+  }, true);
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
