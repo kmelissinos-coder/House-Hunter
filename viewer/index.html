@@ -6301,13 +6301,6 @@ window.hhGeoCluster = function(items){
       document.querySelectorAll('.card-stars span,[data-star]').forEach(function(el){
         if(el.children.length) return;
         var t=(el.textContent||'').trim();
-        /*hhPolish63: τα κλικαρόμενα αστέρια ανήκουν ΜΟΝΟ στο hhPolish61*/
-        if((el.getAttribute('onclick')||'').indexOf('Rating')>=0){
-          el.style.removeProperty('color');
-          el.style.removeProperty('-webkit-text-fill-color');
-          el.removeAttribute('data-hh40');
-          return;
-        }
         if(t!=='☆') { if(el.getAttribute('data-hh40')) el.removeAttribute('data-hh40'); return; }
         if(el.classList.contains('hh-star-hov')) return;        /* το hover γεμίζει χρυσό */
         var bg=bgOf(el.parentElement||el);
@@ -6347,12 +6340,6 @@ window.hhGeoCluster = function(items){
       document.querySelectorAll('.card-stars span,[data-star]').forEach(function(el){
         if(el.children.length) return;
         var t=(el.textContent||'').trim();
-        /*hhPolish63*/
-        if((el.getAttribute('onclick')||'').indexOf('Rating')>=0){
-          if(el.classList.contains('hh-star-empty')) el.classList.remove('hh-star-empty');
-          el.removeAttribute('data-hh41');
-          return;
-        }
         if(t!=='☆'&&t!=='★') return;
         if(el.classList.contains('hh-star-hov')) return;
         var cs=getComputedStyle(el);
@@ -10918,58 +10905,6 @@ RULES.push(
      function(m){ return sqm58(m[0]); }]
 );
 
-
-/* ---------- 2c. hhPolish62: η δεύτερη σάρωση ----------------------------
-   Ό,τι έμεινε ελληνικό στην ομαδοποιημένη κάρτα, στο modal και στον χάρτη,
-   ΣΥΝ έναν γενικό κανόνα για τα εικονίδια: «⛔ Χ», «↩ Χ», «📄 Χ» — το σύμβολο
-   μένει, το κείμενο μεταφράζεται. Αυτό μαζεύει μόνο του τη μακριά ουρά.  */
-var D62={
-  'Αξιολόγηση':'Rating','Επιβεβαιώνω':'Confirm','Αφαιρέθηκε':'Removed',
-  'Νοικιάστηκε/Πουλήθηκε':'Rented/Sold','Νοικιάστηκε / Πουλήθηκε':'Rented / Sold',
-  'Δεν πουλήθηκε':'Not sold','Περιγραφή αγγελίας':'Listing description',
-  'Πλήρης περιγραφή αγγελίας':'Full listing description',
-  'Διεύθυνση (αν έχει επιβεβαιωθεί)':'Address (if confirmed)',
-  'Ομαδοποιημένη κάρτα':'Grouped card','Υπόλοιπες αγγελίες':'Other listings',
-  'Εκτός ομάδας (>800 μ.)':'Outside the group (>800 m)',
-  'Ακριβής πινέζα πλατφόρμας':'Exact platform pin',
-  'Προσεγγιστική τοποθεσία':'Approximate location',
-  'Η σημείωσή σου':'Your note','Σημείωσή σου':'Your note',
-  'Αγγελίες':'Listings','αγγελίες':'listings','μεσιτικά':'agencies',
-  'κατοικίες':'homes','κατοικία':'home','στην προβολή':'in view',
-  'Θέση στον χάρτη':'Location on the map','Λάθος':'Wrong',
-  'Επιβεβαίωση':'Confirmation','Ενημέρωση':'Update','Ιστορικό':'History',
-  'Φωτογραφίες':'Photos','Χαρακτηριστικά':'Features','Παροχές':'Amenities'
-};
-for(var k62 in D62){ if(DICT[k62]==null) DICT[k62]=D62[k62]; }
-
-RULES.push(
-  /* κεφαλίδα ομαδοποιημένης κάρτας */
-  [/^ΟΜΑΔΟΠΟΙΗΜΕΝΗ ΚΑΡΤΑ — (\d+) αγγελί(?:α|ες)(?: · (\d+) μεσιτικ(?:ό|ά))?(.*)$/,
-     function(m){ return 'GROUPED CARD — '+m[1]+' listing'+(m[1]==='1'?'':'s')
-                    +(m[2]?(' · '+m[2]+' agenc'+(m[2]==='1'?'y':'ies')):'')+(m[3]||''); }],
-  [/^Υπόλοιπες αγγελίες (\d+)$/,  function(m){ return 'Other listings '+m[1]; }],
-  /* χάρτης */
-  [/^(\d+) κατοικί(?:α|ες) στην προβολή$/, function(m){ return m[1]+' home'+(m[1]==='1'?'':'s')+' in view'; }],
-  [/^(\d+) αγγελί(?:α|ες) στο χάρτη$/,     function(m){ return m[1]+' listing'+(m[1]==='1'?'':'s')+' on the map'; }],
-  [/^🔄 Sync με (.+)$/,                     function(m){ return '🔄 Sync with '+m[1]; }],
-  /* «📌 Η σημείωσή σου — Dusty» : το όνομα μένει */
-  [/^(📌\s*)?Η σημείωσή σου — (.+)$/,      function(m){ return (m[1]||'')+'Your note — '+m[2]; }],
-  /* τίτλος με εισαγωγικά: μεταφράζουμε ΚΑΙ το μέσα */
-  [/^(.*?)“(.+)”(.*)$/, function(m){
-     var mid=tr(m[2]); if(mid==null) return null;
-     var a=m[1]?trx(m[1].replace(/\s+—\s*$/,'')):'' ;
-     var head=m[1]?(a+(/\s—\s*$/.test(m[1])?' — ':' ')):'';
-     return head+'“'+mid+'”'+(m[3]||''); }],
-  /* «Κάτι (12)» — μετάφρασε το κείμενο, κράτα το πλήθος */
-  [/^(.+?) \((\d+)\)$/, function(m){ var t=tr(m[1]); return t==null?null:(t+' ('+m[2]+')'); }],
-  /* ΓΕΝΙΚΟΣ: σύμβολα/εικονίδια μπροστά — «⛔ Αφαιρέθηκε», «↩ Δεν πουλήθηκε» */
-  [/^([^\p{L}\p{N}]+?)\s*([\p{L}\p{N}].*)$/u, function(m){
-     var t=tr(m[2]); return t==null?null:(m[1]+' '+t); }],
-  /* ΓΕΝΙΚΟΣ: σύμβολα στο τέλος */
-  [/^(.+?[\p{L}\p{N}])\s*([^\p{L}\p{N}\s]+)$/u, function(m){
-     var t=tr(m[1]); return t==null?null:(t+' '+m[2]); }]
-);
-
 window.hhTr=tr;
 
 /* ---------- 3. επίστρωση πάνω στο DOM ----------------------------------- */
@@ -11190,149 +11125,6 @@ if(isEn()){
 window.__hh55={ tr:tr, sweep:sweep, revert:revert, dict:DICT, rules:RULES,
                 lang:function(){return LANG;}, set:setLang, num:num };
 }catch(e){console.warn('hhPolish55',e);}})();</script>
-<script>/*hhPolish61*/(function(){try{
-/* ══════════════════════════════════════════════════════════════════════
-   hhPolish61 — ΤΑ ΑΣΤΕΡΙΑ, ΜΙΑ ΚΑΙ ΚΑΛΗ
-   ══════════════════════════════════════════════════════════════════════
-   ΤΙ ΕΦΤΑΙΓΕ (από μέτρηση στο ζωντανό DOM, όχι εικασία):
-     • Και τα 5 σύμβολα ήταν «★» — ΠΟΤΕ «☆». Το «άδειο» αστέρι γινόταν με
-       color:transparent, δηλαδή αόρατο αντί για περίγραμμα.
-     • Το transparent το έγραφε inline το puLayer κάθε 600 ms.
-     • Το hhStarFix είχε κανόνα MONO για φωτεινό θέμα και MONO για
-       [onclick*="setRating"] — το «setGroupRating» ΔΕΝ περιέχει «setRating»,
-       άρα οι ομαδοποιημένες κάρτες δεν τον έπιαναν ποτέ.
-     • Στο σκούρο θέμα υπερίσχυε ένα rgba(255,255,255,.16) — εξ ου «μόνο το
-       περίγραμμα, μαύρο μέσα».
-   ΤΙ ΚΑΝΟΥΜΕ: ένας ζωγράφος. Γεμάτο = ★ χρυσό, άδειο = ☆ σβησμένο, ίδια
-   συμπεριφορά και στα δύο θέματα, με hover preview. Το inline color
-   αφαιρείται σε κάθε πέρασμα και οι κλάσεις γράφονται διπλές (.a.a) ώστε να
-   κερδίζουν σε specificity τους παλιούς !important κανόνες.            */
-
-var GOLD='#c8a84b', HOVER='#e8c65c';
-var st=document.createElement('style'); st.id='hh-polish61';
-st.textContent=
-  /*hhPolish63: 4 κλάσεις — κερδίζει το .hh-star-empty×3 του hhPolish41 και
-     γράφει ΚΑΙ το -webkit-text-fill-color, που το hhPolish40 έβαζε inline. */
-  'body .hh61-on.hh61-on.hh61-on.hh61-on{color:'+GOLD+'!important;'
- +'-webkit-text-fill-color:'+GOLD+'!important;-webkit-text-stroke:0!important;'
- +'text-shadow:none!important;opacity:1!important;background:none!important}'
- +'body .hh61-off.hh61-off.hh61-off.hh61-off{color:rgba(255,255,255,.34)!important;'
- +'-webkit-text-fill-color:rgba(255,255,255,.34)!important;-webkit-text-stroke:0!important;'
- +'text-shadow:none!important;opacity:1!important;background:none!important}'
- +'body.light .hh61-off.hh61-off.hh61-off.hh61-off{color:rgba(0,0,0,.28)!important;'
- +'-webkit-text-fill-color:rgba(0,0,0,.28)!important}'
- +'body .hh61-pre.hh61-pre.hh61-pre.hh61-pre{color:'+HOVER+'!important;'
- +'-webkit-text-fill-color:'+HOVER+'!important}'
- +'body .hh61-star{cursor:pointer;transition:color .08s linear}';
-(document.head||document.documentElement).appendChild(st);
-
-var SEL='[onclick*="setRating"],[onclick*="setGroupRating"]';
-var RX=/set(Group)?Rating\(\s*event\s*,\s*'([^']*)'\s*,\s*(\d+)/;
-
-function info(el){
-  var m=RX.exec(el.getAttribute('onclick')||'');
-  if(!m) return null;
-  return { group:!!m[1], key:m[2], idx:+m[3] };
-}
-function houseOf(el){
-  var i=info(el); if(!i) return null;
-  if(i.group) return i.key;
-  try{
-    var a=[].concat(allListings||[], extraListings||[]);
-    for(var j=0;j<a.length;j++){
-      var r=a[j];
-      if(String(r.url)===i.key||String(r.id)===i.key||String(r._dbId)===i.key){
-        var h=String(r.house_id||'').trim();
-        return (h&&h!=='0')?h:i.key;
-      }
-    }
-  }catch(e){}
-  return i.key;
-}
-function mine(hid){
-  try{ var v=+window.hhMyRating(hid); return (v>0&&v<=5)?v:0; }catch(e){ return 0; }
-}
-function starsOf(row){
-  var out=[], k=row.querySelectorAll(SEL);
-  for(var i=0;i<k.length;i++) out.push(k[i]);
-  out.sort(function(a,b){ var ia=info(a),ib=info(b); return ((ia&&ia.idx)||0)-((ib&&ib.idx)||0); });
-  return out;
-}
-function paint(row,n,pre){
-  var k=starsOf(row);
-  for(var i=0;i<k.length;i++){
-    var el=k[i], on=(i<n);
-    if(el.textContent!==(on?'★':'☆')) el.textContent=(on?'★':'☆');
-    el.classList.add('hh61-star');
-    /*hhPolish63: καθάρισμα από τα παλιά στρώματα αστεριών*/
-    if(el.className.indexOf('hh-star-')>=0)
-      el.classList.remove('hh-star-empty','hh-star-dim','hh-star-full','hh-star-half');
-    if(!pre && el.classList.contains('hh-star-hov')) el.classList.remove('hh-star-hov');
-    if(el.hasAttribute('data-hh40')) el.removeAttribute('data-hh40');
-    if(el.hasAttribute('data-hh41')) el.removeAttribute('data-hh41');
-    try{ if(el.style){ el.style.removeProperty('-webkit-text-fill-color');
-                       el.style.removeProperty('-webkit-text-stroke'); } }catch(e){}
-    el.classList.toggle('hh61-on', on);
-    el.classList.toggle('hh61-off', !on);
-    el.classList.toggle('hh61-pre', !!pre && on);
-    try{ if(el.style&&el.style.color) el.style.removeProperty('color'); }catch(e){}
-  }
-}
-function rowsNow(){
-  var m=[], k=document.querySelectorAll(SEL);
-  for(var i=0;i<k.length;i++){
-    var p=k[i].parentElement; if(!p) continue;
-    if(m.indexOf(p)<0) m.push(p);
-  }
-  return m;
-}
-function sweep(){
-  var rs=rowsNow();
-  for(var i=0;i<rs.length;i++){
-    var row=rs[i];
-    if(row.__hh61pre) continue;              /* το ποντίκι είναι πάνω του */
-    var k=starsOf(row); if(!k.length) continue;
-    paint(row, mine(houseOf(k[0])), false);
-  }
-}
-/* hover preview */
-document.addEventListener('mouseover', function(e){
-  var t=e.target; if(!t||!t.closest) return;
-  var el=t.closest(SEL); if(!el) return;
-  var row=el.parentElement; if(!row) return;
-  var i=info(el); if(!i) return;
-  row.__hh61pre=1;
-  paint(row, i.idx, true);
-}, true);
-document.addEventListener('mouseout', function(e){
-  var t=e.target; if(!t||!t.closest) return;
-  var el=t.closest(SEL); if(!el) return;
-  var row=el.parentElement; if(!row) return;
-  var to=e.relatedTarget;
-  if(to && row.contains(to)) return;         /* μετακίνηση σε διπλανό αστέρι */
-  row.__hh61pre=0;
-  paint(row, mine(houseOf(el)), false);
-}, true);
-/* κλικ: ζωγραφίζουμε αμέσως (toggle όπως το puLayer), μετά ξανασυγχρονίζουμε */
-document.addEventListener('click', function(e){
-  var t=e.target; if(!t||!t.closest) return;
-  var el=t.closest(SEL); if(!el) return;
-  var row=el.parentElement, i=info(el); if(!row||!i) return;
-  var hid=houseOf(el), cur=mine(hid);
-  var fin=(cur===i.idx)?0:i.idx;
-  row.__hh61pre=0;
-  paint(row, fin, false);
-  setTimeout(function(){ paint(row, mine(hid), false); }, 350);
-  setTimeout(function(){ paint(row, mine(hid), false); }, 1200);
-}, true);
-
-sweep();
-setInterval(sweep, 700);
-try{ new MutationObserver(function(){ if(!window.__hh61t){ window.__hh61t=setTimeout(function(){ window.__hh61t=0; sweep(); },160); } })
-       .observe(document.body,{childList:true,subtree:true}); }catch(e){}
-window.__hh61={ sweep:sweep, mine:mine, houseOf:houseOf };
-}catch(e){console.warn('hhPolish61',e);}})();</script>
-
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
