@@ -11006,6 +11006,19 @@ var D71={
   'Καμία αγγελία δεν περιέχει αυτό το κείμενο.':'No listing contains that text.'
 };
 for(var k71 in D71){ if(DICT[k71]==null) DICT[k71]=D71[k71]; }
+/* ---------- 2e. hhPolish77: η γραμμή διεύθυνσης στην ανοιχτή κάρτα ---------- */
+var D77={
+  'Διεύθυνση':'Address','Χωρίς διεύθυνση':'No address yet',
+  '✎ Προσθήκη διεύθυνσης':'\u270e Add address',
+  'Χάρτης':'Map','Άνοιγμα στον χάρτη':'Open in maps',
+  'Συμπλήρωσε τη διεύθυνση πιο κάτω':'Fill in the address further down',
+  'Ισχύει για όλες τις αγγελίες του σπιτιού':'Applies to every listing of this home',
+  'Δεν έχει επιβεβαιωθεί στον χάρτη':'Not pinned on the map yet'
+};
+for(var k77 in D77){ if(DICT[k77]==null) DICT[k77]=D77[k77]; }
+RULES.push(
+  [/^σε (\d+) αγγελίες$/, function(m){ return 'on '+m[1]+' listings'; }]
+);
 RULES.push(
   [/^🔎 Πού βρέθηκε «(.+)»$/, function(m){ return '🔎 Where “'+m[1]+'” matched'; }]
 );
@@ -12104,6 +12117,77 @@ setInterval(hook, 600); hook();
 window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
 }catch(e){console.warn('hhPolish76',e);}})();</script>
 
+<script>/*hhPolish77*/(function(){try{
+  function esc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+  /* η διεύθυνση ανήκει στο ΣΠΙΤΙ: παίρνουμε την πρώτη συμπληρωμένη της ομάδας */
+  function houseAddr(h){
+    var grp=[h];
+    try{ if(typeof _houseGroup==='function') grp=_houseGroup(h)||[h]; }catch(e){}
+    var pick=null;
+    for(var i=0;i<grp.length;i++){
+      var x=grp[i];
+      if(x && x.address && String(x.address).trim()){ pick=x; break; }
+    }
+    var geo=null;
+    for(var j=0;j<grp.length;j++){
+      var y=grp[j];
+      if(y && y.address_lat!=null && y.address_lng!=null){ geo=y; break; }
+    }
+    return {row:pick, geo:geo, n:grp.length};
+  }
+
+  function lineHTML(h){
+    var a=houseAddr(h);
+    var MUT='font-size:11px;color:var(--muted)';
+    var box='display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 12px;';
+    var chip='font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--text2);text-decoration:none;';
+    var focus="event.stopPropagation();var e=document.getElementById('loAddress');if(e){try{e.scrollIntoView({block:'center',behavior:'smooth'});}catch(_){}e.focus();e.select();}";
+
+    if(!a.row){
+      return '<div class="hh77-addr" style="'+box+'">'
+        +'<span style="'+MUT+'">\uD83D\uDCCD Χωρίς διεύθυνση</span>'
+        +'<span role="button" tabindex="0" title="Συμπλήρωσε τη διεύθυνση πιο κάτω" style="'+chip+'cursor:pointer" onclick="'+focus+'">✎ Προσθήκη διεύθυνσης</span>'
+        +'</div>';
+    }
+    var txt=String(a.row.address).trim();
+    var lat=a.geo?a.geo.address_lat:null, lng=a.geo?a.geo.address_lng:null;
+    var map='';
+    if(lat!=null&&lng!=null){
+      map='<a href="https://www.google.com/maps/search/?api=1&amp;query='+lat+','+lng+'" target="_blank" rel="noopener"'
+         +' title="Άνοιγμα στον χάρτη" style="'+chip+'" onclick="event.stopPropagation()">\uD83D\uDDFA Χάρτης</a>';
+    } else {
+      map='<span title="Δεν έχει επιβεβαιωθεί στον χάρτη" style="'+MUT+'">⚠</span>';
+    }
+    var many = a.n>1
+      ? '<span title="Ισχύει για όλες τις αγγελίες του σπιτιού" style="'+MUT+'">σε '+a.n+' αγγελίες</span>'
+      : '';
+    return '<div class="hh77-addr" style="'+box+'">'
+      +'<span style="font-size:13.5px;font-weight:600;cursor:text" onclick="'+focus+'">\uD83D\uDCCD '+esc(txt)+'</span>'
+      +map+many+'</div>';
+  }
+
+  var SUB=/(<div class="modal-subtitle">[\s\S]*?<\/div>)/;
+  function wrap(name){
+    var orig=window[name];
+    if(typeof orig!=='function'||orig.__hh77) return;
+    var w=function(h){
+      var out=orig.apply(this,arguments);
+      try{
+        if(typeof out==='string' && h && out.indexOf('hh77-addr')<0 && SUB.test(out)){
+          out=out.replace(SUB, '$1'+lineHTML(h));
+        }
+      }catch(e){}
+      return out;
+    };
+    w.__hh77=1;
+    try{ window[name]=w; }catch(e){}
+  }
+  wrap('_featHTML');
+
+  /* το openModal (μονή κάρτα χωρίς overlay) χτίζει δικό του HTML inline —
+     εκεί δεν υπάρχει #loAddress, οπότε το αφήνουμε ήσυχο. */
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
