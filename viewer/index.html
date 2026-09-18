@@ -11052,6 +11052,9 @@ var D77={
   'Δεν έχει επιβεβαιωθεί στον χάρτη':'Not pinned on the map yet'
 };
 for(var k77 in D77){ if(DICT[k77]==null) DICT[k77]=D77[k77]; }
+/* ---------- 2f. hhPolish80: βελάκια σπίτι-σπίτι ---------- */
+var D80={'Προηγούμενο σπίτι':'Previous home','Επόμενο σπίτι':'Next home'};
+for(var k80 in D80){ if(DICT[k80]==null) DICT[k80]=D80[k80]; }
 RULES.push(
   [/^σε (\d+) αγγελίες$/, function(m){ return 'on '+m[1]+' listings'; }]
 );
@@ -12302,6 +12305,116 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
     }catch(e){}
     if(Date.now()>until){ live=true; clearInterval(iv); }
   },250);
+}catch(e){}})();</script>
+<script>/*hhPolish80*/(function(){try{
+  var CSS='#hh80-prev,#hh80-next{position:fixed;top:50%;transform:translateY(-50%);z-index:2147483000;'
+   +'width:38px;height:56px;display:none;align-items:center;justify-content:center;cursor:pointer;'
+   +'background:rgba(20,17,12,.72);color:#e9cf86;border:1px solid rgba(200,168,75,.45);'
+   +'border-radius:10px;font-size:22px;line-height:1;user-select:none;-webkit-user-select:none}'
+   +'body.light #hh80-prev,body.light #hh80-next{background:rgba(250,246,234,.9);color:#7a5c00;border-color:#c9a94a}'
+   +'#hh80-prev{left:8px}#hh80-next{right:8px}'
+   +'#hh80-prev.hh80-off,#hh80-next.hh80-off{opacity:.25;cursor:default}'
+   +'#hh80-count{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:2147483000;'
+   +'display:none;background:rgba(20,17,12,.72);color:#e9cf86;border:1px solid rgba(200,168,75,.35);'
+   +'border-radius:999px;padding:3px 12px;font-size:11px;font-weight:700;letter-spacing:.3px}'
+   +'body.light #hh80-count{background:rgba(250,246,234,.92);color:#7a5c00;border-color:#c9a94a}'
+   +'@media(max-width:700px){#hh80-prev,#hh80-next{width:30px;height:44px;font-size:18px;opacity:.75}}';
+  var st=document.createElement('style'); st.id='hh80-css'; st.textContent=CSS;
+  (document.head||document.documentElement).appendChild(st);
+
+  function ovlOpen(){ var o=document.getElementById('listingOverlay'); return !!(o && o.classList.contains('open')); }
+
+  /* ---- η σειρά των σπιτιών = η σειρά των καρτών στη λίστα από πίσω ---- */
+  /* ΟΧΙ offsetParent/getClientRects: στην προβολή χάρτη το #mapList κόβει ό,τι
+     είναι εκτός οθόνης και θα μετρούσαμε 21 από 140. Και ΟΧΙ μόνο τις ορατές:
+     στην προβολή χάρτη η λίστα κρύβει με inline display όσες κάρτες δεν έχουν
+     πινέζα στο τρέχον κάδρο, οπότε το σπίτι που κοιτάς μπορεί να μην είναι εκεί
+     μέσα. Κρατάμε τις ορατές ΜΟΝΟ αν το τρέχον σπίτι είναι ανάμεσά τους. */
+  function cards(){
+    var c=document.getElementById('main-content'); if(!c) return {all:[],vis:[]};
+    var raw=[].slice.call(c.querySelectorAll('[data-hhh]'));
+    var all=raw.filter(function(el){
+      var p=el.parentElement;
+      while(p && p!==c){ if(p.hasAttribute && p.hasAttribute('data-hhh')) return false; p=p.parentElement; }
+      return true;
+    });
+    var vis=all.filter(function(el){ return el.style.display!=='none'; });
+    return {all:all, vis:vis};
+  }
+  function keyOf(el){
+    var h=el.getAttribute('data-hhh')||'';
+    if(h && h!=='0') return {h:h};
+    var t=el.querySelector('[onclick*="openListingOverlay("]');
+    var m=t && (t.getAttribute('onclick')||'').match(/openListingOverlay\(\s*'([^']+)'/);
+    return m?{u:m[1]}:null;
+  }
+  function current(){
+    try{
+      var sib=(typeof _loSiblings!=='undefined')?_loSiblings:null;
+      if(!sib||!sib.length) return null;
+      var f=sib[typeof _loFeatIdx!=='undefined'?_loFeatIdx:0]||sib[0];
+      var h=String((f&&f.house_id)||'').trim();
+      if(h && h!=='0') return {h:h};
+      return f&&f.url?{u:f.url}:null;
+    }catch(e){ return null; }
+  }
+  function same(a,b){ if(!a||!b) return false; if(a.h&&b.h) return a.h===b.h; if(a.u&&b.u) return a.u===b.u; return false; }
+
+  var list=[], idx=-1;
+  function go(d){
+    if(idx<0) return;
+    var n=idx+d; if(n<0||n>=list.length) return;
+    var k=keyOf(list[n]); if(!k) return;
+    try{
+      if(k.h) openListingOverlay(null,k.h,0);
+      else    openListingOverlay(k.u,null);
+    }catch(e){}
+    setTimeout(sync,120);
+  }
+
+  function btn(id,txt,title,d){
+    var b=document.getElementById(id);
+    if(b) return b;
+    b=document.createElement('div');
+    b.id=id; b.textContent=txt; b.title=title;
+    b.setAttribute('role','button');
+    b.addEventListener('click',function(e){ e.preventDefault(); e.stopPropagation(); go(d); },true);
+    document.body.appendChild(b);
+    return b;
+  }
+  var prev=btn('hh80-prev','\u2039','Προηγούμενο σπίτι',-1);
+  var next=btn('hh80-next','\u203a','Επόμενο σπίτι',1);
+  var cnt=document.getElementById('hh80-count');
+  if(!cnt){ cnt=document.createElement('div'); cnt.id='hh80-count'; document.body.appendChild(cnt); }
+
+  function hide(){ prev.style.display='none'; next.style.display='none'; cnt.style.display='none'; }
+
+  function sync(){
+    try{
+      if(!ovlOpen()){ hide(); return; }
+      var cur=current(); if(!cur){ hide(); return; }
+      var cc=cards();
+      function findIn(arr){ for(var i=0;i<arr.length;i++){ if(same(keyOf(arr[i]),cur)) return i; } return -1; }
+      idx=findIn(cc.vis);
+      if(idx>=0 && cc.vis.length>1){ list=cc.vis; }
+      else { list=cc.all; idx=findIn(cc.all); }
+      if(idx<0 || list.length<2){ hide(); return; }
+      prev.style.display='flex'; next.style.display='flex'; cnt.style.display='block';
+      prev.classList.toggle('hh80-off', idx<=0);
+      next.classList.toggle('hh80-off', idx>=list.length-1);
+      cnt.textContent=(idx+1)+' / '+list.length;
+    }catch(e){ hide(); }
+  }
+
+  (function(){
+    var o=window._renderOvl;
+    if(typeof o==='function' && !o.__hh80){
+      var w=function(){ var r=o.apply(this,arguments); try{ setTimeout(sync,0); }catch(e){} return r; };
+      w.__hh80=1; try{ window._renderOvl=w; }catch(e){}
+    }
+  })();
+  setInterval(sync,400);
+  sync();
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
