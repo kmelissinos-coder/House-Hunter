@@ -140,6 +140,10 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 .legend .same,.legend .diff{font-weight:700}.legend .same{color:#7ed8a0}.legend .diff{color:#ff7a7a}
 @media(max-width:760px){.hcols{grid-template-columns:1fr}.gal2{height:240px}.gal2 img.main{max-height:240px}}
 .fresh{font-size:11px;opacity:.7;margin-left:8px;white-space:nowrap}.fresh b{color:var(--accent);font-weight:600}
+  /*hhMergeV15*/
+  .v15warn{margin:0 0 8px;padding:7px 12px;border-radius:8px;font-size:13px;line-height:1.45;
+    background:rgba(180,40,40,.16);border:1px solid rgba(220,80,80,.55);color:#ffcaca}
+  .v15warn b{color:#fff}
 </style>
 </head>
 <body>
@@ -228,6 +232,7 @@ function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/
       ${(p.reasons||[]).filter(r=>!/φωτογραφί/.test(r)).map(r=>`<span class="reason${neg(r)?' neg':''}">${esc(r)}</span>`).join('')}
       ${p.dsim!=null?`<span class="reason">περιγραφή ${Math.round(p.dsim*100)}% ίδια</span>`:''}${p.shared_photo?'<span class="reason">κοινή φωτογραφία</span>':''}${photoChip(p)}
       <span class="keep">📍 ${dist}</span>${p.postponed?`<span class="reason later" title="Το είχες αφήσει για αργότερα${p.postponed_at?' στις '+new Date(p.postponed_at).toLocaleString('el-GR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):''}">⏳ αναβλήθηκε</span>`:''}</div>
+    ${goneWarn(p,keepId)}
     <div class="acts top">
       <button class="btn merge" onclick="doMerge(${i})">🔗 Ένωση (μένει το #${esc(keepId)})</button>
       <button class="btn no" onclick="verdict(${i},'no')">✕ Όχι, διαφορετικά σπίτια</button>
@@ -350,11 +355,68 @@ function askRating(p,keep){return new Promise(res=>{const m=document.getElementB
   b.querySelectorAll('.opt[data-c]').forEach(o=>o.onclick=()=>{m.style.display='none';res(o.dataset.c==='cancel'?null:{choice:o.dataset.c});});
   b.querySelectorAll('.newstars span').forEach(s=>s.onclick=()=>{nv=+s.dataset.v;b.querySelectorAll('.newstars span').forEach(x=>x.classList.toggle('on',+x.dataset.v<=nv));document.getElementById('mnew').disabled=false;});
   document.getElementById('mnew').onclick=()=>{m.style.display='none';res({choice:'new',rating:nv});};});}
+/*hhMergeV15 — ένωση με σπίτι που έχει ΑΦΑΙΡΕΘΕΙ ------------------------------
+   Ο Dusty: «αν προτείνεις ένωση με σπίτι που έχω διαγράψει, πες μου το καθαρά,
+   ρώτα με αν θέλω παρ' όλα αυτά να τα ενώσω, και μετά ρώτα αν θέλω να επανέλθει
+   στα αποτελέσματα ή να μείνει διαγραμμένο.»                                 */
+function goneOf(h){ try{ var a=(h&&h.ads)||[]; return !!(a.length && a.every(function(x){return x.deleted;})); }catch(e){ return false; } }
+function goneWarn(p,keepId){
+  try{
+    var ga=goneOf(p.a), gb=goneOf(p.b);
+    if(!ga&&!gb) return '';
+    var txt;
+    if(ga&&gb) txt='Και τα <b>δύο</b> σπίτια είναι αφαιρεμένα — καμία ζωντανή αγγελία σε καμία πλατφόρμα.';
+    else txt='Το σπίτι <b>#'+esc(ga?p.h1:p.h2)+'</b> ('+(ga?'A':'B')+') είναι <b>αφαιρεμένο</b> — όλες οι αγγελίες του έχουν φύγει από τις πλατφόρμες.';
+    var extra=(!ga||!gb)?(' Αν τα ενώσεις, το ενωμένο σπίτι θα είναι το <b>#'+esc(keepId)+'</b>'+((keepId===(ga?p.h1:p.h2))?' — δηλαδή θα μείνει εκτός αποτελεσμάτων μέχρι να το επαναφέρεις.':' και θα συνεχίσει να φαίνεται κανονικά.')):' Το ενωμένο σπίτι θα μείνει εκτός αποτελεσμάτων μέχρι να το επαναφέρεις.';
+    return '<div class="v15warn">\u26a0 '+txt+extra+'</div>';
+  }catch(e){ return ''; }
+}
+function askGoneMerge(p,keepId){
+  return new Promise(function(res){
+    var m=document.getElementById('modal'), b=document.getElementById('mbox');
+    var ga=goneOf(p.a), gb=goneOf(p.b);
+    var who=(ga&&gb)?('τα #'+esc(p.h1)+' και #'+esc(p.h2)):('το #'+esc(ga?p.h1:p.h2));
+    b.innerHTML='<h3>\u26d4 '+((ga&&gb)?'Και τα δύο σπίτια είναι αφαιρεμένα':'Το ένα σπίτι είναι αφαιρεμένο')+'</h3>'
+      +'<div style="color:var(--muted);font-size:13px;line-height:1.5">Όλες οι αγγελίες '+(((ga&&gb)?'τους':'του'))+' ('+who+') έχουν φύγει από τις πλατφόρμες. Θέλεις να γίνει η ένωση;</div>'
+      +'<button class="opt" data-c="yes">Ναι, ένωσέ τα — μένει το #'+esc(keepId)+'</button>'
+      +'<button class="opt" data-c="cancel" style="text-align:center;color:var(--muted)">Ακύρωση</button>';
+    m.style.display='flex';
+    b.querySelectorAll('.opt[data-c]').forEach(function(o){ o.onclick=function(){ m.style.display='none'; res(o.dataset.c==='yes'); }; });
+  });
+}
+function askRestore(hid){
+  return new Promise(function(res){
+    var m=document.getElementById('modal'), b=document.getElementById('mbox');
+    b.innerHTML='<h3>Να επανέλθει στα αποτελέσματα;</h3>'
+      +'<div style="color:var(--muted);font-size:13px;line-height:1.5">Το ενωμένο σπίτι <b>#'+esc(hid)+'</b> δεν έχει καμία ζωντανή αγγελία, οπότε δεν θα φαίνεται στη λίστα. Θέλεις να το επαναφέρω;</div>'
+      +'<button class="opt" data-c="yes">\u21a9 Ναι, φέρ\u2019 το πίσω στα αποτελέσματα</button>'
+      +'<button class="opt" data-c="no">Όχι, να μείνει στα αφαιρεμένα</button>';
+    m.style.display='flex';
+    b.querySelectorAll('.opt[data-c]').forEach(function(o){ o.onclick=function(){ m.style.display='none'; res(o.dataset.c==='yes'); }; });
+  });
+}
+async function restoreHouse(hid){
+  var s0=sess(); if(!s0) throw new Error('login');
+  if(s0.expires_at && s0.expires_at<Date.now()+60000 && s0.refresh_token){ s0=(await refreshSess(s0))||s0; }
+  var r=await fetch(SB+'/rest/v1/listings?house_id=eq.'+encodeURIComponent(hid),
+    {method:'PATCH',headers:{apikey:AK,Authorization:'Bearer '+s0.access_token,'Content-Type':'application/json',Prefer:'return=minimal'},
+     body:JSON.stringify({deleted:null,gone_confirmed:false})});
+  if(!r.ok) throw new Error(await r.text());
+  return true;
+}
 async function doMerge(i){const p=PAIRS[i];const keep=keepOf(p);const newH=keep==='a'?p.h1:p.h2,oldH=keep==='a'?p.h2:p.h1;let choice='keep_new',rating=null;
   if(p.rating_a&&p.rating_b&&+p.rating_a!==+p.rating_b){const r=await askRating(p,keep);if(!r)return;choice=r.choice;rating=r.rating||null;}/*v4: ίδια βαθμολογία → καμία ερώτηση*/
+  /*hhMergeV15*/ if(goneOf(p.a)||goneOf(p.b)){ const okg=await askGoneMerge(p,newH); if(!okg) return; }
   const btns=document.querySelectorAll('#p'+i+' button');btns.forEach(b=>b.disabled=true);
   try{const msg=await rpc('merge_house_v2',{old_h:oldH,new_h:newH,rating_choice:choice,new_rating:rating});const id=(String(msg).match(/#(\d+)$/)||[])[1];if(id){UNDO.push({id:+id,txt:'#'+oldH+' → #'+newH});document.getElementById('undoBtn').disabled=false;}
     toast('✓ Ενώθηκαν: #'+oldH+' → #'+newH);
+    /*hhMergeV15: αν ΤΙΠΟΤΑ δεν έμεινε ζωντανό, το σπίτι φεύγει από τη λίστα — ρώτα */
+    try{
+      const ads=[].concat((p.a&&p.a.ads)||[],(p.b&&p.b.ads)||[]);
+      if(ads.length && ads.every(function(x){return x.deleted;})){
+        if(await askRestore(newH)){ await restoreHouse(newH); toast('↩ Το #'+newH+' επανήλθε στα αποτελέσματα'); }
+      }
+    }catch(e){ toast('Η ένωση έγινε, αλλά η επαναφορά απέτυχε: '+e.message,true); }
     // pairs involving either id are stale now
     PAIRS=PAIRS.filter((q,j)=>j===i||!(q.h1===oldH||q.h2===oldH||q.h1===newH||q.h2===newH));const ni=PAIRS.indexOf(p);advance(ni);}
   catch(e){btns.forEach(b=>b.disabled=false);toast('Σφάλμα: '+e.message,true);}}
