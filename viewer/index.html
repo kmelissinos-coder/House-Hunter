@@ -1293,23 +1293,49 @@ try{
   if(sd&&sd.set){
     Object.defineProperty(HTMLImageElement.prototype,'src',{configurable:true,enumerable:sd.enumerable,get:sd.get,
       set:function(v){
+        /* ΠΡΟΣΟΧΗ: η εφαρμογή αλλάζει φωτογραφία κάνοντας img.src=... στο ΙΔΙΟ
+           element. Αν αφήσουμε παλιό srcset, ο browser συνεχίζει να δείχνει την
+           προηγούμενη εικόνα — αυτό ακριβώς έσπασε το fullscreen viewer.
+           Άρα: ΠΑΝΤΑ ξαναϋπολογίζουμε (ή καθαρίζουμε) το srcset.              */
         try{
-          if(typeof v==='string' && v.indexOf(CLD)>=0 && !this.getAttribute('srcset')){
+          if(typeof v==='string' && v.indexOf(CLD)>=0){
             var vv=variants(v);
             if(vv){ this.setAttribute('srcset',vv); this.setAttribute('sizes',sizesFor(this.className)); }
+            else { this.removeAttribute('srcset'); this.removeAttribute('sizes'); }
+          }else{
+            this.removeAttribute('srcset'); this.removeAttribute('sizes');
           }
         }catch(e){}
         return sd.set.call(this,v);
       }});
   }
 }catch(e){}
+/* 2b. το ίδιο και για setAttribute('src', ...) */
+try{
+  var sa=Element.prototype.setAttribute;
+  Element.prototype.setAttribute=function(n,v){
+    try{
+      if(this.tagName==='IMG' && String(n).toLowerCase()==='src'){
+        if(typeof v==='string' && v.indexOf(CLD)>=0){
+          var vv=variants(v);
+          if(vv){ sa.call(this,'srcset',vv); sa.call(this,'sizes',sizesFor(this.className)); }
+          else { this.removeAttribute('srcset'); this.removeAttribute('sizes'); }
+        }else{ this.removeAttribute('srcset'); this.removeAttribute('sizes'); }
+      }
+    }catch(e){}
+    return sa.call(this,n,v);
+  };
+}catch(e){}
 /* 3. σκούπα για ό,τι ξέφυγε (δεν προλαβαίνει πάντα, αλλά δεν βλάπτει) */
 function fix(img){
   try{
-    if(!img||img.tagName!=='IMG'||img.getAttribute('srcset')) return;
-    var u=img.getAttribute('src')||''; if(u.indexOf(CLD)<0) return;
+    if(!img||img.tagName!=='IMG') return;
+    var u=img.getAttribute('src')||'';
+    if(u.indexOf(CLD)<0){ if(img.getAttribute('srcset')&&img.getAttribute('data-hh87for')){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.removeAttribute('data-hh87for'); } return; }
+    if(img.getAttribute('data-hh87for')===u) return;      /* ήδη σωστό για ΑΥΤΟ το url */
     var v=variants(u); if(!v) return;
     img.setAttribute('srcset',v); img.setAttribute('sizes',sizesFor(img.className));
+    img.setAttribute('data-hh87for',u);
   }catch(e){}
 }
 function sweep(r){ try{ if(!r) return; if(r.tagName==='IMG'){fix(r);return;} var l=r.querySelectorAll?r.querySelectorAll('img'):[]; for(var i=0;i<l.length;i++) fix(l[i]); }catch(e){} }
@@ -12880,7 +12906,7 @@ try{
 
 var st=document.createElement('style');
 st.textContent='#hh-gs-vpop-el{max-height:none}'
- +'#hh-gs-vpop-el h5{position:sticky;top:0;background:#1b1710;margin:-2px 0 5px;padding:4px 0 5px;z-index:2}'
+ +'#hh-gs-vpop-el h5{position:sticky;top:0;background:inherit;margin:-2px 0 5px;padding:4px 0 5px;z-index:2}'
  +'#hh-gs-vpop-el::-webkit-scrollbar{width:10px}'
  +'#hh-gs-vpop-el::-webkit-scrollbar-thumb{background:rgba(200,168,75,.45);border-radius:6px}'
  +'#hh-gs-vpop-el::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}';
@@ -12971,6 +12997,28 @@ document.addEventListener('auxclick', function(e){
   if(h.url) bgOpen(h.url);
 }, true);
 
+}catch(e){}})();</script>
+<script>/*hhPolish88*/(function(){try{
+/* Στο fullscreen (#galleryOverlay) έπεφταν πάνω στα βελάκια της φωτογραφίας
+   και τα βελάκια αλλαγής ΣΠΙΤΙΟΥ του hhPolish80 (#hh80-prev/#hh80-next).
+   Μέσα στο fullscreen θέλουμε ΜΟΝΟ αλλαγή φωτογραφίας.                      */
+var st=document.createElement('style');
+st.textContent='body.hh88-fs #hh80-prev,body.hh88-fs #hh80-next,body.hh88-fs #hh80-count{display:none!important}';
+document.head.appendChild(st);
+function open_(){
+  var o=document.getElementById('galleryOverlay');
+  if(!o) return false;
+  try{
+    var cs=getComputedStyle(o);
+    if(cs.display==='none'||cs.visibility==='hidden'||cs.opacity==='0') return false;
+    return o.offsetWidth>0 && o.offsetHeight>0;
+  }catch(e){ return false; }
+}
+function sync(){ try{ document.body.classList.toggle('hh88-fs', open_()); }catch(e){} }
+setInterval(sync, 250);
+document.addEventListener('click', function(){ setTimeout(sync,60); setTimeout(sync,350); }, true);
+document.addEventListener('keydown', function(){ setTimeout(sync,60); }, true);
+sync();
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
