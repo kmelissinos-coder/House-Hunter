@@ -13334,6 +13334,115 @@ try{
 }catch(x){}
 
 }catch(e){}})();</script>
+<script>/*hhPolish90*/(function(){try{
+
+/* ---------------------------------------------------------------------------
+   1) Μεγαλύτερες μικρογραφίες στην ταινία της πλήρους οθόνης.
+   2) Προφόρτωση: μόλις ανοίξει μια φωτογραφία, κατεβαίνουν στη μνήμη οι ΕΠΟΜΕΝΕΣ
+      πέντε (και μία πίσω), και το παράθυρο κυλάει καθώς προχωράς — ώστε το «επόμενη»
+      να δείχνει αμέσως, χωρίς να περιμένεις το κατέβασμα.
+   Καλύπτονται και οι δύο γκαλερί: το #hh-lb (νέα) και το #galleryOverlay (παλιά). */
+
+var AHEAD=5, BEHIND=1;
+
+var st=document.createElement('style'); st.id='hh90-css';
+st.textContent=
+  /* νέα γκαλερί */
+  '#hh-lb .hh-lb-strip{height:118px!important;padding:10px 12px!important;gap:8px!important}'
+ +'#hh-lb .hh-lb-strip img{height:94px!important;width:126px!important;border-radius:6px!important}'
+  /* παλιά γκαλερί */
+ +'#galleryOverlay .gallery-thumbs{padding:10px 16px 16px!important;gap:7px!important}'
+ +'#galleryOverlay .gallery-thumb{width:100px!important;height:70px!important;border-radius:6px!important}'
+  /* σε στενή οθόνη λίγο μικρότερες, να μην τρώνε τη φωτογραφία */
+ +'@media (max-width:700px){'
+ +'#hh-lb .hh-lb-strip{height:96px!important}'
+ +'#hh-lb .hh-lb-strip img{height:76px!important;width:102px!important}'
+ +'#galleryOverlay .gallery-thumb{width:82px!important;height:58px!important}}';
+document.head.appendChild(st);
+
+/* --------------------------- προφόρτωση ----------------------------------- */
+var done={};                 /* url -> true, ώστε να μην ξανακατεβαίνει */
+var live=0, MAXPAR=4, queue=[];
+
+function pump(){
+  while(live<MAXPAR && queue.length){
+    (function(job){
+      live++;
+      var im=new Image();
+      function fin(){ live--; setTimeout(pump,0); }
+      im.onload=fin; im.onerror=fin;
+      try{ im.decoding='async'; }catch(e){}
+      /* ΙΔΙΟ candidate με αυτό που θα ζητήσει η μεγάλη φωτογραφία: το srcset είναι
+         το ίδιο, αλλάζει μόνο το sizes (100vw στη σκηνή) — αλλιώς θα κατεβάζαμε
+         άλλο μέγεθος και το cache δεν θα βοηθούσε καθόλου.                    */
+      if(job.srcset){ im.sizes='100vw'; im.srcset=job.srcset; }
+      im.src=job.url;
+    })(queue.shift());
+  }
+}
+function want(url, srcset){
+  if(!url || done[url]) return;
+  done[url]=true;
+  queue.push({url:url, srcset:srcset||''});
+  pump();
+}
+
+/* ποιά γκαλερί είναι ανοιχτή, ποιές μικρογραφίες έχει, πού βρισκόμαστε */
+function ctx(){
+  try{
+    var lb=document.getElementById('hh-lb');
+    if(lb && lb.offsetWidth>0){
+      var th=lb.querySelectorAll('.hh-lb-strip img');
+      if(th.length){
+        var idx=-1, i;
+        for(i=0;i<th.length;i++){ if(th[i].classList.contains('on')){ idx=i; break; } }
+        if(idx<0){
+          var c=lb.querySelector('.hh-lb-cnt');
+          var m=c&&(c.textContent||'').match(/(\d+)\s*\/\s*(\d+)/);
+          if(m) idx=(+m[1])-1;
+        }
+        return {th:th, idx:idx<0?0:idx};
+      }
+    }
+    var go=document.getElementById('galleryOverlay');
+    if(go && go.offsetWidth>0){
+      var t2=go.querySelectorAll('.gallery-thumb');
+      if(t2.length){
+        var j=-1,k;
+        for(k=0;k<t2.length;k++){ if(t2[k].classList.contains('active')){ j=k; break; } }
+        if(j<0){ try{ j=+window.galleryIdx||0; }catch(e){ j=0; } }
+        return {th:t2, idx:j<0?0:j};
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+function run(){
+  var c=ctx(); if(!c) return;
+  var n=c.th.length, i;
+  for(i=1;i<=AHEAD;i++){
+    var a=c.idx+i; if(a>=n) break;
+    want(c.th[a].getAttribute('src'), c.th[a].getAttribute('srcset'));
+  }
+  for(i=1;i<=BEHIND;i++){
+    var b=c.idx-i; if(b<0) break;
+    want(c.th[b].getAttribute('src'), c.th[b].getAttribute('srcset'));
+  }
+}
+window.__hh90Preload=run;
+
+var t=null;
+function kick(){ clearTimeout(t); t=setTimeout(run,60); }
+
+try{
+  new MutationObserver(kick).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','src']});
+}catch(e){}
+document.addEventListener('click', kick, true);
+document.addEventListener('keydown', function(e){ if(e.key==='ArrowLeft'||e.key==='ArrowRight') kick(); }, true);
+setInterval(run, 1200);        /* φτηνό: το done[] κόβει ό,τι έχει ήδη ζητηθεί */
+
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
