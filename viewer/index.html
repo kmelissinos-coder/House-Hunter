@@ -1251,11 +1251,22 @@ function variants(u){
   var m=String(u).match(RE); if(!m) return '';
   var a=m[1], b=m[2];
   function t(w){ return a+'w_'+w+',c_limit,f_auto,q_auto/'+b+' '+w+'w'; }
-  return t(200)+', '+t(400)+', '+t(800)+', '+t(1400);
+  return t(200)+', '+t(400)+', '+t(800)+', '+t(1400)+', '+t(2000);
 }
-function sizesFor(cls){
-  cls=String(cls||'');
-  if(/hh-cz-img|gallery-img|lo-main-img/.test(cls)) return '(max-width:900px) 96vw, 1200px';
+function sizesFor(elOrCls){
+  var el=null, cls='';
+  if(elOrCls && elOrCls.nodeType===1){ el=elOrCls; cls=String(el.className||''); }
+  else cls=String(elOrCls||'');
+  /* Η μεγάλη φωτογραφία του fullscreen (#hh-lb .hh-lb-stage > img) ΔΕΝ έχει
+     πλάτος από CSS — παίρνει το εγγενές μέγεθος της εικόνας. Αν της δώσουμε
+     μικρό candidate, εμφανίζεται κυριολεκτικά μικρή. Άρα: 100vw.            */
+  try{
+    if(el && el.closest){
+      if(el.closest('.hh-lb-strip')) return '(max-width:600px) 92px, 120px';
+      if(el.closest('.hh-lb-stage') || el.closest('#hh-lb')) return '100vw';
+    }
+  }catch(e){}
+  if(/hh-cz-img|gallery-img|lo-main-img/.test(cls)) return '(max-width:900px) 96vw, 1400px';
   if(/photo-strip-img|thumb/.test(cls))             return '(max-width:600px) 84px, 140px';
   return '(max-width:700px) 46vw, 420px';
 }
@@ -1300,7 +1311,7 @@ try{
         try{
           if(typeof v==='string' && v.indexOf(CLD)>=0){
             var vv=variants(v);
-            if(vv){ this.setAttribute('srcset',vv); this.setAttribute('sizes',sizesFor(this.className)); }
+            if(vv){ this.setAttribute('srcset',vv); this.setAttribute('sizes',sizesFor(this)); this.setAttribute('data-hh87for',v); }
             else { this.removeAttribute('srcset'); this.removeAttribute('sizes'); }
           }else{
             this.removeAttribute('srcset'); this.removeAttribute('sizes');
@@ -1318,7 +1329,7 @@ try{
       if(this.tagName==='IMG' && String(n).toLowerCase()==='src'){
         if(typeof v==='string' && v.indexOf(CLD)>=0){
           var vv=variants(v);
-          if(vv){ sa.call(this,'srcset',vv); sa.call(this,'sizes',sizesFor(this.className)); }
+          if(vv){ sa.call(this,'srcset',vv); sa.call(this,'sizes',sizesFor(this)); sa.call(this,'data-hh87for',v); }
           else { this.removeAttribute('srcset'); this.removeAttribute('sizes'); }
         }else{ this.removeAttribute('srcset'); this.removeAttribute('sizes'); }
       }
@@ -1334,7 +1345,7 @@ function fix(img){
     if(u.indexOf(CLD)<0){ if(img.getAttribute('srcset')&&img.getAttribute('data-hh87for')){ img.removeAttribute('srcset'); img.removeAttribute('sizes'); img.removeAttribute('data-hh87for'); } return; }
     if(img.getAttribute('data-hh87for')===u) return;      /* ήδη σωστό για ΑΥΤΟ το url */
     var v=variants(u); if(!v) return;
-    img.setAttribute('srcset',v); img.setAttribute('sizes',sizesFor(img.className));
+    img.setAttribute('srcset',v); img.setAttribute('sizes',sizesFor(img));
     img.setAttribute('data-hh87for',u);
   }catch(e){}
 }
@@ -13006,6 +13017,9 @@ var st=document.createElement('style');
 st.textContent='body.hh88-fs #hh80-prev,body.hh88-fs #hh80-next,body.hh88-fs #hh80-count{display:none!important}';
 document.head.appendChild(st);
 function open_(){
+  /* το πραγματικό fullscreen είναι το #hh-lb (lightbox)· κρατάμε και το
+     #galleryOverlay για την παλιά διαδρομή                                   */
+  if(document.getElementById('hh-lb')) return true;
   var o=document.getElementById('galleryOverlay');
   if(!o) return false;
   try{
