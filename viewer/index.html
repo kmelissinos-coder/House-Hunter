@@ -13465,6 +13465,177 @@ document.addEventListener('keydown', function(e){ if(e.key==='ArrowLeft'||e.key=
 setInterval(run, 1200);        /* φτηνό: το done[] κόβει ό,τι έχει ήδη ζητηθεί */
 
 }catch(e){}})();</script>
+<script>/*hhPolish91*/(function(){try{
+if(window.__hh91) return; window.__hh91=1;
+
+/* ---------------------------------------------------------------------------
+   Ένα μέρος για ό,τι έφυγε. Μέχρι τώρα υπήρχαν δύο ξεχωριστά κουτάκια —
+   «⛔ διαγραμμένα σπίτια» (αφαιρέθηκαν από τις πλατφόρμες) και «🏷 νοικιασμένα /
+   πουλημένα» (τα μαρκάρει ο Dusty). Τα δύο πράγματα ΠΑΡΑΜΕΝΟΥΝ διαφορετικά και
+   δεν τα ενώνουμε στη βάση: το ένα είναι παρατήρηση που μπορεί να αναιρεθεί,
+   το άλλο απόφαση. Αυτό που ενώνεται είναι η ΘΕΑ: ένα κουτάκι «👻 Μόνο όσα
+   έφυγαν» δείχνει και τα δύο μαζί, με ταμπέλα που λέει για ποιον λόγο.       */
+
+var CSS=
+ '.hh91-why{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}'
++'.hh91-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;'
++'letter-spacing:.3px;padding:3px 9px;border-radius:7px;white-space:nowrap}'
++'.hh91-tag.rm{background:rgba(180,40,40,.20);color:#ffb9b9;border:1px solid rgba(220,80,80,.55)}'
++'.hh91-tag.of{background:rgba(108,124,147,.22);color:#cfe0f2;border:1px solid rgba(150,170,195,.6)}'
++'body.light .hh91-tag.rm{background:rgba(190,40,40,.13);color:#8f1f1f;border-color:rgba(160,40,40,.5)}'
++'body.light .hh91-tag.of{background:rgba(72,88,110,.13);color:#31435a;border-color:rgba(72,88,110,.5)}'
++'#hh91-l{margin-left:18px;cursor:pointer}'
++'#hh91-l.on{color:#e9cf86;font-weight:700}'
++'.hh91-hidden{display:none!important}';
+try{ var st=document.createElement('style'); st.id='hh91-css'; st.textContent=CSS; document.head.appendChild(st); }catch(e){}
+
+function rowsAll(){
+  try{ return [].concat(allListings||[], extraListings||[]); }
+  catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }catch(e2){ return []; } }
+}
+function isDel(h){ try{ return h.deleted===true || String(h.deleted).toUpperCase()==='X' || h.gone_confirmed===true; }catch(e){ return false; } }
+
+/* κλειδί -> {rm:ΟΛΕΣ οι αγγελίες αφαιρέθηκαν, of:κάποια μαρκαρίστηκε νοικιασμένη} */
+var MAP=null, MAPT=0;
+function map(){
+  var now=Date.now();
+  if(MAP && now-MAPT<2000) return MAP;
+  var m={}, a=rowsAll(), i, h, hid, url, k;
+  var byHouse={};
+  for(i=0;i<a.length;i++){
+    h=a[i]; if(!h) continue;
+    if((h.project||'Fameli')!=='Rent' && (window.currentProject==='Rent')) {}
+    hid=String(h.house_id||'').trim();
+    k=(hid&&hid!=='0')?hid:null;
+    if(k){
+      if(!byHouse[k]) byHouse[k]={n:0,del:0,off:0};
+      byHouse[k].n++;
+      if(isDel(h)) byHouse[k].del++;
+      if(h.off_market===true) byHouse[k].off++;
+    }
+    url=h.url||'';
+    if(url && !k) m[url]={rm:isDel(h), of:h.off_market===true};
+    if(url && k) m[url]=null;                 /* θα γεμίσει από το σπίτι */
+  }
+  for(k in byHouse){
+    var b=byHouse[k];
+    m[k]={rm:(b.n>0 && b.del===b.n), of:b.off>0};
+  }
+  /* οι αγγελίες σπιτιών παίρνουν την κατάσταση του σπιτιού τους */
+  for(i=0;i<a.length;i++){
+    h=a[i]; if(!h||!h.url) continue;
+    hid=String(h.house_id||'').trim();
+    if(hid&&hid!=='0'&&m[hid]) m[h.url]=m[hid];
+  }
+  MAP=m; MAPT=now; return m;
+}
+function goneCount(){
+  var m=map(), k, n=0, seen={};
+  for(k in m){ var v=m[k]; if(v&&(v.rm||v.of)&&!seen[k]&&!/^https?:/.test(k)){ seen[k]=1; n++; } }
+  return n;
+}
+
+function keyOf(card){
+  try{
+    var hh=String((card.dataset&&card.dataset.hhh)||'').trim();
+    if(hh&&hh!=='0') return hh;
+    var s1=card.querySelector('[onclick*=setRating],[onclick*=openModal],[onclick*=toggleFav]');
+    if(s1){
+      var oc=s1.getAttribute('onclick')||'';
+      var a=oc.indexOf("'"), b=oc.indexOf("'",a+1);
+      if(a>=0&&b>a) return oc.slice(a+1,b);
+    }
+    var img=card.querySelector('a[href^="http"]');
+    if(img) return img.getAttribute('href');
+  }catch(e){}
+  return null;
+}
+
+function on(){ var c=document.getElementById('hh91'); return !!(c&&c.checked); }
+
+/* το κουτάκι, δίπλα στα υπόλοιπα */
+function ensureBox(){
+  if(document.getElementById('hh91')) return;
+  var wrap=document.querySelector('.show-deleted-wrap'); if(!wrap) return;
+  var lab=document.createElement('label');
+  lab.id='hh91-l';
+  lab.title='Δείχνει μαζί ό,τι έχει φύγει: τα σπίτια που αφαιρέθηκαν από ΟΛΕΣ τις πλατφόρμες και όσα έχεις μαρκάρει νοικιασμένα ή πουλημένα. Κάθε κάρτα λέει για ποιον λόγο έφυγε.';
+  lab.innerHTML='<input type="checkbox" id="hh91"> 👻 Μόνο όσα έφυγαν <span id="hh91-n" style="opacity:.6"></span>';
+  wrap.appendChild(lab);
+  var cb=document.getElementById('hh91');
+  try{ cb.checked = localStorage.getItem('hh91_only_gone')==='1'; }catch(e){}
+  cb.addEventListener('change', function(){
+    try{ localStorage.setItem('hh91_only_gone', cb.checked?'1':'0'); }catch(e){}
+    sync(); try{ applyFilters(); }catch(e){} setTimeout(paint,60);
+  });
+  if(cb.checked){ sync(); }
+}
+
+/* όσο η θέα είναι ανοιχτή, τα δύο υπάρχοντα κουτάκια πρέπει να είναι ΚΑΙ ΤΑ ΔΥΟ
+   ανοιχτά — αλλιώς η λίστα δεν περιέχει καν αυτά που θέλουμε να δείξουμε.    */
+var saved=null;
+function sync(){
+  var d=document.getElementById('hh-delh15'), o=document.getElementById('hh-offm47');
+  if(on()){
+    if(saved===null) saved={d:d?d.checked:null, o:o?o.checked:null};
+    if(d&&!d.checked){ d.checked=true; try{ d.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){} }
+    if(o&&!o.checked){ o.checked=true; try{ o.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){} }
+    var l=document.getElementById('hh91-l'); if(l) l.classList.add('on');
+  }else{
+    if(saved){
+      if(d&&saved.d===false&&d.checked){ d.checked=false; try{ d.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){} }
+      if(o&&saved.o===false&&o.checked){ o.checked=false; try{ o.dispatchEvent(new Event('change',{bubbles:true})); }catch(e){} }
+      saved=null;
+    }
+    var l2=document.getElementById('hh91-l'); if(l2) l2.classList.remove('on');
+  }
+}
+
+function tagHtml(v){
+  var h='';
+  if(v.rm) h+='<span class="hh91-tag rm">\u26d4 ΑΦΑΙΡΕΘΗΚΕ ΑΠΟ ΤΙΣ ΠΛΑΤΦΟΡΜΕΣ</span>';
+  if(v.of) h+='<span class="hh91-tag of">\ud83c\udff7 ΝΟΙΚΙΑΣΤΗΚΕ / ΠΟΥΛΗΘΗΚΕ</span>';
+  return h;
+}
+
+function paint(){
+  try{
+    ensureBox();
+    var n=goneCount();
+    var ne=document.getElementById('hh91-n'); if(ne) ne.textContent='('+n+')';
+    var cards=document.querySelectorAll('.card, .grouped-card, .list-item');
+    var m=map(), i;
+    for(i=0;i<cards.length;i++){
+      var c=cards[i];
+      if(c.closest && c.closest('.lo-sib-carousel, #hh-lb, .hh-gs-vpop')) continue;
+      var k=keyOf(c);
+      var v=k?m[k]:null;
+      var gone=!!(v&&(v.rm||v.of));
+      if(on()){
+        c.classList.toggle('hh91-hidden', !gone);
+        if(gone){
+          var old=c.querySelector(':scope > .hh91-why, :scope .hh91-why');
+          var want=tagHtml(v);
+          if(!old){
+            var d=document.createElement('div'); d.className='hh91-why'; d.innerHTML=want;
+            var body=c.querySelector('.card-body, .grouped-body') || c;
+            body.insertBefore(d, body.firstChild);
+          }else if(old.innerHTML!==want){ old.innerHTML=want; }
+        }
+      }else{
+        c.classList.remove('hh91-hidden');
+        var w=c.querySelector('.hh91-why'); if(w) w.remove();
+      }
+    }
+  }catch(e){}
+}
+window.__hh91Paint=paint;
+
+setInterval(paint, 800);
+setTimeout(paint, 600);
+document.addEventListener('click', function(){ setTimeout(paint,120); }, true);
+
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
