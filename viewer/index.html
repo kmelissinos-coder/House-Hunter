@@ -13648,6 +13648,108 @@ setTimeout(paint, 600);
 document.addEventListener('click', function(){ setTimeout(paint,120); }, true);
 
 }catch(e){}})();</script>
+<script>/*hhPolish92*/(function(){try{
+if(window.__hh92) return; window.__hh92=1;
+
+/* ---------------------------------------------------------------------------
+   Ο Dusty: «μόλις φύγει το «παρακαλώ περιμένετε», αν αρχίσω να γράφω στην
+   αναζήτηση χαλάει όλη η διάταξη· αν περιμένω άλλα 10-20 δευτερόλεπτα, μια χαρά».
+   Δύο πράγματα εδώ:
+     1) Η αναζήτηση ΚΛΕΙΔΩΝΕΙ μέχρι να ησυχάσει πραγματικά η διάταξη — όχι μόνο
+        μέχρι να φύγει το overlay. Καλύτερα να μη δέχεται πληκτρολόγηση παρά να
+        σπάει η σελίδα και να χρειάζεται refresh.
+     2) Αυτοδιόρθωση: μετά από κάθε αναζήτηση ελέγχουμε ότι το ταμπλό
+        «Πού βρέθηκε» (#hh70-why) κάθεται ΑΜΕΣΩΣ κάτω από τη μπάρα (#hh-hb).
+        Αν βρεθεί αλλού — εκεί σπάει η διάταξη — μπαίνει στη θέση του και
+        ξαναμετριούνται τα ύψη (resize → hhPolish18 + Leaflet invalidateSize).  */
+
+var st=document.createElement('style'); st.id='hh92-css';
+st.textContent='#numSearch.hh92-wait{opacity:.5;cursor:progress}'
+ +'#numSearch.hh92-wait::placeholder{color:#c8a84b}';
+document.head.appendChild(st);
+
+function box(){ return document.getElementById('numSearch'); }
+var PH=null, locked=false;
+
+function lock(){
+  var b=box(); if(!b||locked) return;
+  locked=true;
+  if(PH===null) PH=b.getAttribute('placeholder')||'';
+  b.setAttribute('placeholder','\u23f3 \u03a6\u03bf\u03c1\u03c4\u03ce\u03bd\u03b5\u03b9\u2026 \u03b7 \u03b1\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7 \u03b1\u03bd\u03bf\u03af\u03b3\u03b5\u03b9 \u03c3\u03b5 \u03bb\u03af\u03b3\u03bf');
+  b.classList.add('hh92-wait');
+  b.readOnly=true;
+  b.title='Η σελίδα φορτώνει ακόμη — η αναζήτηση ανοίγει μόλις ησυχάσει η διάταξη.';
+}
+function unlock(){
+  var b=box(); if(!b) return;
+  locked=false;
+  if(PH!==null) b.setAttribute('placeholder',PH);
+  b.classList.remove('hh92-wait');
+  b.readOnly=false;
+  b.title='';
+}
+
+/* «ησύχασε η διάταξη» = τα βασικά κουτιά δεν άλλαξαν μέγεθος για 1,2"        */
+var lastSig='', sameSince=0;
+function sig(){
+  try{
+    function d(id){ var e=document.getElementById(id); if(!e) return '-'; var r=e.getBoundingClientRect(); return Math.round(r.width)+'x'+Math.round(r.height)+'@'+Math.round(r.top); }
+    var gc=document.querySelector('.grid-container');
+    var g=gc?Math.round(gc.getBoundingClientRect().height):0;
+    return d('hh-hb')+'|'+d('map-split')+'|'+d('mapList')+'|'+g+'|'+document.querySelectorAll('.card,.grouped-card').length;
+  }catch(e){ return 'x'; }
+}
+var START=Date.now(), opened=false;
+function tick(){
+  try{
+    var b=box(); if(!b) return;
+    if(!opened){
+      if(!locked) lock();
+      var boot=document.getElementById('hh86-boot');
+      var s1=sig();
+      if(s1!==lastSig){ lastSig=s1; sameSince=Date.now(); }
+      var quiet=(Date.now()-sameSince)>1200;
+      var hb=document.getElementById('hh-hb');
+      if(!boot && hb && quiet && (Date.now()-START)>1500){ opened=true; unlock(); }
+      else if((Date.now()-START)>30000){ opened=true; unlock(); }   /* ποτέ κλειδωμένη για πάντα */
+    }
+  }catch(e){}
+}
+setInterval(tick, 200);
+tick();
+
+/* ---------- 2. αυτοδιόρθωση διάταξης ---------------------------------------- */
+function repair(){
+  try{
+    var why=document.getElementById('hh70-why');
+    var hb=document.getElementById('hh-hb');
+    var moved=false;
+    if(why && hb && hb.parentNode){
+      if(why.parentNode!==hb.parentNode || why.previousElementSibling!==hb){
+        try{ hb.parentNode.insertBefore(why, hb.nextSibling); moved=true; }catch(e){}
+      }
+    }
+    /* η μπάρα πρέπει να είναι στην κορυφή όταν δεν έχεις κυλήσει */
+    var bad=false;
+    if(hb){
+      var r=hb.getBoundingClientRect();
+      if((window.scrollY||0)<10 && r.top>80) bad=true;
+    }
+    if(moved||bad){
+      try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+      setTimeout(function(){ try{ window.dispatchEvent(new Event('resize')); }catch(e){} },150);
+    }
+    return {moved:moved, bad:bad};
+  }catch(e){ return null; }
+}
+window.__hh92Repair=repair;
+
+document.addEventListener('input', function(e){
+  try{ if(e.target && e.target.id==='numSearch'){ setTimeout(repair,150); setTimeout(repair,600); } }catch(x){}
+}, true);
+setInterval(function(){ try{ var b=box(); if(b && (b.value||'').trim()) repair(); }catch(e){} }, 1000);
+
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
