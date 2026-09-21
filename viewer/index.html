@@ -13502,9 +13502,19 @@ function map(){
   if(MAP && now-MAPT<2000) return MAP;
   var m={}, a=rowsAll(), i, h, hid, url, k;
   var byHouse={};
+  /* ίδιο φίλτρο έργου με το applyFilters — αλλιώς ο μετρητής μετράει και τα
+     σπίτια των άλλων έργων, που δεν φαίνονται καν στη λίστα */
+  var cp=null; try{ cp=currentProject; }catch(e){ try{ cp=window.currentProject; }catch(e2){} }
+  function inProj(r){
+    try{
+      var pj=r.project||'Fameli';
+      if(cp&&cp!=='all') return pj===cp;
+      return pj!=='Rent';
+    }catch(e){ return true; }
+  }
   for(i=0;i<a.length;i++){
     h=a[i]; if(!h) continue;
-    if((h.project||'Fameli')!=='Rent' && (window.currentProject==='Rent')) {}
+    if(!inProj(h)) continue;
     hid=String(h.house_id||'').trim();
     k=(hid&&hid!=='0')?hid:null;
     if(k){
