@@ -13611,16 +13611,15 @@ function tagHtml(v){
 function paint(){
   try{
     ensureBox();
-    var n=goneCount();
-    var ne=document.getElementById('hh91-n'); if(ne) ne.textContent='('+n+')';
     var cards=document.querySelectorAll('.card, .grouped-card, .list-item');
-    var m=map(), i;
+    var m=map(), i, shown=0;
     for(i=0;i<cards.length;i++){
       var c=cards[i];
       if(c.closest && c.closest('.lo-sib-carousel, #hh-lb, .hh-gs-vpop')) continue;
       var k=keyOf(c);
       var v=k?m[k]:null;
       var gone=!!(v&&(v.rm||v.of));
+      if(gone) shown++;
       if(on()){
         c.classList.toggle('hh91-hidden', !gone);
         if(gone){
@@ -13637,6 +13636,9 @@ function paint(){
         var w=c.querySelector('.hh91-why'); if(w) w.remove();
       }
     }
+    /* ο αριθμός δείχνει ΟΣΑ ΒΛΕΠΕΙΣ, όχι όσα υπάρχουν στη βάση: με ανοιχτά
+       φίλτρα τιμής/περιοχής τα δύο νούμερα διαφέρουν και μπερδεύουν.        */
+    var ne=document.getElementById('hh91-n'); if(ne) ne.textContent='('+shown+')';
   }catch(e){}
 }
 window.__hh91Paint=paint;
