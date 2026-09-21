@@ -1382,6 +1382,21 @@ function rescue(){
       im.setAttribute('loading','eager'); n++;
       if(n>60) break;
     }
+    /* δεύτερη περίπτωση: ξεκίνησε (currentSrc) αλλά κόλλησε — μία σπρωξιά,
+       μία φορά ανά εικόνα, ώστε να μη μείνει άδειο πλαίσιο.                  */
+    var now=Date.now();
+    for(var k=0;k<l.length;k++){
+      var q=l[k];
+      if(q.complete||!q.currentSrc) continue;
+      if(q.getAttribute('data-hh87kick')) continue;
+      var t0=+(q.getAttribute('data-hh87t0')||0);
+      if(!t0){ q.setAttribute('data-hh87t0', String(now)); continue; }
+      if(now-t0<5000) continue;
+      var rr=null; try{ rr=q.getBoundingClientRect(); }catch(e){}
+      if(!rr||(rr.width===0&&rr.height===0)) continue;
+      q.setAttribute('data-hh87kick','1');
+      try{ var u=q.getAttribute('src'); if(u){ q.setAttribute('loading','eager'); q.src=u; } }catch(e){}
+    }
   }catch(e){}
 }
 window.__hh87Rescue=rescue;
@@ -1451,6 +1466,17 @@ document.addEventListener('error', onImg, true);
 
 /* πόσες εικόνες φορτώνουν τώρα μέσα/κοντά στην οθόνη (τις lazy από κάτω
    τις αγνοούμε — δεν πρόκειται να ξεκινήσουν καν)                            */
+var seenAt=(typeof WeakMap==='function')?new WeakMap():null;
+function stale(im){
+  /* Εικόνα που «φορτώνει» πάνω από 4" δεν φορτώνει: κολλημένο αίτημα ή
+     ακυρωμένο από αλλαγή src. Δεν κρατάει άλλο το overlay.                   */
+  try{
+    if(!seenAt) return false;
+    var t0=seenAt.get(im);
+    if(!t0){ t0=Date.now(); seenAt.set(im,t0); }
+    return (Date.now()-t0)>4000;
+  }catch(e){ return false; }
+}
 function pendingImgs(){
   var n=0;
   try{
@@ -1466,6 +1492,7 @@ function pendingImgs(){
       var r=null; try{ r=im.getBoundingClientRect(); }catch(x){}
       if(r&&(r.width===0&&r.height===0)) continue;
       if(r&&(r.bottom<-250||r.top>vh+450)) continue;
+      if(stale(im)) continue;
       n++;
       if(n>200) break;
     }
@@ -1525,6 +1552,7 @@ var iv=setInterval(function(){
     if(!r){ say('αναμονή δεδομένων…', 10+el_/200); }
     else{
       var pi=pendingImgs(), pt=pendingTiles();
+      if(el_>8000){ pi=0; pt=0; }        /* μετά τα 8" κρίνει μόνο η ησυχία δικτύου */
       var parts=[];
       if(inflight>0) parts.push(inflight+' αιτήματα');
       if(pi>0) parts.push(pi+' φωτογραφίες');
