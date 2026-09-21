@@ -13375,16 +13375,37 @@ function pump(){
       /* ΙΔΙΟ candidate με αυτό που θα ζητήσει η μεγάλη φωτογραφία: το srcset είναι
          το ίδιο, αλλάζει μόνο το sizes (100vw στη σκηνή) — αλλιώς θα κατεβάζαμε
          άλλο μέγεθος και το cache δεν θα βοηθούσε καθόλου.                    */
-      if(job.srcset){ im.sizes='100vw'; im.srcset=job.srcset; }
       im.src=job.url;
     })(queue.shift());
   }
 }
-function want(url, srcset){
+function want(url){
   if(!url || done[url]) return;
   done[url]=true;
-  queue.push({url:url, srcset:srcset||''});
+  queue.push({url:url});
   pump();
+}
+
+/* ΠΟΙΑ ΑΚΡΙΒΩΣ διεύθυνση θα ζητήσει η μεγάλη φωτογραφία.
+   Δεν αρκεί new Image() με srcset+sizes='100vw': μια εικόνα ΕΚΤΟΣ DOM δεν
+   αναλύει το 100vw όπως η πραγματική — μετρημένο, διάλεγε w_800 ενώ η σκηνή
+   ζητούσε w_2000, άρα η προφόρτωση δεν βοηθούσε καθόλου. Αντ' αυτού παίρνουμε
+   τον ΙΔΙΟ μετασχηματισμό που έχει ήδη διαλέξει ο browser για τη σκηνή και τον
+   περνάμε αυτούσιο στις επόμενες φωτογραφίες.                                */
+function xform(stageImg){
+  try{
+    var cur=stageImg&&stageImg.currentSrc||'';
+    var m=cur.match(/\/image\/upload\/(w_\d+[^/]*)\//);
+    if(m) return m[1];
+  }catch(e){}
+  return 'w_1400,c_limit,f_auto,q_auto';   /* εφεδρεία πριν προλάβει να επιλέξει */
+}
+function asBig(url, tf){
+  try{
+    if(!url || url.indexOf('res.cloudinary.com')<0) return url;
+    if(/\/image\/upload\/w_\d/.test(url)) return url;      /* ήδη μετασχηματισμένη */
+    return url.replace('/image/upload/', '/image/upload/'+tf+'/');
+  }catch(e){ return url; }
 }
 
 /* ποιά γκαλερί είναι ανοιχτή, ποιές μικρογραφίες έχει, πού βρισκόμαστε */
@@ -13392,6 +13413,7 @@ function ctx(){
   try{
     var lb=document.getElementById('hh-lb');
     if(lb && lb.offsetWidth>0){
+      var stage=lb.querySelector('.hh-lb-stage img');
       var th=lb.querySelectorAll('.hh-lb-strip img');
       if(th.length){
         var idx=-1, i;
@@ -13401,7 +13423,7 @@ function ctx(){
           var m=c&&(c.textContent||'').match(/(\d+)\s*\/\s*(\d+)/);
           if(m) idx=(+m[1])-1;
         }
-        return {th:th, idx:idx<0?0:idx};
+        return {th:th, idx:idx<0?0:idx, tf:xform(stage)};
       }
     }
     var go=document.getElementById('galleryOverlay');
@@ -13411,7 +13433,7 @@ function ctx(){
         var j=-1,k;
         for(k=0;k<t2.length;k++){ if(t2[k].classList.contains('active')){ j=k; break; } }
         if(j<0){ try{ j=+window.galleryIdx||0; }catch(e){ j=0; } }
-        return {th:t2, idx:j<0?0:j};
+        return {th:t2, idx:j<0?0:j, tf:xform(go.querySelector('.gallery-img, #galleryImg'))};
       }
     }
   }catch(e){}
@@ -13423,11 +13445,11 @@ function run(){
   var n=c.th.length, i;
   for(i=1;i<=AHEAD;i++){
     var a=c.idx+i; if(a>=n) break;
-    want(c.th[a].getAttribute('src'), c.th[a].getAttribute('srcset'));
+    want(asBig(c.th[a].getAttribute('src'), c.tf));
   }
   for(i=1;i<=BEHIND;i++){
     var b=c.idx-i; if(b<0) break;
-    want(c.th[b].getAttribute('src'), c.th[b].getAttribute('srcset'));
+    want(asBig(c.th[b].getAttribute('src'), c.tf));
   }
 }
 window.__hh90Preload=run;
