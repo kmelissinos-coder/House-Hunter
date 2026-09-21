@@ -12657,6 +12657,177 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
   }
 }catch(e){}})();</script>
 <script>/*hhPolish84*/(function(){try{window.__hhSvcMsg=function(r,d){try{var t=(d&&(d.message||d.error||d.msg))||'';if(r&&(r.status===402||r.status===403||r.status===503)&&/exceed_egress_quota|exceed_|restricted due to|spend cap|upgrade their plan/i.test(String(t)))return 'Η υπηρεσία είναι προσωρινά σε παύση από το Supabase (υπέρβαση ορίου χρέωσης). Δεν φταίει ο κωδικός σου — χρειάζεται αύξηση του spend cap στο Supabase.';if(r&&r.status===402)return 'Η υπηρεσία είναι προσωρινά σε παύση από το Supabase (όριο χρέωσης). Δεν φταίει ο κωδικός σου.';if(r&&r.status>=500)return 'Ο διακομιστής δεν απαντά αυτή τη στιγμή (σφάλμα '+r.status+'). Δοκίμασε ξανά σε λίγο.';return '';}catch(e){return '';}};}catch(e){}})();</script>
+<script>/*hhPolish85*/(function(){try{
+
+/* ---------- 1. popup του «n ▾» (μεσιτικά κ.λπ.): να χωράει ΠΑΝΤΑ στην οθόνη ----
+   Πριν: top = min(rc.bottom+4, innerHeight-140) και max-height 60vh, οπότε σε
+   μεγάλες λίστες το popup ξεπερνούσε το κάτω άκρο του viewport. Επειδή είναι
+   position:fixed, το scroll της σελίδας δεν το έφερνε πίσω — οι τελευταίες
+   σειρές ήταν απρόσιτες. Τώρα υπολογίζουμε τον διαθέσιμο χώρο κάτω/πάνω από το
+   κουμπί, διαλέγουμε την καλύτερη πλευρά και κλειδώνουμε maxHeight ώστε το
+   popup να τελειώνει GAP px πριν το άκρο της οθόνης. Το overflow:auto κάνει
+   τα υπόλοιπα, και η επικεφαλίδα μένει sticky για να ξέρεις τι κοιτάς.        */
+var GAP=12, MINH=140;
+function fit(pop, trig){
+  if(!pop) return;
+  var vh=window.innerHeight||document.documentElement.clientHeight;
+  var vw=window.innerWidth||document.documentElement.clientWidth;
+  var rc=trig&&trig.getBoundingClientRect?trig.getBoundingClientRect():null;
+  pop.style.maxHeight='none';
+  var natural=pop.scrollHeight;
+  var top, h;
+  if(rc){
+    var below=vh-rc.bottom-4-GAP, above=rc.top-4-GAP;
+    if(natural<=below || below>=above){
+      top=rc.bottom+4; h=below;
+    }else{
+      h=above; top=Math.max(GAP, rc.top-4-Math.min(natural,above));
+    }
+  }else{
+    top=GAP; h=vh-2*GAP;
+  }
+  h=Math.max(MINH, Math.min(h, vh-2*GAP));
+  if(natural<h) h=natural;
+  pop.style.top=Math.max(GAP, Math.min(top, vh-h-GAP))+'px';
+  pop.style.bottom='auto';
+  pop.style.maxHeight=h+'px';
+  pop.style.overflowY='auto';
+  pop.style.overscrollBehavior='contain';
+  var w=pop.offsetWidth||320;
+  if(rc) pop.style.left=Math.max(GAP, Math.min(rc.left, vw-w-GAP))+'px';
+}
+window.__hhFitPop=fit;
+
+var lastTrig=null;
+document.addEventListener('click', function(e){
+  try{
+    var b=e.target&&e.target.closest?e.target.closest('.hh-gs-more'):null;
+    if(b) lastTrig=b;
+  }catch(x){}
+}, true);
+document.addEventListener('click', function(e){
+  try{
+    var b=e.target&&e.target.closest?e.target.closest('.hh-gs-more'):null;
+    if(!b) return;
+    setTimeout(function(){ fit(document.getElementById('hh-gs-vpop-el'), b); },0);
+  }catch(x){}
+}, false);
+
+/* αν το popup μπει στο DOM από άλλο σημείο, το πιάνουμε κι εκεί */
+try{
+  new MutationObserver(function(ms){
+    for(var i=0;i<ms.length;i++){
+      var ad=ms[i].addedNodes||[];
+      for(var j=0;j<ad.length;j++){
+        var n=ad[j];
+        if(n&&n.nodeType===1&&(n.id==='hh-gs-vpop-el'||(n.classList&&n.classList.contains('hh-gs-vpop')))){
+          (function(el){ setTimeout(function(){ fit(el, lastTrig); },0); })(n);
+        }
+      }
+    }
+  }).observe(document.body,{childList:true,subtree:true});
+}catch(x){}
+
+['resize','orientationchange'].forEach(function(ev){
+  window.addEventListener(ev, function(){
+    var p=document.getElementById('hh-gs-vpop-el'); if(p) fit(p, lastTrig);
+  });
+});
+
+var st=document.createElement('style');
+st.textContent='#hh-gs-vpop-el{max-height:none}'
+ +'#hh-gs-vpop-el h5{position:sticky;top:0;background:#1b1710;margin:-2px 0 5px;padding:4px 0 5px;z-index:2}'
+ +'#hh-gs-vpop-el::-webkit-scrollbar{width:10px}'
+ +'#hh-gs-vpop-el::-webkit-scrollbar-thumb{background:rgba(200,168,75,.45);border-radius:6px}'
+ +'#hh-gs-vpop-el::-webkit-scrollbar-track{background:rgba(255,255,255,.05)}';
+document.head.appendChild(st);
+
+/* ---------- 2. μεσαίο κλικ = νέα καρτέλα στο παρασκήνιο, παντού -------------
+   Τα περισσότερα «links» της εφαρμογής δεν είναι <a>, είναι divs/buttons με
+   onclick, οπότε το μεσαίο κλικ δεν έκανε τίποτα. Σειρά προτεραιότητας:
+   πραγματικό <a href> -> το αφήνουμε στον Chrome· data-url -> το ανοίγουμε·
+   inline onclick με URL μέσα -> το βγάζουμε με regex· αλλιώς τρέχουμε τον
+   handler με το window.open προσωρινά δεσμευμένο, ώστε ό,τι κι αν ανοίξει να
+   καταλήξει σε καρτέλα παρασκηνίου.                                          */
+function bgOpen(url){
+  if(!url) return false;
+  try{
+    var a=document.createElement('a');
+    a.href=url; a.target='_blank'; a.rel='noopener noreferrer';
+    a.style.cssText='position:fixed;left:-9999px;top:0';
+    document.body.appendChild(a);
+    a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window,ctrlKey:true,metaKey:true}));
+    setTimeout(function(){ try{a.remove();}catch(e){} },0);
+    return true;
+  }catch(e){
+    try{ window.open(url,'_blank','noopener'); return true; }catch(x){}
+  }
+  return false;
+}
+window.__hhBgOpen=bgOpen;
+
+function deco(v){
+  if(!v) return '';
+  v=String(v);
+  if(/^https?:\/\//i.test(v)) return v;
+  try{ var d=decodeURIComponent(v); if(/^https?:\/\//i.test(d)) return d; }catch(e){}
+  return v;
+}
+function urlFromAttr(el){
+  try{
+    var d=el.getAttribute&&(el.getAttribute('data-url')||el.getAttribute('data-href')||el.getAttribute('data-link'));
+    if(d) return deco(d);
+    var oc=el.getAttribute&&el.getAttribute('onclick');
+    if(oc){
+      /* ΜΟΝΟ handlers που όντως ανοίγουν αγγελία. Το σκέτο «υπάρχει ένα http
+         κάπου μέσα» πιάνει και τα βελάκια φωτογραφιών (cardPhotoNav) ή άλλες
+         ενέργειες που τυχαίνει να κουβαλάνε το url ως κλειδί.                */
+      var m=oc.match(/(?:^|;)\s*(?:event\.stopPropagation\(\);\s*)?(?:window\.open|openModal|openListingOverlay|openAd|openLink)\s*\(\s*['"]([^'"]+)['"]/);
+      if(m) return deco(m[1]);
+    }
+  }catch(e){}
+  return '';
+}
+
+function holder(t){
+  var el,i;
+  /* 1. Αν κάπου πιο πάνω η εφαρμογή χειρίζεται ήδη το μεσαίο κλικ (onauxclick)
+        ή υπάρχει πραγματικό <a href>, το αφήνουμε ΟΛΟΚΛΗΡΟ στον Chrome/στην
+        εφαρμογή. Αυτό έχει προτεραιότητα πάνω από οτιδήποτε άλλο.            */
+  for(el=t,i=0; el && i<8; i++, el=el.parentElement){
+    if(el.nodeType!==1) continue;
+    if(el.getAttribute && el.getAttribute('onauxclick')) return {el:el,native:true};
+    if(el.tagName==='A' && el.getAttribute('href')) return {el:el,native:true};
+  }
+  /* 2. Αλλιώς ψάξε url. Τα βελάκια φωτογραφιών κουβαλούν url ως κλειδί —
+        δεν είναι link, οπότε τα κόβουμε ρητά.                                */
+  for(el=t,i=0; el && i<8; i++, el=el.parentElement){
+    if(el.nodeType!==1) continue;
+    var oc=el.getAttribute?el.getAttribute('onclick'):'';
+    if(oc && /PhotoNav|photoNav/.test(oc)) return null;
+    var u=urlFromAttr(el);
+    if(u) return {el:el,url:u};
+  }
+  return null;
+}
+
+/* μη μας βγάλει ο Chrome τον κύκλο του autoscroll */
+document.addEventListener('mousedown', function(e){
+  if(e.button!==1) return;
+  try{ var hh=holder(e.target); if(hh&&(hh.native||hh.url)) e.preventDefault(); }catch(x){}
+}, true);
+
+document.addEventListener('auxclick', function(e){
+  if(e.button!==1) return;
+  var h=null;
+  try{ h=holder(e.target); }catch(x){}
+  if(!h) return;
+  if(h.native) return;                     /* ο Chrome το κάνει ήδη σωστά */
+  e.preventDefault(); e.stopPropagation();
+  if(h.url) bgOpen(h.url);
+}, true);
+
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
