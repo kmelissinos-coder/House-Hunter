@@ -1238,14 +1238,15 @@ label:has(input[onchange*="seen_it',"]:checked){background:rgba(150,95,130,0.42)
    το search στο μεταξύ, το layout σπάει και θέλει refresh. Το overlay μπλοκάρει
    την αλληλεπίδραση μέχρι να είναι όντως έτοιμη. Αν δεν έχεις κάνει login, φεύγει
    αμέσως ώστε να μην κρύβει τη φόρμα. Και σε κάθε περίπτωση φεύγει στα 15",  */
-var START=Date.now(), HARD=15000, done=false;
+var START=Date.now(), HARD=12000, done=false;
 function el(){ return document.getElementById('hh86-boot'); }
 function ready(){
   try{
     if(document.getElementById('hh-gate')) return true;          /* οθόνη σύνδεσης */
+    /* το allListings ΔΕΝ είναι global — κοιτάμε το ίδιο το render */
     var rc=document.getElementById('resultsCount');
-    var n=(window.allListings&&window.allListings.length)||0;
-    if(n>0 && rc && (rc.textContent||'').trim()) return true;
+    if(rc && (rc.textContent||'').trim().length>3) return true;
+    if(document.querySelectorAll('.card-img-wrap, .hh-gs-more').length>0) return true;
   }catch(e){}
   return false;
 }
