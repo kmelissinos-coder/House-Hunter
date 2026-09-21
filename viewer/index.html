@@ -1233,6 +1233,92 @@ label:has(input[onchange*="seen_it',"]:checked){background:rgba(150,95,130,0.42)
     <div id="hh86-t2">Παρακαλώ περίμενε<br>τα ακίνητα φορτώνονται</div>
   </div>
 </div>
+<script>/*hhPolish87*/(function(){try{
+/* ---------------------------------------------------------------------------
+   Οι φωτογραφίες σερβίρονταν ΠΑΝΤΑ στο πρωτότυπο μέγεθος από το Cloudinary
+   (~200 KB η μία) — μια σελίδα με 264 εικόνες κατέβαζε ~50 MB. Αυτό είναι
+   ταυτόχρονα ο λόγος που αργεί η σελίδα ΚΑΙ ο λόγος που φάγαμε τα credits.
+   Μετρημένο στην ίδια φωτογραφία: 258 KB πρωτότυπη, 20 KB στα 400px, 6 KB στα 200px.
+
+   ΔΕΝ πειράζουμε το src: τα «αγαπημένα» κλειδώνονται πάνω στο img.src
+   (toggleFav / __hhKey), οπότε αλλαγή του src θα τα έσπαγε. Βάζουμε srcset+sizes
+   ΠΡΙΝ μπει η εικόνα στο DOM — αλλιώς ο browser έχει ήδη ξεκινήσει το κατέβασμα
+   του src και το srcset αγνοείται (αυτό ακριβώς έγινε στην πρώτη προσπάθεια).
+   Γι' αυτό πιάνουμε και το innerHTML και τον setter του img.src.            */
+var CLD='res.cloudinary.com';
+var RE=/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?!w_\d)(.+)$/;
+function variants(u){
+  var m=String(u).match(RE); if(!m) return '';
+  var a=m[1], b=m[2];
+  function t(w){ return a+'w_'+w+',c_limit,f_auto,q_auto/'+b+' '+w+'w'; }
+  return t(200)+', '+t(400)+', '+t(800)+', '+t(1400);
+}
+function sizesFor(cls){
+  cls=String(cls||'');
+  if(/hh-cz-img|gallery-img|lo-main-img/.test(cls)) return '(max-width:900px) 96vw, 1200px';
+  if(/photo-strip-img|thumb/.test(cls))             return '(max-width:600px) 84px, 140px';
+  return '(max-width:700px) 46vw, 420px';
+}
+/* 1. εικόνες που μπαίνουν ως HTML string (ο κύριος όγκος) */
+function rw(html){
+  return html.replace(/<img\b([^>]*)>/gi, function(tag, attrs){
+    try{
+      if(/\bsrcset\s*=/i.test(attrs)) return tag;
+      var m=attrs.match(/\bsrc\s*=\s*("([^"]*)"|'([^']*)')/i);
+      if(!m) return tag;
+      var u=(m[2]!==undefined?m[2]:m[3])||'';
+      if(u.indexOf(CLD)<0) return tag;
+      var v=variants(u); if(!v) return tag;
+      var c=attrs.match(/\bclass\s*=\s*("([^"]*)"|'([^']*)')/i);
+      var cls=c?((c[2]!==undefined?c[2]:c[3])||''):'';
+      var extra=' srcset="'+v.replace(/"/g,'&quot;')+'" sizes="'+sizesFor(cls)+'"';
+      if(!/\bloading\s*=/i.test(attrs)) extra+=' loading="lazy"';
+      if(!/\bdecoding\s*=/i.test(attrs)) extra+=' decoding="async"';
+      return '<img'+attrs+extra+'>';
+    }catch(e){ return tag; }
+  });
+}
+try{
+  var d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  if(d&&d.set){
+    Object.defineProperty(Element.prototype,'innerHTML',{configurable:true,enumerable:d.enumerable,get:d.get,
+      set:function(v){ try{ if(typeof v==='string' && v.indexOf(CLD)>=0) v=rw(v); }catch(e){} return d.set.call(this,v); }});
+  }
+  var ia=Element.prototype.insertAdjacentHTML;
+  if(ia){ Element.prototype.insertAdjacentHTML=function(pos,html){ try{ if(typeof html==='string'&&html.indexOf(CLD)>=0) html=rw(html); }catch(e){} return ia.call(this,pos,html); }; }
+}catch(e){}
+/* 2. εικόνες που φτιάχνονται με new Image()/createElement και img.src=... */
+try{
+  var sd=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');
+  if(sd&&sd.set){
+    Object.defineProperty(HTMLImageElement.prototype,'src',{configurable:true,enumerable:sd.enumerable,get:sd.get,
+      set:function(v){
+        try{
+          if(typeof v==='string' && v.indexOf(CLD)>=0 && !this.getAttribute('srcset')){
+            var vv=variants(v);
+            if(vv){ this.setAttribute('srcset',vv); this.setAttribute('sizes',sizesFor(this.className)); }
+          }
+        }catch(e){}
+        return sd.set.call(this,v);
+      }});
+  }
+}catch(e){}
+/* 3. σκούπα για ό,τι ξέφυγε (δεν προλαβαίνει πάντα, αλλά δεν βλάπτει) */
+function fix(img){
+  try{
+    if(!img||img.tagName!=='IMG'||img.getAttribute('srcset')) return;
+    var u=img.getAttribute('src')||''; if(u.indexOf(CLD)<0) return;
+    var v=variants(u); if(!v) return;
+    img.setAttribute('srcset',v); img.setAttribute('sizes',sizesFor(img.className));
+  }catch(e){}
+}
+function sweep(r){ try{ if(!r) return; if(r.tagName==='IMG'){fix(r);return;} var l=r.querySelectorAll?r.querySelectorAll('img'):[]; for(var i=0;i<l.length;i++) fix(l[i]); }catch(e){} }
+window.__hh87Sweep=sweep;
+try{
+  new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var a=ms[i].addedNodes||[]; for(var j=0;j<a.length;j++){ if(a[j]&&a[j].nodeType===1) sweep(a[j]); } } })
+    .observe(document.documentElement,{childList:true,subtree:true});
+}catch(e){}
+}catch(e){}})();</script>
 <script>/*hhPolish86*/(function(){try{
 /* Γιατί: η σελίδα κάνει 3-4 δευτερόλεπτα να φορτώσει και, αν πατήσεις
    το search στο μεταξύ, το layout σπάει και θέλει refresh. Το overlay μπλοκάρει
@@ -12885,73 +12971,6 @@ document.addEventListener('auxclick', function(e){
   if(h.url) bgOpen(h.url);
 }, true);
 
-}catch(e){}})();</script>
-<script>/*hhPolish87*/(function(){try{
-/* ---------------------------------------------------------------------------
-   Οι φωτογραφίες σερβίρονταν ΠΑΝΤΑ στο πρωτότυπο μέγεθος από το Cloudinary
-   (~200 KB η μία). Μία σελίδα με 264 εικόνες = ~50 MB. Αυτό είναι ταυτόχρονα
-   ο λόγος που η σελίδα αργεί ΚΑΙ ο λόγος που ξεπεράσαμε το όριο του Cloudinary.
-   Μετρημένο: 400px + f_auto,q_auto = ~17 KB αντί για ~203 KB (-92%).
-
-   Δεν πειράζουμε το src — βάζουμε srcset/sizes, ώστε ο browser να κατεβάζει το
-   σωστό μέγεθος και όποιος κώδικας διαβάζει img.src να βλέπει ό,τι έβλεπε.   */
-var RE=/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?!.*?\bw_\d)(.+)$/;
-function variants(u){
-  var m=u.match(RE); if(!m) return null;
-  var a=m[1], b=m[2];
-  function t(w){ return a+'w_'+w+',c_limit,f_auto,q_auto/'+b+' '+w+'w'; }
-  return [t(200),t(400),t(800),t(1400)].join(', ');
-}
-var SIZES=[
-  ['.hh-cz-main img, img.hh-cz-img', '(max-width:900px) 96vw, 1200px'],
-  ['.hh-cz-thumb img',               '(max-width:600px) 84px, 132px'],
-  ['img.photo-strip-img',            '(max-width:600px) 84px, 132px'],
-  ['.lo-sib-img-wrap img',           '(max-width:600px) 120px, 240px'],
-  ['.card-img-wrap img',             '(max-width:700px) 92vw, 420px']
-];
-function sizeFor(img){
-  for(var i=0;i<SIZES.length;i++){ try{ if(img.matches(SIZES[i][0])) return SIZES[i][1]; }catch(e){} }
-  return '(max-width:700px) 92vw, 800px';
-}
-function fix(img){
-  try{
-    if(!img || img.tagName!=='IMG') return;
-    if(img.getAttribute('data-hh87')) return;
-    var u=img.getAttribute('src')||'';
-    if(u.indexOf('res.cloudinary.com')<0) return;
-    var v=variants(u);
-    if(!v){ img.setAttribute('data-hh87','skip'); return; }
-    img.setAttribute('srcset', v);
-    img.setAttribute('sizes', sizeFor(img));
-    if(!img.getAttribute('loading')) img.setAttribute('loading','lazy');
-    if(!img.getAttribute('decoding')) img.setAttribute('decoding','async');
-    img.setAttribute('data-hh87','1');
-  }catch(e){}
-}
-function sweep(root){
-  try{
-    var r=root||document;
-    if(r.tagName==='IMG'){ fix(r); return; }
-    var l=r.querySelectorAll?r.querySelectorAll('img'):[];
-    for(var i=0;i<l.length;i++) fix(l[i]);
-  }catch(e){}
-}
-window.__hh87Sweep=sweep;
-function start(){
-  sweep(document);
-  try{
-    new MutationObserver(function(ms){
-      for(var i=0;i<ms.length;i++){
-        var m=ms[i];
-        if(m.type==='attributes'){ if(m.target&&m.target.tagName==='IMG'){ m.target.removeAttribute('data-hh87'); fix(m.target); } continue; }
-        var ad=m.addedNodes||[];
-        for(var j=0;j<ad.length;j++){ if(ad[j]&&ad[j].nodeType===1) sweep(ad[j]); }
-      }
-    }).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src']});
-  }catch(e){}
-}
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
-else start();
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
