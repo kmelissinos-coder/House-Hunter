@@ -13496,7 +13496,7 @@ function rowsAll(){
 function isDel(h){ try{ return h.deleted===true || String(h.deleted).toUpperCase()==='X' || h.gone_confirmed===true; }catch(e){ return false; } }
 
 /* κλειδί -> {rm:ΟΛΕΣ οι αγγελίες αφαιρέθηκαν, of:κάποια μαρκαρίστηκε νοικιασμένη} */
-var MAP=null, MAPT=0;
+var MAP=null, MAPT=0, lastLang=null;
 function map(){
   var now=Date.now();
   if(MAP && now-MAPT<2000) return MAP;
@@ -13569,8 +13569,8 @@ function ensureBox(){
   var wrap=document.querySelector('.show-deleted-wrap'); if(!wrap) return;
   var lab=document.createElement('label');
   lab.id='hh91-l';
-  lab.title='Δείχνει μαζί ό,τι έχει φύγει: τα σπίτια που αφαιρέθηκαν από ΟΛΕΣ τις πλατφόρμες και όσα έχεις μαρκάρει νοικιασμένα ή πουλημένα. Κάθε κάρτα λέει για ποιον λόγο έφυγε.';
-  lab.innerHTML='<input type="checkbox" id="hh91"> 👻 Μόνο όσα έφυγαν <span id="hh91-n" style="opacity:.6"></span>';
+  lab.title=TXT[lang()].tip;
+  lab.innerHTML='<input type="checkbox" id="hh91"> '+TXT[lang()].box+'<span id="hh91-n" style="opacity:.6"></span>';
   wrap.appendChild(lab);
   var cb=document.getElementById('hh91');
   try{ cb.checked = localStorage.getItem('hh91_only_gone')==='1'; }catch(e){}
@@ -13601,16 +13601,43 @@ function sync(){
   }
 }
 
+/* η εφαρμογή έχει διακόπτη EL/EN (localStorage.hh_lang) και το λεξικό της δεν
+   ξέρει τα δικά μας κείμενα — τα δίνουμε μόνοι μας και στις δύο γλώσσες */
+function lang(){ try{ return (localStorage.getItem('hh_lang')||'el').toLowerCase()==='en'?'en':'el'; }catch(e){ return 'el'; } }
+var TXT={
+  el:{ box:'\ud83d\udc7b Μόνο όσα έφυγαν ', rm:'\u26d4 ΑΦΑΙΡΕΘΗΚΕ ΑΠΟ ΤΙΣ ΠΛΑΤΦΟΡΜΕΣ', of:'\ud83d\udd4a\ufe0f ΝΟΙΚΙΑΣΤΗΚΕ / ΠΟΥΛΗΘΗΚΕ',
+       tip:'Δείχνει μαζί ό,τι έχει φύγει: τα σπίτια που αφαιρέθηκαν από ΟΛΕΣ τις πλατφόρμες και όσα έχεις μαρκάρει νοικιασμένα ή πουλημένα. Κάθε κάρτα λέει για ποιον λόγο έφυγε.' },
+  en:{ box:'\ud83d\udc7b Only the ones that are gone ', rm:'\u26d4 REMOVED FROM THE PLATFORMS', of:'\ud83d\udd4a\ufe0f RENTED / SOLD',
+       tip:'Shows everything that is gone in one place: homes withdrawn from EVERY platform and the ones you marked rented or sold. Each card says which it is.' }
+};
 function tagHtml(v){
-  var h='';
-  if(v.rm) h+='<span class="hh91-tag rm">\u26d4 ΑΦΑΙΡΕΘΗΚΕ ΑΠΟ ΤΙΣ ΠΛΑΤΦΟΡΜΕΣ</span>';
-  if(v.of) h+='<span class="hh91-tag of">\ud83d\udd4a\ufe0f ΝΟΙΚΙΑΣΤΗΚΕ / ΠΟΥΛΗΘΗΚΕ</span>';
+  var t=TXT[lang()], h='';
+  if(v.rm) h+='<span class="hh91-tag rm">'+t.rm+'</span>';
+  if(v.of) h+='<span class="hh91-tag of">'+t.of+'</span>';
   return h;
 }
 
 function paint(){
   try{
     ensureBox();
+    /* αλλαγή γλώσσας → ξαναγράφουμε ετικέτα και ταμπελάκια */
+    var lg=lang();
+    if(lg!==lastLang){
+      lastLang=lg;
+      var lb=document.getElementById('hh91-l');
+      if(lb){
+        lb.title=TXT[lg].tip;
+        var cb0=document.getElementById('hh91'), was=cb0?cb0.checked:false;
+        lb.innerHTML='<input type="checkbox" id="hh91"'+(was?' checked':'')+'> '+TXT[lg].box+'<span id="hh91-n" style="opacity:.6"></span>';
+        var cb1=document.getElementById('hh91');
+        if(cb1) cb1.addEventListener('change', function(){
+          try{ localStorage.setItem('hh91_only_gone', cb1.checked?'1':'0'); }catch(e){}
+          sync(); try{ applyFilters(); }catch(e){} setTimeout(paint,60);
+        });
+      }
+      var olds=document.querySelectorAll('.hh91-why');
+      for(var z=0;z<olds.length;z++) olds[z].remove();
+    }
     var cards=document.querySelectorAll('.card, .grouped-card, .list-item');
     var m=map(), i, shown=0;
     for(i=0;i<cards.length;i++){
