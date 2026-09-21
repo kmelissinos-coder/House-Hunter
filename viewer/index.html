@@ -1291,7 +1291,10 @@ function rw(html){
       var c=attrs.match(/\bclass\s*=\s*("([^"]*)"|'([^']*)')/i);
       var cls=c?((c[2]!==undefined?c[2]:c[3])||''):'';
       var extra=' srcset="'+v.replace(/"/g,'&quot;')+'" sizes="'+sizesFor(cls)+'"';
-      if(!/\bloading\s*=/i.test(attrs)) extra+=' loading="lazy"';
+      /* ΔΕΝ βάζουμε loading="lazy" όπου δεν υπήρχε: ο Chrome αναβάλλει την εικόνα
+         και, όταν αυτή μπει στο viewport λόγω αλλαγής layout (άνοιγμα overlay,
+         εμφάνιση κρυφού container) και όχι λόγω scroll, δεν την ξεκινάει ΠΟΤΕ.
+         Μετρημένο ζωντανά: 46 ορατές φωτογραφίες έμεναν για πάντα άδειες.    */
       if(!/\bdecoding\s*=/i.test(attrs)) extra+=' decoding="async"';
       return '<img'+attrs+extra+'>';
     }catch(e){ return tag; }
@@ -1359,6 +1362,33 @@ function fix(img){
 }
 function sweep(r){ try{ if(!r) return; if(r.tagName==='IMG'){fix(r);return;} var l=r.querySelectorAll?r.querySelectorAll('img'):[]; for(var i=0;i<l.length;i++) fix(l[i]); }catch(e){} }
 window.__hh87Sweep=sweep;
+
+/* 4. ΔΙΑΣΩΣΗ: εικόνες με loading="lazy" (δικές της εφαρμογής) που βρίσκονται
+   μέσα/κοντά στο viewport αλλά ο Chrome δεν τις ξεκίνησε ποτέ (currentSrc κενό).
+   Συμβαίνει όταν μπήκαν στο DOM κρυφές και εμφανίστηκαν χωρίς scroll. Τις
+   γυρίζουμε σε eager — τότε κατεβαίνουν αμέσως (και μάλιστα στο σωστό μέγεθος,
+   αφού το srcset είναι ήδη εκεί).                                            */
+function rescue(){
+  try{
+    var vh=window.innerHeight||document.documentElement.clientHeight||900, n=0;
+    var l=document.images;
+    for(var i=0;i<l.length;i++){
+      var im=l[i];
+      if(im.complete||im.currentSrc) continue;
+      if((im.getAttribute('loading')||'')!=='lazy') continue;
+      var r=null; try{ r=im.getBoundingClientRect(); }catch(e){}
+      if(!r||(r.width===0&&r.height===0)) continue;
+      if(r.bottom<-100||r.top>vh+300) continue;
+      im.setAttribute('loading','eager'); n++;
+      if(n>60) break;
+    }
+  }catch(e){}
+}
+window.__hh87Rescue=rescue;
+setInterval(rescue, 900);
+['scroll','resize','orientationchange'].forEach(function(ev){
+  window.addEventListener(ev, function(){ clearTimeout(window.__hh87rt); window.__hh87rt=setTimeout(rescue,120); }, true);
+});
 try{
   new MutationObserver(function(ms){ for(var i=0;i<ms.length;i++){ var a=ms[i].addedNodes||[]; for(var j=0;j<a.length;j++){ if(a[j]&&a[j].nodeType===1) sweep(a[j]); } } })
     .observe(document.documentElement,{childList:true,subtree:true});
@@ -1430,7 +1460,9 @@ function pendingImgs(){
     for(var i=0;i<l.length;i++){
       var im=l[i];
       if(im.complete) continue;
-      if(!im.getAttribute('src')&&!im.getAttribute('srcset')) continue;
+      /* μόνο όσες ΟΝΤΩΣ κατεβαίνουν: currentSrc κενό = ο Chrome δεν την ξεκίνησε
+         (lazy εκτός σειράς) — τη μαζεύει ο rescue του hhPolish87, δεν περιμένουμε */
+      if(!im.currentSrc) continue;
       var r=null; try{ r=im.getBoundingClientRect(); }catch(x){}
       if(r&&(r.width===0&&r.height===0)) continue;
       if(r&&(r.bottom<-250||r.top>vh+450)) continue;
