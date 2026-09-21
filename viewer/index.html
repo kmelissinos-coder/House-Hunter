@@ -1217,13 +1217,18 @@ label:has(input[onchange*="seen_it',"]:checked){background:rgba(150,95,130,0.42)
  background:rgba(14,12,9,.88);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;transition:opacity .28s ease}
 #hh86-boot.hh86-out{opacity:0;pointer-events:none}
-#hh86-box{display:flex;flex-direction:column;align-items:center;gap:14px;padding:26px 34px;border-radius:14px;
+#hh86-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:26px 34px;border-radius:14px;
  background:#1b1710;border:1px solid rgba(200,168,75,.45);box-shadow:0 10px 40px rgba(0,0,0,.55);max-width:82vw}
 #hh86-ring{width:46px;height:46px;border-radius:50%;border:4px solid rgba(200,168,75,.22);border-top-color:#c8a84b;
  animation:hh86spin .9s linear infinite}
 @keyframes hh86spin{to{transform:rotate(360deg)}}
 #hh86-t1{color:#e9cf86;font-size:15px;font-weight:600;letter-spacing:.2px}
 #hh86-t2{color:#b9b1a0;font-size:12.5px;text-align:center;line-height:1.45}
+#hh86-t3{color:#8d8677;font-size:11px;text-align:center;min-height:14px;letter-spacing:.2px}
+#hh86-bar{width:190px;height:4px;border-radius:3px;background:rgba(200,168,75,.16);overflow:hidden}
+#hh86-bar>i{display:block;height:100%;width:8%;background:#c8a84b;border-radius:3px;transition:width .35s ease}
+#hh86-skip{color:#8d8677;font-size:11px;text-decoration:underline;cursor:pointer;opacity:0;transition:opacity .3s}
+#hh86-skip.on{opacity:1}
 @media (prefers-reduced-motion:reduce){#hh86-ring{animation-duration:2.4s}}
 </style>
 <div id="hh86-boot" role="status" aria-live="polite" aria-busy="true">
@@ -1231,6 +1236,9 @@ label:has(input[onchange*="seen_it',"]:checked){background:rgba(150,95,130,0.42)
     <div id="hh86-ring"></div>
     <div id="hh86-t1">Φόρτωση…</div>
     <div id="hh86-t2">Παρακαλώ περίμενε<br>τα ακίνητα φορτώνονται</div>
+    <div id="hh86-bar"><i></i></div>
+    <div id="hh86-t3"></div>
+    <div id="hh86-skip">Παράλειψη</div>
   </div>
 </div>
 <script>/*hhPolish87*/(function(){try{
@@ -1357,40 +1365,159 @@ try{
 }catch(e){}
 }catch(e){}})();</script>
 <script>/*hhPolish86*/(function(){try{
-/* Γιατί: η σελίδα κάνει 3-4 δευτερόλεπτα να φορτώσει και, αν πατήσεις
-   το search στο μεταξύ, το layout σπάει και θέλει refresh. Το overlay μπλοκάρει
-   την αλληλεπίδραση μέχρι να είναι όντως έτοιμη. Αν δεν έχεις κάνει login, φεύγει
-   αμέσως ώστε να μην κρύβει τη φόρμα. Και σε κάθε περίπτωση φεύγει στα 15",  */
-var START=Date.now(), HARD=12000, done=false;
+/* Γιατί: η σελίδα κάνει αρκετά δευτερόλεπτα να φορτώσει και, αν πατήσεις το
+   search στο μεταξύ, το layout σπάει και θέλει refresh.
+
+   v2 — η v1 έφευγε μόλις έμπαιναν οι πρώτες κάρτες (μισό δευτερόλεπτο), ενώ η
+   σελίδα συνέχιζε να δουλεύει για 5-6"+ : φωτογραφίες κατέβαιναν, ο χάρτης
+   ξαναχτιζόταν. Τώρα το overlay φεύγει ΜΟΝΟ όταν ησυχάσουν ΟΛΑ:
+     1) έχουν αποδοθεί αποτελέσματα,
+     2) δεν τρέχει κανένα fetch/XHR,
+     3) δεν υπάρχει εικόνα μέσα (ή κοντά) στο viewport που να φορτώνει ακόμη,
+     4) δεν υπάρχει πλακίδιο χάρτη σε εξέλιξη,
+     5) έχει περάσει QUIET ms από την τελευταία δραστηριότητα δικτύου.
+   Αν δεν έχεις κάνει login φεύγει αμέσως (να μη σκεπάζει τη φόρμα), υπάρχει
+   «Παράλειψη» μετά τα 4" και σκληρό όριο στα 18".                            */
+var START=Date.now(), MIN=500, HARD=18000, SOFT=12000, QUIET=750, done=false;
+var inflight=0, lastAct=Date.now(), imgSeen=0, imgDone=0;
 function el(){ return document.getElementById('hh86-boot'); }
-function ready(){
+function touch(){ lastAct=Date.now(); }
+
+/* ---- 1. μετράμε τα ενεργά αιτήματα δικτύου -------------------------------- */
+try{
+  var _f=window.fetch;
+  if(typeof _f==='function'){
+    window.fetch=function(){
+      inflight++; touch();
+      var p;
+      try{ p=_f.apply(this,arguments); }
+      catch(e){ inflight--; touch(); throw e; }
+      if(!p||typeof p.then!=='function'){ inflight--; touch(); return p; }
+      return p.then(function(r){ inflight--; touch(); return r; },
+                    function(e){ inflight--; touch(); throw e; });
+    };
+  }
+}catch(e){}
+try{
+  var _send=XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.send=function(){
+    var me=this; inflight++; touch();
+    function fin(){ if(me.__hh86d) return; me.__hh86d=1; inflight--; touch(); }
+    try{ me.addEventListener('loadend',fin); }catch(e){}
+    setTimeout(fin, 20000);            /* ποτέ κολλημένος μετρητής */
+    try{ return _send.apply(this,arguments); }catch(e){ fin(); throw e; }
+  };
+}catch(e){}
+
+/* ---- 2. κάθε εικόνα που τελειώνει μετράει ως δραστηριότητα ---------------- */
+function onImg(e){
   try{
-    if(document.getElementById('hh-gate')) return true;          /* οθόνη σύνδεσης */
-    /* το allListings ΔΕΝ είναι global — κοιτάμε το ίδιο το render */
-    var rc=document.getElementById('resultsCount');
-    if(rc && (rc.textContent||'').trim().length>3) return true;
-    if(document.querySelectorAll('.card-img-wrap, .hh-gs-more').length>0) return true;
-  }catch(e){}
-  return false;
+    var t=e&&e.target;
+    if(t&&t.tagName==='IMG'){ imgDone++; touch(); }
+  }catch(x){}
 }
+document.addEventListener('load', onImg, true);
+document.addEventListener('error', onImg, true);
+
+/* πόσες εικόνες φορτώνουν τώρα μέσα/κοντά στην οθόνη (τις lazy από κάτω
+   τις αγνοούμε — δεν πρόκειται να ξεκινήσουν καν)                            */
+function pendingImgs(){
+  var n=0;
+  try{
+    var vh=window.innerHeight||document.documentElement.clientHeight||900;
+    var l=document.images||[];
+    imgSeen=l.length;
+    for(var i=0;i<l.length;i++){
+      var im=l[i];
+      if(im.complete) continue;
+      if(!im.getAttribute('src')&&!im.getAttribute('srcset')) continue;
+      var r=null; try{ r=im.getBoundingClientRect(); }catch(x){}
+      if(r&&(r.width===0&&r.height===0)) continue;
+      if(r&&(r.bottom<-250||r.top>vh+450)) continue;
+      n++;
+      if(n>200) break;
+    }
+  }catch(x){}
+  return n;
+}
+function pendingTiles(){
+  try{
+    var c=document.querySelector('.leaflet-container');
+    if(!c) return 0;
+    var r=c.getBoundingClientRect();
+    if(!r||r.width<40||r.height<40) return 0;          /* αόρατος χάρτης */
+    var all=c.querySelectorAll('img.leaflet-tile');
+    var bad=0;
+    for(var i=0;i<all.length;i++){ if(!all[i].classList.contains('leaflet-tile-loaded')&&!all[i].complete) bad++; }
+    return bad;
+  }catch(x){ return 0; }
+}
+
+/* ---- 3. πότε θεωρείται ότι απέδωσε η λίστα -------------------------------- */
+function rendered(){
+  try{
+    if(document.getElementById('hh-gate')) return 'gate';
+    var rc=document.getElementById('resultsCount');
+    if(rc&&(rc.textContent||'').trim().length>3) return 'ok';
+    if(document.querySelectorAll('.card-img-wrap, .hh-gs-more, .list-item').length>0) return 'ok';
+  }catch(x){}
+  return '';
+}
+
+function say(t3, pct){
+  try{
+    var a=document.getElementById('hh86-t3'); if(a&&a.textContent!==t3) a.textContent=t3;
+    var b=document.querySelector('#hh86-bar>i'); if(b) b.style.width=Math.max(8,Math.min(98,pct))+'%';
+  }catch(x){}
+}
+
 function hide(why){
   if(done) return; done=true;
   var o=el(); if(!o) return;
   o.setAttribute('data-why', why||'');
   o.setAttribute('aria-busy','false');
   o.classList.add('hh86-out');
-  setTimeout(function(){ try{ o.remove(); }catch(e){} }, 320);
-  try{ window.__hh86 = {ms: Date.now()-START, why: why}; }catch(e){}
+  setTimeout(function(){ try{o.remove();}catch(e){} },320);
+  try{ window.__hh86={ms:Date.now()-START, why:why, imgs:imgDone+'/'+imgSeen}; }catch(e){}
 }
-window.__hh86Hide=hide;
+window.__hh86hide=hide;
+
 var iv=setInterval(function(){
-  if(ready()){ clearInterval(iv); setTimeout(function(){ hide(document.getElementById('hh-gate')?'gate':'ready'); }, 220); return; }
-  if(Date.now()-START>HARD){ clearInterval(iv); hide('timeout'); }
-}, 100);
-/* δικλίδα ασφαλείας: ούτε με σφάλμα να μείνει κολλημένο */
+  try{
+    var el_=Date.now()-START;
+    var r=rendered();
+    if(r==='gate'){ clearInterval(iv); hide('gate'); return; }
+
+    if(el_>4000){ var sk=document.getElementById('hh86-skip'); if(sk) sk.classList.add('on'); }
+
+    if(!r){ say('αναμονή δεδομένων…', 10+el_/200); }
+    else{
+      var pi=pendingImgs(), pt=pendingTiles();
+      var parts=[];
+      if(inflight>0) parts.push(inflight+' αιτήματα');
+      if(pi>0) parts.push(pi+' φωτογραφίες');
+      if(pt>0) parts.push('χάρτης');
+      say(parts.length?('φορτώνουν: '+parts.join(' · ')):'σχεδόν έτοιμο…',
+          35+Math.min(60, el_/120));
+
+      var quiet=(Date.now()-lastAct)>QUIET;
+      var netOk=(inflight===0)||(el_>SOFT);        /* κολλημένο request δεν μας κρατάει για πάντα */
+      if(el_>=MIN && netOk && pi===0 && pt===0 && quiet){
+        clearInterval(iv); say('έτοιμο', 100);
+        setTimeout(function(){ hide('ready'); },140);
+        return;
+      }
+    }
+    if(el_>HARD){ clearInterval(iv); hide('timeout'); }
+  }catch(x){ clearInterval(iv); hide('err'); }
+},120);
+
 setTimeout(function(){ hide('hard'); }, HARD+1500);
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') hide('esc'); });
-}catch(e){ try{ var o=document.getElementById('hh86-boot'); if(o) o.remove(); }catch(x){} }})();</script>
+document.addEventListener('click', function(e){
+  try{ if(e.target&&e.target.id==='hh86-skip'){ e.preventDefault(); e.stopPropagation(); hide('skip'); } }catch(x){}
+}, true);
+}catch(e){}})();</script>
 <script>try{var _lv=localStorage.getItem('hh_auth');var _sv=sessionStorage.getItem('hh_auth');if(_lv&&_lv.length>20&&(!_sv||_sv==='null'||_sv.length<20)){sessionStorage.setItem('hh_auth',_lv);}}catch(e){}</script><div id='hh-gate' style='position:fixed;inset:0;z-index:2147483000;background:#0f1420;display:flex;align-items:flex-start;justify-content:center;overflow:auto;font-family:-apple-system,BlinkMacSystemFont,sans-serif;color:#e6e8ee'><div style='width:100%;max-width:360px;padding:48px 20px 40px'><div style='text-align:center;margin-bottom:22px'><div style='font-size:26px;font-weight:800;color:#c8a84b'>🏡 House Hunter</div><div style='font-size:13px;color:#8b93a7;margin-top:4px'>Σύνδεση για πρόσβαση</div></div><div style='background:#161e2e;border:1px solid #2a3040;border-radius:14px;padding:20px;margin-bottom:14px'><input id='hhE' type='email' placeholder='Email ή όνομα χρήστη' autocomplete='username' style='width:100%;box-sizing:border-box;background:#0f1622;border:1px solid #2a3040;border-radius:9px;color:#e6e8ee;padding:11px 12px;font-size:14px;margin-bottom:10px;outline:none'><input id='hhP' type='password' placeholder='Κωδικός' autocomplete='current-password' style='width:100%;box-sizing:border-box;background:#0f1622;border:1px solid #2a3040;border-radius:9px;color:#e6e8ee;padding:11px 12px;font-size:14px;outline:none'><label style='display:flex;align-items:center;gap:8px;font-size:13px;color:#9aa3b6;margin:12px 2px 14px;cursor:pointer;user-select:none'><input id='hhR' type='checkbox' checked style='width:16px;height:16px;accent-color:#c8a84b;cursor:pointer'> Να με θυμάσαι (παραμονή σύνδεσης)</label><button id='hhB' style='width:100%;background:#c8a84b;color:#1a1206;border:none;border-radius:9px;padding:12px;font-size:15px;font-weight:700;cursor:pointer'>Σύνδεση</button><div id='hhErr' style='color:#f87171;font-size:12.5px;margin-top:10px;display:none'></div></div><div style='background:#131a28;border:1px solid #232b3b;border-radius:14px;padding:18px'><div style='font-size:13px;color:#9aa3b6;margin-bottom:10px'>Δεν έχετε πρόσβαση; Ζητήστε την:</div><input id='hhRN' placeholder='Όνομα' style='width:100%;box-sizing:border-box;background:#0f1622;border:1px solid #2a3040;border-radius:9px;color:#e6e8ee;padding:10px 12px;font-size:13.5px;margin-bottom:8px;outline:none'><input id='hhRE' type='email' placeholder='Email σας' style='width:100%;box-sizing:border-box;background:#0f1622;border:1px solid #2a3040;border-radius:9px;color:#e6e8ee;padding:10px 12px;font-size:13.5px;margin-bottom:8px;outline:none'><textarea id='hhRM' placeholder='Μήνυμα (προαιρετικό)' rows='2' style='width:100%;box-sizing:border-box;background:#0f1622;border:1px solid #2a3040;border-radius:9px;color:#e6e8ee;padding:10px 12px;font-size:13.5px;outline:none;resize:vertical'></textarea><button id='hhRB' style='width:100%;background:transparent;color:#c8a84b;border:1px solid #c8a84b;border-radius:9px;padding:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px'>Αίτημα πρόσβασης</button><div id='hhRO' style='font-size:12.5px;margin-top:9px;display:none'></div></div></div></div><script>(function(){var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';function $(id){return document.getElementById(id);}function gs(){try{return JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth'));}catch(e){return null;}}function ss(o,rem){var t=JSON.stringify(o);if(rem){localStorage.setItem('hh_auth',t);sessionStorage.removeItem('hh_auth');}else{sessionStorage.setItem('hh_auth',t);localStorage.removeItem('hh_auth');}}function cs(){localStorage.removeItem('hh_auth');sessionStorage.removeItem('hh_auth');}window.hhLogout=function(){cs();console.warn('[hh] auto-reload suppressed');};function reveal(o){window.hhUser=o.user;window.hhRole=(o.user&&o.user.email==='kmelissinos@gmail.com')?'admin':'member';var g=$('hh-gate');if(g&&g.parentNode)g.parentNode.removeChild(g);var bar=document.createElement('div');bar.id='hhUserBar';bar.style.cssText='position:fixed;top:10px;right:12px;z-index:2147482000;display:flex;align-items:center;gap:9px;background:#161e2e;border:1px solid #2a3040;border-radius:10px;padding:5px 7px 5px 11px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.4)';var nm=document.createElement('span');nm.id='hhUserName';nm.style.cssText='color:#e6e8ee;font-size:13px;font-weight:600;white-space:nowrap';nm.textContent='👤 …';var lo=document.createElement('button');lo.textContent='⎋ Έξοδος';lo.title='Αποσύνδεση';lo.style.cssText='background:#0f1622;color:#c8a84b;border:1px solid #2a3040;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer';lo.onclick=function(){window.hhLogout();};bar.appendChild(nm);bar.appendChild(lo);document.body.appendChild(bar);fetch(SB+'/rest/v1/profiles?id=eq.'+o.user.id+'&select=username',{headers:{apikey:AK,Authorization:'Bearer '+o.access_token}}).then(function(r){return r.json();}).then(function(d){var nick=(d&&d[0]&&d[0].username)||(o.user&&o.user.email)||'';window.hhNick=nick;var el=$('hhUserName');if(el)el.textContent='👤 '+nick;}).catch(function(){});}function mk(o,rem){return{access_token:o.access_token,refresh_token:o.refresh_token,expires_at:Date.now()+(o.expires_in||3600)*1000,user:o.user,remember:rem};}async function refresh(s){try{var r=await fetch(SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});var d=await r.json();if(!r.ok)return null;var n=mk(d,s.remember);ss(n,s.remember);return n;}catch(e){return null;}}async function init(){var s=gs();if(s&&s.expires_at>Date.now()+60000){reveal(s);return;}if(s&&s.refresh_token){var n=await refresh(s);if(n){reveal(n);return;}cs();}}function wire(){var b=$('hhB');if(b)b.onclick=async function(){var e=$('hhErr');e.style.display='none';b.disabled=true;b.textContent='…';try{var handle=$('hhE').value.trim();var email=handle;if(handle.indexOf('@')<0){var rr=await fetch(SB+'/rest/v1/rpc/username_to_email',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({handle:handle})});var em=await rr.json();if(!rr.ok||typeof em!=='string'||!em)throw new Error((window.__hhSvcMsg&&window.__hhSvcMsg(rr,em))||'Άγνωστο όνομα χρήστη ή email');email=em;}var r=await fetch(SB+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({email:email,password:$('hhP').value})});var d=await r.json();if(!r.ok){var sv=(window.__hhSvcMsg&&window.__hhSvcMsg(r,d));if(sv)throw new Error(sv);throw new Error(d.error_description||d.msg||'Λάθος email ή κωδικός');}var rem=$('hhR').checked;var s=mk(d,rem);ss(s,rem);reveal(s);}catch(x){e.textContent=x.message;e.style.display='block';b.disabled=false;b.textContent='Σύνδεση';}};var p=$('hhP');if(p)p.addEventListener('keydown',function(ev){if(ev.key==='Enter')$('hhB').click();});var rb=$('hhRB');if(rb)rb.onclick=async function(){var o=$('hhRO');var em=$('hhRE').value.trim();if(!em){o.textContent='Συμπληρώστε το email σας.';o.style.color='#f87171';o.style.display='block';return;}rb.disabled=true;rb.textContent='…';try{var r=await fetch(SB+'/rest/v1/access_requests',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name:$('hhRN').value.trim(),email:em,message:$('hhRM').value.trim()})});if(!r.ok)throw 0;o.textContent='✓ Το αίτημα στάλθηκε! Θα λάβετε email σύντομα.';o.style.color='#34d399';o.style.display='block';rb.textContent='Στάλθηκε ✓';}catch(x){o.textContent='Σφάλμα, δοκιμάστε ξανά.';o.style.color='#f87171';o.style.display='block';rb.disabled=false;rb.textContent='Αίτημα πρόσβασης';}};}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else wire();init();})();</script>
 
 <header>
@@ -13033,6 +13160,119 @@ setInterval(sync, 250);
 document.addEventListener('click', function(){ setTimeout(sync,60); setTimeout(sync,350); }, true);
 document.addEventListener('keydown', function(){ setTimeout(sync,60); }, true);
 sync();
+}catch(e){}})();</script>
+<script>/*hhPolish89*/(function(){try{
+
+/* ---------------------------------------------------------------------------
+   Το drop-down του «n ▾» (Μεσιτικά / Τύπος / Όροφος / Ενεργειακή / Θέρμανση)
+   δείχνει μία σειρά ανά αγγελία του σπιτιού. Δύο πράγματα έλειπαν:
+     1) αρίθμηση, για να ξέρεις ποια σειρά είναι ποια,
+     2) σήμανση των αγγελιών που έχουν ΑΦΑΙΡΕΘΕΙ από την πλατφόρμα, ώστε να μην
+        τις ανοίγεις άδικα σε νέα καρτέλα.
+   Δεν ξαναγράφουμε τον builder (hhPolish50) — τον αφήνουμε να φτιάξει το popup
+   και μετά περνάμε από πάνω: οι σειρές έχουν data-url, το window.__hhGrpMembers
+   έχει τις γραμμές της βάσης όπως ήρθαν (select=*), άρα και το deleted.       */
+
+var CSS='#hh-gs-vpop-el .hh-gs-vrow{display:flex;align-items:baseline;gap:7px}'
+ +'#hh-gs-vpop-el .hh89-n{flex:none;min-width:1.5em;text-align:right;font-size:10.5px;font-weight:700;'
+ +'color:#c8a84b;opacity:.85;font-variant-numeric:tabular-nums}'
+ +'#hh-gs-vpop-el .hh89-b{flex:1 1 auto;min-width:0}'
+ +'#hh-gs-vpop-el .hh-gs-vrow.hh89-del{opacity:.42;filter:grayscale(.75)}'
+ +'#hh-gs-vpop-el .hh-gs-vrow.hh89-del .hh89-b{text-decoration:line-through;text-decoration-thickness:1px}'
+ +'#hh-gs-vpop-el .hh-gs-vrow.hh89-del:hover{opacity:.72;filter:grayscale(.35)}'
+ +'#hh-gs-vpop-el .hh89-x{flex:none;font-size:8.5px;font-weight:800;letter-spacing:.3px;padding:0 5px;'
+ +'border-radius:5px;background:#8a2230;color:#ffd8dc;align-self:center}'
+ +'body.light #hh-gs-vpop-el .hh89-x{background:#9c2634;color:#ffe8eb}';
+try{ var st=document.createElement('style'); st.id='hh89-css'; st.textContent=CSS; document.head.appendChild(st); }catch(e){}
+
+function deco(v){
+  if(!v) return '';
+  v=String(v);
+  if(/^https?:\/\//i.test(v)) return v;
+  try{ var d=decodeURIComponent(v); if(/^https?:\/\//i.test(d)) return d; }catch(e){}
+  return v;
+}
+function norm(u){ return String(u||'').split('#')[0].replace(/\/+$/,'').toLowerCase(); }
+function isDel(m){
+  try{
+    if(!m) return false;
+    var v=m.deleted;
+    return v===true || v==='true' || String(v).toUpperCase()==='X';
+  }catch(e){ return false; }
+}
+
+/* url -> γραμμή βάσης */
+function memMap(){
+  var map={};
+  try{
+    var mem=window.__hhGrpMembers||[];
+    for(var i=0;i<mem.length;i++){
+      var u=mem[i]&&mem[i].url; if(!u) continue;
+      map[norm(u)]=mem[i];
+    }
+  }catch(e){}
+  return map;
+}
+
+function decorate(pop){
+  if(!pop) return;
+  try{
+    var map=memMap();
+    var rows=pop.querySelectorAll('.hh-gs-vrow');
+    for(var i=0;i<rows.length;i++){
+      var row=rows[i];
+      if(row.getAttribute('data-hh89')==='1'){        /* μόνο ξαναριθμούμε */
+        var nEl=row.querySelector('.hh89-n'); if(nEl) nEl.textContent=(i+1)+'.';
+        continue;
+      }
+      var body=document.createElement('span');
+      body.className='hh89-b';
+      while(row.firstChild) body.appendChild(row.firstChild);
+      var num=document.createElement('span');
+      num.className='hh89-n'; num.textContent=(i+1)+'.';
+      row.appendChild(num); row.appendChild(body);
+
+      var u=deco(row.getAttribute('data-url')||'');
+      var m=u?map[norm(u)]:null;
+      if(m&&isDel(m)){
+        row.classList.add('hh89-del');
+        var tag=document.createElement('span');
+        tag.className='hh89-x'; tag.textContent='\u2715 ΑΦΑΙΡΕΘΗΚΕ';
+        row.appendChild(tag);
+        var t=row.getAttribute('title')||'';
+        row.setAttribute('title', (t?t+' — ':'')+'Η αγγελία δεν υπάρχει πια στην πλατφόρμα');
+      }
+      row.setAttribute('data-hh89','1');
+    }
+    /* το ύψος άλλαξε — ξαναπροσάρμοσε το popup στην οθόνη (hhPolish85) */
+    try{ if(window.__hhFitPop) window.__hhFitPop(pop, lastTrig); }catch(e){}
+  }catch(e){}
+}
+window.__hh89Decorate=decorate;
+
+var lastTrig=null;
+document.addEventListener('click', function(e){
+  try{
+    var b=e.target&&e.target.closest?e.target.closest('.hh-gs-more'):null;
+    if(b){ lastTrig=b; setTimeout(function(){ decorate(document.getElementById('hh-gs-vpop-el')); },0); }
+  }catch(x){}
+}, true);
+
+try{
+  new MutationObserver(function(ms){
+    for(var i=0;i<ms.length;i++){
+      var ad=ms[i].addedNodes||[];
+      for(var j=0;j<ad.length;j++){
+        var n=ad[j];
+        if(n&&n.nodeType===1){
+          if(n.id==='hh-gs-vpop-el'||(n.classList&&n.classList.contains('hh-gs-vpop'))) { (function(el){ setTimeout(function(){ decorate(el); },0); })(n); }
+          else if(n.parentElement&&n.parentElement.id==='hh-gs-vpop-el'){ (function(el){ setTimeout(function(){ decorate(el); },0); })(n.parentElement); }
+        }
+      }
+    }
+  }).observe(document.body,{childList:true,subtree:true});
+}catch(x){}
+
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
