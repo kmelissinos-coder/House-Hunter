@@ -13821,8 +13821,9 @@ if(window.__hh94) return; window.__hh94=1;
 
 var SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/rent_staging';
 var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
-var sentBreak=false, loadedHidden=false;
-try{ loadedHidden = (document.visibilityState==='hidden'); }catch(e){}
+var sentBreak=false, loadedHidden=false, vw0=false;
+try{ loadedHidden = (document.visibilityState==='hidden'); vw0 = (window.innerWidth===0); }catch(e){}
+if(vw0) loadedHidden=true;
 
 function rect(sel){
   try{
@@ -13933,12 +13934,21 @@ document.addEventListener('input', function(e){
 }, true);
 
 /* ---------- η καρτέλα ξαναγίνεται ορατή ----------------------------------- */
+var healedOnce=false;
 document.addEventListener('visibilitychange', function(){
   try{
     if(document.visibilityState!=='visible') return;
-    /* ό,τι μετρήθηκε όσο ήταν κρυμμένη μπορεί να είναι λάθος */
+    /* ΜΕΤΡΗΜΕΝΟ 22/9: σε κρυμμένη καρτέλα ο Chrome δίνει innerWidth = innerHeight = 0.
+       Ό,τι υπολόγισε η σελίδα πάνω σε αυτό (ύψη, πλάτη, ο χάρτης) είναι σκουπίδι
+       και ΔΕΝ διορθώνεται μόνο του. Αν η σελίδα φορτώθηκε κρυμμένη, κάνουμε το
+       πλήρες ξαναμέτρημα μία φορά, χωρίς να περιμένουμε να «φανεί» χαλασμένη.  */
     kickResize();
     setTimeout(kickResize,300);
+    if(loadedHidden && !healedOnce){
+      healedOnce=true;
+      setTimeout(function(){ repair(); }, 500);
+      setTimeout(function(){ check('after-hidden-load'); }, 2000);
+    }
     setTimeout(function(){ check('visible'); }, 900);
     /* το κλείδωμα της αναζήτησης ξαναμετράει από τώρα */
     try{ if(window.__hh92Rearm) window.__hh92Rearm(); }catch(e){}
