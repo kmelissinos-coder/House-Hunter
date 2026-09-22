@@ -1425,6 +1425,17 @@ try{
    «Παράλειψη» μετά τα 4" και σκληρό όριο στα 18".                            */
 var START=Date.now(), MIN=500, HARD=18000, SOFT=12000, QUIET=750, done=false;
 var inflight=0, lastAct=Date.now(), imgSeen=0, imgDone=0;
+/* Ο χρόνος ΔΕΝ μετράει όσο η καρτέλα είναι κρυμμένη: ο Chrome στραγγαλίζει τα
+   timers και τα δίκτυα, οπότε αν μετρούσαμε κανονικά το overlay θα είχε φύγει
+   πριν καν κοιτάξεις την καρτέλα — ακριβώς αυτό ανέφερε ο Dusty στις 22/9.   */
+var hiddenMs=0, hiddenAt=(document.visibilityState==='hidden')?Date.now():0;
+document.addEventListener('visibilitychange', function(){
+  try{
+    if(document.visibilityState==='hidden'){ if(!hiddenAt) hiddenAt=Date.now(); }
+    else if(hiddenAt){ hiddenMs+=Date.now()-hiddenAt; hiddenAt=0; lastAct=Date.now(); lastSig=''; }
+  }catch(e){}
+});
+function elapsed(){ var h=hiddenMs+(hiddenAt?(Date.now()-hiddenAt):0); return Date.now()-START-h; }
 function el(){ return document.getElementById('hh86-boot'); }
 function touch(){ lastAct=Date.now(); }
 
@@ -1541,9 +1552,11 @@ function hide(why){
 }
 window.__hh86hide=hide;
 
+var lastSig='';
 var iv=setInterval(function(){
   try{
-    var el_=Date.now()-START;
+    if(document.visibilityState==='hidden') return;     /* κρυμμένη: δεν κρίνουμε τίποτα */
+    var el_=elapsed();
     var r=rendered();
     if(r==='gate'){ clearInterval(iv); hide('gate'); return; }
 
@@ -1572,7 +1585,13 @@ var iv=setInterval(function(){
   }catch(x){ clearInterval(iv); hide('err'); }
 },120);
 
-setTimeout(function(){ hide('hard'); }, HARD+1500);
+(function hardStop(){
+  setTimeout(function(){
+    if(done) return;
+    if(document.visibilityState==='hidden' || elapsed()<HARD+1500){ hardStop(); return; }
+    hide('hard');
+  }, 1500);
+})();
 document.addEventListener('keydown', function(e){ if(e.key==='Escape') hide('esc'); });
 document.addEventListener('click', function(e){
   try{ if(e.target&&e.target.id==='hh86-skip'){ e.preventDefault(); e.stopPropagation(); hide('skip'); } }catch(x){}
@@ -13727,9 +13746,11 @@ function sig(){
   }catch(e){ return 'x'; }
 }
 var START=Date.now(), opened=false;
+window.__hh92Rearm=function(){ lastSig=''; sameSince=Date.now(); START=Date.now(); };
 function tick(){
   try{
     var b=box(); if(!b) return;
+    if(document.visibilityState==='hidden'){ if(!opened&&!locked) lock(); return; }
     if(!opened){
       if(!locked) lock();
       var boot=document.getElementById('hh86-boot');
@@ -13775,6 +13796,154 @@ document.addEventListener('input', function(e){
   try{ if(e.target && e.target.id==='numSearch'){ setTimeout(repair,150); setTimeout(repair,600); } }catch(x){}
 }, true);
 setInterval(function(){ try{ var b=box(); if(b && (b.value||'').trim()) repair(); }catch(e){} }, 1000);
+
+}catch(e){}})();</script>
+<script>/*hhPolish94*/(function(){try{
+if(window.__hh94) return; window.__hh94=1;
+
+/* ---------------------------------------------------------------------------
+   Η διάταξη ξανασπάει, και ΧΩΡΙΣ να έχει εμφανιστεί καν το «Φόρτωση…».
+   Και τα δύο δείχνουν προς το ίδιο: η σελίδα φόρτωσε σε καρτέλα που ΔΕΝ ήταν
+   μπροστά. Σε κρυμμένη καρτέλα ο Chrome στραγγαλίζει τα timers, οι μετρήσεις
+   μεγέθους γίνονται σε λάθος viewport, και το overlay προλαβαίνει να φύγει
+   πριν καν την κοιτάξεις.
+
+   Τρία πράγματα εδώ:
+     1) Ο ΑΝΙΧΝΕΥΤΗΣ: η μπάρα #hh-hb είναι sticky top:0 — αν βρεθεί χαμηλά ή
+        πολύ στενή ενώ δεν έχεις κυλήσει, η διάταξη ΕΧΕΙ σπάσει.
+     2) Η ΕΠΙΔΙΟΡΘΩΣΗ: ταμπλό πίσω κάτω από τη μπάρα, καταιγισμός resize (τον
+        ακούνε το hhPolish18 και ο χάρτης), ξαναζωγράφισμα, scroll στην κορυφή —
+        και, ως έσχατη λύση, ΕΝΑ αυτόματο refresh (μία φορά ανά λεπτό), γιατί
+        αυτό ακριβώς κάνεις κι εσύ με το χέρι.
+     3) Η ΚΑΤΑΓΡΑΦΗ: στέλνει μία φωτογραφία της γεωμετρίας στο rent_staging
+        (kind 'ui_break'), ώστε την επόμενη φορά να ξέρουμε ΓΙΑΤΙ έσπασε αντί
+        να το μαντεύουμε από screenshot.                                      */
+
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/rent_staging';
+var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var sentBreak=false, loadedHidden=false;
+try{ loadedHidden = (document.visibilityState==='hidden'); }catch(e){}
+
+function rect(sel){
+  try{
+    var e=(sel.charAt(0)==='#')?document.getElementById(sel.slice(1)):document.querySelector(sel);
+    if(!e) return null;
+    var r=e.getBoundingClientRect();
+    return {t:Math.round(r.top),l:Math.round(r.left),w:Math.round(r.width),h:Math.round(r.height)};
+  }catch(e){ return null; }
+}
+
+function rendered(){
+  try{ return document.querySelectorAll('.card,.grouped-card,.list-item').length>0; }catch(e){ return false; }
+}
+
+function broken(){
+  try{
+    if(document.getElementById('hh86-boot')) return false;      /* φορτώνει ακόμη */
+    if(document.getElementById('hh-lb')) return false;          /* πλήρης οθόνη */
+    if(document.getElementById('hh-gate')) return false;        /* οθόνη σύνδεσης */
+    if(!rendered()) return false;
+    var hb=document.getElementById('hh-hb'); if(!hb) return false;
+    var r=hb.getBoundingClientRect();
+    if(r.width===0&&r.height===0) return false;
+    var sy=window.scrollY||document.documentElement.scrollTop||0;
+    var vw=window.innerWidth||document.documentElement.clientWidth||0;
+    if(sy>10) return false;
+    return (r.top>120) || (vw>600 && r.width < vw*0.6);
+  }catch(e){ return false; }
+}
+
+function snapshot(why){
+  var o={why:why, at:new Date().toISOString(),
+    vw:window.innerWidth, vh:window.innerHeight, dpr:window.devicePixelRatio,
+    scrollY:Math.round(window.scrollY||0), vis:document.visibilityState,
+    loadedHidden:loadedHidden, ua:String(navigator.userAgent).slice(-60),
+    boot:(window.__hh86||null),
+    els:{hb:rect('#hh-hb'), why:rect('#hh70-why'), split:rect('#map-split'),
+         mapList:rect('#mapList'), map:rect('#map'), grid:rect('.grid-container'),
+         body:{w:document.body.scrollWidth,h:document.body.scrollHeight}},
+    cards:document.querySelectorAll('.card,.grouped-card').length,
+    whyParent:(function(){try{var w=document.getElementById('hh70-why');return w&&w.parentElement?(w.parentElement.id||w.parentElement.className||'?'):null;}catch(e){return null;}})(),
+    prevSib:(function(){try{var w=document.getElementById('hh70-why');var p=w&&w.previousElementSibling;return p?(p.id||p.className||p.tagName):null;}catch(e){return null;}})()
+  };
+  return o;
+}
+function report(why){
+  if(sentBreak) return;
+  sentBreak=true;
+  try{
+    fetch(SB,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({batch:'ui_break',source:'viewer',kind:'ui_break',payload:snapshot(why)})});
+  }catch(e){}
+}
+window.__hh94Snapshot=function(){ return snapshot('manual'); };
+
+function kickResize(){
+  try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+  try{ if(window._hhMap && window._hhMap.invalidateSize) window._hhMap.invalidateSize(); }catch(e){}
+}
+
+function repair(){
+  try{
+    /* 1. το ταμπλό της αναζήτησης πίσω στη θέση του */
+    var why=document.getElementById('hh70-why'), hb=document.getElementById('hh-hb');
+    if(why&&hb&&hb.parentNode&&(why.parentNode!==hb.parentNode||why.previousElementSibling!==hb)){
+      try{ hb.parentNode.insertBefore(why, hb.nextSibling); }catch(e){}
+    }
+    /* 2. ξαναμέτρημα */
+    kickResize();
+    setTimeout(kickResize,200);
+    setTimeout(kickResize,700);
+    /* 3. ξαναζωγράφισμα της λίστας */
+    setTimeout(function(){ try{ if(typeof applyFilters==='function') applyFilters(); }catch(e){} },260);
+    /* 4. πάνω-πάνω */
+    try{ window.scrollTo(0,0); }catch(e){}
+  }catch(e){}
+}
+window.__hh94Repair=repair;
+
+function reloadOnce(){
+  try{
+    var last=+(sessionStorage.getItem('hh94_reload')||0);
+    if(Date.now()-last < 60000) return false;     /* ποτέ βρόχος refresh */
+    sessionStorage.setItem('hh94_reload', String(Date.now()));
+    location.reload();
+    return true;
+  }catch(e){ return false; }
+}
+
+var busy=false;
+function check(why){
+  if(busy) return;
+  if(!broken()) return;
+  busy=true;
+  report(why||'detect');
+  repair();
+  setTimeout(function(){
+    if(broken()){ if(!reloadOnce()) busy=false; }
+    else busy=false;
+  }, 1500);
+}
+
+/* πότε κοιτάμε */
+setInterval(function(){ check('tick'); }, 2000);
+window.addEventListener('resize', function(){ setTimeout(function(){ check('resize'); },400); });
+document.addEventListener('input', function(e){
+  try{ if(e.target&&e.target.id==='numSearch'){ setTimeout(function(){ check('search'); },500); } }catch(x){}
+}, true);
+
+/* ---------- η καρτέλα ξαναγίνεται ορατή ----------------------------------- */
+document.addEventListener('visibilitychange', function(){
+  try{
+    if(document.visibilityState!=='visible') return;
+    /* ό,τι μετρήθηκε όσο ήταν κρυμμένη μπορεί να είναι λάθος */
+    kickResize();
+    setTimeout(kickResize,300);
+    setTimeout(function(){ check('visible'); }, 900);
+    /* το κλείδωμα της αναζήτησης ξαναμετράει από τώρα */
+    try{ if(window.__hh92Rearm) window.__hh92Rearm(); }catch(e){}
+  }catch(e){}
+});
 
 }catch(e){}})();</script>
 <style>/*hhFold1b*/
