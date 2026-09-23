@@ -13956,6 +13956,128 @@ document.addEventListener('visibilitychange', function(){
 });
 
 }catch(e){}})();</script>
+<script>/*hhPolish95*/(function(){try{
+if(window.__hh95) return; window.__hh95=1;
+
+/* ---------------------------------------------------------------------------
+   23/9 — ΒΡΕΘΗΚΕ. Το ταμπλό αποτελεσμάτων #hh70-why μπαίνει ΜΕΣΑ στη ροή της
+   σελίδας, ανάμεσα στη μπάρα και το περιεχόμενο, και φτάνει το 52% του ύψους.
+   Σε παράθυρο 1030px αυτό είναι ~580-720px συμπαγές μπλοκ: το πλέγμα και ο
+   χάρτης σπρώχνονται κάτω από την οθόνη. Μένει μόνο η μπάρα, το κουτί
+   αναζήτησης και μια μεγάλη άδεια σκοτεινή περιοχή — ακριβώς το screenshot.
+   Μετρημένο: #main-content από y=86 -> y=820, ταμπλό 724px.
+
+   1) ΤΟ ΤΑΜΠΛΟ ΒΓΑΙΝΕΙ ΑΠΟ ΤΗ ΡΟΗ. position:fixed κάτω από τη μπάρα. Όσο ψηλό
+      κι αν γίνει, δεν μετακινεί ΤΙΠΟΤΑ.
+   2) ΦΡΟΥΡΟΣ ΔΟΜΗΣ. Η #hh-hb πρέπει να είναι το πρώτο παιδί του body. Ό,τι
+      χωθεί από πάνω της την κατεβάζει — καταγράφεται και η μπάρα γυρίζει μπροστά.
+   3) ΤΕΛΟΣ ΤΟ ΑΥΤΟΜΑΤΟ REFRESH του hhPolish94. Χτυπούσε τη σελίδα σου χωρίς να
+      λύνει τίποτα.                                                           */
+
+/* ---------- 3. κανένα αυτόματο refresh ποτέ ξανά ------------------------- */
+try{ sessionStorage.setItem('hh94_reload', String(Date.now()+3.15e10)); }catch(e){}
+
+/* ---------- 1. το ταμπλό γίνεται επιπλέον στρώμα ------------------------- */
+var st=document.createElement('style'); st.id='hh95-css';
+st.textContent=
+ '#hh70-why{position:fixed!important;left:12px!important;right:12px!important;'
++'width:auto!important;margin:0!important;z-index:880!important;'
++'display:flex!important;flex-direction:column!important;'
++'max-height:min(60vh,640px)!important;'
++'box-shadow:0 14px 40px rgba(0,0,0,.55)!important}'
++'body.light #hh70-why{box-shadow:0 14px 40px rgba(0,0,0,.22)!important}'
++'#hh70-why .hh70-wrap{max-height:none!important;flex:1 1 auto!important;overflow:auto!important}'
++'#hh70-why .hh70-head{flex:0 0 auto!important}'
++'@media(max-width:700px){#hh70-why{left:6px!important;right:6px!important;max-height:min(70vh,560px)!important}}';
+(document.head||document.documentElement).appendChild(st);
+
+function place(){
+  try{
+    var w=document.getElementById('hh70-why'); if(!w) return;
+    var hb=document.getElementById('hh-hb');
+    var top=8;
+    if(hb){ var r=hb.getBoundingClientRect(); if(r.height>0) top=Math.max(0,r.bottom)+6; }
+    w.style.setProperty('top', Math.round(top)+'px', 'important');
+  }catch(e){}
+}
+place();
+setInterval(place,500);
+['resize','scroll','orientationchange'].forEach(function(ev){
+  window.addEventListener(ev, place, true);
+});
+
+/* το Escape το κλείνει, όπως κάθε επιπλέον στρώμα */
+document.addEventListener('keydown', function(e){
+  try{
+    if(e.key!=='Escape') return;
+    if(document.getElementById('hh-lb')) return;
+    var w=document.getElementById('hh70-why'); if(!w) return;
+    var x=w.querySelector('.hh70-x'); if(x) x.click(); else w.remove();
+  }catch(x){}
+}, true);
+
+/* ---------- 2. φρουρός: η μπάρα μένει πρώτη ------------------------------ */
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/rent_staging';
+var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var told=false;
+
+function describe(n){
+  try{
+    var cs=getComputedStyle(n), r=n.getBoundingClientRect();
+    return {tag:n.tagName, id:n.id||null,
+            cls:String(n.className&&n.className.baseVal!==undefined?n.className.baseVal:(n.className||'')).slice(0,40)||null,
+            t:Math.round(r.top), l:Math.round(r.left), w:Math.round(r.width), h:Math.round(r.height),
+            d:cs.display, p:cs.position};
+  }catch(e){ return null; }
+}
+
+function tellOnce(what, extra){
+  if(told) return; told=true;
+  try{
+    var kids=[].map.call(document.body.children, describe).filter(function(o){ return o && (o.h>0||o.w>0); });
+    var bs=getComputedStyle(document.body);
+    fetch(SB,{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({batch:'ui_break',source:'viewer',kind:'ui_break2',payload:{
+        what:what, extra:extra||null, at:new Date().toISOString(),
+        vw:window.innerWidth, vh:window.innerHeight, dpr:window.devicePixelRatio,
+        scrollX:Math.round(window.scrollX||0), scrollY:Math.round(window.scrollY||0),
+        vis:document.visibilityState,
+        bodyDisp:bs.display, bodyAlign:bs.alignItems, bodyDir:bs.flexDirection,
+        bodyW:document.body.scrollWidth, bodyH:document.body.scrollHeight,
+        htmlDisp:getComputedStyle(document.documentElement).display,
+        kids:kids
+      }})});
+  }catch(e){}
+}
+window.__hh95Report=function(){ told=false; tellOnce('manual'); };
+
+function guard(){
+  try{
+    if(document.getElementById('hh-gate')) return;
+    var hb=document.getElementById('hh-hb'); if(!hb) return;
+    if(hb.parentElement!==document.body) return;   /* δεν πειράζουμε ό,τι δεν ξέρουμε */
+
+    /* ποιος κάθεται πάνω από τη μπάρα και την κατεβάζει; */
+    var above=[], n=hb.previousElementSibling;
+    while(n){
+      var cs=getComputedStyle(n);
+      if(cs.position!=='fixed' && cs.position!=='absolute' && cs.display!=='none'){
+        var r=n.getBoundingClientRect();
+        if(r.height>0) above.push(describe(n));
+      }
+      n=n.previousElementSibling;
+    }
+    if(!above.length) return;
+    tellOnce('above-hb', above);
+    document.body.insertBefore(hb, document.body.firstChild);
+    try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+    try{ window.scrollTo(0,0); }catch(e){}
+  }catch(e){}
+}
+guard();
+setInterval(guard,1000);
+
+}catch(e){ try{console.warn('hhPolish95',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
