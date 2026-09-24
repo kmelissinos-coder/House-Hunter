@@ -12057,6 +12057,11 @@ function render(){
       if(old&&old.parentNode) old.parentNode.removeChild(old);
       LAST=''; return;
     }
+    if(window.__hh70Dismiss===q){                                   /*hhPolish100*/
+      var _c=document.getElementById('hh70-why');
+      if(_c&&_c.parentNode) _c.parentNode.removeChild(_c);
+      LAST=q; return;
+    }
     if(q===LAST && document.getElementById('hh70-why')) return;
     LAST=q;
     var rows=rowsFor(q), el=host();
@@ -12092,7 +12097,10 @@ function render(){
       el.__rows=rows;
     }
     var x=el.querySelector('.hh70-x');
-    if(x) x.onclick=function(){ if(el.parentNode) el.parentNode.removeChild(el); LAST='__closed__'; };
+    if(x) x.onclick=function(){                                     /*hhPolish100*/
+      if(el.parentNode) el.parentNode.removeChild(el);
+      LAST=q; try{ window.__hh70Dismiss=q; }catch(e){}
+    };
     el.onclick=function(ev){
       var tr=ev.target&&ev.target.closest?ev.target.closest('tr[data-ix]'):null;
       if(!tr||!el.__rows) return;
@@ -14396,6 +14404,25 @@ window.__hh99Code=function(h,q){
 };
 
 }catch(e){ try{console.warn('hhPolish99',e);}catch(x){} }})();</script>
+<script>/*hhPolish100*/(function(){try{
+if(window.__hh100) return; window.__hh100=1;
+
+/* Το κλείσιμο ισχύει για ΤΟ ΕΡΩΤΗΜΑ που έκλεισε. Μόλις ο Dusty πατήσει
+   οτιδήποτε στο κουτί αναζήτησης, το ταμπλό ξαναζωντανεύει κανονικά —
+   αλλιώς ένα κλείσιμο θα έκρυβε για πάντα και την επόμενη αναζήτηση. */
+document.addEventListener('input', function(e){
+  try{ if(e.target && e.target.id==='numSearch') window.__hh70Dismiss=null; }catch(x){}
+}, true);
+
+/* Ίδιο και όταν το καθαρίζει με το ✕ του ίδιου του κουτιού. */
+document.addEventListener('click', function(e){
+  try{
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('#numSearch')) window.__hh70Dismiss=null;
+  }catch(x){}
+}, true);
+
+}catch(e){ try{console.warn('hhPolish100',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
