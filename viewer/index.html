@@ -12633,7 +12633,7 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
      εδώ μένει μόνο να φαίνεται ότι η σειρά ανοίγει κάτι. */
   var st=document.createElement('style'); st.id='hh78-css';
   st.textContent='.hh-gs-vpop .hh-gs-vrow[data-url]{position:relative;padding-right:16px;cursor:pointer}'
-   +'.hh-gs-vpop .hh-gs-vrow[data-url]::after{content:"\2197";position:absolute;right:2px;top:2px;font-size:10px;opacity:.55}'
+   +'.hh-gs-vpop .hh-gs-vrow[data-url]::after{content:"\\2197";position:absolute;right:2px;top:2px;font-size:10px;opacity:.55}'
    +'.hh-gs-vpop .hh-gs-vrow[data-url]:hover{background:rgba(200,168,75,.16)}';
   (document.head||document.documentElement).appendChild(st);
 }catch(e){}})();</script>
@@ -14250,6 +14250,109 @@ setInterval(function(){ place(); autoZero(); }, 700);
 setTimeout(function(){ place(); autoZero(); }, 800);
 
 }catch(e){ try{console.warn('hhPolish97',e);}catch(x){} }})();</script>
+<script>/*hhPolish98*/(function(){try{
+if(window.__hh98) return; window.__hh98=1;
+
+/* ---------------------------------------------------------------------------
+   24/9 — Dusty, πάνω στο «n ▾» της κάρτας μηδέν:
+     «If all the listings have it as the same, don't make a drop down… Leave it
+      as it is, Maisonette… If there is even one different, then you make the
+      drop down so I can see who says it is different.»
+     «…whenever you are saying that the house is gone… I want you to put the
+      date after. I don't mind if the drop-down menu becomes wider.»
+
+   1) ΤΟ ΚΟΥΜΠΙ ΦΕΥΓΕΙ ΟΤΑΝ ΟΛΟΙ ΣΥΜΦΩΝΟΥΝ. Κριτήριο είναι το ίδιο το
+      data-vals του κουμπιού: κρατάει τις ΔΙΑΦΟΡΕΤΙΚΕΣ τιμές χωρισμένες με
+      « · ». Μία τιμή -> σκέτο κείμενο, καμία λίστα. Δύο και πάνω -> μένει,
+      για να φαίνεται ποιος λέει τι. (Το «Μεσιτικά» δείχνει πλήθος αγγελιών
+      μέσω του hhPolish50, αλλά το data-vals του έχει τα διακριτά μεσιτικά.)
+   2) ΗΜΕΡΟΜΗΝΙΑ ΣΤΟ «ΑΦΑΙΡΕΘΗΚΕ». Δεν υπάρχει στήλη deleted_at· η ημερομηνία
+      ζει μέσα στο notes, όπως τη γράφει κάθε ημερήσιο τρέξιμο:
+      «Δεν εμφανίζεται πλέον στα αποτελέσματα (DD/MM/YYYY)». Κρατάμε την
+      ΤΕΛΕΥΤΑΙΑ τέτοια ημερομηνία (μια αγγελία μπορεί να έφυγε, να γύρισε και
+      να ξαναέφυγε) και ΜΟΝΟ όποια ακολουθεί τη φράση — όχι κάθε ημερομηνία
+      του κειμένου («Διαθέσιμο από…», «Ανακαίνιση…»).
+   3) Πιο φαρδύ popup, όπως το ζήτησε.
+   --------------------------------------------------------------------------- */
+
+try{
+  if(!document.getElementById('hh98-css')){
+    var st=document.createElement('style'); st.id='hh98-css';
+    st.textContent='.hh-gs-vpop{max-width:min(560px,94vw)!important}'
+      +'#hh-gs-vpop-el .hh89-x{white-space:nowrap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}
+
+/* ---------- 1. κάτω το κουμπί όταν η τιμή είναι μία ---------- */
+function prune(){
+  try{
+    var mvs=document.querySelectorAll('.hh-gs-mv');
+    for(var i=0;i<mvs.length;i++){
+      var mv=mvs[i];
+      var btn=mv.querySelector('.hh-gs-more'); if(!btn) continue;
+      var raw='';
+      try{ raw=decodeURIComponent(btn.getAttribute('data-vals')||''); }
+      catch(e){ raw=btn.getAttribute('data-vals')||''; }
+      var parts=String(raw).split(' \u00b7 ');
+      var uniq=[], k;
+      for(k=0;k<parts.length;k++){
+        var p=parts[k].trim();
+        if(p && p!=='\u2014' && uniq.indexOf(p)<0) uniq.push(p);
+      }
+      if(uniq.length>1) continue;                 /* κάποιος διαφωνεί — μένει */
+      var t=mv.querySelector('.hh-gs-mvtxt');
+      if(t && uniq.length===1 && t.textContent!==uniq[0]) t.textContent=uniq[0];
+      btn.parentNode && btn.parentNode.removeChild(btn);
+    }
+  }catch(e){}
+}
+
+/* ---------- 2. η ημερομηνία της αφαίρεσης ---------- */
+function two(x){ x=String(x); return x.length<2?('0'+x):x; }
+function goneDate(m){
+  try{
+    var n=String((m&&m.notes)||''); if(!n) return '';
+    var re=/\u03b1\u03c0\u03bf\u03c4\u03b5\u03bb\u03ad\u03c3\u03bc\u03b1\u03c4\u03b1[^()]{0,24}\((\d{1,2})\/(\d{1,2})\/(\d{4})\)/g;
+    var mm, last=null;
+    while((mm=re.exec(n))) last=mm;
+    if(!last) return '';
+    return two(last[1])+'/'+two(last[2])+'/'+last[3];
+  }catch(e){ return ''; }
+}
+function norm(u){ return String(u||'').split('#')[0].replace(/\/+$/,'').toLowerCase(); }
+function deco(v){
+  if(!v) return '';
+  v=String(v);
+  if(/^https?:\/\//i.test(v)) return v;
+  try{ var d=decodeURIComponent(v); if(/^https?:\/\//i.test(d)) return d; }catch(e){}
+  return v;
+}
+function stamp(){
+  try{
+    var pop=document.getElementById('hh-gs-vpop-el'); if(!pop) return;
+    var mem=window.__hhGrpMembers||[]; if(!mem.length) return;
+    var map={}, i;
+    for(i=0;i<mem.length;i++){ var u=mem[i]&&mem[i].url; if(u) map[norm(u)]=mem[i]; }
+    var rows=pop.querySelectorAll('.hh-gs-vrow');
+    for(i=0;i<rows.length;i++){
+      var row=rows[i];
+      var tag=row.querySelector('.hh89-x'); if(!tag) continue;
+      if(tag.getAttribute('data-hh98')==='1') continue;
+      var m=map[norm(deco(row.getAttribute('data-url')||''))];
+      var d=goneDate(m);
+      if(d){ tag.textContent='\u2715 \u0391\u03a6\u0391\u0399\u03a1\u0395\u0398\u0397\u039a\u0395 \u00b7 '+d; }
+      tag.setAttribute('data-hh98','1');
+    }
+    try{ if(window.__hhFitPop) window.__hhFitPop(pop, null); }catch(e){}
+  }catch(e){}
+}
+
+setInterval(function(){ prune(); stamp(); }, 600);
+setTimeout(function(){ prune(); stamp(); }, 700);
+document.addEventListener('click', function(){ setTimeout(function(){ prune(); stamp(); }, 60); }, true);
+
+}catch(e){ try{console.warn('hhPolish98',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
