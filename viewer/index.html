@@ -11964,9 +11964,9 @@ function syncViewButtons(){
 /*hhPolish73: ο βαθμός 0 = κωδικός. Ο μεσίτης στο τηλέφωνο λέει έναν κωδικό·
   αυτός πρέπει να είναι η ΠΡΩΤΗ γραμμή, όχι θαμμένος κάτω από 50 «έτος 2005». */
 var FIELDS=[
+  ['house_id','Κωδικός σπιτιού',0], ['hhl_id','Κωδικός αγγελίας',0],
   ['agencyNr','Αρ. Μεσιτικού',0], ['agency_nr','Αρ. Μεσιτικού',0],
   ['platformNr','Αρ. Αγγελίας',0], ['platform_nr','Αρ. Αγγελίας',0],
-  ['house_id','Κωδικός σπιτιού',0], ['hhl_id','Κωδικός αγγελίας',0],
   ['location','Περιοχή',1], ['address','Διεύθυνση',1], ['type','Τύπος',1],
   ['agency','Μεσιτικό',1], ['heating','Θέρμανση',1], ['year','Έτος',1],
   ['price','Τιμή',1], ['sqm','Τετραγωνικά',1],
@@ -12009,6 +12009,9 @@ function rowsFor(q){
     if(out.length>=300) break;
   }
   out.sort(function(a,b){
+    var sa=(window.__hh99Code?window.__hh99Code(a.h,q):9);  /*hhPolish99*/
+    var sb=(window.__hh99Code?window.__hh99Code(b.h,q):9);
+    if(sa!==sb) return sa-sb;
     if(a.best!==b.best) return a.best-b.best;              /*hhPolish73*/
     return String(a.h.location||'').localeCompare(String(b.h.location||''),'el');
   });
@@ -14353,6 +14356,46 @@ setTimeout(function(){ prune(); stamp(); }, 700);
 document.addEventListener('click', function(){ setTimeout(function(){ prune(); stamp(); }, 60); }, true);
 
 }catch(e){ try{console.warn('hhPolish98',e);}catch(x){} }})();</script>
+<script>/*hhPolish99*/(function(){try{
+if(window.__hh99) return; window.__hh99=1;
+
+/* ---------------------------------------------------------------------------
+   24/9 — Dusty: «I searched for 491, but instead of our house ID 491 being the
+   first result, it's further down. When I search a code, you should always show
+   first the house ID that is closest to this code, and then the rest.»
+
+   Η αιτία: στο hhPolish70 ΟΛΑ τα πεδία-κωδικοί (Αρ. Μεσιτικού, Αρ. Αγγελίας,
+   Κωδικός σπιτιού, Κωδικός αγγελίας) έχουν rank 0. Με ισοπαλία, η ταξινόμηση
+   έπεφτε στο ΑΛΦΑΒΗΤΟ ΤΗΣ ΠΕΡΙΟΧΗΣ — οπότε το «491» έδειχνε πρώτα Διόνυσο
+   (491 μέσα σε δεκαψήφιο αριθμό αγγελίας) και το σπίτι #491 όγδοο, επειδή
+   «Κηφισιά» μπαίνει αργά στο αλφάβητο. Δεν ήταν θέμα σχετικότητας· ήταν το
+   τιεμπρέικ.
+
+   Κλίμακα εγγύτητας — μικρότερο = πιο πάνω:
+     0  house_id ΑΚΡΙΒΩΣ ο κωδικός            -> το σπίτι που ζήτησε
+     1  hhl_id ακριβώς
+     2  house_id αρχίζει από τον κωδικό       (491 -> #4910)
+     3  hhl_id αρχίζει από
+     4  house_id τον περιέχει                 (91 -> #491)
+     9  όλα τα υπόλοιπα, με τη σειρά που είχαν
+   --------------------------------------------------------------------------- */
+
+function t(x){ return String(x==null?'':x).trim().toLowerCase(); }
+
+window.__hh99Code=function(h,q){
+  try{
+    q=t(q); if(!q) return 9;
+    var hid=t(h&&h.house_id), lid=t(h&&h.hhl_id);
+    if(hid && hid===q) return 0;
+    if(lid && lid===q) return 1;
+    if(hid && hid.indexOf(q)===0) return 2;
+    if(lid && lid.indexOf(q)===0) return 3;
+    if(hid && hid.indexOf(q)>=0) return 4;
+    return 9;
+  }catch(e){ return 9; }
+};
+
+}catch(e){ try{console.warn('hhPolish99',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
