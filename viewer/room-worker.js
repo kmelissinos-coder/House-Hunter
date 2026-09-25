@@ -1,18 +1,24 @@
-// House Hunter — room classifier (18 Sep 2026). Rebuilt after the original launcher
-// was lost (it was never saved to the project; see DAILY_RENT_RUN.md §5c).
+// House Hunter — room classifier (18 Sep 2026, retargeted 24 Sep 2026).
 //
 // WHERE: a CHROME TAB, and it must be the ACTIVE tab — the cloud container cannot
-// reach res.cloudinary.com, and Chrome's Memory Saver unloads background tabs
+// reach supabase.co, and Chrome's Memory Saver unloads background tabs
 // (that is what killed the xe worker on 18 Sep). Paste the whole file with
 // javascript_tool. It returns immediately; poll window.__rmState.
 //
 // WHY the page and not a Blob worker: MobileNet wants WebGL, and the page already
 // has it. The trade-off is that the tab must stay in front.
 //
-// FLOW: img_room_todo(n) -> for each photo, Cloudinary renders a 224x224 crop
-// (w_224,h_224,c_fill,f_jpg,q_80, ~10 kB) -> mobilenet.classify(img, 5) -> the five
-// ImageNet labels are mapped onto our six categories and their probabilities summed
-// -> img_room_set([{u,c,p,t}]) in batches.
+// 24 Sep 2026 — the photos left Cloudinary for Supabase Storage, so there is no
+// transform in the URL any more. The small copy is a STORED object next to the
+// original (<φάκελος>/<md5>_t400.jpg, ~18 kB) and the 224x224 centre crop that
+// Cloudinary used to make (w_224,h_224,c_fill,g_center) is now drawn here, on a
+// canvas, before the model sees it. Keep the crop: without it the image is
+// STRETCHED into the model's 224x224 input and the labels drift away from the
+// 11.741 already stored.
+//
+// FLOW: img_room_todo(n) -> _t400.jpg -> centre-square crop to 224x224 on canvas
+// -> mobilenet.classify(canvas, 5) -> the five ImageNet labels are mapped onto our
+// six categories and their probabilities summed -> img_room_set([{u,c,p,t}]) in batches.
 //
 // Categories are the six the RPC accepts: exterior, living, kitchen, bedroom, bath, other.
 // `conf` is the summed probability of the winning category, `top` the raw top-1 label,
@@ -70,6 +76,17 @@ function script(src){
     document.head.appendChild(s);
   });
 }
+/* το αποθηκευμένο μικρό αντίγραφο δίπλα στο πρωτότυπο */
+function small(u){ return /_t\d+\.jpg$/i.test(u) ? u : String(u).replace(/\.[a-z0-9]+$/i,'')+'_t400.jpg'; }
+/* c_fill,g_center σε καμβά: κεντρικό τετράγωνο -> 224x224 */
+var RC=document.createElement('canvas'); RC.width=224; RC.height=224;
+var RX=RC.getContext('2d',{willReadFrequently:true});
+function crop224(im){
+  var w=im.naturalWidth||im.width, h=im.naturalHeight||im.height;
+  var side=Math.min(w,h), sx=(w-side)/2, sy=(h-side)/2;
+  RX.drawImage(im, sx, sy, side, side, 0, 0, 224, 224);
+  return RC;
+}
 
 window.__rmState={stage:'boot', done:0, fail:0, err:null, counts:{}, hidden:document.hidden};
 window.__rmStop=false;
@@ -106,9 +123,9 @@ window.__rmGo=async function(limit, backend){
       S.hidden=document.hidden;
       var u=urls[i];
       try{
-        var t=u.replace('/image/upload/','/image/upload/w_224,h_224,c_fill,g_center,f_jpg,q_80/');
-        var im=await load(t);
-        var preds=await window.__rmModel.classify(im,5);
+        var im;
+        try{ im=await load(small(u)); }catch(e){ im=await load(u); }
+        var preds=await window.__rmModel.classify(crop224(im),5);
         var c=catOf(preds);
         buf.push({u:u, c:c.c, p:Math.round(c.p*1000)/1000, t:String((preds[0]||{}).className||'').slice(0,200)});
         S.counts[c.c]=(S.counts[c.c]||0)+1;

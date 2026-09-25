@@ -1253,13 +1253,25 @@ label:has(input[onchange*="seen_it',"]:checked){background:rgba(150,95,130,0.42)
    ΠΡΙΝ μπει η εικόνα στο DOM — αλλιώς ο browser έχει ήδη ξεκινήσει το κατέβασμα
    του src και το srcset αγνοείται (αυτό ακριβώς έγινε στην πρώτη προσπάθεια).
    Γι' αυτό πιάνουμε και το innerHTML και τον setter του img.src.            */
-var CLD='res.cloudinary.com';
-var RE=/^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(?!w_\d)(.+)$/;
+/* 24/9/2026 — hhPolish101: οι φωτογραφίες έφυγαν από το Cloudinary και κάθονται
+   στο Supabase Storage. Το Supabase ΞΕΡΕΙ να σμικρύνει on the fly, αλλά χρεώνει
+   ανά ΔΙΑΦΟΡΕΤΙΚΗ φωτογραφία ανά μήνα (100 δωρεάν, μετά ~4,5 € ανά χίλιες), που
+   με 22.000 φωτογραφίες είναι απρόβλεπτος λογαριασμός κάθε μήνα. Γι' αυτό τα δύο
+   μεγέθη φτιάχνονται ΜΙΑ ΦΟΡΑ και αποθηκεύονται δίπλα στο πρωτότυπο:
+       <φάκελος>/<md5>.jpg        πρωτότυπο (~120 KB)
+       <φάκελος>/<md5>_t400.jpg   ~18 KB — κάρτες, ταινίες μικρογραφιών
+       <φάκελος>/<md5>_t900.jpg   ~61 KB — οθόνες 2x, μεσαίες προβολές
+   Ο κανόνας είναι ΝΤΕΤΕΡΜΙΝΙΣΤΙΚΟΣ (κόψε την κατάληξη, κόλλα _tNNN.jpg), οπότε
+   δεν χρειάζεται τίποτα στη βάση. Το src ΔΕΝ αλλάζει ποτέ — τα «αγαπημένα»
+   κλειδώνονται πάνω του.                                                    */
+var CLD='/storage/v1/object/public/hh-photos/';
+var RE=/^(https:\/\/[^\/]+\/storage\/v1\/object\/public\/hh-photos\/[^?#]+)$/;
 function variants(u){
-  var m=String(u).match(RE); if(!m) return '';
-  var a=m[1], b=m[2];
-  function t(w){ return a+'w_'+w+',c_limit,f_auto,q_auto/'+b+' '+w+'w'; }
-  return t(200)+', '+t(400)+', '+t(800)+', '+t(1400)+', '+t(2000);
+  var s=String(u);
+  var m=s.match(RE); if(!m) return '';
+  if(/_t\d+\.jpg$/i.test(s)) return '';            /* ήδη παράγωγο */
+  var stem=s.replace(/\.[a-z0-9]+$/i,'');
+  return stem+'_t400.jpg 400w, '+stem+'_t900.jpg 900w, '+s+' 1600w';
 }
 function sizesFor(elOrCls){
   var el=null, cls='';
@@ -13425,16 +13437,17 @@ function want(url){
 function xform(stageImg){
   try{
     var cur=stageImg&&stageImg.currentSrc||'';
-    var m=cur.match(/\/image\/upload\/(w_\d+[^/]*)\//);
-    if(m) return m[1];
+    var m=cur.match(/(_t\d+)\.jpg(?:[?#].*)?$/i);
+    if(m) return m[1];            /* '_t400' ή '_t900' */
   }catch(e){}
-  return 'w_1400,c_limit,f_auto,q_auto';   /* εφεδρεία πριν προλάβει να επιλέξει */
+  return '';                      /* κενό = το πρωτότυπο, όπως κάνει η σκηνή fullscreen */
 }
 function asBig(url, tf){
   try{
-    if(!url || url.indexOf('res.cloudinary.com')<0) return url;
-    if(/\/image\/upload\/w_\d/.test(url)) return url;      /* ήδη μετασχηματισμένη */
-    return url.replace('/image/upload/', '/image/upload/'+tf+'/');
+    if(!url || url.indexOf('/storage/v1/object/public/hh-photos/')<0) return url;
+    if(!tf) return url;                                   /* πρωτότυπο */
+    if(/_t\d+\.jpg$/i.test(url)) return url;              /* ήδη παράγωγο */
+    return url.replace(/\.[a-z0-9]+$/i,'')+tf+'.jpg';
   }catch(e){ return url; }
 }
 
@@ -14423,6 +14436,25 @@ document.addEventListener('click', function(e){
 }, true);
 
 }catch(e){ try{console.warn('hhPolish100',e);}catch(x){} }})();</script>
+<script>/*hhPolish101*/(function(){try{
+/* Ένα srcset που δείχνει σε αρχείο που δεν υπάρχει ΔΕΝ πέφτει πίσω στο src —
+   ο browser αφήνει την εικόνα άδεια. Οι μικρογραφίες φτιάχνονται λίγο μετά το
+   κατέβασμα της φωτογραφίας, άρα υπάρχει παράθυρο όπου λείπουν. Εδώ πιάνουμε
+   το σφάλμα φόρτωσης, πετάμε το srcset και ξαναζητάμε το πρωτότυπο — μία φορά
+   ανά εικόνα, ώστε να μην μπει σε βρόχο.                                     */
+document.addEventListener('error', function(ev){
+  try{
+    var im=ev&&ev.target;
+    if(!im||im.tagName!=='IMG') return;
+    if(!im.getAttribute('srcset')) return;
+    if(im.getAttribute('data-hh101fb')) return;
+    im.setAttribute('data-hh101fb','1');
+    var u=im.getAttribute('src')||'';
+    im.removeAttribute('srcset'); im.removeAttribute('sizes'); im.removeAttribute('data-hh87for');
+    if(u){ im.setAttribute('src', u); }
+  }catch(e){}
+}, true);
+}catch(e){}})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
