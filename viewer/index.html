@@ -14613,6 +14613,134 @@ setTimeout(tick,300);
 setTimeout(tick,900);
 document.addEventListener('click',function(){ setTimeout(tick,60); },true);
 }catch(e){ try{console.warn('hhPolish102',e);}catch(x){} }})();</script>
+<script>/*hhPolish103*/(function(){try{
+if(window.__hh103) return; window.__hh103=1;
+/* ---------------------------------------------------------------------------
+   25/9 — δύο ατέλειες του hhPolish102, ζωντανά στο #723:
+
+   1) ΔΙΠΛΗ ΜΙΝΙ ΚΑΡΤΑ. Το deep-link ?house=NNN ανοίγει το overlay ΔΥΟ φορές και
+      ενδιάμεσα το _loSiblings αλλάζει μήκος, οπότε ο έλεγχος «υπάρχει ήδη κάρτα;»
+      δεν αρκεί: βρεθήκαμε με 0-1-2. Τώρα η κάρτα που φτιάχνουμε ΕΜΕΙΣ φέρει
+      data-hh103 και είναι ΜΙΑ: ό,τι περισσεύει φεύγει, και όταν οι αγγελίες δεν
+      είναι μία φεύγει τελείως (τις φτιάχνει η ίδια η εφαρμογή).
+
+   2) ΤΑ «ΜΕΣΙΤΙΚΑ» ΞΑΝΑΧΑΝΟΝΤΑΝ. Το hhPolish98 σαρώνει «.hh-gs-mv .hh-gs-more»
+      και ρίχνει το κουμπί όταν οι τιμές είναι μία — και με ΜΙΑ αγγελία είναι
+      πάντα μία. Αντί να παίζουμε με το data-vals, βγάζουμε τη γραμμή από το
+      ραντάρ του: το περιτύλιγμα γίνεται .hh103-mv (ίδιο στήσιμο, άλλο όνομα).
+      Ο χειριστής του popup πιάνει «.hh-gs-more» οπουδήποτε, οπότε δουλεύει
+      κανονικά — και δείχνει μία γραμμή ΑΝΑ ΑΓΓΕΛΙΑ, με σήμα πλατφόρμας και
+      σύνδεσμο, όπως πριν τη συγχώνευση των ίδιων μεσιτικών.
+   --------------------------------------------------------------------------- */
+try{
+  if(!document.getElementById('hh103-css')){
+    var _st=document.createElement('style'); _st.id='hh103-css';
+    _st.textContent='.hh-gs-grid .hh103-mv{display:flex;align-items:center;gap:4px;min-width:0;'
+      +'color:#f3e7c4;font-size:13px;justify-content:flex-end}'
+      +'.hh103-mv .hh103-mvtxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}'
+      +'body.light .hh-gs-grid .hh103-mv{color:#241f16!important}';
+    document.head.appendChild(_st);
+  }
+}catch(e){}
+
+function mem(){ try{ return window.__hhGrpMembers||[]; }catch(e){ return []; } }
+function sibs(){
+  try{ if(typeof _loSiblings!=='undefined' && _loSiblings) return _loSiblings; }catch(e){}
+  try{ return window._loSiblings||null; }catch(e){}
+  return null;
+}
+function sibHTML(){
+  try{ if(typeof _sibHTML==='function') return _sibHTML; }catch(e){}
+  return (typeof window._sibHTML==='function')?window._sibHTML:null;
+}
+
+/* ---------- 1. ακριβώς ΜΙΑ δική μας μίνι κάρτα ---------- */
+function oneSib(){
+  try{
+    var car=document.getElementById('loCarousel'); if(!car) return;
+    var mine=car.querySelectorAll('.lo-sib-card[data-hh103]');
+    var S=sibs();
+    if(!S || S.length!==1){                       /* η εφαρμογή τις φτιάχνει μόνη της */
+      for(var i=0;i<mine.length;i++) mine[i].parentNode && mine[i].parentNode.removeChild(mine[i]);
+      return;
+    }
+    /* ΜΙΑ αγγελία σημαίνει ΜΙΑ κάρτα: ό,τι περισσεύει φεύγει, δικό μας ή όχι */
+    var all=car.querySelectorAll('.lo-sib-card:not(#hh-sib0)');
+    for(var j=1;j<all.length;j++) all[j].parentNode && all[j].parentNode.removeChild(all[j]);
+    if(all.length) return;
+    var f=sibHTML(); if(!f) return;
+    var tmp=document.createElement('div');
+    tmp.innerHTML=f(S[0],0);
+    var card=tmp.firstElementChild; if(!card) return;
+    card.setAttribute('data-hh103','1');
+    car.appendChild(card);
+    var r=document.getElementById('loRight'); if(r && r.style.display==='none') r.style.display='flex';
+    var t=document.getElementById('loCarouselTitle');
+    if(t) t.textContent='Η αγγελία';
+  }catch(e){}
+}
+
+/* ---------- 2. η γραμμή «Μεσιτικά» κρατάει το κουμπί της ---------- */
+function isAg(sp){
+  if(!sp) return false;
+  var a=(sp.getAttribute && sp.getAttribute('data-hh55')) || '';
+  var t=sp.textContent || '';
+  return /^\s*Μεσιτικ/.test(a)
+      || /^\s*Μεσιτικ/.test(t)
+      || /^\s*Agenc/i.test(t);
+}
+function agRow(){
+  try{
+    var grid=document.querySelector('#hh-grpsum-ov .hh-gs-grid'); if(!grid) return;
+    var M=mem(); if(!M.length) return;
+    var row=null;
+    [].forEach.call(grid.children,function(d){ if(!row && isAg(d.querySelector('span'))) row=d; });
+    if(!row) return;
+    var b=row.querySelector('b'); if(!b) return;
+
+    /* μία μόνο λίστα ανά γραμμή */
+    var btns=row.querySelectorAll('.hh-gs-more');
+    for(var i=1;i<btns.length;i++) btns[i].parentNode && btns[i].parentNode.removeChild(btns[i]);
+    var btn=btns[0]||null;
+
+    var vals=[], seen={};
+    M.forEach(function(m,ix){
+      var a=(m.agency!=null && String(m.agency).trim()) ? String(m.agency).trim()
+            : 'Ιδιώτης';
+      var pl=(m.platform!=null && String(m.platform).trim()) ? String(m.platform).trim() : ('#'+(ix+1));
+      var v=a+' ('+pl+')';
+      seen[v]=(seen[v]||0)+1;
+      vals.push(seen[v]>1 ? (v+' •'+seen[v]) : v);
+    });
+    var enc=encodeURIComponent(vals.join(' · '));
+    var lbl=M.length+' ▾';
+    var AGL='Μεσιτικά';
+
+    if(!btn){
+      var txt=(b.textContent||'').trim();
+      if(!txt) return;
+      b.textContent='';
+      var sp=document.createElement('span'); sp.className='hh103-mvtxt'; sp.textContent=txt;
+      btn=document.createElement('button');
+      btn.type='button'; btn.className='hh-gs-more';
+      b.appendChild(sp); b.appendChild(btn);
+    }else{
+      var old=b.querySelector('.hh-gs-mvtxt');
+      if(old){ old.className='hh103-mvtxt'; }
+    }
+    /* έξω από το ραντάρ του hhPolish98 */
+    b.className='hh103-mv';
+    if(btn.getAttribute('data-label')!==AGL) btn.setAttribute('data-label',AGL);
+    if(btn.getAttribute('data-vals')!==enc) btn.setAttribute('data-vals',enc);
+    if(btn.textContent!==lbl) btn.textContent=lbl;
+  }catch(e){}
+}
+
+function tick(){ oneSib(); agRow(); }
+setInterval(tick,500);
+setTimeout(tick,300); setTimeout(tick,900);
+document.addEventListener('click',function(){ setTimeout(tick,60); },true);
+}catch(e){ try{console.warn('hhPolish103',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
