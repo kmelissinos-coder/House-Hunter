@@ -14795,6 +14795,43 @@ try{
   }
 }catch(e){}
 }catch(e){ try{console.warn('hhPolish104',e);}catch(x){} }})();</script>
+<script>/*hhPolish105*/(function(){try{
+if(window.__hh105) return; window.__hh105=1;
+/* ---------------------------------------------------------------------------
+   25/9 — μετά από hard refresh η μίνι κάρτα «έλειπε» ξανά. Δεν έλειπε: το
+   #loCarousel είχε ΚΑΙ τις δύο κάρτες (0 και 1), αλλά η ΣΤΗΛΗ #loRight είχε
+   ξαναγίνει display:none.
+
+   Το _renderOvl() κρύβει τη στήλη κάθε φορά που τρέχει με μία μόνο αγγελία, και
+   το hhPolish103 την ξανάδειχνε ΜΟΝΟ τη στιγμή που έφτιαχνε την κάρτα — μετά
+   έβγαινε νωρίς («υπάρχει ήδη κάρτα»), οπότε το δεύτερο render την έκρυβε για
+   πάντα. Με το deep link ?house=NNN το overlay ζωγραφίζεται δύο φορές, γι' αυτό
+   φαινόταν σωστά στο πρώτο άνοιγμα και χανόταν στο σκέτο φόρτωμα.
+
+   Εδώ η ορατότητα ελέγχεται ΑΝΕΞΑΡΤΗΤΑ από τη δημιουργία: όσο υπάρχει ακριβώς
+   μία αγγελία και έστω μία κάρτα μέσα στο καρουζέλ, η στήλη μένει ανοιχτή.
+   --------------------------------------------------------------------------- */
+function sibs(){
+  try{ if(typeof _loSiblings!=='undefined' && _loSiblings) return _loSiblings; }catch(e){}
+  try{ return window._loSiblings||null; }catch(e){}
+  return null;
+}
+function show(){
+  try{
+    var S=sibs(); if(!S || S.length!==1) return;
+    var car=document.getElementById('loCarousel'); if(!car) return;
+    if(!car.querySelector('.lo-sib-card')) return;
+    var r=document.getElementById('loRight');
+    if(r && r.style.display==='none') r.style.display='flex';
+    var t=document.getElementById('loCarouselTitle');
+    var lbl='Η αγγελία';
+    if(t && t.textContent!==lbl) t.textContent=lbl;
+  }catch(e){}
+}
+setInterval(show,400);
+setTimeout(show,250); setTimeout(show,800);
+document.addEventListener('click',function(){ setTimeout(show,60); },true);
+}catch(e){ try{console.warn('hhPolish105',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
