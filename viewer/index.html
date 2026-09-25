@@ -14741,6 +14741,60 @@ setInterval(tick,500);
 setTimeout(tick,300); setTimeout(tick,900);
 document.addEventListener('click',function(){ setTimeout(tick,60); },true);
 }catch(e){ try{console.warn('hhPolish103',e);}catch(x){} }})();</script>
+<script>/*hhPolish104*/(function(){try{
+if(window.__hh104) return; window.__hh104=1;
+/* ---------------------------------------------------------------------------
+   25/9 — η μίνι κάρτα του #723 έβγαινε σπασμένη: το «Maisonette» καβάλαγε το
+   νούμερο και όλο το σώμα (περιοχή, τιμή, €/τ.μ.) έλειπε.
+
+   ΑΙΤΙΑ, και δεν είναι της μίνι κάρτας: το hhPolish87 βρίσκει τις εικόνες με
+   `/<img\b([^>]*)>/g`. Το `[^>]*` κόβει στο ΠΡΩΤΟ `>` — και η εικόνα της κάρτας
+   κουβαλάει
+       onerror="this.outerHTML='<div class=&quot;lo-sib-no-img&quot;>🏠</div>'"
+   δηλαδή ένα ΚΑΝΟΝΙΚΟ `>` ΜΕΣΑ σε τιμή γνωρίσματος. Έτσι το «tag» που νομίζει
+   ότι βρήκε τελειώνει στη μέση του onerror, κολλάει εκεί το srcset, και ό,τι
+   απομένει («🏠</div>'">») μπαίνει στο DOM ως σκέτο markup: το .lo-sib-img-wrap
+   κλείνει νωρίς, τα δύο badges δραπετεύουν, και το .lo-sib-body γίνεται ΔΕΥΤΕΡΗ
+   ρίζα — γι' αυτό χανόταν όταν κρατούσαμε μόνο το firstElementChild.
+
+   Αφορά ΚΑΘΕ κάρτα της εφαρμογής, όχι μόνο τη δική μας· απλώς φάνηκε εδώ.
+
+   ΔΙΟΡΘΩΣΗ χωρίς να πειραχτεί το hhPolish87 (είναι κλειστό σε closure): μπαίνουμε
+   ΠΑΝΩ του στο innerHTML/insertAdjacentHTML και κάνουμε τα `>` μέσα σε τιμές
+   γνωρισμάτων `&gt;`. Ισοδύναμο για τον parser, αλλά τώρα το δικό του regex
+   βλέπει κανονική ετικέτα και βάζει το srcset στη σωστή θέση.
+   --------------------------------------------------------------------------- */
+var IMGRE=/<img\b((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
+function fixImgs(h){
+  try{
+    return String(h).replace(IMGRE,function(tag,attrs){
+      if(attrs.indexOf('>')<0) return tag;               /* ήδη εντάξει */
+      return '<img'+attrs.replace(/>/g,'&gt;')+'>';
+    });
+  }catch(e){ return h; }
+}
+window.__hhFixImgs=fixImgs;
+
+try{
+  var d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  if(d&&d.set){
+    Object.defineProperty(Element.prototype,'innerHTML',{configurable:true,enumerable:d.enumerable,get:d.get,
+      set:function(v){
+        try{ if(typeof v==='string' && v.indexOf('<img')>=0) v=fixImgs(v); }catch(e){}
+        return d.set.call(this,v);
+      }});
+  }
+}catch(e){}
+try{
+  var ia=Element.prototype.insertAdjacentHTML;
+  if(ia){
+    Element.prototype.insertAdjacentHTML=function(pos,html){
+      try{ if(typeof html==='string' && html.indexOf('<img')>=0) html=fixImgs(html); }catch(e){}
+      return ia.call(this,pos,html);
+    };
+  }
+}catch(e){}
+}catch(e){ try{console.warn('hhPolish104',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
