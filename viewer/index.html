@@ -14832,6 +14832,86 @@ setInterval(show,400);
 setTimeout(show,250); setTimeout(show,800);
 document.addEventListener('click',function(){ setTimeout(show,60); },true);
 }catch(e){ try{console.warn('hhPolish105',e);}catch(x){} }})();</script>
+<script>/*hhPolish106*/(function(){try{
+if(window.__hh106) return; window.__hh106=1;
+/* ---------------------------------------------------------------------------
+   27/9 — Samsung Z Fold, ΕΣΩΤΕΡΙΚΗ οθόνη: «φαίνεται σαν desktop, ζουμαρισμένο
+   προς τα έξω».
+
+   Γιατί: η εσωτερική οθόνη δηλώνει ~884 CSS px. Όλα τα mobile styles της
+   εφαρμογής είναι κάτω από @media (max-width:560px), οπότε δεν πιάνουν ΚΑΝΕΝΑ
+   από αυτά. Στα 884 px ισχύει η desktop διάταξη του χάρτη:
+
+     #map-split{display:flex}  #mapList{flex:0 0 68%}  #map{flex:0 0 30%}
+     #mapList .card{width:calc(33.33% - 6px)}
+
+   δηλαδή λίστα ~590 px με ΤΡΕΙΣ κάρτες ανά σειρά (~190 px η καθεμία) και χάρτης
+   200 px. Αυτό ακριβώς είναι το «ζουμαρισμένο».
+
+   Η διόρθωση δεν αλλάζει το breakpoint των 560 px — προσθέτει ΔΕΥΤΕΡΗ συνθήκη:
+   οθόνη αφής (pointer:coarse) έως 1024 px παίρνει τη διάταξη κινητού. Έτσι:
+     • Z Fold εσωτερική (~884) και tablet  → διάταξη κινητού, 2 κάρτες/σειρά
+     • Z Fold εξωτερική (~360)             → όπως πριν, 1 κάρτα/σειρά
+     • κανονικό desktop 561–1024 (ποντίκι) → ΑΜΕΤΑΒΛΗΤΟ (pointer:fine)
+
+   Ο χάρτης γίνεται στήλη: χάρτης πάνω σε σταθερό ύψος, λίστα από κάτω να
+   κυλάει — κρατάμε το σταθερό ύψος του #map-split, γιατί το hhPolish74 κλειδώνει
+   το scroll του body (body.hh74-maplock{overflow:hidden}) όσο είμαστε σε χάρτη.
+
+   Δοκιμή χωρίς συσκευή: ?fold=1 επιβάλλει τους ίδιους κανόνες σε κάθε πλάτος.
+   --------------------------------------------------------------------------- */
+
+var R = [
+  /* ── προβολή χάρτη: στήλη αντί για δύο κολόνες ── */
+  '#map-split{flex-direction:column!important;padding:0 6px!important;gap:8px!important}',
+  '#map-split #map{order:1;flex:0 0 42%!important;width:100%!important;min-width:0!important;height:auto!important;min-height:200px!important;border-radius:12px}',
+  '#mapList{order:2;flex:1 1 auto!important;width:100%!important;min-width:0!important;overflow-y:auto!important;padding:6px 2px 24px 2px!important}',
+  /* ── το chrome του κινητού (ίδιο με το μπλοκ των 560px) ── */
+  '#hh-hb{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:5px 8px;gap:6px}',
+  '#hh-hb::-webkit-scrollbar{display:none}',
+  '#hh-hb .hb-ctrl{padding:4px 8px;font-size:12px;flex:0 0 auto}',
+  '.hh-hb-menu{position:fixed;left:10px;right:10px;top:50px;min-width:0;max-height:70vh}',
+  '#hh-fpanel-real{position:fixed;left:10px;right:10px;top:50px;width:auto;max-width:none;max-height:75vh;overflow:auto;box-sizing:border-box}',
+  '#numSearch{width:calc(100vw - 24px);left:12px;box-sizing:border-box}',
+  '#hh-newhdr{margin-left:8px;margin-right:8px}',
+  'body{-webkit-text-size-adjust:100%}',
+  '.card,.grouped-card,.lo-sib-card{max-width:100%}'
+].join('');
+
+/* δύο κάρτες ανά σειρά όταν υπάρχει χώρος (εσωτερική οθόνη Fold, tablet) */
+var R2 = '#mapList .card,#mapList .grouped-card{width:calc(50% - 6px)!important}'
+       + '.grid-container{grid-template-columns:repeat(2,1fr)!important}';
+/* μία κάρτα ανά σειρά σε στενό κινητό */
+var R1 = '#mapList .card,#mapList .grouped-card{width:100%!important}'
+       + '.grid-container{grid-template-columns:1fr!important}';
+
+var TOUCH = '(max-width:1024px) and (pointer:coarse)';
+
+var st=document.createElement('style'); st.id='hh-polish106';
+st.textContent =
+    '@media (max-width:560px),'+TOUCH+'{'+R+'}'
+  + '@media (min-width:600px) and (max-width:1024px) and (pointer:coarse){'+R2+'}'
+  + '@media (max-width:560px),(max-width:599px) and (pointer:coarse){'+R1+'}';
+document.head.appendChild(st);
+
+/* ---- διακόπτης δοκιμής: ?fold=1 (ίδιοι κανόνες, χωρίς media query) ---- */
+var sf=document.createElement('style'); sf.id='hh-polish106-force';
+sf.textContent = R + '@media (min-width:600px){'+R2+'}@media (max-width:599px){'+R1+'}';
+sf.disabled = !/[?&]fold=1\b/.test(location.search);
+document.head.appendChild(sf);
+
+/* ---- άνοιγμα/κλείσιμο του Fold αλλάζει viewport: ο Leaflet πρέπει να το μάθει ---- */
+var t=null;
+function poke(){
+  clearTimeout(t);
+  t=setTimeout(function(){
+    try{ if(window._hhMap && window._hhMap.invalidateSize) window._hhMap.invalidateSize(); }catch(e){}
+    try{ window.dispatchEvent(new Event('resize')); }catch(e){}
+  },260);
+}
+window.addEventListener('orientationchange',poke);
+if(window.visualViewport) window.visualViewport.addEventListener('resize',poke);
+}catch(e){ try{console.warn('hhPolish106',e);}catch(x){} }})();</script>
 <style>/*hhFold1b*/
 /* --- belt & braces: nothing may push the document sideways (clip keeps sticky alive) --- */
 @media (max-width:1024px){
