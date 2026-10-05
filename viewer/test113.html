@@ -15527,6 +15527,25 @@ inject(); setInterval(inject,1000);
 window.hhChangePassword=open;
 }catch(e){ console.warn('hhPolish112',e); }})();
 </script>
+<script>
+/*hhPolish113*/(function(){try{
+if(window.__hh113) return; window.__hh113=1;
+/* 5 Oct 2026 (late) — map view: the list follows the map LIVE again.
+   1. The real bug: hhPolish108's «.card,.grouped-card{display:flex!important}» beat the map
+      filter's inline display:none, so every card stayed visible whatever the map showed.
+      That CSS now skips cards hidden inline (see the hh108 style block).
+   2. Live while dragging: the filter used to run only on «moveend» (after the map stops,
+      including the glide after a fast drag). Now it also runs during the move (max every
+      150 ms) and right at the end of a drag. */
+var last=0, timer=null;
+function run(){ last=Date.now(); timer=null; try{ window.hhFilterMapList&&window.hhFilterMapList(); }catch(e){} }
+function soon(){ var d=Date.now()-last; if(d>=150) run(); else if(!timer) timer=setTimeout(run,150-d); }
+setInterval(function(){
+  var m=window._hhMap;
+  if(m && !m.__hh113){ m.__hh113=1; m.on('move',soon); m.on('dragend',function(){ setTimeout(run,0); }); }
+},700);
+}catch(e){ console.warn('hhPolish113',e); }})();
+</script>
 </body>
 </html>
 <!-- build: hh113 -->
