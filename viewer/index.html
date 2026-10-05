@@ -15338,6 +15338,69 @@ window.fetch=function(u,o){
 };
 }catch(e){ console.warn('hhPolish109',e); }})();
 </script>
+<script>
+/*hhPolish110*/(function(){try{
+if(window.__hh110) return; window.__hh110=1;
+/* 5 Oct 2026 — Security Phase 3. The publishable key can no longer read the listings,
+   so the WhatsApp/Viber link preview (Cloudflare middleware) needs a share token in the
+   link: ?house=1265&t=<token>. 📤 asks the database for the house's token (signed-in
+   members only, hh_share_token), builds the text from the same call and opens the
+   same menu as before. Without a token (not signed in / error) the plain link is used:
+   it still opens the house, only the chat preview has no picture. */
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1';
+var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var cache={};
+function tr(s){ try{ return (typeof window.hhT==='function')?window.hhT(s):s; }catch(e){ return s; } }
+function closeShare(){ var m=document.getElementById('hh-share-menu'); if(m) m.remove(); }
+function copy(t){
+  var done=function(){ try{ window.showToast&&window.showToast('✓ Το link αντιγράφηκε'); }catch(e){} };
+  var fb=function(){ try{ var ta=document.createElement('textarea'); ta.value=t; ta.style.cssText='position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }catch(e){} done(); };
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done,fb); else fb();
+}
+function token(hid){
+  if(cache[hid]) return Promise.resolve(cache[hid]);
+  return fetch(SB+'/rpc/hh_share_token',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json'},body:JSON.stringify({p_house:String(hid)})})
+    .then(function(r){ return r.ok?r.json():null; })
+    .then(function(j){ if(j&&j.t) cache[hid]=j; return j; }, function(){ return null; });
+}
+function money(v){ v=Number(v); return (isFinite(v)&&v>0)?'€'+v.toLocaleString('el'):''; }
+function build(hid,url,j){
+  var base=location.origin+location.pathname, link, head='🏠 House Hunter'+(hid?' #'+hid:''), parts=[];
+  if(hid){ link=base+'?house='+encodeURIComponent(hid)+(j&&j.t?'&t='+encodeURIComponent(j.t):''); }
+  else link=base+'?open='+encodeURIComponent(url||'');
+  if(j){
+    if(j.location||j.type) parts.push((j.location||'')+(j.type?' · '+j.type:''));
+    if(j.sqm) parts.push(j.sqm+' τ.μ.');
+    var p=money(j.price_lo||j.price_any); if(p) parts.push(p+(j.project==='Rent'?'/μήνα':''));
+  }
+  return { link:link, txt: head+(parts.length?'\n'+parts.join(' · '):'')+'\n'+link };
+}
+function menu(ev,hid,s){
+  closeShare();
+  var m=document.createElement('div'); m.id='hh-share-menu';
+  var items=[['📋',tr('Αντιγραφή link'),function(){ copy(s.link); }],
+    ['✉️','Email',function(){ location.href='mailto:?subject='+encodeURIComponent('House Hunter'+(hid?' #'+hid:''))+'&body='+encodeURIComponent(s.txt); }],
+    ['💬','WhatsApp',function(){ window.open('https://wa.me/?text='+encodeURIComponent(s.txt),'_blank','noopener'); }],
+    ['📱','Viber',function(){ location.href='viber://forward?text='+encodeURIComponent(s.txt); }]];
+  if(navigator.share) items.push(['📤',tr('Άλλο…'),function(){ navigator.share({title:'House Hunter',text:s.txt,url:s.link}).catch(function(){}); }]);
+  items.forEach(function(it){ var b=document.createElement('button'); b.type='button'; b.innerHTML='<span class="hh-sh-ic">'+it[0]+'</span>'+it[1]; b.onclick=function(e){ e.stopPropagation(); try{ it[2](); }catch(x){} closeShare(); }; m.appendChild(b); });
+  document.body.appendChild(m);
+  var x=ev&&ev.clientX!=null?ev.clientX:window.innerWidth/2, y=ev&&ev.clientY!=null?ev.clientY:window.innerHeight/2;
+  var W=190, H=m.offsetHeight||200;
+  m.style.left=Math.min(Math.max(8,x-W/2),window.innerWidth-W-8)+'px';
+  m.style.top=((y+H+12>window.innerHeight)?Math.max(8,y-H-8):y+8)+'px';
+  setTimeout(function(){ document.addEventListener('click',closeShare,{once:true}); },0);
+}
+window.hhShare=function(ev,hid,url){
+  try{ ev&&ev.stopPropagation&&ev.stopPropagation(); }catch(e){}
+  hid=String(hid||''); if(!/^[0-9]{1,8}$/.test(hid)) hid='';
+  var pos=ev?{clientX:ev.clientX,clientY:ev.clientY}:null;
+  if(!hid){ menu(pos,'',build('',url,null)); return; }
+  token(hid).then(function(j){ menu(pos,hid,build(hid,url,j)); });
+};
+window.hhShareToken=token;
+}catch(e){ console.warn('hhPolish110',e); }})();
+</script>
 </body>
 </html>
-<!-- build: hh109 -->
+<!-- build: hh110 -->
