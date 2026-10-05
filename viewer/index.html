@@ -3,6 +3,92 @@
 <html lang="el">
 <head>
 <meta charset="UTF-8">
+<script>
+/*hhPolish111*/(function(){try{
+if(window.__hh109) return; window.__hh109=1; window.__hh111=1;
+/* 5 Oct 2026 — Security Phase 3. The publishable key can no longer READ the listings
+   either, so every request to Supabase REST must carry the signed-in member's token.
+   This is hhPolish109 moved to the very top of <head>: the main loader starts while the
+   page is still being parsed (≈0.4 s), long before the end-of-page patches run, and its
+   first «select * from listings» went out with the publishable key → 401 → «0 listings».
+   It also refreshes the token itself when it is about to expire (hhAuthFix, which does
+   that later, is not loaded yet at that moment) and retries a 401 once after a refresh.
+   Not signed in → requests go out unchanged (and the database answers 401). */
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co';
+var HOST='ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/';
+var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var _f=window.fetch;
+function parse(s){ try{ return JSON.parse(s||'null'); }catch(e){ return null; } }
+function expOf(tok){ try{ var p=JSON.parse(atob(String(tok).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); return +p.exp||0; }catch(e){ return 0; } }
+function stores(){ var c=[]; try{ c.push(['s',sessionStorage]); }catch(e){} try{ c.push(['l',localStorage]); }catch(e){} return c; }
+function best(){
+  var b=null, be=-1, bs=null;
+  stores().forEach(function(p){ var a=null; try{ a=parse(p[1].getItem('hh_auth')); }catch(e){}
+    if(a&&a.access_token){ var e=expOf(a.access_token); if(e>be){ be=e; b=a; bs=p[1]; } } });
+  return b?{t:b.access_token,e:be,a:b,st:bs}:null;
+}
+var flight=null;
+function ownRefresh(){
+  if(flight) return flight;
+  flight=(function(){
+    var s=best(); if(!s||!s.a.refresh_token){ return Promise.resolve(null); }
+    return _f.call(window,SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.a.refresh_token})})
+      .then(function(r){ return r.ok?r.json():null; })
+      .then(function(j){
+        if(!j||!j.access_token) return null;
+        var a=s.a; a.access_token=j.access_token; if(j.refresh_token) a.refresh_token=j.refresh_token;
+        if(j.expires_at) a.expires_at=j.expires_at; if(j.user) a.user=j.user;
+        try{ s.st.setItem('hh_auth',JSON.stringify(a)); }catch(e){}
+        return j.access_token;
+      }, function(){ return null; });
+  })().then(function(t){ flight=null; return t; }, function(){ flight=null; return null; });
+  return flight;
+}
+function refresh(){ return (typeof window.hhRefreshAuth==='function') ? Promise.resolve(window.hhRefreshAuth()).then(function(t){ return t||null; },function(){ return null; }) : ownRefresh(); }
+window.__hh111refresh=ownRefresh;
+function plain(h){
+  var o={}; if(!h) return o;
+  try{ if(typeof Headers!=='undefined' && h instanceof Headers){ h.forEach(function(v,k){ o[k]=v; }); return o; } }catch(e){}
+  if(Array.isArray(h)){ for(var i=0;i<h.length;i++) o[h[i][0]]=h[i][1]; return o; }
+  for(var k in h) o[k]=h[k];
+  return o;
+}
+window.fetch=function(u,o){
+  try{
+    var url=(typeof u==='string')?u:((u&&u.href)||'');
+    if(url && url.indexOf(HOST)>=0){
+      var h=plain(o&&o.headers), key=null;
+      for(var k in h){ if(k.toLowerCase()==='authorization') key=k; }
+      var cur=key?String(h[key]):'';
+      if(!key || cur==='Bearer '+AK){
+        var s=best();
+        if(s){
+          var go=function(tok){
+            var h2=plain(o&&o.headers); if(key) delete h2[key];
+            var hasApi=false; for(var k3 in h2){ if(k3.toLowerCase()==='apikey') hasApi=true; }
+            if(!hasApi) h2['apikey']=AK;
+            h2['Authorization']='Bearer '+tok;
+            var o2={}; if(o){ for(var k2 in o) o2[k2]=o[k2]; } o2.headers=h2;
+            return _f.call(window,url,o2);
+          };
+          var send=function(tok){
+            return go(tok).then(function(res){
+              if(res.status!==401) return res;
+              return refresh().then(function(nt){ return (nt&&nt!==tok)?go(nt):res; });
+            });
+          };
+          if(s.e && s.e*1000 < Date.now()+60000){
+            return refresh().then(function(nt){ return send(nt||s.t); },function(){ return send(s.t); });
+          }
+          return send(s.t);
+        }
+      }
+    }
+  }catch(e){}
+  return _f.apply(this,arguments);
+};
+}catch(e){ console.warn('hhPolish111',e); }})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>House Hunter — Αθήνα Βόρεια</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2064%2064'%3E%3Crect%20width%3D'64'%20height%3D'64'%20rx%3D'14'%20fill%3D'%2317130c'%2F%3E%3Cpath%20d%3D'M32%208L60%2033h-8v23H38V42H26v14H12V33H4z'%20fill%3D'%23e3b23c'%2F%3E%3Crect%20x%3D'26'%20y%3D'42'%20width%3D'12'%20height%3D'14'%20rx%3D'1.5'%20fill%3D'%2317130c'%2F%3E%3C%2Fsvg%3E">
@@ -15281,63 +15367,7 @@ try{ mo=new MutationObserver(function(){ if(pend) return; pend=setTimeout(functi
      mo.observe(document.body,{childList:true,subtree:true}); }catch(e){}
 }catch(e){ console.warn('hhPolish108',e); }})();
 </script>
-<script>/*hhPolish109*/(function(){try{
-if(window.__hh109) return; window.__hh109=1;
-/* 5 Oct 2026 — Security Phase 2. After this the publishable (anon) key may only READ the
-   listings; writing needs the signed-in admin. Many places in the board still send the
-   publishable key as their «Bearer» (sb.headers(), raw PATCHes, a few hard-coded calls), so
-   instead of touching ~60 call sites, every request to Supabase REST that carries the
-   publishable key (or no Authorization at all) leaves with the user's own access token.
-   The token is refreshed first when it is about to expire; a 401 is still caught and retried
-   by hhAuthFix underneath. Not signed in → the request goes out unchanged. */
-var HOST='ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/';
-var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
-function parse(s){ try{ return JSON.parse(s||'null'); }catch(e){ return null; } }
-function expOf(tok){ try{ var p=JSON.parse(atob(String(tok).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); return +p.exp||0; }catch(e){ return 0; } }
-function best(){
-  var c=[];
-  try{ c.push(parse(sessionStorage.getItem('hh_auth'))); }catch(e){}
-  try{ c.push(parse(localStorage.getItem('hh_auth'))); }catch(e){}
-  var b=null, be=-1;
-  for(var i=0;i<c.length;i++){ var a=c[i]; if(a&&a.access_token){ var e=expOf(a.access_token); if(e>be){ be=e; b=a.access_token; } } }
-  return b?{t:b,e:be}:null;
-}
-function plain(h){
-  var o={}; if(!h) return o;
-  try{ if(typeof Headers!=='undefined' && h instanceof Headers){ h.forEach(function(v,k){ o[k]=v; }); return o; } }catch(e){}
-  if(Array.isArray(h)){ for(var i=0;i<h.length;i++) o[h[i][0]]=h[i][1]; return o; }
-  for(var k in h) o[k]=h[k];
-  return o;
-}
-var _f=window.fetch;
-window.fetch=function(u,o){
-  try{
-    var url=(typeof u==='string')?u:'';
-    if(url && url.indexOf(HOST)>=0 && o && o.headers){
-      var h=plain(o.headers), key=null, api=false;
-      for(var k in h){ var lk=k.toLowerCase(); if(lk==='authorization') key=k; if(lk==='apikey') api=true; }
-      var cur=key?String(h[key]):'';
-      if(api && (!key || cur==='Bearer '+AK)){
-        var s=best();
-        if(s){
-          var go=function(tok){
-            var h2=plain(o.headers); if(key) delete h2[key];
-            h2['Authorization']='Bearer '+tok;
-            var o2={}; for(var k2 in o) o2[k2]=o[k2]; o2.headers=h2;
-            return _f.call(window,u,o2);
-          };
-          if(s.e && s.e*1000 < Date.now()+60000 && typeof window.hhRefreshAuth==='function'){
-            return Promise.resolve(window.hhRefreshAuth()).then(function(nt){ return go(nt||s.t); },function(){ return go(s.t); });
-          }
-          return go(s.t);
-        }
-      }
-    }
-  }catch(e){}
-  return _f.apply(this,arguments);
-};
-}catch(e){ console.warn('hhPolish109',e); }})();
-</script>
+<!-- hhPolish109 moved to the top of <head> as hhPolish111 -->
 <script>
 /*hhPolish110*/(function(){try{
 if(window.__hh110) return; window.__hh110=1;
@@ -15403,4 +15433,4 @@ window.hhShareToken=token;
 </script>
 </body>
 </html>
-<!-- build: hh110 -->
+<!-- build: hh111 -->
