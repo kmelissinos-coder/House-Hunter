@@ -59,14 +59,18 @@ export async function onRequest(context) {
     const ct = res.headers.get('content-type') || '';
     if (ct.indexOf('text/html') < 0) return res;
 
-    const q = SB + '/listings'
-      + '?select=house_id,location,price,sqm,rooms,type,image_url,description,platform,agency,deleted'
-      + '&project=eq.Rent'
-      + '&house_id=eq.' + encodeURIComponent(house)
-      + '&order=deleted.asc,price.asc'
-      + '&limit=25';
+    /* 5 Oct 2026 — Security Phase 3: the publishable key can no longer read the
+       listings. Previews now need the share token the board puts in the link
+       (?house=1265&t=…); hh_share_preview returns the few preview fields only when
+       the token matches, so nobody can walk ?house=1..1400 to read the list. */
+    const t = url.searchParams.get('t') || '';
+    if (!/^[0-9a-f]{8,64}$/.test(t)) return res;
 
-    const r = await fetch(q, { headers: { apikey: AK, Authorization: 'Bearer ' + AK } });
+    const r = await fetch(SB + '/rpc/hh_share_preview', {
+      method: 'POST',
+      headers: { apikey: AK, Authorization: 'Bearer ' + AK, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_house: house, p_t: t })
+    });
     if (!r.ok) return res;
     const rows = await r.json();
     if (!Array.isArray(rows) || !rows.length) return res;
