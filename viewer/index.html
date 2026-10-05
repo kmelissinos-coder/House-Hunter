@@ -5508,7 +5508,12 @@ function delMap(){
   var now=Date.now(); if(_dm && now-_dmAt<2500) return _dm;
   var m={},all=[];
   try{ all=[].concat(allListings||[], extraListings||[]); }catch(e){}
-  all.forEach(function(h){ var k=HK(h); if(!(k in m)) m[k]=false; if(h.gone_confirmed) m[k]=true; });
+  var cnt={};
+  all.forEach(function(h){ var k=HK(h); if(!(k in m)) m[k]=false; if(h.gone_confirmed) m[k]=true;
+    var c=cnt[k]||(cnt[k]={n:0,d:0}); c.n++; if(h.deleted===true) c.d++; });
+  /*hhPolish108: a house whose ads have ALL left the sites is a deleted house too —
+    it shows only with «Εμφάνιση διαγραμμένων σπιτιών» ticked (Dusty, 5 Oct). */
+  Object.keys(cnt).forEach(function(k){ if(cnt[k].n && cnt[k].d===cnt[k].n) m[k]=true; });
   _dm=m; _dmAt=now; return m;
 }
 function stripDel(list){ if(delOn()) return list||[]; var m=delMap(); return (list||[]).filter(function(h){return !m[HK(h)];}); }
@@ -13080,6 +13085,17 @@ window.__hh76={ keepSet:keepSet, houseOfKey:houseOfKey };
 var GAP=12, MINH=140;
 function fit(pop, trig){
   if(!pop) return;
+  /*hhPolish108: το hhPolish98 καλεί fit(pop,null) κάθε 600ms — χωρίς κουμπί
+    το popup πήγαινε στην κορυφή της οθόνης. Κρατάμε το κουμπί πάνω στο popup. */
+  if(!trig) trig=pop.__hhTrig||null;
+  if(trig && trig.isConnected===false) trig=null;
+  if(trig) pop.__hhTrig=trig;
+  if(!trig && pop.style.top){
+    var vh0=window.innerHeight||document.documentElement.clientHeight;
+    var t0=parseFloat(pop.style.top)||GAP;
+    pop.style.maxHeight=Math.max(MINH, vh0-t0-GAP)+'px'; pop.style.overflowY='auto';
+    return;
+  }
   var vh=window.innerHeight||document.documentElement.clientHeight;
   var vw=window.innerWidth||document.documentElement.clientWidth;
   var rc=trig&&trig.getBoundingClientRect?trig.getBoundingClientRect():null;
@@ -13111,8 +13127,9 @@ window.__hhFitPop=fit;
 var lastTrig=null;
 document.addEventListener('click', function(e){
   try{
-    var b=e.target&&e.target.closest?e.target.closest('.hh-gs-more'):null;
-    if(b) lastTrig=b;
+    var b=e.target&&e.target.closest?e.target.closest('.hh-gs-more,.hh107-price'):null;
+    if(b){ lastTrig=b;
+      setTimeout(function(){ var p=document.getElementById('hh-gs-vpop-el'); if(p){ p.__hhTrig=b; fit(p,b); } },0); }
   }catch(x){}
 }, true);
 document.addEventListener('click', function(e){
@@ -13131,7 +13148,7 @@ try{
       for(var j=0;j<ad.length;j++){
         var n=ad[j];
         if(n&&n.nodeType===1&&(n.id==='hh-gs-vpop-el'||(n.classList&&n.classList.contains('hh-gs-vpop')))){
-          (function(el){ setTimeout(function(){ fit(el, lastTrig); },0); })(n);
+          (function(el,tg){ setTimeout(function(){ fit(el, el.__hhTrig||tg); },0); })(n, lastTrig);
         }
       }
     }
@@ -15010,6 +15027,260 @@ document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e
  priceRows(mem).then(function(html){var l=pop.querySelector('.hh107-load');if(l)l.outerHTML=html;});},true);
 }catch(e){console.warn('hhPolish107',e);}})();</script>
 
+<script>/*hhPolish108*/(function(){try{
+if(window.__hh108) return; window.__hh108=1;
+/* 5 Oct 2026 — one look everywhere:
+   1. top bar of the zero card AND of a single listing: ☆☆☆☆☆ · 👎 Don't like ⇄ ⛔ Not liked [↩ Restore]
+      · 🕊️ Rented/Sold ⇄ 🕊️ RENTED/SOLD [↩ Back on market] · ↩ Undo · 📤 Share  (single listing: + ↗ Open)
+      Platform links, «⛔ Removed», «✅ Confirm», «⊕ Compare», «☆ Favourite» leave the top bars.
+   2. every «open this ad» (old window, map pin, ?ad= link, list row) opens the same card as the board.
+   3. mini cards: same buttons, same symbols, same order, same line; no notes, no agency name.
+   4. «REMOVED» / ✕ badges no longer cover the #id. */
+
+function lang(){ try{ return (localStorage.getItem('hh_lang')||'el').toLowerCase()==='en'?'en':'el'; }catch(e){ return 'el'; } }
+var TX={
+  el:{like:'👎 Δεν μας αρέσει', nl:'⛔ Δεν μας άρεσε', restore:'↩ Επαναφορά', off:'🕊️ Νοικιάστηκε / Πουλήθηκε',
+      offPill:'🕊️ Νοικιάστηκε / Πουλήθηκε', back:'↩ Ξανά διαθέσιμο', undo:'↩ Αναίρεση', likeT:'Δεν μας αρέσει — κρύβεται όλο το σπίτι',
+      offT:'Νοικιάστηκε ή πουλήθηκε — κρύβεται όλο το σπίτι', ads:'Αγγελίες', open:'Άνοιγμα αγγελίας', priv:'Ιδιώτης',
+      mixed:function(a,b){ return a+' από '+b+' αγγελίες — οι υπόλοιπες ήρθαν μετά'; }},
+  en:{like:"👎 Don't like", nl:'⛔ Not liked', restore:'↩ Restore', off:'🕊️ Rented / Sold',
+      offPill:'🕊️ Rented / Sold', back:'↩ Back on market', undo:'↩ Undo', likeT:"Don't like — hides the whole house",
+      offT:'Rented or sold — hides the whole house', ads:'Listings', open:'Open the ad', priv:'Private owner',
+      mixed:function(a,b){ return a+' of '+b+' listings — the rest arrived later'; }}
+};
+function L(){ return TX[lang()]; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function allRows(){ try{ return [].concat(allListings||[], extraListings||[]); }catch(e){ try{ return [].concat(window.allListings||[], window.extraListings||[]); }catch(x){ return []; } } }
+function rowsFor(hid,url){
+  var a=allRows(); hid=String(hid==null?'':hid).trim();
+  if(hid && hid!=='0') return a.filter(function(x){ return String(x.house_id||'').trim()===hid; });
+  return a.filter(function(x){ return url && x.url===url; });
+}
+function toast(m){ try{ if(window.showToast) showToast(m); }catch(e){} }
+function refilter(){ try{ window._savedScroll=window.scrollY; }catch(e){} try{ applyFilters(); }catch(e){} }
+
+/* ---------------- CSS ---------------- */
+var css=''
+ /* 4. no badges over the #id */
+ +'.card.deleted::before,.card.deleted::after{content:none!important;display:none!important}'
+ /* 1. the bars */
+ +'.hh108-bar{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;white-space:nowrap}'
+ +'.hh108-b,.hh108-pill{display:inline-flex!important;align-items:center;height:30px;padding:0 10px;border-radius:8px;font-size:12px;font-weight:600;white-space:nowrap;box-sizing:border-box;line-height:1}'
+ +'.hh108-b{cursor:pointer;border:1px solid var(--border,#d9d5cb);background:rgba(127,127,127,.08);color:inherit}'
+ +'.hh108-b:hover{border-color:var(--accent,#a8792f)}'
+ +'.hh108-pill{cursor:default;font-weight:800;letter-spacing:.2px}'
+ +'.hh108-pill.nl{background:rgba(224,43,43,.13);border:1px solid rgba(224,43,43,.6);color:#c62828}'
+ +'.hh108-pill.off{background:rgba(43,108,224,.12);border:1px solid rgba(43,108,224,.6);color:#1f5bbf}'
+ +'body:not(.light) .hh108-pill.nl{color:#ff8a8a}body:not(.light) .hh108-pill.off{color:#8fb6ff}'
+ +'.hh-gs-tools.hh-gs-tools.hh-gs-tools{flex-wrap:nowrap!important;align-items:center!important;gap:8px!important}'
+ +'.hh-gs-tools>.hh102-open,.hh-gs-tools>.hh-gs-rm.gone,.hh-gs-tools>.hh-gs-rm.nope,.hh-gs-tools>.hh47-offm,.hh-gs-tools>.hh-gs-cf{display:none!important}'
+ +'.hh-gs-tools.hh-gs-tools.hh-gs-tools>.card-stars{order:1!important;flex:0 0 auto!important}.hh-gs-tools.hh-gs-tools>.hh108-bar{order:2!important}'
+ +'.hh-gs-tools.hh-gs-tools>.hh45-undo{order:3!important}.hh-gs-tools.hh-gs-tools>.modal-btn{order:4!important;margin-left:auto!important}'
+ +'.hh108-row{display:flex!important;flex-wrap:nowrap!important;align-items:center;gap:6px!important}'
+ +'.hh108-row>*:not(.hh108-bar):not(.hh108-keep){display:none!important}'
+ +'.hh108-row>.hh108-bar{order:1}.hh108-row>.hh108-keep.share{order:2}.hh108-row>.hh108-keep.open{order:3}'
+ /* 3. mini cards */
+ +'.card:not(.lo-sib-card),.grouped-card{display:flex!important;flex-direction:column!important}'
+ +'.card>.card-body{flex:1 1 auto!important}.card>.card-body>.card-stars{margin-top:auto!important}'
+ +'.grouped-card>.grouped-body{flex:1 1 auto!important}'
+ +'.card-footer>.agency-name,.grouped-card-footer>.agency-summary{display:none!important}'
+ +'.card-footer,.grouped-card-footer{justify-content:flex-end!important;flex-wrap:nowrap!important;align-items:center!important}'
+ +'.card .hh-npv46,.grouped-card .hh-npv46{display:none!important}'
+ +'.card-actions,.group-action-btns{display:flex!important;gap:6px!important;flex-wrap:nowrap!important;margin-left:auto!important}'
+ +'.card-actions>*,.group-action-btns>*{width:30px!important;height:30px!important;min-width:30px!important;padding:0!important;margin:0!important;'
+ +   'display:inline-flex;align-items:center!important;justify-content:center!important;border-radius:7px!important;'
+ +   'font-size:14px!important;box-sizing:border-box!important;text-decoration:none!important;cursor:pointer}'
+ +'body.light .card-actions>*,body.light .group-action-btns>*{background:#efece5!important;border:1px solid #d9d5cb!important;color:#5c5850!important}'
+ +'body:not(.light) .card-actions>*,body:not(.light) .group-action-btns>*{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.14)!important;color:#d8d2c4!important}'
+ +'.card-actions>*:hover,.group-action-btns>*:hover{border-color:var(--accent,#a8792f)!important}'
+ +'.card-actions>[onclick*="openModal"],.group-action-btns>.open-all,.group-action-btns>[onclick*="toggleGroupFav"]{display:none!important}'
+ +'.card-actions>[onclick*="addToCompare"],.group-action-btns>[onclick*="addGroupCompare"]{order:1}'
+ +'.card-actions>[onclick*="hideListing"],.group-action-btns>[onclick*="toggleGroupHide"]{order:2}'
+ +'.card-actions>.hh97-offm,.group-action-btns>.hh97-offm{order:3;font-size:0!important}'
+ +'.card-actions>.hh97-offm::before,.group-action-btns>.hh97-offm::before{content:"\\1F54A\\FE0F";font-size:14px}'
+ +'.card-actions>.hh97-offm.active,.group-action-btns>.hh97-offm.active{background:rgba(43,108,224,.18)!important;border-color:rgba(43,108,224,.7)!important}'
+ +'.card-actions>[onclick*="toggleMsSelect"],.group-action-btns>[onclick*="toggleMsSelect"]{order:4}'
+ +'.card-actions>[onclick*="hhShare"],.group-action-btns>[onclick*="hhShare"]{order:5}'
+ +'.card-actions>a.action-btn,.group-action-btns>.hh108-open{order:6}'
+ +'.card-actions>.hh45-undo,.group-action-btns>.hh45-undo,.card-actions>.hh45-rm,.group-action-btns>.hh45-rm{order:7;width:auto!important;padding:0 7px!important}'
+ +'.card-actions svg,.group-action-btns svg{width:17px;height:17px}'
+ +'.card-actions>.link-sel,.group-action-btns>.link-sel{background:rgba(99,179,237,.25)!important;border-color:#3b8fd1!important}';
+var st=document.createElement('style'); st.id='hh108-css'; st.textContent=css; document.head.appendChild(st);
+
+/* ---------------- 1. bar ---------------- */
+function state(hid,url){
+  var ms=rowsFor(hid,url);
+  var nl=ms.length>0 && ms.every(function(m){ return !!m.hidden; });
+  var nOff=ms.filter(function(m){ return m.off_market===true; }).length;
+  return {ms:ms, nl:nl, off:nOff>0, nOff:nOff, n:ms.length};
+}
+function barHTML(s, single){
+  var t=L(), h='';
+  h+= s.nl ? '<span class="hh108-pill nl">'+t.nl+'</span><span class="hh108-b" data-hh108="restore">'+t.restore+'</span>'
+           : '<span class="hh108-b" data-hh108="nope" title="'+esc(t.likeT)+'">'+t.like+'</span>';
+  h+= s.off ? '<span class="hh108-pill off"'+(s.nOff<s.n?' title="'+esc(t.mixed(s.nOff,s.n))+'"':'')+'>'+t.offPill+(s.nOff<s.n?' · '+s.nOff+'/'+s.n:'')+'</span>'
+              +'<span class="hh108-b" data-hh108="back">'+t.back+'</span>'
+            : '<span class="hh108-b" data-hh108="off" title="'+esc(t.offT)+'">'+t.off+'</span>';
+  if(single) h+='<span class="hh108-b" data-hh108="undo">'+t.undo+'</span>';
+  return h;
+}
+function paint(bar, hid, url, single){
+  var s=state(hid,url); if(!s.n) return;
+  var sig=[s.nl?1:0, s.off?1:0, s.nOff, s.n, lang(), single?1:0].join('|');
+  bar.setAttribute('data-hid', hid||''); bar.setAttribute('data-url', url||'');
+  if(bar.__sig===sig) return; bar.__sig=sig;
+  bar.innerHTML=barHTML(s, single);
+}
+function zeroBar(){
+  var tools=document.querySelector('.hh-gs-tools'); if(!tools) return;
+  var hid=String(tools.dataset.hhh||'').trim(); if(!hid) return;
+  var bar=tools.querySelector(':scope>.hh108-bar');
+  if(!bar){ bar=document.createElement('span'); bar.className='hh108-bar'; tools.appendChild(bar); }
+  paint(bar, hid, '', false);
+}
+function featBar(){
+  var hb=document.getElementById('lo-hide'); if(!hb) return;
+  var row=hb.parentElement; if(!row) return;
+  var h=null; try{ h=_loSiblings[_loFeatIdx]; }catch(e){}
+  if(!h){ try{ var k=(hb.getAttribute('onclick')||'').match(/loToggleHide\('([^']*)'/); if(k) h=getByUrl(k[1]); }catch(e){} }
+  if(!h) return;
+  if(!row.classList.contains('hh108-row')) row.classList.add('hh108-row');
+  for(var i=0;i<row.children.length;i++){
+    var c=row.children[i]; if(c.classList.contains('hh108-bar')) continue;
+    var oc=c.getAttribute('onclick')||'', om=c.getAttribute('onmousedown')||'';
+    if(/hhShare/.test(oc)) { c.classList.add('hh108-keep','share'); continue; }
+    if(/primary/.test(c.className) || /handleLinkClick|hhBgOpen|hhOpenAd/.test(oc+om) || c.tagName==='A') { c.classList.add('hh108-keep','open'); continue; }
+  }
+  var bar=row.querySelector(':scope>.hh108-bar');
+  if(!bar){ bar=document.createElement('span'); bar.className='hh108-bar'; row.insertBefore(bar,row.firstChild); }
+  paint(bar, String(h.house_id||'').trim(), h.url||'', true);
+}
+
+async function setHidden(hid,url,on){
+  var ms=rowsFor(hid,url); if(!ms.length){ toast('⚠'); return; }
+  var prev=ms.map(function(m){ return [m, !!m.hidden]; });
+  async function apply(get){
+    for(var i=0;i<prev.length;i++){ var m=prev[i][0], v=get(prev[i]); m.hidden=v;
+      if(m._dbId||m.id){ try{ await sb.update(m._dbId||m.id,{hidden:v}); }catch(e){} } }
+    refilter(); tick(true);
+  }
+  await apply(function(){ return on; });
+  try{ pushAction({label:(on?L().nl:L().restore)+' #'+(hid||''),
+    undo:function(){ return apply(function(p){ return p[1]; }); },
+    redo:function(){ return apply(function(){ return on; }); }}); }catch(e){}
+  toast(on? L().nl : L().restore);
+}
+function offMarket(hid){
+  if(!hid || hid==='0' || typeof window.hhGsOffMarket!=='function'){ toast('⚠'); return; }
+  var oc=window.confirm; window.confirm=function(){ return true; };
+  try{ var r=window.hhGsOffMarket(hid); if(r&&r.then) r.then(function(){ tick(true); }); }
+  finally{ window.confirm=oc; }
+  setTimeout(function(){ tick(true); },600);
+}
+document.addEventListener('click',function(e){
+  var b=e.target&&e.target.closest?e.target.closest('[data-hh108]'):null; if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  var bar=b.closest('.hh108-bar'); if(!bar) return;
+  var hid=bar.getAttribute('data-hid')||'', url=bar.getAttribute('data-url')||'';
+  var a=b.getAttribute('data-hh108');
+  if(a==='nope') setHidden(hid,url,true);
+  else if(a==='restore') setHidden(hid,url,false);
+  else if(a==='off'||a==='back') offMarket(hid);
+  else if(a==='undo'){ try{ undoAction(); }catch(x){} setTimeout(function(){ tick(true); },500); }
+},true);
+
+/* ---------------- 2. one card everywhere ---------------- */
+function wrapModal(){
+  if(typeof window.openModal!=='function' || window.openModal.__hh108) return;
+  var _om=window.openModal;
+  var w=function(url){
+    try{ var h=getByUrl(url);
+      if(h && typeof window.openListingOverlay==='function'){
+        try{ closeModal(); }catch(e){}
+        return window.openListingOverlay(url);
+      } }catch(e){}
+    return _om.apply(this,arguments);
+  };
+  w.__hh108=1; window.openModal=w;
+  try{ openModal=w; }catch(e){}
+}
+
+/* ---------------- 3. mini cards ---------------- */
+var CMP=null;
+function cmpIcon(){
+  if(CMP) return CMP.cloneNode(true);
+  var s=document.querySelector('[data-hhcmp] svg'); if(!s) return null;
+  CMP=s.cloneNode(true); return CMP.cloneNode(true);
+}
+function hidOfGroup(card){
+  var e=card.querySelector('[onclick*="toggleGroupHide"],[onclick*="addGroupCompare"],.open-all');
+  var m=e&&(e.getAttribute('onclick')||'').match(/(?:toggleGroupHide|addGroupCompare)\('([^']+)'|openListingOverlay\(null,'([^']+)'/);
+  return m?(m[1]||m[2]):'';
+}
+function openList(ev, hid, btn){
+  try{
+    var t=L(), ms=rowsFor(hid,'').filter(function(m){ return m.url; });
+    ms.sort(function(a,b){ return (a.deleted?1:0)-(b.deleted?1:0) || (+a.price||0)-(+b.price||0); });
+    var old=document.getElementById('hh-gs-vpop-el'); if(old) old.remove();
+    var pop=document.createElement('div'); pop.className='hh-gs-vpop hh108-list'; pop.id='hh-gs-vpop-el';
+    pop.innerHTML='<h5>'+t.ads+'</h5>'+ms.map(function(m){
+      var p=+m.price>0?(' · €'+(+m.price).toLocaleString('el')):'';
+      return '<div class="hh-gs-vrow hh-gs-link" data-url="'+encodeURIComponent(m.url)+'" title="'+esc(t.open)+'">'
+        +esc(m.agency||t.priv)+' <span class="hh-src">'+esc(m.platform||'')+'</span>'+p+(m.deleted?' ⛔':'')+'</div>';
+    }).join('');
+    pop.__hhTrig=btn;
+    document.body.appendChild(pop);
+    var rc=btn.getBoundingClientRect();
+    pop.style.left=Math.max(6,Math.min(rc.right-300,window.innerWidth-330))+'px';
+    pop.style.top=(rc.bottom+4)+'px';
+    try{ if(window.__hhFitPop) window.__hhFitPop(pop, btn); }catch(e){}
+  }catch(e){}
+}
+window.hh108OpenList=function(ev,hid){ try{ ev.stopPropagation(); ev.preventDefault(); }catch(e){} openList(ev,hid,ev.currentTarget||ev.target); };
+function miniCards(){
+  var t=L();
+  document.querySelectorAll('.card-actions [onclick*="hideListing"]').forEach(function(b){
+    if(b.textContent.trim()!=='👎'){ b.textContent='👎'; }
+    if(b.title!==t.likeT) { b.title=t.likeT; b.setAttribute('aria-label',t.likeT); }
+  });
+  document.querySelectorAll('.group-action-btns [onclick*="toggleGroupHide"]').forEach(function(b){
+    var tx=b.textContent.trim(); if(tx==='✕'||tx==='×'){ b.textContent='👎'; }
+    if(b.textContent.trim()==='👎' && b.title!==t.likeT){ b.title=t.likeT; }
+  });
+  document.querySelectorAll('.group-action-btns [onclick*="addGroupCompare"]').forEach(function(b){
+    if(b.getAttribute('data-hh108cmp')) return; var ic=cmpIcon(); if(!ic) return;
+    b.setAttribute('data-hh108cmp','1'); b.textContent=''; b.appendChild(ic);
+  });
+  document.querySelectorAll('.grouped-card .group-action-btns').forEach(function(box){
+    if(box.querySelector('.hh108-open')) return;
+    var card=box.closest('.grouped-card'); var hid=card?hidOfGroup(card):''; if(!hid) return;
+    var o=document.createElement('span'); o.className='grp-btn hh108-open'; o.textContent='↗'; o.title=t.ads;
+    o.setAttribute('onclick',"hh108OpenList(event,'"+String(hid).replace(/'/g,'')+"')");
+    box.appendChild(o);
+  });
+  /* ↗ on single cards: same meaning, same title */
+  document.querySelectorAll('.card-actions>a.action-btn').forEach(function(a){ if(a.title!==t.open) a.title=t.open; });
+}
+
+/* ---------------- tick ---------------- */
+var busy=false;
+function tick(force){
+  if(busy) return; busy=true;
+  try{ wrapModal(); }catch(e){}
+  try{ if(force){ var bs=document.querySelectorAll('.hh108-bar'); for(var i=0;i<bs.length;i++) bs[i].__sig=null; } }catch(e){}
+  try{ zeroBar(); }catch(e){}
+  try{ featBar(); }catch(e){}
+  try{ miniCards(); }catch(e){}
+  busy=false;
+}
+window.hh108Tick=tick;
+setInterval(tick,700);
+setTimeout(tick,300);
+var mo=null, pend=0;
+try{ mo=new MutationObserver(function(){ if(pend) return; pend=setTimeout(function(){ pend=0; tick(); },60); });
+     mo.observe(document.body,{childList:true,subtree:true}); }catch(e){}
+}catch(e){ console.warn('hhPolish108',e); }})();
+</script>
 </body>
 </html>
-<!-- build: 1780867944512 -->
+<!-- build: hh108 -->
