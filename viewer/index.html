@@ -15431,6 +15431,100 @@ window.hhShare=function(ev,hid,url){
 window.hhShareToken=token;
 }catch(e){ console.warn('hhPolish110',e); }})();
 </script>
+<script>
+/*hhPolish112*/(function(){try{
+if(window.__hh112) return; window.__hh112=1;
+/* 5 Oct 2026 — 🔑 Change password, next to ⎋ Logout, for every signed-in member.
+   Supabase: PUT /auth/v1/user {password} with the member's own token. If Supabase wants a
+   confirmation (Secure password change ON and the session is older than 24 h →
+   error_code «reauthentication_needed»), we ask it to email a code (GET /auth/v1/reauthenticate),
+   the dialog shows a code box, and Save sends {password, nonce}. The password goes only to
+   Supabase — it is never stored or logged by the board. */
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+function lang(){ try{ return localStorage.getItem('hh_lang')==='en'?'en':'el'; }catch(e){ return 'el'; } }
+var TX={
+ el:{btn:'🔑 Κωδικός',tip:'Αλλαγή κωδικού',title:'🔑 Αλλαγή κωδικού',p1:'Νέος κωδικός',p2:'Ξανά ο νέος κωδικός',save:'Αποθήκευση',cancel:'Άκυρο',
+     mismatch:'Οι δύο κωδικοί δεν είναι ίδιοι',short:'Τουλάχιστον 8 χαρακτήρες',code:'Κωδικός από το email',
+     codeSent:'Σου στάλθηκε κωδικός στο email σου. Γράψ’ τον εδώ και πάτα ξανά Αποθήκευση.',ok:'✓ Ο κωδικός άλλαξε',
+     same:'Είναι ίδιος με τον τωρινό — διάλεξε άλλον',login:'Κάνε πρώτα Είσοδο',err:'Δεν άλλαξε: ',wait:'Περίμενε…'},
+ en:{btn:'🔑 Password',tip:'Change password',title:'🔑 Change password',p1:'New password',p2:'New password again',save:'Save',cancel:'Cancel',
+     mismatch:'The two passwords are not the same',short:'At least 8 characters',code:'Code from the email',
+     codeSent:'A code was sent to your email. Type it here and press Save again.',ok:'✓ Password changed',
+     same:'That is your current password — pick another',login:'Sign in first',err:'Not changed: ',wait:'Please wait…'}};
+function t(){ return TX[lang()]; }
+function parse(s){ try{ return JSON.parse(s||'null'); }catch(e){ return null; } }
+function expOf(tok){ try{ return +JSON.parse(atob(String(tok).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp||0; }catch(e){ return 0; } }
+function sess(){ var b=null,be=-1; [sessionStorage,localStorage].forEach(function(st){ try{ var a=parse(st.getItem('hh_auth')); if(a&&a.access_token){ var e=expOf(a.access_token); if(e>be){ be=e; b=a; } } }catch(e){} }); return b; }
+function token(){
+  var s=sess(); if(!s) return Promise.resolve(null);
+  if(expOf(s.access_token)*1000 > Date.now()+60000) return Promise.resolve(s.access_token);
+  var f=window.hhRefreshAuth||window.__hh111refresh;
+  return f ? Promise.resolve(f()).then(function(nt){ return nt||((sess()||{}).access_token)||null; },function(){ return s.access_token; }) : Promise.resolve(s.access_token);
+}
+function toast(msg){ try{ if(window.showToast) return window.showToast(msg); }catch(e){} alert(msg); }
+function close(){ var o=document.getElementById('hh112-ov'); if(o) o.remove(); }
+function open(){
+  close(); var L=t(), s=sess(); if(!s){ toast(L.login); return; }
+  var o=document.createElement('div'); o.id='hh112-ov';
+  o.style.cssText='position:fixed;inset:0;z-index:2147483200;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+  var email=(s.user&&s.user.email)||'';
+  o.innerHTML='<form id="hh112-f" autocomplete="on" style="background:#161e2e;border:1px solid #2a3040;border-radius:12px;padding:18px;width:100%;max-width:340px;color:#e6e8ee;font-family:inherit;box-shadow:0 10px 40px rgba(0,0,0,.6)">'
+   +'<div style="font-weight:700;font-size:16px;margin-bottom:12px">'+L.title+'</div>'
+   +'<input type="text" name="username" autocomplete="username" value="'+email.replace(/"/g,'')+'" style="display:none" readonly>'
+   +'<label style="font-size:12px;color:#9aa4b8">'+L.p1+'</label><input id="hh112-p1" type="password" autocomplete="new-password" style="width:100%;box-sizing:border-box;margin:4px 0 10px;padding:9px;border-radius:8px;border:1px solid #2a3040;background:#0f1622;color:#e6e8ee;font-size:15px">'
+   +'<label style="font-size:12px;color:#9aa4b8">'+L.p2+'</label><input id="hh112-p2" type="password" autocomplete="new-password" style="width:100%;box-sizing:border-box;margin:4px 0 10px;padding:9px;border-radius:8px;border:1px solid #2a3040;background:#0f1622;color:#e6e8ee;font-size:15px">'
+   +'<div id="hh112-cw" style="display:none"><label style="font-size:12px;color:#9aa4b8">'+L.code+'</label><input id="hh112-code" type="text" inputmode="numeric" autocomplete="one-time-code" style="width:100%;box-sizing:border-box;margin:4px 0 10px;padding:9px;border-radius:8px;border:1px solid #2a3040;background:#0f1622;color:#e6e8ee;font-size:15px"></div>'
+   +'<div id="hh112-msg" style="min-height:18px;font-size:13px;color:#e8a33c;margin-bottom:10px"></div>'
+   +'<div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" id="hh112-x" style="background:#0f1622;color:#9aa4b8;border:1px solid #2a3040;border-radius:8px;padding:8px 14px;cursor:pointer">'+L.cancel+'</button>'
+   +'<button type="submit" id="hh112-ok" style="background:#c8a84b;color:#17130c;border:0;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer">'+L.save+'</button></div></form>';
+  document.body.appendChild(o);
+  o.addEventListener('click',function(e){ if(e.target===o) close(); });
+  document.getElementById('hh112-x').onclick=close;
+  document.getElementById('hh112-p1').focus();
+  document.getElementById('hh112-f').onsubmit=function(e){ e.preventDefault(); save(); };
+}
+function say(m,ok){ var el=document.getElementById('hh112-msg'); if(el){ el.textContent=m; el.style.color=ok?'#7bd88f':'#e8a33c'; } }
+var busy=false;
+function save(){
+  if(busy) return; var L=t();
+  var p1=document.getElementById('hh112-p1').value, p2=document.getElementById('hh112-p2').value;
+  var cw=document.getElementById('hh112-cw'), code=(document.getElementById('hh112-code').value||'').trim();
+  if(p1.length<8){ say(L.short); return; }
+  if(p1!==p2){ say(L.mismatch); return; }
+  busy=true; say(L.wait,true); var btn=document.getElementById('hh112-ok'); btn.disabled=true;
+  var done=function(){ busy=false; var b=document.getElementById('hh112-ok'); if(b) b.disabled=false; };
+  token().then(function(tok){
+    if(!tok){ say(L.login); done(); return; }
+    var body={password:p1}; if(cw.style.display!=='none' && code) body.nonce=code;
+    return fetch(SB+'/auth/v1/user',{method:'PUT',headers:{apikey:AK,Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify(body)})
+      .then(function(r){ return r.text().then(function(x){ return {ok:r.ok,j:parse(x)||{}}; }); })
+      .then(function(res){
+        if(res.ok){ close(); toast(L.ok); done(); return; }
+        var ec=res.j.error_code||res.j.code||'', msg=res.j.msg||res.j.message||res.j.error_description||res.j.error||'';
+        if(ec==='reauthentication_needed' || /reauthentication/i.test(msg)){
+          return fetch(SB+'/auth/v1/reauthenticate',{method:'GET',headers:{apikey:AK,Authorization:'Bearer '+tok}})
+            .then(function(){ cw.style.display=''; say(L.codeSent,true); document.getElementById('hh112-code').focus(); done(); });
+        }
+        if(ec==='same_password'){ say(L.same); done(); return; }
+        say(L.err+(msg||ec||'?')); done();
+      });
+  }).catch(function(e){ say(L.err+String(e&&e.message||e)); done(); });
+}
+function inject(){
+  var bar=document.getElementById('hhUserBar'); if(!bar) return;
+  var b=document.getElementById('hh112-btn'), L=t();
+  if(!b){
+    b=document.createElement('button'); b.id='hh112-btn'; b.type='button';
+    b.style.cssText='background:#0f1622;color:#c8a84b;border:1px solid #2a3040;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer';
+    b.onclick=function(e){ e.stopPropagation(); open(); };
+    var last=bar.lastElementChild; bar.insertBefore(b,last);
+  }
+  if(b.textContent!==L.btn){ b.textContent=L.btn; b.title=L.tip; }
+}
+inject(); setInterval(inject,1000);
+window.hhChangePassword=open;
+}catch(e){ console.warn('hhPolish112',e); }})();
+</script>
 </body>
 </html>
-<!-- build: hh111 -->
+<!-- build: hh112 -->
