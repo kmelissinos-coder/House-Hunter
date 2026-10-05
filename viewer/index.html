@@ -15281,6 +15281,63 @@ try{ mo=new MutationObserver(function(){ if(pend) return; pend=setTimeout(functi
      mo.observe(document.body,{childList:true,subtree:true}); }catch(e){}
 }catch(e){ console.warn('hhPolish108',e); }})();
 </script>
+<script>/*hhPolish109*/(function(){try{
+if(window.__hh109) return; window.__hh109=1;
+/* 5 Oct 2026 — Security Phase 2. After this the publishable (anon) key may only READ the
+   listings; writing needs the signed-in admin. Many places in the board still send the
+   publishable key as their «Bearer» (sb.headers(), raw PATCHes, a few hard-coded calls), so
+   instead of touching ~60 call sites, every request to Supabase REST that carries the
+   publishable key (or no Authorization at all) leaves with the user's own access token.
+   The token is refreshed first when it is about to expire; a 401 is still caught and retried
+   by hhAuthFix underneath. Not signed in → the request goes out unchanged. */
+var HOST='ofvanbbujgcqhbiyihgy.supabase.co/rest/v1/';
+var AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+function parse(s){ try{ return JSON.parse(s||'null'); }catch(e){ return null; } }
+function expOf(tok){ try{ var p=JSON.parse(atob(String(tok).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); return +p.exp||0; }catch(e){ return 0; } }
+function best(){
+  var c=[];
+  try{ c.push(parse(sessionStorage.getItem('hh_auth'))); }catch(e){}
+  try{ c.push(parse(localStorage.getItem('hh_auth'))); }catch(e){}
+  var b=null, be=-1;
+  for(var i=0;i<c.length;i++){ var a=c[i]; if(a&&a.access_token){ var e=expOf(a.access_token); if(e>be){ be=e; b=a.access_token; } } }
+  return b?{t:b,e:be}:null;
+}
+function plain(h){
+  var o={}; if(!h) return o;
+  try{ if(typeof Headers!=='undefined' && h instanceof Headers){ h.forEach(function(v,k){ o[k]=v; }); return o; } }catch(e){}
+  if(Array.isArray(h)){ for(var i=0;i<h.length;i++) o[h[i][0]]=h[i][1]; return o; }
+  for(var k in h) o[k]=h[k];
+  return o;
+}
+var _f=window.fetch;
+window.fetch=function(u,o){
+  try{
+    var url=(typeof u==='string')?u:'';
+    if(url && url.indexOf(HOST)>=0 && o && o.headers){
+      var h=plain(o.headers), key=null, api=false;
+      for(var k in h){ var lk=k.toLowerCase(); if(lk==='authorization') key=k; if(lk==='apikey') api=true; }
+      var cur=key?String(h[key]):'';
+      if(api && (!key || cur==='Bearer '+AK)){
+        var s=best();
+        if(s){
+          var go=function(tok){
+            var h2=plain(o.headers); if(key) delete h2[key];
+            h2['Authorization']='Bearer '+tok;
+            var o2={}; for(var k2 in o) o2[k2]=o[k2]; o2.headers=h2;
+            return _f.call(window,u,o2);
+          };
+          if(s.e && s.e*1000 < Date.now()+60000 && typeof window.hhRefreshAuth==='function'){
+            return Promise.resolve(window.hhRefreshAuth()).then(function(nt){ return go(nt||s.t); },function(){ return go(s.t); });
+          }
+          return go(s.t);
+        }
+      }
+    }
+  }catch(e){}
+  return _f.apply(this,arguments);
+};
+}catch(e){ console.warn('hhPolish109',e); }})();
+</script>
 </body>
 </html>
-<!-- build: hh108 -->
+<!-- build: hh109 -->
