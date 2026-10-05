@@ -308,6 +308,10 @@ function render(){PICK.clear();const el=document.getElementById('list');const ar
   window.scrollTo(0,0);}
 async function load(){const el=document.getElementById('list');el.className='msg';el.textContent='Φόρτωση…';
   if(!sess()){el.innerHTML='Δεν είσαι συνδεδεμένος. <a href="index.html" style="color:var(--accent)">Σύνδεση στο House Hunter</a> και μετά ξαναέλα εδώ.';return;}
+  /*mergeV17: house numbers change with every merge — re-key the photo evidence first,
+    otherwise pairs merged-into houses look like they share no photo (5 Oct, #1274/#1282/#1276) */
+  try{el.textContent='Ενημέρωση φωτογραφιών μετά τις ενώσεις…';await rpc('rent_merge_refresh',{});}catch(e){console.warn('refresh',e);}
+  el.textContent='Φόρτωση…';
   await autoMerge16();
   try{if(TAB==='pairs')PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});else GROUPS=await rpc('rent_suspicious_groups',{});}
   catch(e){el.textContent='Σφάλμα: '+e.message+(/admin/.test(e.message)?' — η σελίδα είναι μόνο για τον διαχειριστή.':'');return;}
