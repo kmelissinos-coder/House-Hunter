@@ -15166,7 +15166,9 @@ var css=''
  +'.hh108-row>*:not(.hh108-bar):not(.hh108-keep){display:none!important}'
  +'.hh108-row>.hh108-bar{order:1}.hh108-row>.hh108-keep.share{order:2}.hh108-row>.hh108-keep.open{order:3}'
  /* 3. mini cards */
- +'.card:not(.lo-sib-card),.grouped-card{display:flex!important;flex-direction:column!important}'
+ /* hhPolish113 (5 Oct, late): skip cards hidden inline (display:none) — the map filter hides the cards
+    outside the map view that way, and this !important rule was showing them all again */
+ +'.card:not(.lo-sib-card):not([style*="display: none"]),.grouped-card:not([style*="display: none"]){display:flex!important;flex-direction:column!important}'
  +'.card>.card-body{flex:1 1 auto!important}.card>.card-body>.card-stars{margin-top:auto!important}'
  +'.grouped-card>.grouped-body{flex:1 1 auto!important}'
  +'.card-footer>.agency-name,.grouped-card-footer>.agency-summary{display:none!important}'
@@ -15525,6 +15527,25 @@ inject(); setInterval(inject,1000);
 window.hhChangePassword=open;
 }catch(e){ console.warn('hhPolish112',e); }})();
 </script>
+<script>
+/*hhPolish113*/(function(){try{
+if(window.__hh113) return; window.__hh113=1;
+/* 5 Oct 2026 (late) — map view: the list follows the map LIVE again.
+   1. The real bug: hhPolish108's «.card,.grouped-card{display:flex!important}» beat the map
+      filter's inline display:none, so every card stayed visible whatever the map showed.
+      That CSS now skips cards hidden inline (see the hh108 style block).
+   2. Live while dragging: the filter used to run only on «moveend» (after the map stops,
+      including the glide after a fast drag). Now it also runs during the move (max every
+      150 ms) and right at the end of a drag. */
+var last=0, timer=null;
+function run(){ last=Date.now(); timer=null; try{ window.hhFilterMapList&&window.hhFilterMapList(); }catch(e){} }
+function soon(){ var d=Date.now()-last; if(d>=150) run(); else if(!timer) timer=setTimeout(run,150-d); }
+setInterval(function(){
+  var m=window._hhMap;
+  if(m && !m.__hh113){ m.__hh113=1; m.on('move',soon); m.on('dragend',function(){ setTimeout(run,0); }); }
+},700);
+}catch(e){ console.warn('hhPolish113',e); }})();
+</script>
 </body>
 </html>
-<!-- build: hh112 -->
+<!-- build: hh113 -->
