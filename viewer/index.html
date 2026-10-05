@@ -14896,6 +14896,120 @@ document.addEventListener('click',function(){ setTimeout(show,60); },true);
   .lo-sib-card{width:168px}
 }
 </style>
+<script>/*hhPolish107*/(function(){try{
+/* Dusty 5/10/2026:
+   1) Τιμή στην ομαδοποιημένη κάρτα: ▾ με κάθε τιμή, ποιο μεσιτικό τη ζητάει και τι άλλαξε.
+   2) Δεξί κλικ (ή παρατεταμένο πάτημα) στον χάρτη → «Εδώ είναι το σπίτι» = επιβεβαιωμένη θέση για όλο το σπίτι.
+   3) Πλαίσιο διεύθυνσης και στην ομαδοποιημένη κάρτα (υπήρχε μόνο στις μεμονωμένες αγγελίες). */
+var EN=function(){try{return !!(window.hhLang&&window.hhLang()==='en');}catch(e){return false;}};
+var T=function(el,en){return EN()?en:el;};
+function hdrs(){try{return Object.assign({},sb.headers());}catch(e){return {};}}
+function grpOf(h){try{return _houseGroup(h);}catch(e){return h?[h]:[];}}
+function eur(v){return '\u20ac'+Math.round(+v).toLocaleString('el-GR');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function dm(t){try{var d=new Date(t);return d.getDate()+'/'+(d.getMonth()+1);}catch(e){return '';}}
+function toast(m){try{showToast(m);}catch(e){}}
+
+if(!document.getElementById('hh107-css')){var st=document.createElement('style');st.id='hh107-css';st.textContent=
+ '#hh-gs-vpop-el.hh107{max-height:62vh;overflow:auto;min-width:300px}'
++'.hh107-ph{font-weight:800;margin:8px 0 2px;color:#c8a84b;font-size:13px}.hh107-ph .n{font-weight:600;opacity:.75;font-size:11px}'
++'.hh107-dn{color:#16a34a;font-weight:700}.hh107-up{color:#dc2626;font-weight:700}.hh107-gone{opacity:.5}'
++'.hh-gs-addr{margin:10px 0 4px;padding:9px 10px;border:1px solid var(--border,#d8c9a3);border-radius:10px;background:var(--surface2,rgba(0,0,0,.03))}'
++'.hh-gs-addr .t{font-size:11px;color:var(--muted,#8a7f6a);margin-bottom:5px}.hh-gs-addr .t .ok{color:#16a34a;font-weight:700}'
++'.hh-gs-addr .r{display:flex;gap:6px}.hh-gs-addr input{flex:1;min-width:0;background:var(--surface2,#fff);border:1px solid var(--border,#d8c9a3);border-radius:8px;padding:8px 10px;color:inherit;font-size:12px}'
++'.hh-gs-addr button{background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700}'
++'.hh-gs-addr .h{font-size:10.5px;color:var(--text3,#9a9284);margin-top:5px}'
++'.hh107-pop button{background:#16a34a;color:#fff;border:none;border-radius:7px;padding:7px 11px;font-weight:700;cursor:pointer;font-size:12px}'
++'.hh107-pop .c{color:#888;margin-top:5px;font-size:11px}';
+document.head.appendChild(st);}
+
+/* ---------- 2+3. επιβεβαιωμένη θέση για όλο το σπίτι ---------- */
+async function revGeo(lat,lng){try{var c=new AbortController();setTimeout(function(){c.abort();},6000);
+ var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&zoom=18&addressdetails=1&lat='+lat+'&lon='+lng,{headers:{'Accept-Language':'el'},signal:c.signal});
+ var j=await r.json();var a=(j&&j.address)||{};var road=[a.road,a.house_number].filter(Boolean).join(' ');
+ var area=a.suburb||a.neighbourhood||a.village||a.town||a.city_district||a.city||'';
+ var t=[road,area].filter(Boolean).join(', ');return t||null;}catch(e){return null;}}
+window.hhSaveHousePos=async function(h,text,lat,lng){
+ if(!h)return;var grp=grpOf(h);
+ if(lat==null&&text){var c=window.hhCoordsOf?window.hhCoordsOf(text):null;
+  if(c){lat=c.lat;lng=c.lng;}
+  else{try{var r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(text),{headers:{'Accept-Language':'el'}});var j=await r.json();if(j&&j[0]){lat=parseFloat(j[0].lat);lng=parseFloat(j[0].lon);}}catch(e){}}}
+ if(lat==null){toast(T('\u26a0 Δεν βρέθηκε στον χάρτη — γράψε «οδός αριθμός, περιοχή» ή κάνε δεξί κλικ στον χάρτη','\u26a0 Not found on the map — type «street number, area» or right-click the map'));return;}
+ var addr=(text||'').trim();
+ if(!addr||window.hhCoordsOf&&window.hhCoordsOf(addr)){var rg=await revGeo(lat,lng);addr=rg||(lat.toFixed(6)+', '+lng.toFixed(6));}
+ var body=JSON.stringify({address:addr,address_lat:lat,address_lng:lng,address_confirmed:true});var ok=true;
+ for(var i=0;i<grp.length;i++){var m=grp[i];m.address=addr;m.address_lat=lat;m.address_lng=lng;m.address_confirmed=true;if(!m._dbId)continue;
+  try{var rr=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+m._dbId,{method:'PATCH',headers:Object.assign(hdrs(),{'Content-Type':'application/json','Prefer':'return=minimal'}),body:body});if(!rr.ok)ok=false;}catch(e){ok=false;}}
+ toast(ok?T('\u2713 Επιβεβαιωμένη θέση: ','\u2713 Confirmed position: ')+addr:T('\u26a0 Δεν αποθηκεύτηκε — είσαι συνδεδεμένος;','\u26a0 Not saved — are you signed in?'));
+ try{if(typeof _renderOvl==='function'&&document.getElementById('listingOverlay').classList.contains('open'))_renderOvl();}catch(e){}
+ try{if(typeof currentView!=='undefined'&&currentView==='map'&&typeof initMap==='function')initMap();}catch(e){}
+};
+function houseForMap(map){try{var c=map.getContainer();
+ if(c.id==='hh-gs-map'){var mem=window.__hhGrpMembers||[];return mem[0]||null;}
+ var b=document.querySelector('#listingOverlay button[onclick*="saveAddress("]');if(!b)return null;
+ var mm=/saveAddress\('((?:\\.|[^'\\])*)'\)/.exec(b.getAttribute('onclick')||'');if(!mm)return null;
+ var url=mm[1].replace(/\\(.)/g,'$1');return getByUrl(url)||null;}catch(e){return null;}}
+window.__hh107=window.__hh107||{};
+window.hh107Go=function(k){var o=window.__hh107[k];if(!o)return;try{o.map.closePopup();}catch(e){}
+ try{L.circleMarker([o.lat,o.lng],{radius:8,color:'#fff',weight:2,fillColor:'#16a34a',fillOpacity:1}).addTo(o.map);}catch(e){}
+ window.hhSaveHousePos(o.h,null,o.lat,o.lng);};
+function hookMaps(){if(!(window.L&&L.Map&&L.Map.addInitHook))return false;if(L.Map.__hh107)return true;L.Map.__hh107=1;
+ L.Map.addInitHook(function(){var map=this;var c=map.getContainer&&map.getContainer();if(!c||(c.id!=='hh-gs-map'&&c.id!=='hh-lo-map'))return;
+  map.on('contextmenu',function(e){var h=houseForMap(map);if(!h){toast(T('\u26a0 Δεν βρέθηκε το σπίτι','\u26a0 House not found'));return;}
+   var k='p'+Date.now();window.__hh107[k]={h:h,lat:e.latlng.lat,lng:e.latlng.lng,map:map};
+   L.popup({closeButton:true}).setLatLng(e.latlng).setContent('<div class="hh107-pop"><button type="button" onclick="hh107Go(\''+k+'\')">\ud83d\udccd '+T('Εδώ είναι το σπίτι — επιβεβαίωση','The house is here — confirm')+'</button><div class="c">'+e.latlng.lat.toFixed(6)+', '+e.latlng.lng.toFixed(6)+'</div></div>').openOn(map);});});
+ return true;}
+if(!hookMaps()){var _hk=setInterval(function(){if(hookMaps())clearInterval(_hk);},300);}
+
+function addrBox(){try{var ov=document.getElementById('hh-grpsum-ov');if(!ov)return;var slot=ov.querySelector('.hh-gs-notes-slot');if(!slot)return;
+ var mem=window.__hhGrpMembers||[];if(!mem.length)return;var hid=String(mem[0].house_id||'');
+ var ex=ov.querySelector('#hh-gs-addr');if(ex&&ex.dataset.hid===hid)return;if(ex)ex.remove();
+ var cf=null;mem.forEach(function(m){if(!cf&&m&&m.address_confirmed===true&&m.address)cf=m;});
+ var d=document.createElement('div');d.id='hh-gs-addr';d.dataset.hid=hid;d.className='hh-gs-addr';
+ d.innerHTML='<div class="t">\ud83d\udccd '+T('Διεύθυνση του σπιτιού','House address')+(cf?' <span class="ok">\u2713 '+T('επιβεβαιωμένη','confirmed')+'</span>':'')+'</div>'
+  +'<div class="r"><input type="text" placeholder="'+esc(T('π.χ. Ηροδότου 30, Πεύκη — ή lat, lng','e.g. Irodotou 30, Pefki — or lat, lng'))+'"><button type="button" title="'+esc(T('Αποθήκευση για όλες τις αγγελίες του σπιτιού','Save for every listing of the house'))+'">\u2713</button></div>'
+  +'<div class="h">'+T('ή δεξί κλικ στο σημείο του χάρτη (στο κινητό: παρατεταμένο πάτημα)','or right-click the spot on the map (on the phone: long-press)')+'</div>';
+ d.querySelector('input').value=cf?cf.address:'';
+ d.addEventListener('click',function(e){e.stopPropagation();});
+ var go=function(){var v=d.querySelector('input').value.trim();if(!v)return;window.hhSaveHousePos(mem[0],v,null,null);};
+ d.querySelector('button').onclick=go;d.querySelector('input').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();go();}});
+ slot.parentNode.insertBefore(d,slot);}catch(e){}}
+setInterval(addrBox,800);
+
+/* ---------- 1. Τιμή ▾ ---------- */
+function fixPrice(){try{var mem=window.__hhGrpMembers||[];if(!mem.length)return;
+ document.querySelectorAll('#hh-grpsum-ov .hh-gs-grid > div').forEach(function(row){var lab=row.querySelector('span');if(!lab)return;
+  var key=(((lab.getAttribute&&lab.getAttribute('data-hh55'))||lab.textContent||'')).trim();if(key!=='Τιμή'&&key!=='Price')return;
+  if(row.querySelector('.hh-gs-more'))return;var b=row.querySelector('b');if(!b)return;var v=(b.textContent||'').trim();if(!v||v==='\u2014')return;
+  var n=mem.filter(function(m){return m&&+m.price>0;}).length;if(n<1)return;
+  b.className='hh-gs-mv';b.innerHTML='<span class="hh-gs-mvtxt"></span>';b.firstChild.textContent=v;
+  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');btn.setAttribute('data-vals',encodeURIComponent(v));btn.textContent=n+' \u25be';b.appendChild(btn);});}catch(e){}}
+setInterval(fixPrice,700);
+async function priceRows(mem){
+ var hid=mem[0]?String(mem[0].house_id||''):'';var rows=[],ph=[];
+ try{var r=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?select=id,url,agency,price,platform,deleted&house_id=eq.'+encodeURIComponent(hid)+'&limit=200',{headers:hdrs()});rows=r.ok?await r.json():[];}catch(e){}
+ if(!rows.length)rows=mem.map(function(m){return {id:m._dbId,url:m.url,agency:m.agency,price:m.price,platform:m.platform,deleted:m.deleted};});
+ var ids=rows.map(function(x){return x.id;}).filter(Boolean);
+ if(ids.length){try{var r2=await fetch(SUPABASE_URL+'/rest/v1/price_history?select=listing_id,old_price,new_price,changed_at&listing_id=in.('+ids.join(',')+')&order=changed_at.asc',{headers:hdrs()});ph=r2.ok?await r2.json():[];}catch(e){}}
+ var last={};ph.forEach(function(x){last[x.listing_id]=x;});
+ var by={};rows.forEach(function(x){var p=+x.price||0;if(!p)return;(by[p]=by[p]||[]).push(x);});
+ var ps=Object.keys(by).map(Number).sort(function(a,b){return a-b;});
+ if(!ps.length)return '<div class="hh-gs-vrow">\u2014</div>';
+ return ps.map(function(p){var xs=by[p].sort(function(a,b){return (!!a.deleted-!!b.deleted)||String(a.agency||'').localeCompare(String(b.agency||''));});
+  var live=xs.filter(function(x){return !x.deleted;}).length;
+  return '<div class="hh107-ph">'+eur(p)+' <span class="n">\u00b7 '+live+' '+T(live===1?'αγγελία':'αγγελίες',live===1?'listing':'listings')+'</span></div>'
+   +xs.map(function(x){var pl=String(x.platform||'');var c=last[x.id];var ch='';
+    if(c&&c.old_price!=null&&c.new_price!=null&&+c.old_price!==+c.new_price){var dn=+c.new_price<+c.old_price;ch=' <span class="'+(dn?'hh107-dn':'hh107-up')+'">'+(dn?'\u25bc ':'\u25b2 ')+T('από ','from ')+eur(c.old_price)+' \u00b7 '+dm(c.changed_at)+'</span>';}
+    return '<div class="hh-gs-vrow'+(x.url?' hh-gs-link':'')+(x.deleted?' hh107-gone':'')+'"'+(x.url?' data-url="'+encodeURIComponent(x.url)+'"':'')+'>'+esc(x.agency||T('Ιδιώτης','Private owner'))+' <span class="hh-src">'+esc(pl)+'</span>'+(x.deleted?' \u26d4':'')+ch+'</div>';}).join('');}).join('');}
+document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.hh107-price'):null;if(!b)return;
+ e.stopPropagation();e.preventDefault();var op=document.getElementById('hh-gs-vpop-el');if(op){var same=op.classList.contains('hh107');op.remove();if(same)return;}
+ var mem=(window.__hhGrpMembers||[]).slice();
+ var pop=document.createElement('div');pop.className='hh-gs-vpop hh107';pop.id='hh-gs-vpop-el';
+ pop.innerHTML='<h5>'+T('Τιμή ανά μεσιτικό','Price by agency')+'</h5><div class="hh107-load">\u2026</div>';document.body.appendChild(pop);
+ var rc=b.getBoundingClientRect();pop.style.left=Math.max(6,Math.min(rc.right-320,window.innerWidth-352))+'px';pop.style.top=Math.min(rc.bottom+4,window.innerHeight-200)+'px';
+ priceRows(mem).then(function(html){var l=pop.querySelector('.hh107-load');if(l)l.outerHTML=html;});},true);
+}catch(e){console.warn('hhPolish107',e);}})();</script>
+
 </body>
 </html>
 <!-- build: 1780867944512 -->
