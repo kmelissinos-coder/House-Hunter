@@ -14983,7 +14983,7 @@ function fixPrice(){try{var mem=window.__hhGrpMembers||[];if(!mem.length)return;
   if(row.querySelector('.hh-gs-more'))return;var b=row.querySelector('b');if(!b)return;var v=(b.textContent||'').trim();if(!v||v==='\u2014')return;
   var n=mem.filter(function(m){return m&&+m.price>0;}).length;if(n<1)return;
   b.className='hh-gs-mv';b.innerHTML='<span class="hh-gs-mvtxt"></span>';b.firstChild.textContent=v;
-  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');btn.setAttribute('data-vals',encodeURIComponent(v));btn.textContent=n+' \u25be';b.appendChild(btn);});}catch(e){}}
+  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');var dps=[];mem.forEach(function(m){var q=+m.price||0;if(q&&dps.indexOf(q)<0)dps.push(q);});dps.sort(function(a,c){return a-c;});if(dps.length<2){b.className='';b.textContent=v;return;}/*ίδια τιμή παντού → χωρίς λίστα (κανόνας hhPolish98)*/btn.setAttribute('data-vals',encodeURIComponent(dps.map(eur).join(' \u00b7 ')));btn.textContent=n+' \u25be';b.appendChild(btn);});}catch(e){}}
 setInterval(fixPrice,700);
 async function priceRows(mem){
  var hid=mem[0]?String(mem[0].house_id||''):'';var rows=[],ph=[];
