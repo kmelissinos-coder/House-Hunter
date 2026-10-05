@@ -1,6 +1,7 @@
 // House Hunter — room classifier (18 Sep 2026, retargeted 24 Sep 2026).
 //
-// WHERE: a CHROME TAB, and it must be the ACTIVE tab — the cloud container cannot
+// WHERE: the BOARD TAB (vresto.pages.dev), SIGNED IN, and it must be the ACTIVE tab — since 5 Oct 2026
+// img_room_todo / img_room_set need the member's token, which the board's hhPolish111 adds to every call — the cloud container cannot
 // reach supabase.co, and Chrome's Memory Saver unloads background tabs
 // (that is what killed the xe worker on 18 Sep). Paste the whole file with
 // javascript_tool. It returns immediately; poll window.__rmState.

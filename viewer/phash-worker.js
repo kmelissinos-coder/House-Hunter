@@ -19,7 +19,9 @@
 // ΟΧΙ ακριβώς ίδια. Επειδή το auto-merge θέλει `ph_exact >= 3` (απόσταση ΜΗΔΕΝ), τα 12.427 παλιά hash
 // ξαναϋπολογίστηκαν ΟΛΑ με αυτή τη μέθοδο στις 24/9· μη μπλέξεις τις δύο γενιές.
 //
-// WHERE: must run in a CHROME TAB (any page). The cloud container cannot reach supabase.co —
+// WHERE: must run in the BOARD TAB (vresto.pages.dev), SIGNED IN — since 5 Oct 2026 the publishable key
+// alone may not call rent_phash_todo; the launcher hands the worker the member's token and renews it every 60 s.
+// (Before: any page.) The cloud container cannot reach supabase.co —
 // the egress proxy denies it, and every platform CDN too. Paste the launcher below with javascript_tool.
 // ⚠ Chrome FREEZES a hidden tab: the worker stops until the tab is touched again. Either ask Dusty to keep
 // the tab in front, or poke it with a tiny javascript_tool call (e.g. `1`) every ~45 s — each poke buys
@@ -41,7 +43,7 @@
 
 (function(){var W=`
 const SB='https://ofvanbbujgcqhbiyihgy.supabase.co/rest/v1',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
-const HD={apikey:AK,Authorization:'Bearer '+AK,'Content-Type':'application/json'};
+let TOK=AK;const HD0={apikey:AK,'Content-Type':'application/json'};function HDf(){return Object.assign({},HD0,{Authorization:'Bearer '+TOK});}
 const S=96,N=32,CONC=24,ROUND=800;const COS=new Float64Array(N*N);
 for(let u=0;u<N;u++)for(let x=0;x<N;x++)COS[u*N+x]=Math.cos((2*x+1)*u*Math.PI/(2*N))*(u===0?Math.sqrt(1/N):Math.sqrt(2/N));
 function box(s,SW,SH,W,H){const o=new Float64Array(W*H);
@@ -78,11 +80,11 @@ async function one(u){
 async function jf(url,opt,tries){for(let k=0;k<(tries||3);k++){try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),25000);
   try{const r=await fetch(url,Object.assign({signal:ac.signal},opt));const tx=await r.text();if(!r.ok)throw new Error(r.status+' '+tx.slice(0,120));return tx;}finally{clearTimeout(to);}
  }catch(e){if(k===(tries||3)-1)throw e;await sleep(1200*(k+1));}}}
-async function todo(n){const tx=await jf(SB+'/rpc/rent_phash_todo',{method:'POST',headers:HD,body:JSON.stringify({n})});
+async function todo(n){const tx=await jf(SB+'/rpc/rent_phash_todo',{method:'POST',headers:HDf(),body:JSON.stringify({n})});
  const j=JSON.parse(tx);return (Array.isArray(j)?j:[]).map(x=>typeof x==='string'?x:x.cld_url);}
-async function save(rows){for(let i=0;i<rows.length;i+=200){await jf(SB+'/img_phash?on_conflict=cld_url',{method:'POST',headers:Object.assign({},HD,{Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(rows.slice(i,i+200))});}}
-async function note(p){try{await jf(SB+'/rent_staging',{method:'POST',headers:Object.assign({},HD,{Prefer:'return=minimal'}),body:JSON.stringify({batch:'phash',source:'browser',kind:'phash_progress',payload:p})},1);}catch(e){}}
-onmessage=async()=>{let total=0,fail=0,round=0,errs=0;
+async function save(rows){for(let i=0;i<rows.length;i+=200){await jf(SB+'/img_phash?on_conflict=cld_url',{method:'POST',headers:Object.assign({},HDf(),{Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(rows.slice(i,i+200))});}}
+async function note(p){try{await jf(SB+'/rent_staging',{method:'POST',headers:Object.assign({},HDf(),{Prefer:'return=minimal'}),body:JSON.stringify({batch:'phash',source:'browser',kind:'phash_progress',payload:p})},1);}catch(e){}}
+let RUN=0;onmessage=async(ev)=>{if(ev&&ev.data&&ev.data.tok){TOK=ev.data.tok;return;}if(RUN)return;RUN=1;let total=0,fail=0,round=0,errs=0;
  while(true){round++;
   try{
    const urls=await todo(ROUND);
@@ -96,5 +98,7 @@ onmessage=async()=>{let total=0,fail=0,round=0,errs=0;
   }catch(e){errs++;await note({round,err:String(e&&e.message||e).slice(0,200),errs});if(errs>15){postMessage({stopped:'errors'});return;}await sleep(3000);}
   if(round>200){postMessage({done:total,stopped:1});return;}}};
 `;var u=URL.createObjectURL(new Blob([W],{type:'application/javascript'}));window.__phUrl=u;
-window.__phGo=function(){try{window.__phW.terminate();}catch(e){}var w=new Worker(window.__phUrl);w.onmessage=function(e){window.__phMsg=e.data;};w.onerror=function(e){window.__phErr=String(e.message||e);};window.__phW=w;w.postMessage({});return 'go';};
+function tok(){var b=null,be=-1;[sessionStorage,localStorage].forEach(function(st){try{var a=JSON.parse(st.getItem('hh_auth')||'null');if(a&&a.access_token){var e=JSON.parse(atob(a.access_token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).exp||0;if(e>be){be=e;b=a.access_token;}}}catch(x){}});return {t:b,e:be};}
+function push(){var s=tok();var f=(s.e*1000<Date.now()+300000)?(window.hhRefreshAuth||window.__hh111refresh):null;Promise.resolve(f?f():null).then(function(nt){var t=nt||tok().t;if(t&&window.__phW)window.__phW.postMessage({tok:t});},function(){});}
+window.__phGo=function(){try{window.__phW.terminate();}catch(e){}try{clearInterval(window.__phTokIv);}catch(e){}var s=tok();if(!s.t){window.__phErr='not signed in: open the board (vresto.pages.dev), sign in, run it there';return 'not signed in';}var w=new Worker(window.__phUrl);w.onmessage=function(e){window.__phMsg=e.data;};w.onerror=function(e){window.__phErr=String(e.message||e);};window.__phW=w;w.postMessage({tok:s.t});push();w.postMessage({});window.__phTokIv=setInterval(push,60000);return 'go';};
 return window.__phGo();})()
