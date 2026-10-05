@@ -144,6 +144,18 @@ main{max-width:1240px;margin:0 auto;padding:16px}
   .v15warn{margin:0 0 8px;padding:7px 12px;border-radius:8px;font-size:13px;line-height:1.45;
     background:rgba(180,40,40,.16);border:1px solid rgba(220,80,80,.55);color:#ffcaca}
   .v15warn b{color:#fff}
+  /*hhMergeV16*/
+  .auto16{margin:0 0 14px;padding:10px 14px;border-radius:10px;background:rgba(64,160,96,.12);border:1px solid rgba(64,160,96,.5);font-size:13px;line-height:1.5}
+  .auto16 h3{margin:0 0 6px;font-size:14px;color:#8fe0ab}
+  .auto16 .row16{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:3px 0;border-top:1px dashed rgba(255,255,255,.08)}
+  .auto16 .row16 a{color:var(--text)}
+  .auto16 .row16 button{font-size:12px;padding:2px 8px;border-radius:6px;border:1px solid rgba(224,90,90,.6);background:rgba(224,90,90,.12);color:#ffb3b3;cursor:pointer}
+  .auto16 .row16.undone{opacity:.45;text-decoration:line-through}
+  .pg16{font-size:10.5px;font-weight:800;border-radius:6px;padding:1px 7px;margin-left:4px;color:#111}
+  .pg16.k1{background:#7ec8ff}.pg16.k2{background:#ffcf6e}.pg16.k3{background:#c9a6ff}.pg16.k4{background:#8fe0ab}.pg16.k5{background:#ff9f9f}
+  .mini.pgk1{border-top:6px solid #7ec8ff}.mini.pgk2{border-top:6px solid #ffcf6e}.mini.pgk3{border-top:6px solid #c9a6ff}.mini.pgk4{border-top:6px solid #8fe0ab}.mini.pgk5{border-top:6px solid #ff9f9f}
+  .mini .resume{position:absolute;top:4px;left:6px;background:rgba(0,0,0,.65);color:#ffd27a;font-size:10px;padding:1px 6px;border-radius:8px}
+  .mini .seen16{font-size:10.5px;color:#9fb3c8;margin-left:6px}
 </style>
 </head>
 <body>
@@ -168,8 +180,8 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 <div id="toast"></div>
 <script>
 const SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
-const HELP={pairs:'Κάθε πρόταση δείχνει δύο σπίτια που μοιάζουν. Το <b>σκορ ομοιότητας</b> (0–100) βγαίνει από τα τ.μ., την τιμή, τη θέση, το έτος, τον όροφο, τον μεσίτη, την περιγραφή και τις κοινές φωτογραφίες — όσο ψηλότερο, τόσο πιο πιθανό να είναι το ίδιο σπίτι. «Ένωση» κρατάει τον αριθμό του σπιτιού που έχει τις περισσότερες αγγελίες. «Αναίρεση» επαναφέρει την τελευταία ένωση. Αν και τα δύο σπίτια έχουν <b>διαφορετική</b> βαθμολογία σου, ρωτάει ποια να κρατήσει· ίδια βαθμολογία = ένωση χωρίς ερώτηση.',
- susp:'Ομάδες που ήδη έχουν ενωθεί αλλά τα στοιχεία τους δεν συμφωνούν (τ.μ., τιμή, έτος, δωμάτια, όροφος, τύπος ή πινέζες μακριά η μία από την άλλη). Με «✂ Αποσύνδεση» μια αγγελία γίνεται ξεχωριστό σπίτι· με «Είναι σωστά» η ομάδα δεν ξαναεμφανίζεται εδώ.'};
+const HELP={pairs:'Κάθε πρόταση δείχνει δύο σπίτια που μοιάζουν — <b>μόνο σπίτια με φωτογραφίες</b>. Όσα έχουν 3+ ίδιες φωτογραφίες, ίδια τ.μ. και ίδια τιμή <b>ενώνονται αυτόματα</b> μόλις ανοίξεις τη σελίδα (τα βλέπεις στο πράσινο πλαίσιο, με αναίρεση). Οι φωτογραφίες των δύο σπιτιών ξεκινούν από τις κοινές, με την ίδια σειρά (πρώτα εξωτερικοί χώροι/μπαλκόνια). «Ένωση» κρατάει τον αριθμό του σπιτιού με τις περισσότερες αγγελίες. Αν τα δύο σπίτια έχουν <b>διαφορετική</b> βαθμολογία σου, ρωτάει ποια να κρατήσει.',
+ susp:'Ομάδες που ήδη έχουν ενωθεί αλλά κάτι δεν ταιριάζει — <b>μόνο αγγελίες με φωτογραφίες</b>. Ομάδες όπου όλες οι φωτογραφίες ταιριάζουν δεν εμφανίζονται. Κάθε κάρτα ξεκινά από τις φωτογραφίες που έχει κοινές με τις άλλες, με την ίδια σειρά, και ανοίγει στη φωτογραφία όπου σταμάτησες την προηγούμενη φορά (⏸). Το χρώμα πάνω στην κάρτα δείχνει σε ποια ομάδα φωτογραφιών ανήκει. «✂ Αποσύνδεση» = ξεχωριστό σπίτι· «Είναι σωστά» = δεν ξαναεμφανίζεται, εκτός αν μπει καινούργια αγγελία που δεν έχεις δει.'};
 function sess(){try{const j=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;}catch(e){}return null;}
 async function refreshSess(s){try{const r=await fetch(SB+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token})});const d=await r.json();if(!r.ok)return null;const n={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:Date.now()+(d.expires_in||3600)*1000,user:d.user,remember:s.remember};(s.remember?localStorage:sessionStorage).setItem('hh_auth',JSON.stringify(n));return n;}catch(e){return null;}}
 async function rpc(name,args){let s=sess();if(!s)throw new Error('login');if(s.expires_at&&s.expires_at<Date.now()+60000&&s.refresh_token){s=(await refreshSess(s))||s;}
@@ -184,6 +196,12 @@ function sq(v){return v?Math.round(v)+' τ.μ.':'—';}
 function stars(n){return n?'★'.repeat(n)+'☆'.repeat(5-n):'';}
 function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;t.style.background=bad?'#a11':'#2e7d32';t.style.display='block';setTimeout(()=>t.style.display='none',3500);}
 let TAB='pairs', VIEW='list', PAIRS=[], GROUPS=[], IDX=0, UNDO=[];
+/*hhMergeV16: τα προφανή (3+ ίδιες φωτογραφίες, ίδια τ.μ. και τιμή) ενώνονται χωρίς ερώτηση*/
+let AUTO16=[];
+async function autoMerge16(){try{const r=await rpc('rent_merge_obvious',{});if(Array.isArray(r)&&r.length){AUTO16=AUTO16.concat(r);toast('🔗 Ενώθηκαν αυτόματα '+r.length+' προφανή');}}catch(e){console.warn('auto-merge',e);}}
+function autoBanner16(){if(!AUTO16.length)return '';
+  return `<div class="auto16"><h3>🔗 Ενώθηκαν αυτόματα ${AUTO16.length} προφανή — ίδιες φωτογραφίες, ίδια τ.μ. και τιμή</h3>${AUTO16.map((a,i)=>`<div class="row16${a.undone?' undone':''}" id="a16_${i}"><span>#${esc(a.old)} → <b>#${esc(a.new)}</b></span><span>📸 ${esc(a.ph)} ίδιες</span><span>${a.sqm?esc(a.sqm)+' τ.μ.':''} ${a.price?'· €'+Number(a.price).toLocaleString('el'):''}</span><a href="index.html?house=${encodeURIComponent(a.new)}" target="_blank">🏡 άνοιγμα</a>${a.undone?'<span>αναιρέθηκε</span>':`<button onclick="autoUndo16(${i})" title="Χωρίζει ξανά τα δύο σπίτια και δεν θα ξαναενωθούν αυτόματα">↶ Δεν είναι το ίδιο</button>`}</div>`).join('')}</div>`;}
+async function autoUndo16(i){const a=AUTO16[i];if(!a||a.undone)return;try{if(a.log_id)await rpc('merge_undo',{p_log_id:a.log_id});await rpc('merge_verdict',{p_h1:a.old,p_h2:a.new,p_verdict:'no'});a.undone=true;toast('↶ Χωρίστηκαν: #'+a.old+' / #'+a.new);render();}catch(e){toast('Σφάλμα: '+e.message,true);}}
 function keepOf(p){const na=+(p.a&&p.a.n_ads)||0,nb=+(p.b&&p.b.n_ads)||0;if(na!==nb)return na>nb?'a':'b';return (+p.h1<=+p.h2)?'a':'b';}
 function galHTML(imgs,key){imgs=(imgs||[]).filter(Boolean);if(!imgs.length)return '<div class="gal2"><div class="noimg" style="width:100%;height:100%;font-size:40px">🏠</div></div>';
   return `<div class="gal2" data-g="${key}" data-i="0"><img class="main" src="${esc(imgs[0])}" onclick="openBig('${key}')" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="galNav('${key}',-1)">‹</button><button class="nav r" onclick="galNav('${key}',1)">›</button><span class="cnt">1/${imgs.length}</span></div>
@@ -245,16 +263,21 @@ function pairHTML(p,i){const neg=r=>/διαφορετικ|άλλος|μακρι/
       <button class="btn later" onclick="verdict(${i},'later')">⏳ Αργότερα</button>
     </div></div>`;}
 const MG={};
-function mgTo(key,k){const box=document.querySelector(`.mg[data-g="${key}"]`);const imgs=MG[key]||[];if(!box||!imgs.length)return;k=(k+imgs.length)%imgs.length;box.dataset.i=k;box.querySelector('img').src=imgs[k];box.querySelector('.cnt').textContent=(k+1)+'/'+imgs.length;}
+function mgTo(key,k){const box=document.querySelector(`.mg[data-g="${key}"]`);const imgs=MG[key]||[];if(!box||!imgs.length)return;k=(k+imgs.length)%imgs.length;box.dataset.i=k;box.querySelector('img').src=imgs[k];box.querySelector('.cnt').textContent=(k+1)+'/'+imgs.length;const rs=box.querySelector('.resume');if(rs)rs.remove();savePos16(key,imgs[k]);}
+/*hhMergeV16: θυμάται τη φωτογραφία όπου σταμάτησες σε κάθε μικρή κάρτα*/
+const MGID={},POS16T={};
+function savePos16(key,url){const id=MGID[key];if(!id||!url)return;clearTimeout(POS16T[key]);POS16T[key]=setTimeout(()=>{rpc('merge_photo_pos_set',{p_listing:id,p_url:url}).catch(()=>{});},700);}
 function majority(vals){const c={};let best=null,bn=0;vals.forEach(v=>{if(v==null||v==='')return;const k=String(v);c[k]=(c[k]||0)+1;if(c[k]>bn){bn=c[k];best=k;}});return best;}
-function miniHTML(m,key,maj,hid){const imgs=[m.img].concat(m.imgs||[]).filter(Boolean);MG[key]=imgs;
+function miniHTML(m,key,maj,hid){/*hhMergeV16*/const imgs=[m.img].concat(m.imgs||[]).filter(Boolean);MG[key]=imgs;MGID[key]=m.id;const p0=m.pos?imgs.indexOf(m.pos):-1;const i0=p0>0?p0:0;
   let odd=0;/*v5: count the fields where this ad disagrees with the group (price only if >20%)*/
   const cell=(label,val,mv,fmt,tol,hard)=>{const shown=val==null||val===''?'—':(fmt?fmt(val):val);let cls='';if(val!=null&&val!==''&&mv!=null){const same=tol?Math.abs(+val-+mv)/(+mv||1)<=tol:String(val)===String(mv);cls=same?'same':'diff';if(!same&&hard!==false){if(label==='Τιμή'){if(Math.abs(+val-+mv)/(+mv||1)>0.2)odd++;}else odd++;}}return `<div class="row"><span>${label}</span><span class="${cls}">${esc(shown)}</span></div>`;};
   const rows=[cell('Περιοχή',m.location,maj.location,null,null,false),cell('τ.μ.',m.sqm,maj.sqm,v=>Math.round(v)+' τ.μ.',0.05),cell('Τιμή',m.price,maj.price,v=>'€'+Number(v).toLocaleString('el'),0.05),cell('Έτος',m.year,maj.year),cell('Δωμάτια',m.rooms,maj.rooms),cell('Όροφος',m.floor,maj.floor),cell('Τύπος',m.type,maj.type)];
-  return `<div class="mini${m.deleted?' gone':''}${odd?' odd':''}" id="mini_${esc(m.id)}" title="${odd?'Διαφέρει από τα υπόλοιπα σε '+odd+' στοιχεί'+(odd===1?'ο':'α')+' — μάλλον άλλο σπίτι':''}">${odd?'<div class="oddtag">⚠ μάλλον άλλο σπίτι</div>':''}
-    <div class="mg" data-g="${key}" data-i="0">${imgs.length?`<img src="${esc(imgs[0])}" loading="lazy" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)-1)">‹</button><button class="nav r" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)+1)">›</button><span class="cnt">1/${imgs.length}</span>`:'<div class="noimg" style="width:100%;height:150px">🏠</div>'}</div>
+  if(m.ph_conf)odd=0;/*v16: οι φωτογραφίες ταιριάζουν → όχι «άλλο σπίτι»*/
+  const pgk=m.pg?((+m.pg-1)%5)+1:0;
+  return `<div class="mini${m.deleted?' gone':''}${odd?' odd':''}${pgk?' pgk'+pgk:''}" id="mini_${esc(m.id)}" title="${odd?'Διαφέρει από τα υπόλοιπα σε '+odd+' στοιχεί'+(odd===1?'ο':'α')+' — μάλλον άλλο σπίτι':''}">${odd?'<div class="oddtag">⚠ μάλλον άλλο σπίτι</div>':''}
+    <div class="mg" data-g="${key}" data-i="${i0}">${imgs.length?`${i0?'<span class="resume" title="Εδώ σταμάτησες την προηγούμενη φορά">⏸ εδώ σταμάτησες</span>':''}<img src="${esc(imgs[i0])}" loading="lazy" onerror="this.style.visibility='hidden'"><button class="nav l" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)-1)">‹</button><button class="nav r" onclick="mgTo('${key}',(+this.parentNode.dataset.i||0)+1)">›</button><span class="cnt">${i0+1}/${imgs.length}</span>`:'<div class="noimg" style="width:100%;height:150px">🏠</div>'}</div>
     <div class="body">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="plat">${esc(m.platform||'')}</span>${phBadge(m)}${m.deleted?'<span class="diff" style="font-size:11px">⛔ αφαιρέθηκε</span>':''}<span style="color:var(--muted);font-size:11px">#${m.hhl||''}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span class="plat">${esc(m.platform||'')}</span>${pgk?`<span class="pg16 k${pgk}" title="Ομάδα φωτογραφιών: οι αγγελίες με το ίδιο χρώμα έχουν ίδιες φωτογραφίες μεταξύ τους">📷 ${m.pg}</span>`:''}${phBadge(m)}${m.seen?'<span class="seen16" title="Την είχες ήδη δει και πατήσει «Είναι σωστά»">✓ ελεγμένη</span>':''}${m.deleted?'<span class="diff" style="font-size:11px">⛔ αφαιρέθηκε</span>':''}<span style="color:var(--muted);font-size:11px">#${m.hhl||''}</span></div>
       ${rows.join('')}
       <div class="row"><span>Μεσίτης</span><span>${esc(m.agency||'Ιδιώτης')}</span></div>
       <div class="mlinks">${m.hhl?`<a href="index.html?house=${encodeURIComponent(hid||'')}&ad=${encodeURIComponent(m.hhl)}" target="_blank" rel="noopener">🏡 στο HH</a>`:''}${m.url?`<a href="${esc(m.url)}" target="_blank" rel="noopener">↗ αγγελία</a>`:''}</div>
@@ -265,9 +288,9 @@ function phBadge(m){const o=+m.ph_own||0,k=+m.ph_match||0;if(o<3)return '';
    :`<span class="phb no" title="Καμία από τις ${o} φωτογραφίες της δεν υπάρχει σε άλλη αγγελία του σπιτιού">📸 0/${o}</span>`;}
 function groupHTML(g,i){const ms=g.members||[];const maj={location:majority(ms.map(m=>m.location)),sqm:majority(ms.map(m=>m.sqm!=null?Math.round(m.sqm):null)),price:majority(ms.map(m=>m.price!=null?Math.round(m.price):null)),year:majority(ms.map(m=>m.year)),rooms:majority(ms.map(m=>m.rooms)),floor:majority(ms.map(m=>m.floor)),type:majority(ms.map(m=>m.type))};
   return `<div class="grp" id="g${i}">
-    <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}${(+g.ph_ok>=2&&!+g.ph_odd)?'<span class="reason ph">📸 οι φωτογραφίες συμφωνούν—μάλλον σωστό</span>':''}
+    <div class="ptop"><span class="hid">#${esc(g.house_id)}</span><span class="spec">${g.n} αγγελίες</span>${(g.flags||[]).map(f=>`<span class="reason neg">${esc(f)}</span>`).join('')}${(+g.ph_ok>=2&&!+g.ph_odd&&!(g.flags||[]).some(f=>/χωρίζονται/.test(f)))?'<span class="reason ph">📸 οι φωτογραφίες συμφωνούν—μάλλον σωστό</span>':''}
       <span class="keep"><a href="index.html?house=${encodeURIComponent(g.house_id)}" target="_blank" style="color:var(--text)">🏡 Άνοιγμα στο HH</a></span></div>
-    <div class="legend"><b style="color:#e05252">Κόκκινο πλαίσιο</b> = η αγγελία διαφέρει από τις υπόλοιπες της ομάδας (τ.μ., έτος, όροφος, τύπος ή τιμή >20%) — κοίτα μόνο αυτές. <span class="same">πράσινο</span> = ίδιο · <span class="diff">κόκκινο</span> = διαφέρει. Τσέκαρε τις αγγελίες που είναι άλλο σπίτι και πάτα «Αποσύνδεση».</div>
+    <div class="legend"><b style="color:#e05252">Κόκκινο πλαίσιο</b> = διαφέρει από τις υπόλοιπες ΚΑΙ οι φωτογραφίες της δεν ταιριάζουν — κοίτα μόνο αυτές. Το <b>χρώμα πάνω</b> στην κάρτα = ομάδα φωτογραφιών (ίδιο χρώμα = ίδιες φωτογραφίες). <span class="same">πράσινο</span> = ίδιο · <span class="diff">κόκκινο</span> = διαφέρει. Τσέκαρε όσες είναι άλλο σπίτι και πάτα «Αποσύνδεση».</div>
     <div class="mgrid">${ms.map((m,k)=>miniHTML(m,'g'+i+'_'+k,maj,g.house_id)).join('')}</div>
     <div class="acts"><button class="btn split" style="padding:8px 14px;font-size:13px" onclick="splitPicked(${i})">✂ Αποσύνδεση επιλεγμένων (<span id="npick${i}">0</span>)</button><button class="btn ok" onclick="groupOk(${i})">✓ Είναι σωστά, μην το ξαναδείξεις</button></div></div>`;}
 const PICK=new Set();
@@ -277,14 +300,15 @@ function items(){return TAB==='pairs'?PAIRS:GROUPS;}
 function render(){PICK.clear();const el=document.getElementById('list');const arr=items();el.className='';
   document.getElementById('help').innerHTML=HELP[TAB];
   document.getElementById('count').textContent=arr.length+(TAB==='pairs'?' ζευγάρια':' ομάδες');
-  if(!arr.length){el.className='msg';el.textContent=TAB==='pairs'?'Καμία εκκρεμής πρόταση 🎉':'Καμία ύποπτη ομάδα 🎉';document.getElementById('gal').style.display='none';return;}
+  if(!arr.length){el.className=AUTO16.length?'':'msg';el.innerHTML=autoBanner16()+'<div class="msg">'+(TAB==='pairs'?'Καμία εκκρεμής πρόταση 🎉':'Καμία ύποπτη ομάδα 🎉')+'</div>';document.getElementById('gal').style.display='none';return;}
   const one=VIEW==='one';document.getElementById('gal').style.display=one?'flex':'none';
   if(one){IDX=Math.min(Math.max(0,IDX),arr.length-1);document.getElementById('pos').textContent=(IDX+1)+' / '+arr.length;document.getElementById('prev').disabled=IDX<=0;document.getElementById('next').disabled=IDX>=arr.length-1;
-    el.innerHTML=TAB==='pairs'?pairHTML(arr[IDX],IDX):groupHTML(arr[IDX],IDX);}
-  else el.innerHTML=arr.map((x,i)=>TAB==='pairs'?pairHTML(x,i):groupHTML(x,i)).join('');
+    el.innerHTML=autoBanner16()+(TAB==='pairs'?pairHTML(arr[IDX],IDX):groupHTML(arr[IDX],IDX));}
+  else el.innerHTML=autoBanner16()+arr.map((x,i)=>TAB==='pairs'?pairHTML(x,i):groupHTML(x,i)).join('');
   window.scrollTo(0,0);}
 async function load(){const el=document.getElementById('list');el.className='msg';el.textContent='Φόρτωση…';
   if(!sess()){el.innerHTML='Δεν είσαι συνδεδεμένος. <a href="index.html" style="color:var(--accent)">Σύνδεση στο House Hunter</a> και μετά ξαναέλα εδώ.';return;}
+  await autoMerge16();
   try{if(TAB==='pairs')PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});else GROUPS=await rpc('rent_suspicious_groups',{});}
   catch(e){el.textContent='Σφάλμα: '+e.message+(/admin/.test(e.message)?' — η σελίδα είναι μόνο για τον διαχειριστή.':'');return;}
   render();showFreshness();}
