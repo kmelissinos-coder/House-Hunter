@@ -14769,13 +14769,18 @@ function oneSib(){
     }
     /* ΜΙΑ αγγελία σημαίνει ΜΙΑ κάρτα: ό,τι περισσεύει φεύγει, δικό μας ή όχι */
     var all=car.querySelectorAll('.lo-sib-card:not(#hh-sib0)');
-    for(var j=1;j<all.length;j++) all[j].parentNode && all[j].parentNode.removeChild(all[j]);
-    if(all.length) return;
+    /* hhPolish114 (6 Oct): keep the card only if it is THIS ad. After a home with 2+ ads the
+       carousel still holds that home's cards (the base render hides the column but does not
+       empty it) and the first of them was kept — #1262 showed #1275's Indomio ad. */
+    var key=String(S[0].url||S[0]._dbId||S[0].id||'');
+    var keep=(all.length && all[0].getAttribute('data-hh103')===key) ? 1 : 0;
+    for(var j=keep;j<all.length;j++) all[j].parentNode && all[j].parentNode.removeChild(all[j]);
+    if(keep) return;
     var f=sibHTML(); if(!f) return;
     var tmp=document.createElement('div');
     tmp.innerHTML=f(S[0],0);
     var card=tmp.firstElementChild; if(!card) return;
-    card.setAttribute('data-hh103','1');
+    card.setAttribute('data-hh103',key);
     car.appendChild(card);
     var r=document.getElementById('loRight'); if(r && r.style.display==='none') r.style.display='flex';
     var t=document.getElementById('loCarouselTitle');
@@ -15548,4 +15553,4 @@ setInterval(function(){
 </script>
 </body>
 </html>
-<!-- build: hh113 -->
+<!-- build: hh114 -->
