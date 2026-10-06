@@ -15989,20 +15989,7 @@ async function refresh(force){
 }
 setInterval(refresh,1000);
 }catch(e){try{console.warn('hhPolish117',e);}catch(x){}}})();</script>
-<script>/*hhPolish118*/(function(){try{
-/* 6 Oct 2026 — an expired or already-used invite / reset link (#error_code=otp_expired) used to drop the person
-   on the sign-in screen without a word. Now the sign-in card says the link expired and to ask Dusty for a new one. */
-var k=null; try{k=sessionStorage.getItem('hh_linkerr');}catch(e){} if(!k) return;
-var en=false; try{en=localStorage.getItem('hh_lang')==='en';}catch(e){}
-var msg=(k==='otp_expired')?(en?'This link has expired. Ask Dusty for a new one.':'Ο σύνδεσμος έληξε. Ζήτα από τον Dusty νέο.')
-                        :(en?'This link did not work. Ask Dusty for a new one.':'Ο σύνδεσμος δεν λειτούργησε. Ζήτα από τον Dusty νέο.');
-var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'); if(n>80){clearInterval(iv);return;} if(!g) return;
-  clearInterval(iv); try{sessionStorage.removeItem('hh_linkerr');}catch(e){}
-  var d=document.createElement('div'); d.textContent=msg;
-  d.style.cssText='margin:0 0 12px;padding:9px 11px;border-radius:9px;font-size:13px;line-height:1.4;background:rgba(232,163,60,.12);border:1px solid rgba(232,163,60,.45);color:#e8a33c';
-  var f=g.querySelector('input'); var host=(f&&f.parentNode)||g; host.insertBefore(d, host.firstChild);
-},250);
-}catch(e){}})();</script>
+<script>/*hhPolish118 — replaced by hhPolish123 (7 Oct)*/</script>
 <script>/*hhPolish121*/(function(){try{
 if(window.__hh121) return; window.__hh121=1;
 /* 6 Oct 2026 — the zero card's «Σύνοψη» comes from an AI summary of ALL the home's ads (table hh_house_summary,
@@ -16076,6 +16063,62 @@ function upd(){try{var p=pj(),q=(p==='Rent'?'':'?p='+p);
 setInterval(upd,800); upd();
 }catch(e){try{console.warn('hhPolish122',e);}catch(x){}}})();
 </script>
+<script>/*hhPolish123*/(function(){try{
+/* 7 Oct 2026 — «📧 Στείλε μου νέο σύνδεσμο» on the sign-in card. Anyone (Con first) types his email or username and gets a
+   fresh link by email (Supabase password-recovery). The link opens the board and the 🔑 dialog to set a password
+   (hhPolish115a). An expired / used link now says so AND opens this panel, so nobody has to ask Dusty. */
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co',AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var en=false; try{en=localStorage.getItem('hh_lang')==='en';}catch(e){}
+var T=en?{btn:'📧 Forgot password / send me a new link',hint:'Type your email or username and press Send. You will get a link by email; open it within 1 hour and set your password.',
+  ph:'Email or username',send:'Send link',sending:'Sending…',ok:function(m){return '✓ Link sent to '+m+'. Open it within 1 hour — it brings you here to set your password. Check Spam too.';},
+  nouser:'No account with this username.',empty:'Type your email or username first.',wait:'Too many requests. Wait a minute and try again.',fail:'Could not send. Try again in a few minutes.',
+  exp:'This link has expired. Get a new one below.',bad:'This link did not work. Get a new one below.'}
+ :{btn:'📧 Ξέχασα τον κωδικό / Στείλε μου νέο σύνδεσμο',hint:'Γράψε το email ή το όνομα χρήστη σου και πάτα Αποστολή. Θα σου έρθει σύνδεσμος στο email· άνοιξέ τον μέσα σε 1 ώρα και βάλε κωδικό.',
+  ph:'Email ή όνομα χρήστη',send:'Αποστολή',sending:'Αποστολή…',ok:function(m){return '✓ Στάλθηκε σύνδεσμος στο '+m+'. Άνοιξέ τον μέσα σε 1 ώρα — σε φέρνει εδώ να βάλεις κωδικό. Κοίτα και στα Ανεπιθύμητα (Spam).';},
+  nouser:'Δεν υπάρχει λογαριασμός με αυτό το όνομα χρήστη.',empty:'Γράψε πρώτα το email ή το όνομα χρήστη σου.',wait:'Πολλά αιτήματα. Περίμενε ένα λεπτό και ξαναδοκίμασε.',fail:'Δεν στάλθηκε. Δοκίμασε ξανά σε λίγα λεπτά.',
+  exp:'Ο σύνδεσμος έληξε. Πάρε νέο εδώ από κάτω.',bad:'Ο σύνδεσμος δεν λειτούργησε. Πάρε νέο εδώ από κάτω.'};
+var k=null; try{k=sessionStorage.getItem('hh_linkerr');}catch(e){}
+function mask(e){var p=String(e).split('@');if(p.length!==2)return e;var u=p[0];return (u.length<=2?u[0]+'*':u.slice(0,2)+'***')+'@'+p[1];}
+var IN='width:100%;box-sizing:border-box;background:#0f1622;border:1px solid #2a3040;border-radius:9px;color:#e6e8ee;padding:10px 12px;font-size:13.5px;outline:none';
+function build(g){
+  if(document.getElementById('hh123')) return;
+  var err=document.getElementById('hhErr'); var card=err?err.parentNode:null; if(!card) return;
+  var w=document.createElement('div'); w.id='hh123'; w.style.cssText='margin-top:12px;text-align:center';
+  w.innerHTML='<button type="button" id="hh123-b" style="background:none;border:none;color:#9aa3b6;font-size:12.5px;cursor:pointer;text-decoration:underline;padding:4px">'+T.btn+'</button>'
+   +'<div id="hh123-p" style="display:none;text-align:left;margin-top:10px;padding:12px;border-radius:10px;background:#0f1622;border:1px solid #2a3040">'
+   +'<div id="hh123-x" style="display:none;margin:0 0 10px;padding:9px 11px;border-radius:9px;font-size:13px;line-height:1.4;background:rgba(232,163,60,.12);border:1px solid rgba(232,163,60,.45);color:#e8a33c"></div>'
+   +'<div style="font-size:12.5px;color:#9aa3b6;line-height:1.4;margin-bottom:8px">'+T.hint+'</div>'
+   +'<input id="hh123-i" type="text" autocomplete="username" placeholder="'+T.ph+'" style="'+IN+';margin-bottom:8px">'
+   +'<button type="button" id="hh123-s" style="width:100%;background:transparent;color:#c8a84b;border:1px solid #c8a84b;border-radius:9px;padding:10px;font-size:14px;font-weight:600;cursor:pointer">'+T.send+'</button>'
+   +'<div id="hh123-o" style="font-size:12.5px;line-height:1.4;margin-top:9px;display:none"></div></div>';
+  card.appendChild(w);
+  var P=w.querySelector('#hh123-p'),I=w.querySelector('#hh123-i'),S=w.querySelector('#hh123-s'),O=w.querySelector('#hh123-o');
+  function open(){ P.style.display='block'; var e=document.getElementById('hhE'); if(e&&e.value&&!I.value) I.value=e.value; setTimeout(function(){try{I.focus();}catch(x){}},50); }
+  w.querySelector('#hh123-b').onclick=function(){ if(P.style.display==='block') P.style.display='none'; else open(); };
+  function say(t,ok){ O.style.display='block'; O.style.color=ok?'#7eb89a':'#f87171'; O.textContent=t; }
+  async function send(){
+    var v=(I.value||'').trim(); if(!v){ say(T.empty,false); return; }
+    S.disabled=true; var old=S.textContent; S.textContent=T.sending; O.style.display='none';
+    try{
+      var email=v;
+      if(v.indexOf('@')<0){
+        var r=await fetch(SB+'/rest/v1/rpc/username_to_email',{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({handle:v})});
+        email=r.ok?await r.json():null; if(!email){ say(T.nouser,false); return; }
+      }
+      var rr=await fetch(SB+'/auth/v1/recover?redirect_to='+encodeURIComponent(location.origin+'/'),{method:'POST',headers:{apikey:AK,'Content-Type':'application/json'},body:JSON.stringify({email:email})});
+      if(rr.ok){ say(T.ok(mask(email)),true); }
+      else if(rr.status===429){ say(T.wait,false); }
+      else { var j=null; try{j=await rr.json();}catch(x){} say(T.fail+(j&&(j.msg||j.message)?' ('+(j.msg||j.message)+')':''),false); }
+    }catch(e){ say(T.fail,false); }
+    finally{ S.disabled=false; S.textContent=old; }
+  }
+  S.onclick=send; I.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); send(); } });
+  if(k){ try{sessionStorage.removeItem('hh_linkerr');}catch(e){} var X=w.querySelector('#hh123-x'); X.textContent=(k==='otp_expired')?T.exp:T.bad; X.style.display='block'; open(); }
+}
+var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'); if(g&&document.getElementById('hhErr')){ build(g); }
+  if(document.getElementById('hh123')||n>240){ clearInterval(iv); } },250);
+}catch(e){try{console.warn('hhPolish123',e);}catch(x){}}})();
+</script>
 </body>
 </html>
-<!-- build: hh122 -->
+<!-- build: hh123 -->
