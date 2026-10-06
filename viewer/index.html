@@ -5138,7 +5138,7 @@ document.head.appendChild(st);
 function tok(){try{var o=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');return o&&o.access_token?o.access_token:null;}catch(e){return null;}}
 var counts=null,lastAt=0;
 function paint(){try{var m=document.getElementById('hh-mergebtn'),u=document.getElementById('hh-suspbtn');if(!counts)return;[[m,counts.suggestions],[u,counts.suspicious]].forEach(function(p){var el=p[0],n=p[1];if(!el)return;var b=el.querySelector('.hh-cnt');if(!b){b=document.createElement('span');b.className='hh-cnt';el.appendChild(b);}var v=(n==null?'…':String(n));if(b.textContent!==v)b.textContent=v;b.classList.toggle('zero',!n);el.title=(el.id==='hh-mergebtn'?'Προτάσεις ένωσης που περιμένουν: ':'Ύποπτες ενώσεις που περιμένουν: ')+v;});}catch(e){}}
-async function load(force){try{if(window.hhRole!=='admin')return;var t=tok();if(!t)return;if(!force&&Date.now()-lastAt<5*60*1000)return;lastAt=Date.now();var r=await fetch(SB+'/rest/v1/rpc/rent_admin_counts',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+t,'Content-Type':'application/json'},body:'{}'});if(!r.ok)return;counts=await r.json();paint();}catch(e){}}
+async function load(force){try{if(window.hhRole!=='admin')return;var t=tok();if(!t)return;var pj=(function(){var c=null;try{c=currentProject;}catch(e){}return c==='Pakis'?'Pakis':'Rent';})();/*hhPolish122*/if(pj!==window.__hhCntP){window.__hhCntP=pj;counts={suggestions:null,suspicious:null};paint();force=true;}if(!force&&Date.now()-lastAt<5*60*1000)return;lastAt=Date.now();var r=await fetch(SB+'/rest/v1/rpc/hh_admin_counts',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({p_project:pj})});if(!r.ok)return;counts=await r.json();paint();}catch(e){}}
 setInterval(function(){load(false);paint();},1500);
 document.addEventListener('visibilitychange',function(){if(!document.hidden)load(true);});
 window.hhRefreshCounts=function(){load(true);};
@@ -15731,7 +15731,7 @@ css.textContent=''
 +'#hh117-drawer .st{border:1px solid rgba(255,255,255,.12);background:transparent;color:#c3c9d6;border-radius:8px;padding:4px 9px;font-size:11.5px;cursor:pointer}'
 +'body.light #hh117-card,body.light #hh117-drawer{background:#fff;color:#1d2230;border-color:rgba(0,0,0,.08)}body.light #hh117-card textarea{background:#f6f7f9;color:#1d2230;border-color:rgba(0,0,0,.12)}'
 +'body.light #hh117-fab{background:rgba(255,255,255,.85);border-color:rgba(0,0,0,.1)}body.light #hh117-fab span{color:#1d2230}'
-+'body.hh-projadmin #hh-mergebtn,body.hh-projadmin #hh-suspbtn{display:none!important}'
++''
 +'#hh117-card .mk{display:flex;align-items:center;gap:8px;margin-top:8px}#hh117-card .mkb{border:1px dashed rgba(200,168,75,.55);background:transparent;color:#e8cf86;border-radius:9px;padding:6px 10px;font-size:12px;cursor:pointer}'
 +'#hh117-card .th{position:relative;display:inline-block}#hh117-card .th img{height:48px;border-radius:7px;border:1px solid rgba(255,255,255,.15);display:block}#hh117-card .th button{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;border:0;background:#2a3040;color:#e6e8ee;font-size:11px;line-height:18px;padding:0;cursor:pointer}'
 +'#hh119-ann{position:fixed;inset:0;z-index:2147482500;cursor:crosshair;touch-action:none}'
@@ -16063,6 +16063,19 @@ function wrap(){
 }
 var n=0, iv=setInterval(function(){ n++; if(wrap()||n>120) clearInterval(iv); },500);
 }catch(e){try{console.warn('hhPolish121',e);}catch(x){}}})();</script>
+<script>/*hhPolish122*/(function(){try{
+/* 6 Oct 2026 — 🔀 Ενώσεις and ⚠ Ύποπτες per category: on the Pakis tab they open the Pakis merge screen
+   (merge.html?p=Pakis) and count Pakis pairs; Con (Pakis admin) now sees both buttons. */
+function pj(){var c=null;try{c=currentProject;}catch(e){}return c==='Pakis'?'Pakis':'Rent';}
+function upd(){try{var p=pj(),q=(p==='Rent'?'':'?p='+p);
+  var m=document.getElementById('hh-mergebtn'),u=document.getElementById('hh-suspbtn');
+  if(m&&m.getAttribute('href')!=='merge.html'+q) m.setAttribute('href','merge.html'+q);
+  if(u&&u.getAttribute('href')!=='merge.html'+q+'#susp') u.setAttribute('href','merge.html'+q+'#susp');
+  if(window.hhRefreshCounts&&window.__hhCntP&&window.__hhCntP!==p) window.hhRefreshCounts();
+}catch(e){}}
+setInterval(upd,800); upd();
+}catch(e){try{console.warn('hhPolish122',e);}catch(x){}}})();
+</script>
 </body>
 </html>
-<!-- build: hh121 -->
+<!-- build: hh122 -->
