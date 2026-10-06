@@ -7,7 +7,9 @@
 /* 6 Oct 2026 — Supabase invite / password-reset links land here as #access_token=…&type=invite.
    They become the board's own session (same shape as a normal sign-in), the address bar is cleaned,
    and the 🔑 dialog opens by itself so the new member sets a password (hhPolish115). */
-var h=location.hash||''; if(h.indexOf('access_token=')<0) return;
+var h=location.hash||'';
+if(h.indexOf('error_code=')>=0||h.indexOf('error=')>=0){try{var e=new URLSearchParams(h.replace(/^#/,''));sessionStorage.setItem('hh_linkerr',e.get('error_code')||e.get('error')||'error');}catch(x){}history.replaceState(null,'',location.pathname+location.search);return;}
+if(h.indexOf('access_token=')<0) return;
 var q=new URLSearchParams(h.replace(/^#/,'')); var at=q.get('access_token'); if(!at) return;
 var p=JSON.parse(decodeURIComponent(escape(atob(at.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))));
 var user={id:p.sub,email:p.email,app_metadata:p.app_metadata||{},user_metadata:p.user_metadata||{},role:p.role};
@@ -15825,6 +15827,20 @@ async function refresh(force){
 }
 setInterval(refresh,1000);
 }catch(e){try{console.warn('hhPolish117',e);}catch(x){}}})();</script>
+<script>/*hhPolish118*/(function(){try{
+/* 6 Oct 2026 — an expired or already-used invite / reset link (#error_code=otp_expired) used to drop the person
+   on the sign-in screen without a word. Now the sign-in card says the link expired and to ask Dusty for a new one. */
+var k=null; try{k=sessionStorage.getItem('hh_linkerr');}catch(e){} if(!k) return;
+var en=false; try{en=localStorage.getItem('hh_lang')==='en';}catch(e){}
+var msg=(k==='otp_expired')?(en?'This link has expired. Ask Dusty for a new one.':'Ο σύνδεσμος έληξε. Ζήτα από τον Dusty νέο.')
+                        :(en?'This link did not work. Ask Dusty for a new one.':'Ο σύνδεσμος δεν λειτούργησε. Ζήτα από τον Dusty νέο.');
+var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'); if(n>80){clearInterval(iv);return;} if(!g) return;
+  clearInterval(iv); try{sessionStorage.removeItem('hh_linkerr');}catch(e){}
+  var d=document.createElement('div'); d.textContent=msg;
+  d.style.cssText='margin:0 0 12px;padding:9px 11px;border-radius:9px;font-size:13px;line-height:1.4;background:rgba(232,163,60,.12);border:1px solid rgba(232,163,60,.45);color:#e8a33c';
+  var f=g.querySelector('input'); var host=(f&&f.parentNode)||g; host.insertBefore(d, host.firstChild);
+},250);
+}catch(e){}})();</script>
 </body>
 </html>
-<!-- build: hh117 -->
+<!-- build: hh118 -->
