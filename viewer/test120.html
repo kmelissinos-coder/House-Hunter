@@ -15854,11 +15854,14 @@ function annotate(){
       var h2c=await loadH2C(); document.body.appendChild(busy); busy.style.background='transparent'; busy.style.color='transparent';
       var shot=await Promise.race([ h2c(document.body,{useCORS:true,allowTaint:false,logging:false,backgroundColor:getComputedStyle(document.body).backgroundColor||'#111',
           x:scrollX,y:scrollY,width:W,height:Hh,windowWidth:W,windowHeight:Hh,scale:sc,
-          ignoreElements:function(el){ return el.id==='hh119-ann'||el.id==='hh119-bar'||el.id==='hh119-busy'||el.id==='hh117-card'||el.id==='hh117-fab'||el.id==='hh119-hint'; }}),
-        new Promise(function(_,rej){ setTimeout(function(){rej(new Error('timeout'));},25000); }) ]);
+          ignoreElements:function(el){ if(el.id==='hh119-ann'||el.id==='hh119-bar'||el.id==='hh119-busy'||el.id==='hh117-card'||el.id==='hh117-fab'||el.id==='hh119-hint') return true;
+            /* only what is on screen: skip anything entirely outside the viewport (big speed-up on the long list) */
+            try{ if(el.nodeType===1&&el!==document.body&&el!==document.documentElement){ var rr=el.getBoundingClientRect(); if(rr.width>0&&rr.height>0&&(rr.bottom<-2||rr.top>Hh+2||rr.right<-2||rr.left>W+2)) return true; } }catch(e){}
+            return false; }}),
+        new Promise(function(_,rej){ setTimeout(function(){rej(new Error('timeout'));},45000); }) ]);
       var out=document.createElement('canvas'); out.width=shot.width; out.height=shot.height; var o2=out.getContext('2d');
       o2.drawImage(shot,0,0); o2.drawImage(cv,0,0,out.width,out.height);
-      data=enc(out,0.9); var q=0.82; while(data.length>1500000 && q>=0.5){ data=enc(out,q); q-=0.08; }
+      data=enc(out,0.9); if(data.length>1500000) data=enc(out,0.78); if(data.length>1500000) data=enc(out,0.62);
       if(data.length>1500000){ var c5=document.createElement('canvas'); c5.width=Math.round(out.width*.75); c5.height=Math.round(out.height*.75); c5.getContext('2d').drawImage(out,0,0,c5.width,c5.height); data=enc(c5,0.8); }
       marks.image='page'; marks.px=[out.width,out.height];
     }catch(err){
