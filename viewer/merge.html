@@ -160,7 +160,7 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 </head>
 <body>
 <header>
-  <h1>🔀 Ενώσεις (Rent)</h1>
+  <h1>🔀 Ενώσεις (<span id="projName">Rent</span>)</h1>
   <a class="back" href="index.html">← House Hunter</a>
   <div class="tabs"><button id="tabPairs" class="on">Προτάσεις ένωσης</button><button id="tabSusp">Ύποπτες ενώσεις</button></div>
   <div class="tabs" id="viewTabs"><button id="viewList" class="on">Λίστα</button><button id="viewOne">Ένα-ένα</button></div>
@@ -180,6 +180,9 @@ main{max-width:1240px;margin:0 auto;padding:16px}
 <div id="toast"></div>
 <script>
 const SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+/*hhMergeP1 (6 Oct 2026): one merge screen per category — merge.html = Rent, merge.html?p=Pakis = Pakis (Con)*/
+const PROJ=(function(){try{var p=new URLSearchParams(location.search).get('p')||'Rent';return /^[A-Za-z0-9]{1,20}$/.test(p)?p:'Rent';}catch(e){return 'Rent';}})();
+let ISADM=true;
 const HELP={pairs:'Κάθε πρόταση δείχνει δύο σπίτια που μοιάζουν — <b>μόνο σπίτια με φωτογραφίες</b>. Όσα έχουν 3+ ίδιες φωτογραφίες, ίδια τ.μ. και ίδια τιμή <b>ενώνονται αυτόματα</b> μόλις ανοίξεις τη σελίδα (τα βλέπεις στο πράσινο πλαίσιο, με αναίρεση). Οι φωτογραφίες των δύο σπιτιών ξεκινούν από τις κοινές, με την ίδια σειρά (πρώτα εξωτερικοί χώροι/μπαλκόνια). «Ένωση» κρατάει τον αριθμό του σπιτιού με τις περισσότερες αγγελίες. Αν τα δύο σπίτια έχουν <b>διαφορετική</b> βαθμολογία σου, ρωτάει ποια να κρατήσει.',
  susp:'Ομάδες που ήδη έχουν ενωθεί αλλά κάτι δεν ταιριάζει — <b>μόνο αγγελίες με φωτογραφίες</b>. Ομάδες όπου όλες οι φωτογραφίες ταιριάζουν δεν εμφανίζονται. Κάθε κάρτα ξεκινά από τις φωτογραφίες που έχει κοινές με τις άλλες, με την ίδια σειρά, και ανοίγει στη φωτογραφία όπου σταμάτησες την προηγούμενη φορά (⏸). Το χρώμα πάνω στην κάρτα δείχνει σε ποια ομάδα φωτογραφιών ανήκει. «✂ Αποσύνδεση» = ξεχωριστό σπίτι· «Είναι σωστά» = δεν ξαναεμφανίζεται, εκτός αν μπει καινούργια αγγελία που δεν έχεις δει.'};
 function sess(){try{const j=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');if(j&&j.access_token)return j;}catch(e){}return null;}
@@ -198,7 +201,7 @@ function toast(m,bad){const t=document.getElementById('toast');t.textContent=m;t
 let TAB='pairs', VIEW='list', PAIRS=[], GROUPS=[], IDX=0, UNDO=[];
 /*hhMergeV16: τα προφανή (3+ ίδιες φωτογραφίες, ίδια τ.μ. και τιμή) ενώνονται χωρίς ερώτηση*/
 let AUTO16=[];
-async function autoMerge16(){try{const r=await rpc('rent_merge_obvious',{});if(Array.isArray(r)&&r.length){AUTO16=AUTO16.concat(r);toast('🔗 Ενώθηκαν αυτόματα '+r.length+' προφανή');}}catch(e){console.warn('auto-merge',e);}}
+async function autoMerge16(){try{const r=await rpc('hh_merge_obvious',{p_project:PROJ});if(Array.isArray(r)&&r.length){AUTO16=AUTO16.concat(r);toast('🔗 Ενώθηκαν αυτόματα '+r.length+' προφανή');}}catch(e){console.warn('auto-merge',e);}}
 function autoBanner16(){if(!AUTO16.length)return '';
   return `<div class="auto16"><h3>🔗 Ενώθηκαν αυτόματα ${AUTO16.length} προφανή — ίδιες φωτογραφίες, ίδια τ.μ. και τιμή</h3>${AUTO16.map((a,i)=>`<div class="row16${a.undone?' undone':''}" id="a16_${i}"><span>#${esc(a.old)} → <b>#${esc(a.new)}</b></span><span>📸 ${esc(a.ph)} ίδιες</span><span>${a.sqm?esc(a.sqm)+' τ.μ.':''} ${a.price?'· €'+Number(a.price).toLocaleString('el'):''}</span><a href="index.html?house=${encodeURIComponent(a.new)}" target="_blank">🏡 άνοιγμα</a>${a.undone?'<span>αναιρέθηκε</span>':`<button onclick="autoUndo16(${i})" title="Χωρίζει ξανά τα δύο σπίτια και δεν θα ξαναενωθούν αυτόματα">↶ Δεν είναι το ίδιο</button>`}</div>`).join('')}</div>`;}
 async function autoUndo16(i){const a=AUTO16[i];if(!a||a.undone)return;try{if(a.log_id)await rpc('merge_undo',{p_log_id:a.log_id});await rpc('merge_verdict',{p_h1:a.old,p_h2:a.new,p_verdict:'no'});a.undone=true;toast('↶ Χωρίστηκαν: #'+a.old+' / #'+a.new);render();}catch(e){toast('Σφάλμα: '+e.message,true);}}
@@ -313,7 +316,7 @@ async function load(){const el=document.getElementById('list');el.className='msg
   try{el.textContent='Ενημέρωση φωτογραφιών μετά τις ενώσεις…';await rpc('rent_merge_refresh',{});}catch(e){console.warn('refresh',e);}
   el.textContent='Φόρτωση…';
   await autoMerge16();
-  try{if(TAB==='pairs')PAIRS=await rpc('rent_merge_suggestions',{min_score:+document.getElementById('minScore').value});else GROUPS=await rpc('rent_suspicious_groups',{});}
+  try{if(TAB==='pairs')PAIRS=await rpc('hh_merge_suggestions',{p_project:PROJ,min_score:+document.getElementById('minScore').value});else GROUPS=await rpc('hh_suspicious_groups',{p_project:PROJ});}
   catch(e){el.textContent='Σφάλμα: '+e.message+(/admin/.test(e.message)?' — η σελίδα είναι μόνο για τον διαχειριστή.':'');return;}
   render();showFreshness();}
 async function showFreshness(){/*mergeV6*/try{var st=await rpc('rent_pairs_status',{});var el=document.getElementById('freshness');if(!el||!st)return;var d=st.built_at?new Date(st.built_at):null;var mins=d?Math.round((Date.now()-d.getTime())/60000):null;var when=!d?'—':(mins<1?'μόλις τώρα':(mins<60?('πριν '+mins+'′'):d.toLocaleString('el-GR',{hour:'2-digit',minute:'2-digit',day:'2-digit',month:'2-digit'})));el.innerHTML='ζεύγη: <b>'+(st.n_pairs||0)+'</b> · υπολογίστηκαν '+when+(st.dirty?' · <b>άλλαξαν αγγελίες — ανανεώνεται</b>':'');}catch(e){}}
@@ -451,7 +454,7 @@ async function doMerge(i){const p=PAIRS[i];const keep=keepOf(p);const newH=keep=
 async function undo(){const u=UNDO.pop();if(!u)return;try{const msg=await rpc('merge_undo',{p_log_id:u.id});toast('↶ '+msg);document.getElementById('undoBtn').disabled=!UNDO.length;load();}catch(e){UNDO.push(u);toast('Σφάλμα: '+e.message,true);}}
 async function doSplit(id,btn){btn.disabled=true;try{const nh=await rpc('split_listing',{p_listing:id});toast('✂ Έγινε ξεχωριστό σπίτι #'+nh);load();}catch(e){btn.disabled=false;toast('Σφάλμα: '+e.message,true);}}
 async function groupOk(i){const g=GROUPS[i];try{await rpc('group_check',{p_house:g.house_id,p_verdict:'ok'});toast('✓ Η ομάδα #'+g.house_id+' σημειώθηκε ως σωστή');advance(i);}catch(e){toast('Σφάλμα: '+e.message,true);}}
-document.getElementById('reload').onclick=async function(){/*mergeV6*/var b=this;var t=b.textContent;b.disabled=true;b.textContent='⏳ Υπολογίζω ξανά…';var el=document.getElementById('list');el.className='msg';el.textContent='Ξανατρέχει ο αλγόριθμος σύγκρισης σε όλα τα σπίτια…';try{await rpc('rent_pairs_refresh',{});}catch(e){toast('Σφάλμα ανανέωσης: '+e.message,true);}b.disabled=false;b.textContent=t;await load();};document.getElementById('minScore').onchange=load;document.getElementById('undoBtn').onclick=undo;
+document.getElementById('reload').onclick=async function(){/*mergeV6*/var b=this;var t=b.textContent;b.disabled=true;b.textContent='⏳ Υπολογίζω ξανά…';var el=document.getElementById('list');el.className='msg';el.textContent='Ξανατρέχει ο αλγόριθμος σύγκρισης σε όλα τα σπίτια…';try{await rpc(ISADM?'rent_pairs_refresh':'rent_merge_refresh',{});}catch(e){toast('Σφάλμα ανανέωσης: '+e.message,true);}b.disabled=false;b.textContent=t;await load();};document.getElementById('minScore').onchange=load;document.getElementById('undoBtn').onclick=undo;
 document.getElementById('tabPairs').onclick=()=>{TAB='pairs';IDX=0;setTabs();load();};document.getElementById('tabSusp').onclick=()=>{TAB='susp';IDX=0;setTabs();load();};
 document.getElementById('viewList').onclick=()=>{VIEW='list';setTabs();render();};document.getElementById('viewOne').onclick=()=>{VIEW='one';setTabs();render();};
 document.getElementById('prev').onclick=()=>{IDX--;render();};document.getElementById('next').onclick=()=>{IDX++;render();};
@@ -459,7 +462,8 @@ document.addEventListener('keydown',e=>{if(VIEW!=='one'||document.getElementById
 function setTabs(){document.getElementById('tabPairs').classList.toggle('on',TAB==='pairs');document.getElementById('tabSusp').classList.toggle('on',TAB==='susp');document.getElementById('viewList').classList.toggle('on',VIEW==='list');document.getElementById('viewOne').classList.toggle('on',VIEW==='one');document.getElementById('minWrap').style.display=TAB==='pairs'?'':'none';}
 try{VIEW=localStorage.getItem('hh_merge_view')||'list';}catch(e){}
 document.getElementById('viewList').addEventListener('click',()=>{try{localStorage.setItem('hh_merge_view','list');}catch(e){}});document.getElementById('viewOne').addEventListener('click',()=>{try{localStorage.setItem('hh_merge_view','one');}catch(e){}});
-if(location.hash==='#susp')TAB='susp';setTabs();load();
+if(location.hash==='#susp')TAB='susp';setTabs();
+(async function(){try{var pn=document.getElementById('projName');if(pn)pn.textContent=PROJ;document.title='🔀 Ενώσεις — '+PROJ;var st=document.createElement('style');st.textContent='body.hh-nonadm .btn.nuke{display:none!important}';document.head.appendChild(st);if(sess()){var j=await rpc('hh_my_status',{});if(j&&!j.admin){ISADM=false;document.body.classList.add('hh-nonadm');}}}catch(e){}var bk=document.querySelector('a.back');if(bk&&PROJ!=='Rent')bk.setAttribute('href','index.html');load();})();
 </script>
 </body>
 </html>
