@@ -15600,6 +15600,63 @@ var pw=setInterval(function(){try{
   if(b){sessionStorage.removeItem('hh_setpw');clearInterval(pw);setTimeout(function(){b.click();},500);}
 }catch(e){}},700);
 }catch(e){try{console.warn('hhPolish115',e);}catch(x){}}})();</script>
+<script>/*hhPolish116*/(function(){try{
+if(window.__hh116) return; window.__hh116=1;
+/* 6 Oct 2026 — account on hold. When hh_my_status() says hold:true (set by Dusty in hh_project_access),
+   the database already returns nothing; this shows a calm, neutral screen instead of an empty board:
+   «your account is being upgraded — check back later». No end time on purpose. The 🔑 password dialog
+   (z-index above this screen) still works, so an invited member can set a password first. */
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+function parse(s){try{return JSON.parse(s||'null');}catch(e){return null;}}
+function sess(){return parse(sessionStorage.getItem('hh_auth'))||parse(localStorage.getItem('hh_auth'));}
+function en(){try{return localStorage.getItem('hh_lang')==='en';}catch(e){return false;}}
+function show(){
+  if(document.getElementById('hh116-hold')) return;
+  var E=en();
+  var css=document.createElement('style'); css.id='hh116-css';
+  css.textContent='#hh116-hold{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:24px;'
+   +'background:radial-gradient(1200px 600px at 50% -10%,rgba(200,168,75,.10),transparent 60%),rgba(10,13,20,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);'
+   +'font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#e6e8ee}'
+   +'#hh116-hold .c{max-width:380px;width:100%;text-align:center;padding:34px 28px 26px;border:1px solid rgba(255,255,255,.08);border-radius:18px;'
+   +'background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));box-shadow:0 20px 60px rgba(0,0,0,.45)}'
+   +'#hh116-hold .ic{width:52px;height:52px;margin:0 auto 18px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;'
+   +'background:rgba(200,168,75,.12);border:1px solid rgba(200,168,75,.25)}'
+   +'#hh116-hold h1{font-size:19px;font-weight:600;margin:0 0 8px;letter-spacing:-.2px}'
+   +'#hh116-hold p{font-size:14px;line-height:1.55;margin:0;color:#9aa4b8}'
+   +'#hh116-hold .bar{height:3px;border-radius:3px;margin:22px auto 18px;width:120px;overflow:hidden;background:rgba(255,255,255,.07);position:relative}'
+   +'#hh116-hold .bar i{position:absolute;top:0;left:-40%;width:40%;height:100%;border-radius:3px;background:#c8a84b;animation:hh116 2.4s ease-in-out infinite}'
+   +'@keyframes hh116{0%{left:-40%}100%{left:100%}}'
+   +'#hh116-hold a{font-size:12px;color:#7d879b;text-decoration:none;cursor:pointer}#hh116-hold a:hover{color:#c8a84b}'
+   +'body.light #hh116-hold{background:rgba(246,244,239,.94);color:#1d2230}body.light #hh116-hold p{color:#5b6476}'
+   +'body.light #hh116-hold .c{background:#fff;border-color:rgba(0,0,0,.08);box-shadow:0 20px 60px rgba(0,0,0,.12)}';
+  document.head.appendChild(css);
+  var o=document.createElement('div'); o.id='hh116-hold'; o.setAttribute('role','dialog'); o.setAttribute('aria-live','polite');
+  o.innerHTML='<div class="c"><div class="ic">🏡</div>'
+   +'<h1>'+(E?'Your account is being upgraded':'Ο λογαριασμός σου αναβαθμίζεται')+'</h1>'
+   +'<p>'+(E?'We are preparing a few things for you. Please check back later.':'Ετοιμάζουμε μερικά πράγματα για σένα. Ξαναδοκίμασε αργότερα.')+'</p>'
+   +'<div class="bar"><i></i></div>'
+   +'<a id="hh116-out">'+(E?'Sign out':'Αποσύνδεση')+'</a></div>';
+  document.body.appendChild(o);
+  document.getElementById('hh116-out').onclick=function(){try{localStorage.removeItem('hh_auth');sessionStorage.removeItem('hh_auth');}catch(e){} location.replace(location.pathname);};
+}
+function hide(){var o=document.getElementById('hh116-hold'); if(o) o.remove();}
+/* poll: every 1 s until the first answer; then every 60 s while on hold (unlocks by itself),
+   every 10 min otherwise (RLS already blocks a held account in between) */
+var busy=false, next=0;
+async function check(){
+  if(busy||Date.now()<next) return; var s=sess(); if(!s||!s.access_token){hide();return;}
+  busy=true;
+  try{
+    var r=await fetch(SB+'/rest/v1/rpc/hh_my_status',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+s.access_token,'Content-Type':'application/json'},body:'{}'});
+    if(r.ok){var j=await r.json();
+      if(j&&j.hold){ show(); next=Date.now()+60000; }
+      else if(j){ next=Date.now()+600000; if(document.getElementById('hh116-hold')){ hide(); location.reload(); } }
+    } else { next=Date.now()+5000; }
+  }catch(e){ next=Date.now()+5000; }
+  busy=false;
+}
+setInterval(check,1000);
+}catch(e){try{console.warn('hhPolish116',e);}catch(x){}}})();</script>
 </body>
 </html>
-<!-- build: hh115 -->
+<!-- build: hh116 -->
