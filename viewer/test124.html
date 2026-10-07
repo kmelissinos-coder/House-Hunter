@@ -97,7 +97,10 @@ window.fetch=function(u,o){
             return _f.call(window,url,o3);
           };
           var dead=function(){ return !s.e || s.e*1000 < Date.now()+5000; };
-          var drop=function(){ stores().forEach(function(p){ try{ var a=parse(p[1].getItem('hh_auth')); if(a&&a.access_token===s.t) p[1].removeItem('hh_auth'); }catch(e){} }); };
+          /* localStorage gets a tombstone instead of being emptied: other open House Hunter tabs (hhSessSync) copy
+             their own copy of the dead session back into an EMPTY localStorage every 400 ms, but leave it alone
+             while it holds something; a new sign-in simply overwrites the tombstone. */
+          var drop=function(){ stores().forEach(function(p){ try{ var a=parse(p[1].getItem('hh_auth')); if(a&&a.access_token===s.t){ if(p[0]==='l') p[1].setItem('hh_auth','{"dead":1}'); else p[1].removeItem('hh_auth'); } }catch(e){} }); };
           var send=function(tok){
             return go(tok).then(function(res){
               if(res.status!==401) return res;
