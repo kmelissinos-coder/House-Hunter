@@ -1976,6 +1976,7 @@ const sb = {
 
 //    STATE                                                                
 let allListings    = [];
+window._hhLoading = true; /*hhPolish125: ads not loaded yet*/
 let extraListings  = []; 
 let filtered       = [];
 let currentView    = 'grid';
@@ -2053,6 +2054,7 @@ async function loadData() {
 }
 
 async function tryFetch() {
+  window._hhLoading = true; /*hhPolish125*/ try {
   if(!window._hhSilent) document.getElementById('main-content').innerHTML = `
     <div class="loading"><div class="loading-spinner"></div>Φόρτωση δεδομένων από το Supabase...</div>`;
   try {
@@ -2113,6 +2115,7 @@ async function tryFetch() {
       </div>`;
   }
   (document.querySelector('.refresh-btn')||{}).disabled = false;
+  } finally { window._hhLoading = false; /*hhPolish125*/ }
 }
 
 //    CSV PARSER ───────────────────────────────────────────────────────────
@@ -2552,6 +2555,8 @@ function renderListings() {
   })();
 
   const container = document.getElementById('main-content');
+  if (!filtered.length && window._hhLoading && !(allListings||[]).length) { /*hhPolish125: still loading — never say «no ads» yet*/
+    container.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Φόρτωση αγγελιών…</div>'; return; }
   if (!filtered.length) { container.innerHTML = '<div class="empty">Δεν βρέθηκαν αγγελίες με αυτά τα φίλτρα.</div>'; return; }
   if (currentView === 'map') {
     const { groupCards, singles } = groupByHouseId(filtered);
@@ -16144,4 +16149,4 @@ var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'
 </script>
 </body>
 </html>
-<!-- build: hh124 -->
+<!-- build: hh125 -->
