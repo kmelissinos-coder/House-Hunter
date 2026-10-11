@@ -108,9 +108,20 @@ window.__rmGo=async function(limit, backend){
   try{
     if(!window.tf){ S.stage='tfjs'; await script('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js'); }
     if(!window.mobilenet){ S.stage='model-js'; await script('https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js'); }
-    if(backend){ S.stage='backend'; try{ await tf.setBackend(backend); await tf.ready(); }catch(e){} }
+    /* 11 Oct 2026: default backend = WASM (CPU). WebGL crawled at ~3 photos/min whenever the
+       Chrome window was behind another window; WASM does ~260/min in front and needs no GPU,
+       so the window no longer has to be visible. __rmGo(n,'webgl') still forces WebGL. */
+    backend = backend || 'wasm';
+    if(backend==='wasm' && !(window.tf && tf.wasm)){
+      S.stage='wasm-js';
+      try{ await script('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.20.0/dist/tf-backend-wasm.min.js');
+           tf.wasm.setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.20.0/dist/'); }
+      catch(e){ backend='webgl'; }
+    }
+    S.stage='backend'; try{ if(tf.getBackend()!==backend){ await tf.setBackend(backend); } await tf.ready(); }catch(e){}
     S.backend=(window.tf&&tf.getBackend)?tf.getBackend():null;
-    if(!window.__rmModel){ S.stage='model'; window.__rmModel=await mobilenet.load({version:2,alpha:1.0}); }
+    if(!window.__rmModel || window.__rmModelBackend!==S.backend){ S.stage='model'; window.__rmModel=await mobilenet.load({version:2,alpha:1.0}); window.__rmModelBackend=S.backend; }
+    S.t0=Date.now(); S.d0=S.done; S.doneHidden=0;
     S.stage='todo';
     var r=await fetch(SB+'/rpc/img_room_todo',{method:'POST',headers:HD,body:JSON.stringify({n:limit||400})});
     var j=await r.json();
@@ -134,7 +145,8 @@ window.__rmGo=async function(limit, backend){
         var c=catOf(preds);
         buf.push({u:u, c:c.c, p:Math.round(c.p*1000)/1000, t:String((preds[0]||{}).className||'').slice(0,200)});
         S.counts[c.c]=(S.counts[c.c]||0)+1;
-        S.done++;
+        S.done++; if(document.hidden) S.doneHidden++;
+        S.perMin=Math.round((S.done-S.d0)*60000/Math.max(1,Date.now()-S.t0));
       }catch(e){ S.fail++; }
       /* μικρές παρτίδες: 18 Σεπ μια διακοπή στις 16 φωτογραφίες πέταξε όλη τη
          δουλειά, γιατί το flush γινόταν κάθε 60. */
