@@ -66,7 +66,11 @@ function load(src, timeout){
     var im=new Image(); im.crossOrigin='anonymous';
     var t=setTimeout(function(){ im.src=''; rej(new Error('timeout')); }, timeout||15000);
     im.onload=function(){ clearTimeout(t); res(im); };
-    im.onerror=function(){ clearTimeout(t); rej(new Error('img')); };
+    /* 11 Oct 2026: a photo the board already showed sits in Chrome's cache WITHOUT the CORS header,
+       so the crossOrigin <img> fails on it -> fetch it fresh and decode it as an ImageBitmap */
+    im.onerror=function(){ clearTimeout(t);
+      fetch(src,{cache:'no-store',mode:'cors'}).then(function(r){ if(!r.ok) throw new Error('http '+r.status); return r.blob(); })
+        .then(function(b){ return createImageBitmap(b); }).then(res, function(){ rej(new Error('img')); }); };
     im.src=src;
   });
 }
