@@ -672,5 +672,49 @@ if(typeof pairHTML==='function'){
 }
 }catch(err){console.warn('hhMergeV18b',err);}})();</script>
 
+<script>/*hhMergeV18c: the photos of A and B grouped by room (outside / living / kitchen / bedrooms / bath), side by side — Dusty 11/10*/
+(function(){try{
+if(window.__hhRm18) return; window.__hhRm18=true;
+var st=document.createElement('style'); st.textContent=''
++'.rm18{padding:8px 14px 12px;border-top:1px solid var(--border,#333)}'
++'.rm18h{font-size:12px;color:var(--muted,#999);margin-bottom:6px}.rm18h b{color:var(--text,#eee)}'
++'.rm18r{margin:8px 0 10px}.rm18l{font-size:12px;font-weight:700;color:var(--text,#eee);margin-bottom:4px}.rm18l span{font-weight:400;color:var(--muted,#999)}'
++'.rm18s{display:grid;grid-template-columns:1fr 1fr;gap:12px}'
++'.rm18x{display:flex;gap:5px;flex-wrap:wrap;align-items:flex-start;background:rgba(255,255,255,.03);border:1px solid var(--border,#333);border-radius:8px;padding:5px;min-height:40px}'
++'.rm18x .tg{font-size:11px;font-weight:700;color:#fff;background:rgba(0,0,0,.6);border-radius:5px;padding:1px 6px;align-self:center}'
++'.rm18x img{width:calc(25% - 8px);min-width:90px;height:105px;object-fit:cover;border-radius:6px;cursor:zoom-in;background:#111}'
++'.rm18x .more{font-size:11px;color:var(--muted,#999);align-self:center;cursor:pointer;text-decoration:underline}'
++'.rm18o{font-size:11px;color:var(--muted,#999);margin-top:4px}'
++'@media(max-width:760px){.rm18s{grid-template-columns:1fr}.rm18x img{width:calc(50% - 6px);height:110px}}';
+document.head.appendChild(st);
+var CAT=[['exterior','🌳 Έξω — μπαλκόνι, βεράντα, κήπος, πρόσοψη, θέα'],['living','🛋 Σαλόνι / τραπεζαρία'],['kitchen','🍳 Κουζίνα'],['bedroom','🛏 Υπνοδωμάτια'],['bath','🚿 Μπάνιο / WC'],['other','📐 Άλλα (κάτοψη, διάδρομος…)']];
+function e(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function side(tag,key,urls,idx){
+  var show=idx.slice(0,4), more=idx.length-show.length;
+  return '<div class="rm18x"><span class="tg">'+tag+'</span>'+show.map(function(k){return '<img loading="lazy" src="'+e(urls[k])+'" onclick="hhCmp18(\''+key+'\','+k+')" onerror="this.style.display=\'none\'">';}).join('')
+    +(more>0?'<span class="more" onclick="hhCmp18(\''+key+'\','+idx[4]+')">+'+more+' ακόμη</span>':'')+'</div>';
+}
+function roomsHTML(p,i){
+  var R=(p&&p.a&&p.a.rooms)||{}, A=p.imgs_a||[], B=p.imgs_b||[];
+  if(!A.length||!B.length) return '';
+  var ga={},gb={},na=0,nb=0;
+  A.forEach(function(u,k){var c=R[u]; if(c){(ga[c]=ga[c]||[]).push(k);} else na++;});
+  B.forEach(function(u,k){var c=R[u]; if(c){(gb[c]=gb[c]||[]).push(k);} else nb++;});
+  var rows=[], only=[];
+  CAT.forEach(function(c){var a=ga[c[0]]||[], b=gb[c[0]]||[];
+    if(a.length&&b.length) rows.push('<div class="rm18r"><div class="rm18l">'+c[1]+' <span>· A '+a.length+' · B '+b.length+'</span></div><div class="rm18s">'+side('A','a'+i,A,a)+side('B','b'+i,B,b)+'</div></div>');
+    else if(a.length||b.length) only.push(c[1].split(' ')[0]+' μόνο στο '+(a.length?'A ('+a.length+')':'B ('+b.length+')'));});
+  if(!rows.length&&!(na||nb)) return '';
+  return '<div class="rm18"><div class="rm18h">🏠 <b>Ίδιος χώρος δίπλα-δίπλα</b> — αριστερά το A, δεξιά το B. Κλικ σε φωτογραφία για μεγάλη προβολή.</div>'
+    +(rows.join('')||'<div class="rm18o">Δεν υπάρχει ακόμη κοινός χώρος με κατηγορία.</div>')
+    +(only.length?'<div class="rm18o">'+only.join(' · ')+'</div>':'')
+    +((na||nb)?'<div class="rm18o">Χωρίς κατηγορία ακόμη: A '+na+' · B '+nb+' φωτογραφίες (ο ταξινομητής τις περνά αυτές τις μέρες).</div>':'')+'</div>';
+}
+if(typeof pairHTML==='function'){
+  var _ph=pairHTML;
+  window.pairHTML=function(p,i){ var h=_ph(p,i); try{ var c=roomsHTML(p,i); if(c){ var j=h.indexOf('<div class="hcols">'); if(j>0) h=h.slice(0,j)+c+h.slice(j); } }catch(x){} return h; };
+}
+}catch(err){console.warn('hhMergeV18c',err);}})();</script>
+
 </body>
 </html>
