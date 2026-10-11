@@ -14484,7 +14484,7 @@ function two(x){ x=String(x); return x.length<2?('0'+x):x; }
 function goneDate(m){
   try{
     var n=String((m&&m.notes)||''); if(!n) return '';
-    var re=/\u03b1\u03c0\u03bf\u03c4\u03b5\u03bb\u03ad\u03c3\u03bc\u03b1\u03c4\u03b1[^()]{0,24}\((\d{1,2})\/(\d{1,2})\/(\d{4})\)/g;
+    var re=/\u03b1\u03c0\u03bf\u03c4\u03b5\u03bb\u03ad\u03c3\u03bc\u03b1\u03c4\u03b1[^()]{0,24}\((\d{1,2})\/(\d{1,2})\/(\d{4})/g; /*hhPolish126: also «(16/09/2026 — επιβεβαιώθηκε …)»*/
     var mm, last=null;
     while((mm=re.exec(n))) last=mm;
     if(!last) return '';
@@ -14513,6 +14513,7 @@ function stamp(){
       var m=map[norm(deco(row.getAttribute('data-url')||''))];
       var d=goneDate(m);
       if(d){ tag.textContent='\u2715 \u0391\u03a6\u0391\u0399\u03a1\u0395\u0398\u0397\u039a\u0395 \u00b7 '+d; }
+      else { /*hhPolish126: ad not kept at import (pin outside the Rent map)*/ try{ var rj=/εισαγωγή\s*\((\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(String((m&&m.notes)||'')); if(rj){ tag.textContent='\u2715 ΕΚΤΟΣ ΧΑΡΤΗ \u00b7 '+two(rj[1])+'/'+two(rj[2])+'/'+rj[3]; tag.title='Δεν κρατήθηκε στην εισαγωγή: η πινέζα της αγγελίας είναι έξω από τον χάρτη αναζήτησης'; } }catch(e2){} }
       tag.setAttribute('data-hh98','1');
     }
     try{ if(window.__hhFitPop) window.__hhFitPop(pop, null); }catch(e){}
@@ -16149,4 +16150,4 @@ var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'
 </script>
 </body>
 </html>
-<!-- build: hh125 -->
+<!-- build: hh126 -->
