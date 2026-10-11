@@ -121,6 +121,20 @@ window.fetch=function(u,o){
           return send(s.t);
         }
       }
+      /*hhPolish127 (11 Oct 2026): code that sends its OWN copy of the member token (ratings, «we viewed it», notes, the
+        badge counts) kept using it after it expired -> 401 -> red «write_failed» lines in the Log, then a second try that
+        worked. Now an expired / older token is swapped for the freshest one before sending, and a 401 is retried once
+        after a refresh. */
+      else if(/^Bearer\s+ey/i.test(cur)){
+        var ctok=cur.replace(/^Bearer\s+/i,''), ce=expOf(ctok);
+        var withTok=function(tok){ var h4=plain(o&&o.headers); h4[key]='Bearer '+tok; var o4={}; if(o){ for(var k7 in o) o4[k7]=o[k7]; } o4.headers=h4; return _f.call(window,url,o4); };
+        var again=function(res,used){ if(res.status!==401) return res; return refresh().then(function(nt){ return (nt&&nt!==used)?withTok(nt):res; },function(){ return res; }); };
+        var fresh=best();
+        var pick=(fresh && fresh.t!==ctok && fresh.e>ce) ? Promise.resolve(fresh.t)
+                 : ((ce && ce*1000 < Date.now()+60000) ? refresh() : Promise.resolve(null));
+        return pick.then(function(nt){ var use=nt||ctok; return withTok(use).then(function(res){ return again(res,use); }); },
+                         function(){ return withTok(ctok).then(function(res){ return again(res,ctok); }); });
+      }
     }
   }catch(e){}
   return _f.apply(this,arguments);
