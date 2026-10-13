@@ -4360,7 +4360,7 @@ function dist(arr){var s=[];arr.forEach(function(v){v=(v==null?'':(''+v)).trim()
 function parseEx(ex){if(Array.isArray(ex))return ex;try{return JSON.parse(ex||'[]');}catch(e){return [];}}
 function esc(s){return (s==null?'':(''+s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function measure(url){if(/res\.cloudinary\.com\/.+\/upload\//.test(url)){var gi=url.replace('/upload/','/upload/fl_getinfo/');return fetch(gi).then(function(r){return r.json();}).then(function(j){var i=j.input||j.output||{};return (i.width||0)*(i.height||0);}).catch(function(){return 0;});}return new Promise(function(res){var im=new Image();var done=false;var t=setTimeout(function(){if(!done){done=true;res(0);}},2600);im.onload=function(){if(done)return;done=true;clearTimeout(t);res((im.naturalWidth||0)*(im.naturalHeight||0));};im.onerror=function(){if(done)return;done=true;clearTimeout(t);res(0);};im.src=url;});}
-function collectImgs(){var out=[];members.forEach(function(m){var ex=parseEx(m.extra_images);var seen={};[m.image_url].concat(ex).forEach(function(u){if(!u)return;var k=window.__hhKey(u);if(seen[k])return;seen[k]=1;out.push({url:u,agency:m.agency,id:m.id});});});var fs={};out=out.filter(function(o){if(fs[o.url])return false;fs[o.url]=1;return true;});try{var K=window.__hhGalKeep;if(K&&String(K.h)===String(hid())&&K.rank){var f=out.filter(function(o){return K.rank[o.url]!=null;});if(f.length>=Math.min(3,out.length)){f.sort(function(a,b){return K.rank[a.url]-K.rank[b.url];});return f;}}}catch(e){}return out;}
+function collectImgs(){var out=[];members.forEach(function(m){var ex=parseEx(m.extra_images);var seen={};[m.image_url].concat(ex).forEach(function(u){if(!u)return;var k=window.__hhKey(u);if(seen[k])return;seen[k]=1;out.push({url:u,agency:m.agency,id:m.id});});});var fs={};out=out.filter(function(o){if(fs[o.url])return false;fs[o.url]=1;return true;});try{/*hhPolish129: the house of THESE members, not hid() — hid() is shared by every open board tab (localStorage) and a second tab on another house switched the duplicate filter off (#1288 showed 75 photos instead of 25)*/var hh=(members&&members[0]&&String(members[0].house_id||'').trim())||String(hid()||'');var K=window.__hhGalKeep;if(K&&String(K.h)===hh&&K.rank){var f=out.filter(function(o){return K.rank[o.url]!=null;});if(f.length>=Math.min(3,out.length)){f.sort(function(a,b){return K.rank[a.url]-K.rank[b.url];});return f;}}else if(hh&&hh!=='0'&&typeof window.hhLoadGalKeep==='function'){window.hhLoadGalKeep(hh);}}catch(e){}return out;}
 function collectVideos(){var out=[],s={};members.forEach(function(m){if(m.video_url&&!s[m.video_url]){s[m.video_url]=1;out.push({url:m.video_url,agency:m.agency});}});return out;}
 function removeSummary(){try{if(window.hhGsRestoreNotes)hhGsRestoreNotes();}catch(e){}var ov=document.getElementById('hh-grpsum-ov');if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);var c0=document.getElementById('hh-sib0');if(c0)c0.classList.remove('lo-sib-active');var f=document.querySelector('.lo-featured');if(f){[].forEach.call(f.querySelectorAll('[data-hhhid]'),function(c){var v=c.getAttribute('data-hhhid');c.style.display=(v==='_'?'':v);c.removeAttribute('data-hhhid');});}}
 function toggleFav(it){var key=window.__hhKey(it.url);if(window.__favKeys[key]){delete window.__favKeys[key];fetch(FAV+'?image_key=eq.'+encodeURIComponent(key),{method:'DELETE',headers:AH});}else{window.__favKeys[key]={url:it.url};fetch(FAV,{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},AH),body:JSON.stringify({image_key:key,image_url:it.url,listing_id:it.id||null,house_id:hid()})});}if(window.applyFilters){try{window.applyFilters();}catch(e){}}}
@@ -5873,13 +5873,22 @@ window.hhLoadGalKeep=function(h){
    .then(function(r){return r.json();})
    .then(function(arr){
       window.__hhGalLoading=null;
-      if(!Array.isArray(arr)||!arr.length) return;
+      if(!Array.isArray(arr)||!arr.length){ /*hhPolish129: one retry after 4 s*/
+        window.__hhGalRetry=window.__hhGalRetry||{};
+        if(!window.__hhGalRetry[h]){ window.__hhGalRetry[h]=1; setTimeout(function(){ window.hhLoadGalKeep(h); },4000); }
+        return; }
       var rank={}; arr.forEach(function(u,i){rank[u]=i;});
       window.__hhGalKeep={h:h,rank:rank,n:arr.length};
+      /*hhPolish129: the grouped card caches its photo list per house; a list built BEFORE this set arrived still holds
+        every duplicate (#1288: 75 instead of 25) — drop it so the card rebuilds with the duplicates removed*/
+      try{ if(window.__grpImgCache) delete window.__grpImgCache[h]; }catch(e){}
       try{ var c0=document.getElementById('hh-sib0');
            if(c0 && document.getElementById('hh-grpsum-ov')) c0.click(); }catch(e){}
    })
-   .catch(function(){ window.__hhGalLoading=null; });
+   .catch(function(){ window.__hhGalLoading=null;
+      window.__hhGalRetry=window.__hhGalRetry||{};
+      if(!window.__hhGalRetry[h]){ window.__hhGalRetry[h]=1; setTimeout(function(){ window.hhLoadGalKeep(h); },4000); } });
+  setTimeout(function(){ if(window.__hhGalLoading===h) window.__hhGalLoading=null; },20000);
 };
 if(typeof openListingOverlay==='function' && !window.__h16ov){
   var _o16=openListingOverlay;
