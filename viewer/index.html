@@ -2443,11 +2443,15 @@ function applyFilters() {
   const hideSeen = (document.getElementById('hideSeen')||{}).checked;
 
   const _idq=/^#?\d+$/.test(q)?q.replace('#',''):null; /*hhPolish2*/
+  /*hhPolish130 (13 Oct 2026, Dusty): the search stays inside the category you are in (Rent shows no homes for sale),
+    and a home number (e.g. 1519 or #1519) shows THAT home only — not every ad whose link or text happens to contain the digits. */
+  const _cat = h => currentProject==='all' ? !/^(Rent|Pakis)$/.test(h.project||'Fameli') : (h.project||'Fameli')===currentProject;
+  const _idHit = _idq!=null && combined.some(x => String(x.house_id||'').trim()===_idq && _cat(x));
   filtered = combined.filter(h => {
     /*hhPolish41: when something is typed in the search box we search the whole
       archive — price, size, year, area, type, platform and project filters all
       step aside, so a code an agent reads out on the phone always finds its ad. */
-    if (q) { try { return window.hhQMatch ? window.hhQMatch(h,q) : String(h.location||'').toLowerCase().includes(q); } catch(e) { return false; } }
+    if (q) { try { if (!_cat(h)) return false; if (_idHit) return String(h.house_id||'').trim()===_idq; return window.hhQMatch ? window.hhQMatch(h,q) : String(h.location||'').toLowerCase().includes(q); } catch(e) { return false; } }
     if (h.unfavorited === true) return false;
     if (_idq!=null && (String(h.house_id||'').trim()===_idq || String(h.hhl_id||'')===_idq)) return true; /*hhPolish2: id hit ignores project/platform filters*/
     /* REMOVED: deleted stays visible for review */
