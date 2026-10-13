@@ -5879,6 +5879,9 @@ window.hhLoadGalKeep=function(h){
         return; }
       var rank={}; arr.forEach(function(u,i){rank[u]=i;});
       window.__hhGalKeep={h:h,rank:rank,n:arr.length};
+      /*hhPolish129: the grouped card caches its photo list per house; a list built BEFORE this set arrived still holds
+        every duplicate (#1288: 75 instead of 25) — drop it so the card rebuilds with the duplicates removed*/
+      try{ if(window.__grpImgCache) delete window.__grpImgCache[h]; }catch(e){}
       try{ var c0=document.getElementById('hh-sib0');
            if(c0 && document.getElementById('hh-grpsum-ov')) c0.click(); }catch(e){}
    })
