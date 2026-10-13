@@ -4352,7 +4352,7 @@ window.__hhKey=function(u){return (String(u||'').split('?')[0].toLowerCase().mat
 window.__favCmp=function(a,b){return (window.__favKeys[window.__hhKey(b)]?1:0)-(window.__favKeys[window.__hhKey(a)]?1:0);};
 function isAdmin(){try{var v=JSON.parse(localStorage.getItem('hh_auth')||'{}');return !!(v.user&&(v.user.email==='kmelissinos@gmail.com'||!!(v.user.app_metadata&&v.user.app_metadata.hh_admin)));}catch(e){return false;}}
 function loadFavs(){fetch(FAV+'?select=image_key,image_url',{headers:AH}).then(function(r){return r.json();}).then(function(rows){var o={};(rows||[]).forEach(function(r){o[r.image_key]={url:r.image_url};});window.__favKeys=o;if(window.applyFilters){try{window.applyFilters();}catch(e){}}}).catch(function(){});}
-function hid(){/*hhPolish129: this tab's own home first (?house=), localStorage is shared by every open board tab*/try{var mm=/[?&]house=([^&#]+)/.exec(location.search);if(mm)return decodeURIComponent(mm[1]);}catch(e){}try{return (JSON.parse(localStorage.getItem('hh_open_v1')||'{}').houseId)||null;}catch(e){return null;}}
+function hid(){try{return (JSON.parse(localStorage.getItem('hh_open_v1')||'{}').houseId)||null;}catch(e){return null;}}
 function num(v){v=parseFloat(v);return isNaN(v)?null:v;}
 function rng(arr,suf,fmt){var v=arr.map(num).filter(function(x){return x!=null;});if(!v.length)return '—';var mn=Math.min.apply(null,v),mx=Math.max.apply(null,v);fmt=fmt||function(x){return x;};return mn===mx?fmt(mn)+(suf||''):fmt(mn)+'–'+fmt(mx)+(suf||'');}
 function eur(x){return '€'+Number(x).toLocaleString('el-GR');}
@@ -4360,7 +4360,7 @@ function dist(arr){var s=[];arr.forEach(function(v){v=(v==null?'':(''+v)).trim()
 function parseEx(ex){if(Array.isArray(ex))return ex;try{return JSON.parse(ex||'[]');}catch(e){return [];}}
 function esc(s){return (s==null?'':(''+s)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function measure(url){if(/res\.cloudinary\.com\/.+\/upload\//.test(url)){var gi=url.replace('/upload/','/upload/fl_getinfo/');return fetch(gi).then(function(r){return r.json();}).then(function(j){var i=j.input||j.output||{};return (i.width||0)*(i.height||0);}).catch(function(){return 0;});}return new Promise(function(res){var im=new Image();var done=false;var t=setTimeout(function(){if(!done){done=true;res(0);}},2600);im.onload=function(){if(done)return;done=true;clearTimeout(t);res((im.naturalWidth||0)*(im.naturalHeight||0));};im.onerror=function(){if(done)return;done=true;clearTimeout(t);res(0);};im.src=url;});}
-function collectImgs(){var out=[];members.forEach(function(m){var ex=parseEx(m.extra_images);var seen={};[m.image_url].concat(ex).forEach(function(u){if(!u)return;var k=window.__hhKey(u);if(seen[k])return;seen[k]=1;out.push({url:u,agency:m.agency,id:m.id});});});var fs={};out=out.filter(function(o){if(fs[o.url])return false;fs[o.url]=1;return true;});try{var K=window.__hhGalKeep;/*hhPolish129: the grouped card reached by any path (next/prev home, link, reload) asks for the de-duplicated set itself*/if(!(K&&String(K.h)===String(hid()))){try{if(window.hhLoadGalKeep&&hid())window.hhLoadGalKeep(hid());}catch(e2){}}if(K&&String(K.h)===String(hid())&&K.rank){var f=out.filter(function(o){return K.rank[o.url]!=null;});if(f.length>=Math.min(3,out.length)){f.sort(function(a,b){return K.rank[a.url]-K.rank[b.url];});return f;}}}catch(e){}return out;}
+function collectImgs(){var out=[];members.forEach(function(m){var ex=parseEx(m.extra_images);var seen={};[m.image_url].concat(ex).forEach(function(u){if(!u)return;var k=window.__hhKey(u);if(seen[k])return;seen[k]=1;out.push({url:u,agency:m.agency,id:m.id});});});var fs={};out=out.filter(function(o){if(fs[o.url])return false;fs[o.url]=1;return true;});try{/*hhPolish129: the house of THESE members, not hid() — hid() is shared by every open board tab (localStorage) and a second tab on another house switched the duplicate filter off (#1288 showed 75 photos instead of 25)*/var hh=(members&&members[0]&&String(members[0].house_id||'').trim())||String(hid()||'');var K=window.__hhGalKeep;if(K&&String(K.h)===hh&&K.rank){var f=out.filter(function(o){return K.rank[o.url]!=null;});if(f.length>=Math.min(3,out.length)){f.sort(function(a,b){return K.rank[a.url]-K.rank[b.url];});return f;}}else if(hh&&hh!=='0'&&typeof window.hhLoadGalKeep==='function'){window.hhLoadGalKeep(hh);}}catch(e){}return out;}
 function collectVideos(){var out=[],s={};members.forEach(function(m){if(m.video_url&&!s[m.video_url]){s[m.video_url]=1;out.push({url:m.video_url,agency:m.agency});}});return out;}
 function removeSummary(){try{if(window.hhGsRestoreNotes)hhGsRestoreNotes();}catch(e){}var ov=document.getElementById('hh-grpsum-ov');if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);var c0=document.getElementById('hh-sib0');if(c0)c0.classList.remove('lo-sib-active');var f=document.querySelector('.lo-featured');if(f){[].forEach.call(f.querySelectorAll('[data-hhhid]'),function(c){var v=c.getAttribute('data-hhhid');c.style.display=(v==='_'?'':v);c.removeAttribute('data-hhhid');});}}
 function toggleFav(it){var key=window.__hhKey(it.url);if(window.__favKeys[key]){delete window.__favKeys[key];fetch(FAV+'?image_key=eq.'+encodeURIComponent(key),{method:'DELETE',headers:AH});}else{window.__favKeys[key]={url:it.url};fetch(FAV,{method:'POST',headers:Object.assign({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},AH),body:JSON.stringify({image_key:key,image_url:it.url,listing_id:it.id||null,house_id:hid()})});}if(window.applyFilters){try{window.applyFilters();}catch(e){}}}
@@ -5873,17 +5873,19 @@ window.hhLoadGalKeep=function(h){
    .then(function(r){return r.json();})
    .then(function(arr){
       window.__hhGalLoading=null;
-      /*hhPolish129: a failed / timed-out answer (busy database, expired sign-in) used to leave the grouped card with every
-        agency's copy of every photo (#1288: 75 instead of 25). Try again a few times. */
-      if(!Array.isArray(arr)){ window.__hhGalTry=(window.__hhGalTry||0)+1; if(window.__hhGalTry<=3) setTimeout(function(){ window.hhLoadGalKeep(h); }, 4000*window.__hhGalTry); return; }
-      window.__hhGalTry=0;
-      if(!arr.length) return;
+      if(!Array.isArray(arr)||!arr.length){ /*hhPolish129: one retry after 4 s*/
+        window.__hhGalRetry=window.__hhGalRetry||{};
+        if(!window.__hhGalRetry[h]){ window.__hhGalRetry[h]=1; setTimeout(function(){ window.hhLoadGalKeep(h); },4000); }
+        return; }
       var rank={}; arr.forEach(function(u,i){rank[u]=i;});
       window.__hhGalKeep={h:h,rank:rank,n:arr.length};
       try{ var c0=document.getElementById('hh-sib0');
            if(c0 && document.getElementById('hh-grpsum-ov')) c0.click(); }catch(e){}
    })
-   .catch(function(){ window.__hhGalLoading=null; window.__hhGalTry=(window.__hhGalTry||0)+1; if(window.__hhGalTry<=3) setTimeout(function(){ window.hhLoadGalKeep(h); }, 4000*window.__hhGalTry); });
+   .catch(function(){ window.__hhGalLoading=null;
+      window.__hhGalRetry=window.__hhGalRetry||{};
+      if(!window.__hhGalRetry[h]){ window.__hhGalRetry[h]=1; setTimeout(function(){ window.hhLoadGalKeep(h); },4000); } });
+  setTimeout(function(){ if(window.__hhGalLoading===h) window.__hhGalLoading=null; },20000);
 };
 if(typeof openListingOverlay==='function' && !window.__h16ov){
   var _o16=openListingOverlay;
