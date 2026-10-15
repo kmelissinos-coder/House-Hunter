@@ -16175,6 +16175,55 @@ var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'
   if(document.getElementById('hh123')||n>240){ clearInterval(iv); } },250);
 }catch(e){try{console.warn('hhPolish123',e);}catch(x){}}})();
 </script>
+<style id="hhPhone1">/*hhPhone1 — Xiaomi Mix Flip (Olga): inner 6.86" ≈410×900 CSS px (2.38:1), cover 4" ≈464×330 */
+/* narrow + tall (inner screen): map view = map on top, list underneath, both full width
+   (was side by side: list 280px + map 200px minimum → the map spilled off the right edge) */
+@media (max-width:600px) and (min-height:501px){
+  #map-split{flex-direction:column!important;gap:6px!important;padding:0 4px!important}
+  #map-split #map{order:-1;flex:0 0 38%!important;width:100%!important;min-width:0!important;height:38%!important;min-height:150px}
+  #mapList{flex:1 1 auto!important;width:100%!important;min-width:0!important;min-height:0!important;padding:2px 4px 16px!important}
+}
+/* short (cover screen, phone in landscape): keep side by side, but nothing may spill off-screen */
+@media (max-height:500px){
+  #mapList{min-width:0!important;flex:1 1 62%!important}
+  #map-split #map{min-width:0!important;flex:0 0 36%!important}
+}
+@media (max-width:600px){
+  #mapList .card,#mapList .grouped-card{width:100%!important;max-width:100%!important}
+  /* house view: whole width, no sideways wobble, every action button visible (they sat in a strip running off the right edge) */
+  .listing-overlay{padding:10px 8px!important;overflow-x:hidden!important}
+  #loRight{width:100%!important;max-width:100%!important;min-width:0!important}
+  #loFeatured{width:100%!important;max-width:100%!important}
+  .hh-gs-tools{flex-wrap:wrap!important;overflow-x:visible!important;row-gap:6px}
+}
+/* small map: the legend folds to one line («Legend ▸»), tap to open */
+@media (max-width:600px),(max-height:500px){
+  .map-legend{cursor:pointer}
+  .map-legend:not(.hhp-open)>*:not(:first-child){display:none!important}
+  .map-legend:not(.hhp-open)>:first-child::after{content:' \25B8'}
+}
+/* map view height = exactly the free space (older rules forced ≥360px → the bottom was cut off on the cover screen) */
+html.hhp-fit body.hh74-maplock #map-split{height:var(--hhp-split-h)!important;max-height:var(--hhp-split-h)!important;min-height:0!important}
+</style>
+<script>/*hhPhone1*/(function(){try{
+function fit(){ try{
+  var sp=document.getElementById('map-split'), H=window.innerHeight, W=window.innerWidth;
+  var on=!!sp && (H<=560 || W<=600);
+  document.documentElement.classList.toggle('hhp-fit', on);
+  if(!sp) return;
+  var top=sp.getBoundingClientRect().top+(window.scrollY||0);
+  var h=Math.max(160, Math.round(H-top-6));
+  document.documentElement.style.setProperty('--hhp-split-h', h+'px');
+  var mode=(W<=600&&H>500)?'col':'row';
+  if(sp.__hhpMode!==mode||sp.__hhpH!==h){ sp.__hhpMode=mode; sp.__hhpH=h;
+    setTimeout(function(){ try{ if(window._hhMap&&window._hhMap.invalidateSize) window._hhMap.invalidateSize(); }catch(e){} },80); }
+}catch(e){} }
+window.addEventListener('resize',fit);
+window.addEventListener('orientationchange',function(){ setTimeout(fit,300); });
+setInterval(fit,700); setTimeout(fit,300);
+document.addEventListener('click',function(e){ try{ var lg=e.target&&e.target.closest?e.target.closest('.map-legend'):null; if(lg&&(window.innerWidth<=600||window.innerHeight<=500)) lg.classList.toggle('hhp-open'); }catch(x){} },true);
+try{ var mc=document.getElementById('main-content'); if(mc) new MutationObserver(fit).observe(mc,{childList:true}); }catch(e){}
+}catch(e){try{console.warn('hhPhone1',e);}catch(x){}}})();</script>
 </body>
 </html>
 <!-- build: hh126 -->
