@@ -16196,6 +16196,12 @@ var n=0, iv=setInterval(function(){ n++; var g=document.getElementById('hh-gate'
   #loFeatured{width:100%!important;max-width:100%!important}
   .hh-gs-tools{flex-wrap:wrap!important;overflow-x:visible!important;row-gap:6px}
 }
+/* small map: the legend folds to one line («Legend ▸»), tap to open */
+@media (max-width:600px),(max-height:500px){
+  .map-legend{cursor:pointer}
+  .map-legend:not(.hhp-open)>*:not(:first-child){display:none!important}
+  .map-legend:not(.hhp-open)>:first-child::after{content:' \25B8'}
+}
 /* map view height = exactly the free space (older rules forced ≥360px → the bottom was cut off on the cover screen) */
 html.hhp-fit body.hh74-maplock #map-split{height:var(--hhp-split-h)!important;max-height:var(--hhp-split-h)!important;min-height:0!important}
 </style>
@@ -16215,6 +16221,7 @@ function fit(){ try{
 window.addEventListener('resize',fit);
 window.addEventListener('orientationchange',function(){ setTimeout(fit,300); });
 setInterval(fit,700); setTimeout(fit,300);
+document.addEventListener('click',function(e){ try{ var lg=e.target&&e.target.closest?e.target.closest('.map-legend'):null; if(lg&&(window.innerWidth<=600||window.innerHeight<=500)) lg.classList.toggle('hhp-open'); }catch(x){} },true);
 try{ var mc=document.getElementById('main-content'); if(mc) new MutationObserver(fit).observe(mc,{childList:true}); }catch(e){}
 }catch(e){try{console.warn('hhPhone1',e);}catch(x){}}})();</script>
 </body>
