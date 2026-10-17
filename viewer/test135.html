@@ -2660,7 +2660,7 @@ function renderGroupedCard(g) {
         </div>
       </div>
       <div class="grouped-specs">
-        ${(function(){const v=g.items.map(x=>x.sqm).filter(x=>x>0);if(!v.length)return g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:'';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">📐 ${mn===mx?mn:mn+'–'+mx}τ.μ.</span>`;})()}${(function(){const v=g.items.map(x=>parseInt(x.rooms,10)).filter(x=>x>0&&x<20);if(!v.length)return '';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag hh-bed" style="font-weight:700;color:var(--text)">🛏 ${mn===mx?mn:mn+'–'+mx} ${(window.hhLang&&window.hhLang()==='en')?'bed':'υ/δ'}</span>`;})()}/*hh135*/
+        ${(function(){const v=g.items.map(x=>x.sqm).filter(x=>x>0);if(!v.length)return g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:'';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">📐 ${mn===mx?mn:mn+'–'+mx}τ.μ.</span>`;})()}${(function(){const v=g.items.map(x=>parseInt(x.rooms,10)).filter(x=>x>0&&x<20);if(!v.length)return '';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag hh-bed" style="font-weight:700;color:var(--text)">🛏 ${mn===mx?mn:mn+'–'+mx} ${(window.hhLang&&window.hhLang()==='en')?'bed':'υ/δ'}</span>`;})()}${''/*hh135*/}
         ${(function(){const v=g.items.map(x=>x.year).filter(x=>x>1800);if(!v.length)return '';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">🏗 ${mn===mx?mn:mn+'–'+mx}</span>`;})()}
         ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
         ${g.heating&&g.heating.includes('αέριο')?`<span class="spec-tag">🔥 Αέριο</span>`:''}
