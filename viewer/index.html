@@ -2660,7 +2660,7 @@ function renderGroupedCard(g) {
         </div>
       </div>
       <div class="grouped-specs">
-        ${(function(){const v=g.items.map(x=>x.sqm).filter(x=>x>0);if(!v.length)return g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:'';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">📐 ${mn===mx?mn:mn+'–'+mx}τ.μ.</span>`;})()}
+        ${(function(){const v=g.items.map(x=>x.sqm).filter(x=>x>0);if(!v.length)return g.sqmRaw?`<span class="spec-tag">📐 ${g.sqmRaw}</span>`:'';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">📐 ${mn===mx?mn:mn+'–'+mx}τ.μ.</span>`;})()}${(function(){const v=g.items.map(x=>parseInt(x.rooms,10)).filter(x=>x>0&&x<20);if(!v.length)return '';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag hh-bed" style="font-weight:700;color:var(--text)">🛏 ${mn===mx?mn:mn+'–'+mx} ${(window.hhLang&&window.hhLang()==='en')?'bed':'υ/δ'}</span>`;})()}${''/*hh135*/}
         ${(function(){const v=g.items.map(x=>x.year).filter(x=>x>1800);if(!v.length)return '';const mn=Math.min(...v),mx=Math.max(...v);return `<span class="spec-tag">🏗 ${mn===mx?mn:mn+'–'+mx}</span>`;})()}
         ${g.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(g.energy)}">${energyLabel(g.energy)}</span></span>`:''}
         ${g.heating&&g.heating.includes('αέριο')?`<span class="spec-tag">🔥 Αέριο</span>`:''}
@@ -2875,7 +2875,7 @@ function renderCard(h) {
       </div>
       <div class="card-specs">
         ${(h.sqm_raw||h.sqmRaw) ? `<span class="spec-tag">📐 ${h.sqm_raw||h.sqmRaw}</span>` : ''}
-        ${h.rooms ? `<span class="spec-tag">🛏 ${h.rooms}</span>` : ''}
+        ${h.rooms ? `<span class="spec-tag hh-bed" style="font-weight:700;color:var(--text)">🛏 ${h.rooms} ${(window.hhLang&&window.hhLang()==='en')?'bed':'υ/δ'}</span>` : ''}
         ${h.year ? `<span class="spec-tag">🏗 ${h.year}</span>` : ''}
         ${h.energy ? `<span class="spec-tag"><span class="energy-badge e-${energyClass(h.energy)}">${energyLabel(h.energy)}</span></span>` : ''}
         ${h.heating && h.heating.includes('αέριο') ? `<span class="spec-tag">🔥 Αέριο</span>` : ''}
@@ -2938,7 +2938,7 @@ function renderListItem(h) {
       </div>
       <div class="list-specs">
         ${(h.sqm_raw||h.sqmRaw)?`<span class="list-spec">📐 ${h.sqm_raw||h.sqmRaw}</span>`:''}
-        ${h.rooms?`<span class="list-spec">🛏 ${h.rooms}</span>`:''}
+        ${h.rooms?`<span class="list-spec" style="font-weight:700">🛏 ${h.rooms} ${(window.hhLang&&window.hhLang()==='en')?'bed':'υ/δ'}</span>`:''}
         ${h.year?`<span class="list-spec">🏗 ${h.year}</span>`:''}
         ${h.floor?`<span class="list-spec">📍 ${h.floor}</span>`:''}
         ${h.heating?`<span class="list-spec" style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">=% ${h.heating.slice(0,30)}</span>`:''}
@@ -3950,7 +3950,7 @@ function _sibHTML(s, ri) {
       </div>
       <div class="lo-sib-specs">
         ${s.sqm_raw||s.sqmRaw?`<span class="spec-tag">📐 ${s.sqm_raw||s.sqmRaw}</span>`:''}
-        ${s.rooms?`<span class="spec-tag">🛏 ${s.rooms}</span>`:''}
+        ${s.rooms?`<span class="spec-tag hh-bed" style="font-weight:700;color:var(--text)">🛏 ${s.rooms} ${(window.hhLang&&window.hhLang()==='en')?'bed':'υ/δ'}</span>`:''}
         ${s.year?`<span class="spec-tag">🏗 ${s.year}</span>`:''}
         ${s.energy?`<span class="spec-tag"><span class="energy-badge e-${energyClass(s.energy)}">${energyLabel(s.energy)}</span></span>`:''}
       </div>
@@ -16228,4 +16228,4 @@ try{ var mc=document.getElementById('main-content'); if(mc) new MutationObserver
 }catch(e){try{console.warn('hhPhone1',e);}catch(x){}}})();</script>
 </body>
 </html>
-<!-- build: hh134 -->
+<!-- build: hh135 -->
