@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>FB photos</title>
+<style>
+body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f1420;color:#e8ecf3;margin:0;padding:20px}
+h1{font-size:18px;margin:0 0 12px}
+#r{font-size:20px;font-weight:600;margin:8px 0 14px}
+#g{display:flex;flex-wrap:wrap;gap:6px}
+#g img{height:90px;border-radius:6px;background:#1c2333}
+</style>
+</head>
+<body>
+<h1>House Hunter — Facebook photos</h1>
+<div id="r">…</div>
+<div id="g"></div>
+<script>
+/* 17 Oct 2026 — receiver for Facebook Marketplace photos (fbphotos.html).
+   WHY: Facebook's own page cannot call Supabase (its CSP connect-src blocks it), the old form-POST route
+   used the publishable key and stopped working when fb_photos_set was closed to anon (5 Oct security
+   phase), and the photo addresses are signed CDN links that must not travel through the chat.
+   HOW: in the Facebook item tab the run collects the listing photos (img alt «Φωτογραφία του προϊόντος…»
+   / «Product photo of…») and NAVIGATES that tab here with them in the #fragment — a fragment is never sent
+   to any server:
+       https://vresto.pages.dev/fbphotos.html#hhl=<listings.hhl_id>&u=<encodeURIComponent(JSON array)>
+   This page clears the fragment at once and saves the photos with the signed-in member's session
+   (rpc fb_photos_set: admin only, https fbcdn/scontent links only, only Facebook rows of Rent).
+   It never refreshes the session itself — two tabs refreshing the same token can sign the board out.
+   If the token is about to expire it waits up to 2 minutes for an open board tab to renew it
+   (or run  await window.hhRefreshAuth()  in the board tab).
+   Result: in the page title and in window.__fbResult = {hhl, ok, msg}. */
+(function(){
+var SB='https://ofvanbbujgcqhbiyihgy.supabase.co', AK='sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr';
+var R=document.getElementById('r'), G=document.getElementById('g');
+function show(t,ok){ R.textContent=t; R.style.color=ok?'#7ee08a':(ok===false?'#ff8a80':'#e8ecf3'); document.title='FB photos: '+t; }
+function done(hhl,ok,msg){ window.__fbResult={hhl:hhl,ok:ok,msg:msg}; show((hhl?'#'+hhl+' ':'')+msg, ok); }
+var h=location.hash.replace(/^#/,'');
+try{ history.replaceState(null,'',location.pathname); }catch(e){}
+var q=new URLSearchParams(h), hhl=parseInt(q.get('hhl')||'',10), arr=null;
+try{ arr=JSON.parse(q.get('u')||'null'); }catch(e){ arr=null; }
+if(!hhl || !Array.isArray(arr) || !arr.length){ done(hhl||null,false,'nothing to save (no photos in the link)'); return; }
+var RX=/^https:\/\/[a-zA-Z0-9.-]*(fbcdn\.net|scontent[a-zA-Z0-9.-]*)\//, seen={}, urls=[];
+arr.forEach(function(u){ u=String(u||''); var k=u.split('?')[0]; if(RX.test(u) && !seen[k]){ seen[k]=1; urls.push(u); } });
+if(!urls.length){ done(hhl,false,'no Facebook photo links in the list'); return; }
+if(urls.length>60) urls=urls.slice(0,60);
+urls.forEach(function(u){ var i=document.createElement('img'); i.referrerPolicy='no-referrer'; i.loading='lazy'; i.src=u; G.appendChild(i); });
+function parse(s){ try{ return JSON.parse(s||'null'); }catch(e){ return null; } }
+function expOf(t){ try{ var p=JSON.parse(atob(String(t).split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))); return +p.exp||0; }catch(e){ return 0; } }
+function best(){ var b=null, be=-1; [function(){return sessionStorage;},function(){return localStorage;}].forEach(function(f){
+  try{ var a=parse(f().getItem('hh_auth')); if(a && a.access_token){ var e=expOf(a.access_token); if(e>be){ be=e; b=a.access_token; } } }catch(e){} });
+  return b?{t:b,e:be}:null; }
+var t0=Date.now();
+show('#'+hhl+' saving '+urls.length+' photos…');
+(function tryIt(){
+  var s=best();
+  if(!s || s.e*1000 < Date.now()+20000){
+    if(Date.now()-t0 < 120000){ show('#'+hhl+' '+urls.length+' photos — waiting for a signed-in board tab to renew the session…'); return setTimeout(tryIt,3000); }
+    done(hhl,false,s?'session expired — open the board (vresto.pages.dev), then send again':'not signed in on vresto.pages.dev'); return;
+  }
+  fetch(SB+'/rest/v1/rpc/fb_photos_set',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+s.t,'Content-Type':'application/json'},
+        body:JSON.stringify({p_hhl:hhl,p_urls:JSON.stringify(urls)})})
+  .then(function(r){ return r.text().then(function(x){ return {ok:r.ok,st:r.status,x:x}; }); })
+  .then(function(o){
+    var msg; try{ msg=o.ok?JSON.parse(o.x):null; }catch(e){ msg=null; }
+    if(o.ok && typeof msg==='string'){ done(hhl, /rows updated: [1-9]/.test(msg), msg); }
+    else { done(hhl,false,'HTTP '+o.st+' '+String(o.x||'').slice(0,160)); }
+  }, function(e){ done(hhl,false,'network error '+e); });
+})();
+})();
+</script>
+</body>
+</html>
