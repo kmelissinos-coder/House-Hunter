@@ -6571,6 +6571,7 @@ document.addEventListener('click',function(e){
   function delOn(){ var c=document.getElementById('hh-delh15'); return !!(c&&c.checked); }
   function leaking(){
     if(delOn()) return false;
+    try{ var sd=document.getElementById('showDeleted'); if(sd&&sd.checked) return false; }catch(e){}/*hh134*/
     var s=gcSet(); var any=false; for(var k in s){ any=true; break; }
     if(!any) return false;
     try{ if((filtered||[]).some(function(h){ return s[hid(h)]; })) return true; }catch(e){}
