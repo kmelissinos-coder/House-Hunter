@@ -15159,13 +15159,19 @@ function addrBox(){try{var ov=document.getElementById('hh-grpsum-ov');if(!ov)ret
 setInterval(addrBox,800);
 
 /* ---------- 1. Τιμή ▾ ---------- */
+var PHC={};/*hh136: price changes per house (all ads, removed ones too)*/
+function phInfo(hid){if(!hid||hid==='0')return null;var c=PHC[hid];if(c===undefined){PHC[hid]=null;(async function(){try{
+ var r=await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?select=id&house_id=eq.'+encodeURIComponent(hid)+'&limit=200',{headers:hdrs()});var rows=r.ok?await r.json():[];
+ var ids=rows.map(function(x){return x.id;}).filter(Boolean);if(!ids.length){PHC[hid]=false;return;}
+ var r2=await fetch(SUPABASE_URL+'/rest/v1/price_history?select=old_price,new_price,changed_at&listing_id=in.('+ids.join(',')+')&order=changed_at.asc',{headers:hdrs()});var ph=r2.ok?await r2.json():[];
+ ph=ph.filter(function(x){return x.old_price!=null&&x.new_price!=null&&+x.old_price!==+x.new_price;});PHC[hid]=ph.length?ph:false;}catch(e){PHC[hid]=false;}})();return null;}return c||null;}
 function fixPrice(){try{var mem=window.__hhGrpMembers||[];if(!mem.length)return;
  document.querySelectorAll('#hh-grpsum-ov .hh-gs-grid > div').forEach(function(row){var lab=row.querySelector('span');if(!lab)return;
   var key=(((lab.getAttribute&&lab.getAttribute('data-hh55'))||lab.textContent||'')).trim();if(key!=='Τιμή'&&key!=='Price')return;
   if(row.querySelector('.hh-gs-more'))return;var b=row.querySelector('b');if(!b)return;var v=(b.textContent||'').trim();if(!v||v==='\u2014')return;
   var n=mem.filter(function(m){return m&&+m.price>0;}).length;if(n<1)return;
   b.className='hh-gs-mv';b.innerHTML='<span class="hh-gs-mvtxt"></span>';b.firstChild.textContent=v;
-  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');var dps=[];mem.forEach(function(m){var q=+m.price||0;if(q&&dps.indexOf(q)<0)dps.push(q);});dps.sort(function(a,c){return a-c;});if(dps.length<2){b.className='';b.textContent=v;return;}/*ίδια τιμή παντού → χωρίς λίστα (κανόνας hhPolish98)*/btn.setAttribute('data-vals',encodeURIComponent(dps.map(eur).join(' \u00b7 ')));btn.textContent=n+' \u25be';b.appendChild(btn);});}catch(e){}}
+  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');var dps=[];mem.forEach(function(m){var q=+m.price||0;if(q&&dps.indexOf(q)<0)dps.push(q);});dps.sort(function(a,c){return a-c;});var hc=phInfo(String(mem[0].house_id||''));if(dps.length<2&&!hc){b.className='';b.textContent=v;return;}/*ίδια τιμή παντού → χωρίς λίστα (κανόνας hhPolish98)*/btn.setAttribute('data-vals',encodeURIComponent(dps.map(eur).join(' \u00b7 ')));btn.textContent=n+' ▾';b.appendChild(btn);if(hc){var f=hc[0],l=hc[hc.length-1],up=+l.new_price>+f.old_price;var mk=document.createElement('span');mk.className=up?'hh107-up':'hh107-dn';mk.style.cssText='margin:0 6px;font-size:11px;white-space:nowrap';mk.textContent=(up?'▲ ':'▼ ')+T('από ','from ')+eur(f.old_price)+' · '+dm(l.changed_at);b.insertBefore(mk,btn);var hv=[];hc.forEach(function(x){var e1=eur(x.old_price);if(hv.indexOf(e1)<0)hv.push(e1);});dps.forEach(function(q){var e2=eur(q);if(hv.indexOf(e2)<0)hv.push(e2);});btn.setAttribute('data-vals',encodeURIComponent(hv.join(' '+String.fromCharCode(183)+' ')));}});}catch(e){}}
 setInterval(fixPrice,700);
 async function priceRows(mem){
  var hid=mem[0]?String(mem[0].house_id||''):'';var rows=[],ph=[];
@@ -16228,4 +16234,4 @@ try{ var mc=document.getElementById('main-content'); if(mc) new MutationObserver
 }catch(e){try{console.warn('hhPhone1',e);}catch(x){}}})();</script>
 </body>
 </html>
-<!-- build: hh135 -->
+<!-- build: hh136 -->
