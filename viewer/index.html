@@ -6563,13 +6563,15 @@ document.addEventListener('click',function(e){
     try{
       var a=[];
       try{ a=[].concat(allListings||[], extraListings||[]); }catch(e){ a=[]; }
-      a.forEach(function(h){ if(h && h.gone_confirmed){ var k=hid(h); if(k) s[k]=1; } });
+      var live={}; a.forEach(function(h){ if(h && !h.gone_confirmed){ var k=hid(h); if(k) live[k]=1; } });/*hh134*/
+      a.forEach(function(h){ if(h && h.gone_confirmed){ var k=hid(h); if(k && k!=='0' && !live[k]) s[k]=1; } });
     }catch(e){}
     return s;
   }
   function delOn(){ var c=document.getElementById('hh-delh15'); return !!(c&&c.checked); }
   function leaking(){
     if(delOn()) return false;
+    try{ var sd=document.getElementById('showDeleted'); if(sd&&sd.checked) return false; }catch(e){}/*hh134*/
     var s=gcSet(); var any=false; for(var k in s){ any=true; break; }
     if(!any) return false;
     try{ if((filtered||[]).some(function(h){ return s[hid(h)]; })) return true; }catch(e){}
@@ -6587,7 +6589,7 @@ document.addEventListener('click',function(e){
     ticks++;
     try{
       if(leaking()){
-        if(fires<60){ fires++; applyFilters(); }
+        if(fires<3){ fires++; applyFilters(); }/*hh134*/
       } else { fires=0; }
     }catch(e){}
     if(ticks>1200) clearInterval(iv);   /* ~30 λεπτά, μετά σταματά */
@@ -16226,4 +16228,4 @@ try{ var mc=document.getElementById('main-content'); if(mc) new MutationObserver
 }catch(e){try{console.warn('hhPhone1',e);}catch(x){}}})();</script>
 </body>
 </html>
-<!-- build: hh133 -->
+<!-- build: hh134 -->
