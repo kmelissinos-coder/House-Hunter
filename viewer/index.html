@@ -15210,7 +15210,7 @@ function fixPrice(){try{var mem=window.__hhGrpMembers||[];if(!mem.length)return;
   if(row.querySelector('.hh-gs-more'))return;var b=row.querySelector('b');if(!b)return;var v=(b.textContent||'').trim();if(!v||v==='\u2014')return;
   var n=mem.filter(function(m){return m&&+m.price>0;}).length;if(n<1)return;
   b.className='hh-gs-mv';b.innerHTML='<span class="hh-gs-mvtxt"></span>';b.firstChild.textContent=v;
-  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');var dps=[];mem.forEach(function(m){var q=+m.price||0;if(q&&dps.indexOf(q)<0)dps.push(q);});dps.sort(function(a,c){return a-c;});var hc=phInfo(String(mem[0].house_id||''));if(dps.length<2&&!hc){b.className='';b.textContent=v;return;}/*ίδια τιμή παντού → χωρίς λίστα (κανόνας hhPolish98)*/btn.setAttribute('data-vals',encodeURIComponent(dps.map(eur).join(' \u00b7 ')));btn.textContent=n+' ▾';b.appendChild(btn);if(hc){var f=hc[0],l=hc[hc.length-1],up=+l.new_price>+f.old_price;var mk=document.createElement('span');mk.className=up?'hh107-up':'hh107-dn';mk.style.cssText='margin:0 6px;font-size:11px;white-space:nowrap';mk.textContent=(up?'▲ ':'▼ ')+T('από ','from ')+eur(f.old_price)+' · '+dm(l.changed_at);b.insertBefore(mk,btn);var hv=[];hc.forEach(function(x){var e1=eur(x.old_price);if(hv.indexOf(e1)<0)hv.push(e1);});dps.forEach(function(q){var e2=eur(q);if(hv.indexOf(e2)<0)hv.push(e2);});btn.setAttribute('data-vals',encodeURIComponent(hv.join(' '+String.fromCharCode(183)+' ')));}});}catch(e){}}
+  var btn=document.createElement('button');btn.type='button';btn.className='hh-gs-more hh107-price';btn.setAttribute('data-label','Τιμή');var dps=[];mem.forEach(function(m){var q=+m.price||0;if(q&&dps.indexOf(q)<0)dps.push(q);});dps.sort(function(a,c){return a-c;});var hc=phInfo(String(mem[0].house_id||''));if(dps.length<2&&!hc&&n<2){b.className='';b.textContent=v;return;}/*hh140 (Dusty 17/10): 2+ ads → ▾ even at one price, to see every ad's price with its agency (hhPolish98 needs 2+ different data-vals)*/var _dv=dps.map(eur);if(_dv.length<2){_dv=[];mem.forEach(function(m,i){if(+m.price>0)_dv.push(eur(+m.price)+' '+String(m.agency||'')+' '+String(m.platform||'')+' #'+i);});}btn.setAttribute('data-vals',encodeURIComponent(_dv.join(' \u00b7 ')));btn.textContent=n+' ▾';b.appendChild(btn);if(hc){var f=hc[0],l=hc[hc.length-1],up=+l.new_price>+f.old_price;var mk=document.createElement('span');mk.className=up?'hh107-up':'hh107-dn';mk.style.cssText='margin:0 6px;font-size:11px;white-space:nowrap';mk.textContent=(up?'▲ ':'▼ ')+T('από ','from ')+eur(f.old_price)+' · '+dm(l.changed_at);b.insertBefore(mk,btn);var hv=[];hc.forEach(function(x){var e1=eur(x.old_price);if(hv.indexOf(e1)<0)hv.push(e1);});dps.forEach(function(q){var e2=eur(q);if(hv.indexOf(e2)<0)hv.push(e2);});btn.setAttribute('data-vals',encodeURIComponent(hv.join(' '+String.fromCharCode(183)+' ')));}});}catch(e){}}
 setInterval(fixPrice,700);
 async function priceRows(mem){
  var hid=mem[0]?String(mem[0].house_id||''):'';var rows=[],ph=[];
@@ -15219,15 +15219,13 @@ async function priceRows(mem){
  var ids=rows.map(function(x){return x.id;}).filter(Boolean);
  if(ids.length){try{var r2=await fetch(SUPABASE_URL+'/rest/v1/price_history?select=listing_id,old_price,new_price,changed_at&listing_id=in.('+ids.join(',')+')&order=changed_at.asc',{headers:hdrs()});ph=r2.ok?await r2.json():[];}catch(e){}}
  var last={};ph.forEach(function(x){last[x.listing_id]=x;});
- var by={};rows.forEach(function(x){var p=+x.price||0;if(!p)return;(by[p]=by[p]||[]).push(x);});
- var ps=Object.keys(by).map(Number).sort(function(a,b){return a-b;});
- if(!ps.length)return '<div class="hh-gs-vrow">\u2014</div>';
- return ps.map(function(p){var xs=by[p].sort(function(a,b){return (!!a.deleted-!!b.deleted)||String(a.agency||'').localeCompare(String(b.agency||''));});
-  var live=xs.filter(function(x){return !x.deleted;}).length;
-  return '<div class="hh107-ph">'+eur(p)+' <span class="n">\u00b7 '+live+' '+T(live===1?'αγγελία':'αγγελίες',live===1?'listing':'listings')+'</span></div>'
-   +xs.map(function(x){var pl=String(x.platform||'');var c=last[x.id];var ch='';
-    if(c&&c.old_price!=null&&c.new_price!=null&&+c.old_price!==+c.new_price){var dn=+c.new_price<+c.old_price;ch=' <span class="'+(dn?'hh107-dn':'hh107-up')+'">'+(dn?'\u25bc ':'\u25b2 ')+T('από ','from ')+eur(c.old_price)+' \u00b7 '+dm(c.changed_at)+'</span>';}
-    return '<div class="hh-gs-vrow'+(x.url?' hh-gs-link':'')+(x.deleted?' hh107-gone':'')+'"'+(x.url?' data-url="'+encodeURIComponent(x.url)+'"':'')+'>'+esc(x.agency||T('Ιδιώτης','Private owner'))+' <span class="hh-src">'+esc(pl)+'</span>'+(x.deleted?' \u26d4':'')+ch+'</div>';}).join('');}).join('');}
+ var xs=rows.filter(function(x){return +x.price>0;}).sort(function(a,b){return (!!a.deleted-!!b.deleted)||((+a.price)-(+b.price))||String(a.agency||'').localeCompare(String(b.agency||''));});
+ if(!xs.length)return '<div class="hh-gs-vrow">\u2014</div>';
+ /*hh140 (Dusty 17/10): one line per ad — its price with its agency next to it; live ads first, cheapest first, gone ads ⛔ last*/
+ var dec=function(s){return String(s||'').replace(/&quot;/g,'"').replace(/&#0?39;/g,"'").replace(/&amp;/g,'&');};
+ return xs.map(function(x){var pl=String(x.platform||'');var c=last[x.id];var ch='';
+  if(c&&c.old_price!=null&&c.new_price!=null&&+c.old_price!==+c.new_price){var dn=+c.new_price<+c.old_price;ch=' <span class="'+(dn?'hh107-dn':'hh107-up')+'">'+(dn?'\u25bc ':'\u25b2 ')+T('από ','from ')+eur(c.old_price)+' \u00b7 '+dm(c.changed_at)+'</span>';}
+  return '<div class="hh-gs-vrow'+(x.url?' hh-gs-link':'')+(x.deleted?' hh107-gone':'')+'"'+(x.url?' data-url="'+encodeURIComponent(x.url)+'"':'')+'><b style="white-space:nowrap">'+eur(+x.price)+'</b> \u00b7 '+esc(dec(x.agency)||T('Ιδιώτης','Private owner'))+' <span class="hh-src">'+esc(pl)+'</span>'+(x.deleted?' \u26d4':'')+ch+'</div>';}).join('');}
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('.hh107-price'):null;if(!b)return;
  e.stopPropagation();e.preventDefault();var op=document.getElementById('hh-gs-vpop-el');if(op){var same=op.classList.contains('hh107');op.remove();if(same)return;}
  var mem=(window.__hhGrpMembers||[]).slice();
