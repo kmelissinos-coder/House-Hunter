@@ -16269,6 +16269,36 @@ setInterval(fit,700); setTimeout(fit,300);
 document.addEventListener('click',function(e){ try{ var lg=e.target&&e.target.closest?e.target.closest('.map-legend'):null; if(lg&&(window.innerWidth<=600||window.innerHeight<=500)) lg.classList.toggle('hhp-open'); }catch(x){} },true);
 try{ var mc=document.getElementById('main-content'); if(mc) new MutationObserver(fit).observe(mc,{childList:true}); }catch(e){}
 }catch(e){try{console.warn('hhPhone1',e);}catch(x){}}})();</script>
+<script>/*hh141*/(function(){try{
+/* 18 Oct 2026 — the database hung twice in three days (16 + 18 Oct). Besides the heavy jobs, every open board tab kept
+   polling all night: the full ads list every 5 min plus ratings / notes / names / counts every 45–60 s
+   (≈ 2.000 requests an hour from idle tabs on 17–18 Oct). Now a tab that is HIDDEN, or that nobody has touched for
+   10 minutes, holds those background reads back until someone looks at it again (mouse, key, touch, scroll or the
+   tab coming to the front) — then it catches up at once. Nothing the user clicks is ever held back (writes, sign-in,
+   opening a house all pass straight through). This is the outermost fetch wrapper, so the held request gets a fresh
+   sign-in token when it finally goes out. */
+var IDLE=10*60*1000, last=Date.now(), waiters=[];
+function asleep(){ try{ return document.hidden || (Date.now()-last)>IDLE; }catch(e){ return false; } }
+function wake(){ if(!waiters.length) return; var w=waiters; waiters=[]; w.forEach(function(f){ try{ f(); }catch(e){} }); }
+['mousemove','mousedown','keydown','touchstart','scroll','wheel','click','focus'].forEach(function(ev){
+  window.addEventListener(ev,function(){ last=Date.now(); if(waiters.length && !document.hidden) wake(); },{passive:true,capture:true});
+});
+document.addEventListener('visibilitychange',function(){ if(!document.hidden){ last=Date.now(); wake(); } });
+var BG=/\/rest\/v1\/(listings\?select=(\*|id,house_id)|profiles\?select=id,username|user_notes\?select=|user_ratings\?select=|hh_house_summary\?select=|rpc\/hh_admin_counts|rpc\/hh_my_status)/;
+var _f=window.fetch;
+window.fetch=function(u,o){
+  try{
+    var url=(typeof u==='string')?u:((u&&u.url)||'');
+    if(BG.test(url) && asleep()){
+      var self=this, args=arguments;
+      window.__hh141held=(window.__hh141held||0)+1;
+      return new Promise(function(res,rej){ waiters.push(function(){ try{ res(_f.apply(self,args)); }catch(e){ rej(e); } }); });
+    }
+  }catch(e){}
+  return _f.apply(this,arguments);
+};
+window.__hh141={asleep:asleep,pending:function(){return waiters.length;}};
+}catch(e){try{console.warn('hh141',e);}catch(x){}}})();</script>
 </body>
 </html>
-<!-- build: hh136 -->
+<!-- build: hh141 -->
