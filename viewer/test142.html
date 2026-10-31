@@ -1595,13 +1595,14 @@ var START=Date.now(), MIN=500, HARD=40000, SOFT=28000, QUIET=1500, EXTRA=2000, r
 /* hh142 (31 Oct 2026, Dusty): το overlay μένει μέχρι να τελειώσει ΟΛΗ η πρώτη φόρτωση των αγγελιών
    (loadData), να ησυχάσουν δίκτυο, φωτογραφίες, χάρτης και ξαναζωγραφίσματα της λίστας, και μετά
    +2" ακόμη. Έτσι δεν βλέπεις τη σελίδα να «ξαναφορτώνει» μόνη της αφού φύγει η οθόνη φόρτωσης. */
-var mo=null;
+var wrapped={};
 function watchMain(){
-  if(mo) return;
-  try{ var mc=document.getElementById('main-content'); if(!mc||typeof MutationObserver!=='function') return;
-    mo=new MutationObserver(function(ms){ if(done) return; var a=0; for(var i=0;i<ms.length;i++){ a+=(ms[i].addedNodes||[]).length; } if(a>=5) touch(); });
-    mo.observe(mc,{childList:true,subtree:true});
-  }catch(e){}
+  /* κάθε ξαναζωγράφισμα της λίστας μετράει ως δραστηριότητα */
+  ['renderListings','buildUI'].forEach(function(n){
+    try{ if(wrapped[n]) return; var f=window[n]; if(typeof f!=='function') return;
+      window[n]=function(){ if(!done) touch(); return f.apply(this,arguments); }; wrapped[n]=1;
+    }catch(e){}
+  });
 }
 var inflight=0, lastAct=Date.now(), imgSeen=0, imgDone=0;
 /* Ο χρόνος ΔΕΝ μετράει όσο η καρτέλα είναι κρυμμένη: ο Chrome στραγγαλίζει τα
@@ -1623,13 +1624,19 @@ try{
   var _f=window.fetch;
   if(typeof _f==='function'){
     window.fetch=function(){
+      /* hh142: τα μετρητάκια του admin (hh_admin_counts) και τα logs (app_events) δεν κρατάνε το overlay,
+         και κανένα αίτημα δεν το κρατάει πάνω από 8" */
+      var _u=''; try{ _u=String((arguments[0]&&arguments[0].url)||arguments[0]||''); }catch(x){}
+      if(/rpc\/hh_admin_counts|\/app_events/.test(_u)) return _f.apply(this,arguments);
       inflight++; touch();
+      var _fin=false; function fin(){ if(_fin) return; _fin=true; inflight--; touch(); }
+      setTimeout(fin, 8000);
       var p;
       try{ p=_f.apply(this,arguments); }
-      catch(e){ inflight--; touch(); throw e; }
-      if(!p||typeof p.then!=='function'){ inflight--; touch(); return p; }
-      return p.then(function(r){ inflight--; touch(); return r; },
-                    function(e){ inflight--; touch(); throw e; });
+      catch(e){ fin(); throw e; }
+      if(!p||typeof p.then!=='function'){ fin(); return p; }
+      return p.then(function(r){ fin(); return r; },
+                    function(e){ fin(); throw e; });
     };
   }
 }catch(e){}
@@ -1722,7 +1729,6 @@ function say(t3, pct){
 
 function hide(why){
   if(done) return; done=true;
-  try{ if(mo) mo.disconnect(); }catch(e){}
   var o=el(); if(!o) return;
   o.setAttribute('data-why', why||'');
   o.setAttribute('aria-busy','false');
