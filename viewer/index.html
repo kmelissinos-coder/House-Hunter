@@ -1591,7 +1591,19 @@ try{
      5) έχει περάσει QUIET ms από την τελευταία δραστηριότητα δικτύου.
    Αν δεν έχεις κάνει login φεύγει αμέσως (να μη σκεπάζει τη φόρμα), υπάρχει
    «Παράλειψη» μετά τα 4" και σκληρό όριο στα 18".                            */
-var START=Date.now(), MIN=500, HARD=18000, SOFT=12000, QUIET=750, done=false;
+var START=Date.now(), MIN=500, HARD=40000, SOFT=28000, QUIET=1500, EXTRA=2000, readyAt=0, loadedAt=0, done=false;
+/* hh142 (31 Oct 2026, Dusty): το overlay μένει μέχρι να τελειώσει ΟΛΗ η πρώτη φόρτωση των αγγελιών
+   (loadData), να ησυχάσουν δίκτυο, φωτογραφίες, χάρτης και ξαναζωγραφίσματα της λίστας, και μετά
+   +2" ακόμη. Έτσι δεν βλέπεις τη σελίδα να «ξαναφορτώνει» μόνη της αφού φύγει η οθόνη φόρτωσης. */
+var wrapped={};
+function watchMain(){
+  /* κάθε ξαναζωγράφισμα της λίστας μετράει ως δραστηριότητα */
+  ['renderListings','buildUI'].forEach(function(n){
+    try{ if(wrapped[n]) return; var f=window[n]; if(typeof f!=='function') return;
+      window[n]=function(){ if(!done) touch(); return f.apply(this,arguments); }; wrapped[n]=1;
+    }catch(e){}
+  });
+}
 var inflight=0, lastAct=Date.now(), imgSeen=0, imgDone=0;
 /* Ο χρόνος ΔΕΝ μετράει όσο η καρτέλα είναι κρυμμένη: ο Chrome στραγγαλίζει τα
    timers και τα δίκτυα, οπότε αν μετρούσαμε κανονικά το overlay θα είχε φύγει
@@ -1612,13 +1624,19 @@ try{
   var _f=window.fetch;
   if(typeof _f==='function'){
     window.fetch=function(){
+      /* hh142: τα μετρητάκια του admin (hh_admin_counts) και τα logs (app_events) δεν κρατάνε το overlay,
+         και κανένα αίτημα δεν το κρατάει πάνω από 8" */
+      var _u=''; try{ _u=String((arguments[0]&&arguments[0].url)||arguments[0]||''); }catch(x){}
+      if(/rpc\/hh_admin_counts|\/app_events/.test(_u)) return _f.apply(this,arguments);
       inflight++; touch();
+      var _fin=false; function fin(){ if(_fin) return; _fin=true; inflight--; touch(); }
+      setTimeout(fin, 8000);
       var p;
       try{ p=_f.apply(this,arguments); }
-      catch(e){ inflight--; touch(); throw e; }
-      if(!p||typeof p.then!=='function'){ inflight--; touch(); return p; }
-      return p.then(function(r){ inflight--; touch(); return r; },
-                    function(e){ inflight--; touch(); throw e; });
+      catch(e){ fin(); throw e; }
+      if(!p||typeof p.then!=='function'){ fin(); return p; }
+      return p.then(function(r){ fin(); return r; },
+                    function(e){ fin(); throw e; });
     };
   }
 }catch(e){}
@@ -1732,9 +1750,13 @@ var iv=setInterval(function(){
 
     if(!r){ say('αναμονή δεδομένων…', 10+el_/200); }
     else{
+      watchMain();
+      var loaded=((window.__hhLoads||0)>=1);
+      if(loaded&&!loadedAt) loadedAt=Date.now();
       var pi=pendingImgs(), pt=pendingTiles();
-      if(el_>8000){ pi=0; pt=0; }        /* μετά τα 8" κρίνει μόνο η ησυχία δικτύου */
+      if(el_>SOFT || (loadedAt && Date.now()-loadedAt>8000)){ pi=0; pt=0; }   /* hh142: 8" μετά την πλήρη φόρτωση, όχι από την αρχή */        /* μετά τα 8" κρίνει μόνο η ησυχία δικτύου */
       var parts=[];
+      if(!loaded) parts.push('αγγελίες');
       if(inflight>0) parts.push(inflight+' αιτήματα');
       if(pi>0) parts.push(pi+' φωτογραφίες');
       if(pt>0) parts.push('χάρτης');
@@ -1743,11 +1765,14 @@ var iv=setInterval(function(){
 
       var quiet=(Date.now()-lastAct)>QUIET;
       var netOk=(inflight===0)||(el_>SOFT);        /* κολλημένο request δεν μας κρατάει για πάντα */
-      if(el_>=MIN && netOk && pi===0 && pt===0 && quiet){
-        clearInterval(iv); say('έτοιμο', 100);
-        setTimeout(function(){ hide('ready'); },140);
-        return;
-      }
+      if(el_>=MIN && netOk && pi===0 && pt===0 && quiet && (loaded||el_>SOFT)){
+        if(!readyAt) readyAt=Date.now();
+        if(Date.now()-readyAt>=EXTRA){
+          clearInterval(iv); say('έτοιμο', 100);
+          setTimeout(function(){ hide('ready'); },140);
+          return;
+        }
+      } else readyAt=0;
     }
     if(el_>HARD){ clearInterval(iv); hide('timeout'); }
   }catch(x){ clearInterval(iv); hide('err'); }
@@ -2098,16 +2123,36 @@ async function tryFetch() {
   try {
     /*hhPolish2b: PostgREST caps a request at 1000 rows — page through with offset */
     const data = [];
-    for (let _off = 0; _off < 20000; _off += 1000) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc,id.asc&limit=1000&offset=${_off}`, {
-        method: 'GET',
-        headers: sb.headers()
-      });
-      if (!resp.ok) throw new Error(`Σφάλμα Βάσης: ${resp.status} ${resp.statusText}`);
-      const _chunk = await resp.json();
-      data.push(..._chunk);
-      if (_chunk.length < 1000) break;
+    /*hh142: the pages are asked for 4 at a time instead of one after the other (each page takes seconds) */
+    let _more = true;
+    for (let _off = 0; _more && _off < 20000; _off += 4000) {
+      const _pages = await Promise.all([0, 1000, 2000, 3000].map(async (_d) => {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc,id.asc&limit=1000&offset=${_off + _d}`, {
+          method: 'GET',
+          headers: sb.headers()
+        });
+        if (!resp.ok) throw new Error(`Σφάλμα Βάσης: ${resp.status} ${resp.statusText}`);
+        return resp.json();
+      }));
+      for (const _chunk of _pages) {
+        data.push(..._chunk);
+        if (_chunk.length < 1000) { _more = false; break; }
+      }
     }
+    /*hh142: background refresh — nothing changed in the database → do not rebuild the page (no visible reload) */
+    try {
+      /* long texts (descriptions, photo lists) count by length + start + end, so the check stays fast on phones */
+      let _h = 2166136261 >>> 0, _n = 0;
+      const _mix = (str) => { for (let _i = 0; _i < str.length; _i++) { _h ^= str.charCodeAt(_i); _h = Math.imul(_h, 16777619) >>> 0; } _n += str.length; };
+      for (const _r of data) { for (const _k in _r) { let _v = _r[_k]; _v = (_v === null || _v === undefined) ? '' : String(_v);
+        if (_v.length > 120) _v = _v.length + '|' + _v.slice(0, 40) + '|' + _v.slice(-40); _mix(_k + '=' + _v + ';'); } }
+      const _sig = data.length + ':' + _n + ':' + _h;
+      if (window._hhSilent && window.__hhDataSig === _sig && Array.isArray(allListings) && allListings.length) {
+        (document.querySelector('.refresh-btn')||{}).disabled = false;
+        return;
+      }
+      window.__hhDataSig = _sig;
+    } catch (_e) {}
     
     allListings = data.map(item => ({
       ...item,
@@ -2153,7 +2198,7 @@ async function tryFetch() {
       </div>`;
   }
   (document.querySelector('.refresh-btn')||{}).disabled = false;
-  } finally { window._hhLoading = false; /*hhPolish125*/ }
+  } finally { window._hhLoading = false; /*hhPolish125*/ window.__hhLoads = (window.__hhLoads||0) + 1; /*hh142*/ }
 }
 
 //    CSV PARSER ───────────────────────────────────────────────────────────
