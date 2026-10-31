@@ -2141,9 +2141,12 @@ async function tryFetch() {
     }
     /*hh142: background refresh — nothing changed in the database → do not rebuild the page (no visible reload) */
     try {
-      const _js = JSON.stringify(data); let _h = 2166136261 >>> 0;
-      for (let _i = 0; _i < _js.length; _i++) { _h ^= _js.charCodeAt(_i); _h = Math.imul(_h, 16777619) >>> 0; }
-      const _sig = data.length + ':' + _js.length + ':' + _h;
+      /* long texts (descriptions, photo lists) count by length + start + end, so the check stays fast on phones */
+      let _h = 2166136261 >>> 0, _n = 0;
+      const _mix = (str) => { for (let _i = 0; _i < str.length; _i++) { _h ^= str.charCodeAt(_i); _h = Math.imul(_h, 16777619) >>> 0; } _n += str.length; };
+      for (const _r of data) { for (const _k in _r) { let _v = _r[_k]; _v = (_v === null || _v === undefined) ? '' : String(_v);
+        if (_v.length > 120) _v = _v.length + '|' + _v.slice(0, 40) + '|' + _v.slice(-40); _mix(_k + '=' + _v + ';'); } }
+      const _sig = data.length + ':' + _n + ':' + _h;
       if (window._hhSilent && window.__hhDataSig === _sig && Array.isArray(allListings) && allListings.length) {
         (document.querySelector('.refresh-btn')||{}).disabled = false;
         return;
