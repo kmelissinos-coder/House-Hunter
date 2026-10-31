@@ -4547,7 +4547,7 @@ ensure();setInterval(ensure,600);var _moP=false;try{var _mo=new MutationObserver
  window.addEventListener('error',function(e){log('js_error',{msg:(''+e.message).slice(0,200),src:(''+(e.filename||'')).slice(-60),line:e.lineno})});
  window.addEventListener('unhandledrejection',function(e){log('js_rejection',{msg:(''+(e.reason&&e.reason.message||e.reason)).slice(0,200)})});
  log('page_load',{path:location.pathname,w:(window.innerWidth||0),h:(window.innerHeight||0),lang:(navigator.language||'')});
- /*hh144: usage — time on the site (visible tab only), homes and ads opened, project / view / search */
+ /*hh144: usage — time on the site (visible tab only), homes opened, project / view / search */
  try{
   var vis=0,lastTick=Date.now();
   function tick(){var n=Date.now();if(document.visibilityState==='visible')vis+=Math.min(n-lastTick,70000);lastTick=n;}
@@ -4559,7 +4559,7 @@ ensure();setInterval(ensure,600);var _moP=false;try{var _mo=new MutationObserver
   window.addEventListener('popstate',houseCheck);setTimeout(houseCheck,1500);
   var wr={};
   function wrapFn(n,ev,arg){try{if(wr[n])return;var f=window[n];if(typeof f!=='function')return;window[n]=function(){try{log(ev,arg(arguments));}catch(e){}return f.apply(this,arguments);};wr[n]=1;}catch(e){}}
-  var wi=setInterval(function(){wrapFn('setProject','project',function(a){return {p:String(a[0]||'')};});wrapFn('setView','view',function(a){return {v:String(a[0]||'')};});wrapFn('openListingOverlay','listing_open',function(a){return {url:String(a[0]||'').slice(0,160)};});if(wr.setProject&&wr.setView&&wr.openListingOverlay)clearInterval(wi);},1500);
+  var wi=setInterval(function(){wrapFn('setProject','project',function(a){return {p:String(a[0]||'')};});wrapFn('setView','view',function(a){return {v:String(a[0]||'')};});if(wr.setProject&&wr.setView)clearInterval(wi);},1500);
   setTimeout(function(){clearInterval(wi);},30000);
   var stq=null;document.addEventListener('input',function(e){try{if(e.target&&e.target.id==='numSearch'){clearTimeout(stq);var q=String(e.target.value||'').trim();stq=setTimeout(function(){if(q)log('search',{q:q.slice(0,80)});},2500);}}catch(x){}},true);
  }catch(e){}
