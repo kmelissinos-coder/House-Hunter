@@ -1819,6 +1819,7 @@ document.addEventListener('click', function(e){
   <button class="project-tab" data-project="2xFam" onclick="setProject('2xFam',this)">2xFam</button>
   <button class="project-tab" data-project="Rent" onclick="setProject('Rent',this)">Rent</button>
   <button class="project-tab" data-project="Pakis" onclick="setProject('Pakis',this)">Pakis</button>
+  <button class="project-tab" data-project="xirosigma" onclick="setProject('xirosigma',this)">xirosigma</button><!--hhXiro1 9 Nov 2026-->
 </div>
 <div class="platform-bar" id="platform-bar">
   <button class="platform-tab active" data-platform="all" onclick="setPlatform('all', this)">
@@ -2409,9 +2410,9 @@ function buildUI() {
 
   const platforms = [...new Set(combined.map(h => h.platform).filter(Boolean))];
   const bar = document.getElementById('platform-bar');
-  bar.innerHTML = `<button class="platform-tab ${currentPlatform==='all'?'active':''}" data-platform="all" onclick="setPlatform('all',this)">Όλες οι πλατφόρμες <span style="opacity:0.6">(${combined.filter(function(h){return ((currentProject==='all'?!/^(Rent|Pakis)$/.test(h.project||'Fameli'):(h.project||'Fameli')===currentProject));}).length})</span></button>`;
+  bar.innerHTML = `<button class="platform-tab ${currentPlatform==='all'?'active':''}" data-platform="all" onclick="setPlatform('all',this)">Όλες οι πλατφόρμες <span style="opacity:0.6">(${combined.filter(function(h){return ((currentProject==='all'?!/^(Rent|Pakis|xirosigma)$/.test(h.project||'Fameli'):(h.project||'Fameli')===currentProject));}).length})</span></button>`;
   platforms.forEach(p => {
-    const cnt = combined.filter(h => h.platform === p && ((currentProject==='all'?!/^(Rent|Pakis)$/.test(h.project||'Fameli'):(h.project||'Fameli')===currentProject))).length;
+    const cnt = combined.filter(h => h.platform === p && ((currentProject==='all'?!/^(Rent|Pakis|xirosigma)$/.test(h.project||'Fameli'):(h.project||'Fameli')===currentProject))).length;
     const tab = document.createElement('button');
     tab.className = 'platform-tab' + (currentPlatform === p ? ' active' : '');
     tab.setAttribute('data-platform', p);
@@ -2522,7 +2523,7 @@ function applyFilters() {
   const _idq=/^#?\d+$/.test(q)?q.replace('#',''):null; /*hhPolish2*/
   /*hhPolish130 (13 Oct 2026, Dusty): the search stays inside the category you are in (Rent shows no homes for sale),
     and a home number (e.g. 1519 or #1519) shows THAT home only — not every ad whose link or text happens to contain the digits. */
-  const _cat = h => currentProject==='all' ? !/^(Rent|Pakis)$/.test(h.project||'Fameli') : (h.project||'Fameli')===currentProject;
+  const _cat = h => currentProject==='all' ? !/^(Rent|Pakis|xirosigma)$/.test(h.project||'Fameli') : (h.project||'Fameli')===currentProject;
   const _idHit = _idq!=null && combined.some(x => String(x.house_id||'').trim()===_idq && _cat(x));
   filtered = combined.filter(h => {
     /*hhPolish41: when something is typed in the search box we search the whole
@@ -2537,7 +2538,7 @@ function applyFilters() {
     if (hideSeen && h.seen_it) return false;
     if (currentPlatform !== 'all' && h.platform !== currentPlatform) return false;
     if (currentProject  !== 'all' && (h.project||'Fameli') !== currentProject) return false;
-    if (currentProject === 'all' && /^(Rent|Pakis)$/.test(h.project||'Fameli')) return false; /*hhRentCatV1+Pakis*/
+    if (currentProject === 'all' && /^(Rent|Pakis|xirosigma)$/.test(h.project||'Fameli')) return false; /*hhRentCatV1+Pakis*/
     if (loc && String(h.location||'').split('(')[0].trim() !== loc) return false;
     if (typ && h.type !== typ) return false;
     if (q && !(window.hhQMatch ? window.hhQMatch(h,q) : `${h.location} ${h.type} ${h.agency} ${h.notes} ${h.heating} ${h.platformNr||''} ${h.agencyNr||''}`.toLowerCase().includes(q))) return false;
@@ -2588,7 +2589,7 @@ function setPlatform(p, el) {
 
 function setProject(p, el) {
   currentProject = p;
-  try{var _comb=[...allListings,...extraListings];var _pm=function(h){return (currentProject==='all'?!/^(Rent|Pakis)$/.test(h.project||'Fameli'):(h.project||'Fameli')===currentProject);};var _bar=document.getElementById('platform-bar');if(_bar){[].forEach.call(_bar.querySelectorAll('.platform-tab'),function(t){var pl=t.getAttribute('data-platform');var c=pl==='all'?_comb.filter(_pm).length:_comb.filter(function(h){return h.platform===pl&&_pm(h);}).length;var sp=t.querySelector('span');if(sp)sp.textContent='('+c+')';});}}catch(e){}
+  try{var _comb=[...allListings,...extraListings];var _pm=function(h){return (currentProject==='all'?!/^(Rent|Pakis|xirosigma)$/.test(h.project||'Fameli'):(h.project||'Fameli')===currentProject);};var _bar=document.getElementById('platform-bar');if(_bar){[].forEach.call(_bar.querySelectorAll('.platform-tab'),function(t){var pl=t.getAttribute('data-platform');var c=pl==='all'?_comb.filter(_pm).length:_comb.filter(function(h){return h.platform===pl&&_pm(h);}).length;var sp=t.querySelector('span');if(sp)sp.textContent='('+c+')';});}}catch(e){}
   document.querySelectorAll('.project-tab').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   try { _saveUISoon(); } catch(e) {}
@@ -2687,7 +2688,7 @@ function renderListings() {
         return 0;
       });
     })();
-    document.getElementById('resultsCount').innerHTML = (function(){function _pc(p){try{var s=allListings.filter(function(h){return (h.project||'Fameli')===p;});var g=groupByHouseId(s);return g.groupCards.length+g.singles.length;}catch(e){return 0;}}var _b=[['Fameli','rgba(255,255,255,0.10)'],['2xFam','rgba(150,90,240,0.32)'],['Rent','rgba(20,150,120,0.32)'],['Pakis','rgba(180,83,9,0.40)']];return _b.map(function(x){var n=_pc(x[0]);return n?'<span style="display:inline-block;padding:1px 8px;border-radius:9px;background:'+x[1]+';margin-right:5px">'+x[0]+' '+n+'</span>':'';}).join('');})();
+    document.getElementById('resultsCount').innerHTML = (function(){function _pc(p){try{var s=allListings.filter(function(h){return (h.project||'Fameli')===p;});var g=groupByHouseId(s);return g.groupCards.length+g.singles.length;}catch(e){return 0;}}var _b=[['Fameli','rgba(255,255,255,0.10)'],['2xFam','rgba(150,90,240,0.32)'],['Rent','rgba(20,150,120,0.32)'],['Pakis','rgba(180,83,9,0.40)'],['xirosigma','rgba(29,78,216,0.40)']];return _b.map(function(x){var n=_pc(x[0]);return n?'<span style="display:inline-block;padding:1px 8px;border-radius:9px;background:'+x[1]+';margin-right:5px">'+x[0]+' '+n+'</span>':'';}).join('');})();
     container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
   if(window._savedScroll!==undefined){setTimeout(()=>{window.scrollTo(0,window._savedScroll);window._savedScroll=undefined;},30);}
     renderRejectedSection();
@@ -5088,7 +5089,7 @@ var st=document.createElement('style');st.id='hh-polish1';
 st.textContent='body.hh-rent .card-price::after,body.hh-rent .list-price::after,body.hh-rent .modal-price::after,body.hh-rent .price-range-main::after{content:"/μήνα";font-size:.55em;opacity:.65;margin-left:2px;font-weight:500}'
 +'#hh-lo-map{height:230px;border-radius:10px;margin:10px 0;border:1px solid rgba(255,255,255,.12);overflow:hidden}#hh-lo-map .leaflet-control-attribution{font-size:9px}.hh-lo-map-t{font-size:11px;color:var(--muted);margin:10px 0 4px}';
 document.head.appendChild(st);
-setInterval(function(){try{var t=document.querySelector('.project-tab.active');document.body.classList.toggle('hh-rent',!!t&&/^(Rent|Pakis)$/.test(t.getAttribute('data-project')||''));}catch(e){}},600);
+setInterval(function(){try{var t=document.querySelector('.project-tab.active');document.body.classList.toggle('hh-rent',!!t&&/^(Rent|Pakis|xirosigma)$/.test(t.getAttribute('data-project')||''));}catch(e){}},600);
 function drawMap(){try{
  if(!window.L)return; var ov=document.getElementById('listingOverlay'); if(!ov||!ov.classList.contains('open'))return;
  var sib=(typeof _loSiblings!=='undefined')?_loSiblings:[]; var idx=(typeof _loFeatIdx!=='undefined')?_loFeatIdx:0; var h=sib[idx]; if(!h)return;
@@ -5123,7 +5124,7 @@ window.hhConfirmHTML=function(h){var grp=[h];try{grp=_houseGroup(h);}catch(e){}v
 window.hhConfirmAddr=async function(url,val){try{var h=getByUrl(url);if(!h)return;var grp=_houseGroup(h);for(var i=0;i<grp.length;i++){var m=grp[i];m.address_confirmed=!!val;if(m._dbId){try{await fetch(SUPABASE_URL+'/rest/v1/'+TABLE+'?id=eq.'+m._dbId,{method:'PATCH',headers:Object.assign({},sb.headers(),{'Content-Type':'application/json','Prefer':'return=minimal'}),body:JSON.stringify({address_confirmed:!!val})});}catch(e){}}}showToast(val?'✓ Επιβεβαιώθηκε η θέση':'Αφαιρέθηκε η επιβεβαίωση');try{if(document.getElementById('listingOverlay').classList.contains('open'))_renderOvl();}catch(e){}try{if(currentView==='map')initMap();}catch(e){}}catch(e){}};
 /* share */
 function shareLink(hid,url){var base=location.origin+location.pathname;if(hid&&hid!=='0'&&hid!=='null'&&hid!=='undefined')return base+'?house='+encodeURIComponent(hid);return base+'?open='+encodeURIComponent(url||'');}
-function shareText(hid,url){var h=null;try{h=url?getByUrl(url):null;if(!h&&hid){var all=[].concat(allListings,extraListings);h=all.find(function(x){return String(x.house_id||'').trim()===String(hid);});}}catch(e){}var rent=false;try{rent=!!(h&&/^(Rent|Pakis)$/.test(h.project||''));}catch(e){}var parts=[];if(h){parts.push((h.location||'')+(h.type?' · '+h.type:''));if(h.sqm_raw||h.sqmRaw||h.sqm)parts.push((h.sqm_raw||h.sqmRaw||h.sqm)+(/τ/.test(String(h.sqm_raw||h.sqmRaw||''))?'':' τ.μ.'));if(h.price)parts.push('€'+Number(h.price).toLocaleString('el')+(rent?'/μήνα':''));}var head='🏠 House Hunter'+(hid&&hid!=='0'?' #'+hid:'');return head+(parts.length?'\n'+parts.join(' · '):'')+'\n'+shareLink(hid,url);}
+function shareText(hid,url){var h=null;try{h=url?getByUrl(url):null;if(!h&&hid){var all=[].concat(allListings,extraListings);h=all.find(function(x){return String(x.house_id||'').trim()===String(hid);});}}catch(e){}var rent=false;try{rent=!!(h&&/^(Rent|Pakis|xirosigma)$/.test(h.project||''));}catch(e){}var parts=[];if(h){parts.push((h.location||'')+(h.type?' · '+h.type:''));if(h.sqm_raw||h.sqmRaw||h.sqm)parts.push((h.sqm_raw||h.sqmRaw||h.sqm)+(/τ/.test(String(h.sqm_raw||h.sqmRaw||''))?'':' τ.μ.'));if(h.price)parts.push('€'+Number(h.price).toLocaleString('el')+(rent?'/μήνα':''));}var head='🏠 House Hunter'+(hid&&hid!=='0'?' #'+hid:'');return head+(parts.length?'\n'+parts.join(' · '):'')+'\n'+shareLink(hid,url);}
 function closeShare(){var m=document.getElementById('hh-share-menu');if(m)m.remove();}
 window.hhShare=function(ev,hid,url){try{ev&&ev.stopPropagation&&ev.stopPropagation();closeShare();var txt=shareText(hid,url),link=shareLink(hid,url);var m=document.createElement('div');m.id='hh-share-menu';var items=[['📋','Αντιγραφή link',function(){var done=function(){showToast('✓ Το link αντιγράφηκε');};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(done,function(){fallbackCopy(link);done();});}else{fallbackCopy(link);done();}}],['✉️','Email',function(){location.href='mailto:?subject='+encodeURIComponent('House Hunter'+(hid&&hid!=='0'?' #'+hid:''))+'&body='+encodeURIComponent(txt);}],['💬','WhatsApp',function(){window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');}],['📱','Viber',function(){location.href='viber://forward?text='+encodeURIComponent(txt);}]];if(navigator.share)items.push(['📤','Άλλο…',function(){navigator.share({title:'House Hunter',text:txt,url:link}).catch(function(){});}]);items.forEach(function(it){var b=document.createElement('button');b.type='button';b.innerHTML='<span class="hh-sh-ic">'+it[0]+'</span>'+it[1];b.onclick=function(e){e.stopPropagation();try{it[2]();}catch(x){}closeShare();};m.appendChild(b);});document.body.appendChild(m);var x=ev&&ev.clientX!=null?ev.clientX:window.innerWidth/2,y=ev&&ev.clientY!=null?ev.clientY:window.innerHeight/2;var W=190,H=m.offsetHeight||200;var lx=Math.min(Math.max(8,x-W/2),window.innerWidth-W-8),ly=(y+H+12>window.innerHeight)?Math.max(8,y-H-8):y+8;m.style.left=lx+'px';m.style.top=ly+'px';setTimeout(function(){document.addEventListener('click',closeShare,{once:true});},0);}catch(e){}};
 function fallbackCopy(t){try{var ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}catch(e){}}
@@ -5135,7 +5136,7 @@ function unhot(){if(hot){try{hot.el.classList.remove('hh-pin-hot');hot.mk.setZIn
 document.addEventListener('mouseover',function(e){try{var c=e.target&&e.target.closest&&e.target.closest('#mapList [data-hhh]');if(!c){return;}var hid=c.getAttribute('data-hhh');if(hot&&hot.hid===hid)return;unhot();var p=pinEl(hid);if(!p)return;p.el.classList.add('hh-pin-hot');p.mk.setZIndexOffset(1000);hot={hid:hid,el:p.el,mk:p.mk};}catch(x){}});
 document.addEventListener('mouseout',function(e){try{var c=e.target&&e.target.closest&&e.target.closest('#mapList [data-hhh]');if(!c)return;var to=e.relatedTarget;if(to&&c.contains(to))return;unhot();}catch(x){}});
 /* ?house= deep link that works across projects */
-(function(){var want=null;try{want=new URL(location.href).searchParams.get('house');}catch(e){}if(!want)return;var n=0,iv=setInterval(function(){n++;if(n>60){clearInterval(iv);return;}try{var ov=document.getElementById('listingOverlay');if(ov&&ov.classList.contains('open')){try{var cur=(typeof _loSiblings!=='undefined'&&_loSiblings[_loFeatIdx])?String(_loSiblings[_loFeatIdx].house_id||''):'';if(cur===String(want)){clearInterval(iv);return;}}catch(e){}}if(typeof allListings==='undefined'||!allListings.length)return;var all=[].concat(allListings,extraListings||[]);var h=all.find(function(x){return String(x.house_id||'').trim()===String(want);});if(!h){clearInterval(iv);return;}var p=h.project||'Fameli';if(typeof currentProject!=='undefined'&&currentProject!==p&&currentProject!=='all'||(currentProject==='all'&&(p==='Rent'||p==='Pakis'))){var t=document.querySelector('.project-tab[data-project="'+p+'"]');if(t&&typeof setProject==='function'){setProject(p,t);}}clearInterval(iv);setTimeout(function(){try{openListingOverlay(null,String(want),0);}catch(e){}},300);}catch(e){}},500);})();
+(function(){var want=null;try{want=new URL(location.href).searchParams.get('house');}catch(e){}if(!want)return;var n=0,iv=setInterval(function(){n++;if(n>60){clearInterval(iv);return;}try{var ov=document.getElementById('listingOverlay');if(ov&&ov.classList.contains('open')){try{var cur=(typeof _loSiblings!=='undefined'&&_loSiblings[_loFeatIdx])?String(_loSiblings[_loFeatIdx].house_id||''):'';if(cur===String(want)){clearInterval(iv);return;}}catch(e){}}if(typeof allListings==='undefined'||!allListings.length)return;var all=[].concat(allListings,extraListings||[]);var h=all.find(function(x){return String(x.house_id||'').trim()===String(want);});if(!h){clearInterval(iv);return;}var p=h.project||'Fameli';if(typeof currentProject!=='undefined'&&currentProject!==p&&currentProject!=='all'||(currentProject==='all'&&(p==='Rent'||p==='Pakis'||p==='xirosigma'))){var t=document.querySelector('.project-tab[data-project="'+p+'"]');if(t&&typeof setProject==='function'){setProject(p,t);}}clearInterval(iv);setTimeout(function(){try{openListingOverlay(null,String(want),0);}catch(e){}},300);}catch(e){}},500);})();
 var st=document.createElement('style');st.id='hh-polish2';
 st.textContent='.hh-logo-btn{display:inline-flex;align-items:center;justify-content:center;background:#fff!important;border:1px solid rgba(0,0,0,.15)!important;padding:3px 9px!important;border-radius:9px;cursor:pointer;line-height:0;min-height:30px}.hh-logo-btn img{height:22px;width:auto;max-width:120px;display:block}.hh-logo-btn span{color:#222;font-size:12px;font-weight:700;line-height:1.2}.hh-logo-btn.hh-logo-sm{min-height:24px;padding:2px 6px!important}.hh-logo-btn.hh-logo-sm img{height:15px;max-width:80px}'
 +'#hh-share-menu{position:fixed;z-index:2147483100;background:var(--card,#1b1a17);border:1px solid var(--border,#3a382f);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.55);padding:6px;display:flex;flex-direction:column;min-width:190px;font-family:inherit}#hh-share-menu button{background:none;border:none;color:var(--text,#e8e4dc);text-align:left;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:9px}#hh-share-menu button:hover{background:rgba(255,255,255,.08)}.hh-sh-ic{width:20px;text-align:center}'
@@ -5284,7 +5285,7 @@ document.head.appendChild(st);
 function tok(){try{var o=JSON.parse(sessionStorage.getItem('hh_auth')||localStorage.getItem('hh_auth')||'null');return o&&o.access_token?o.access_token:null;}catch(e){return null;}}
 var counts=null,lastAt=0;
 function paint(){try{var m=document.getElementById('hh-mergebtn'),u=document.getElementById('hh-suspbtn');if(!counts)return;[[m,counts.suggestions],[u,counts.suspicious]].forEach(function(p){var el=p[0],n=p[1];if(!el)return;var b=el.querySelector('.hh-cnt');if(!b){b=document.createElement('span');b.className='hh-cnt';el.appendChild(b);}var v=(n==null?'…':String(n));if(b.textContent!==v)b.textContent=v;b.classList.toggle('zero',!n);el.title=(el.id==='hh-mergebtn'?'Προτάσεις ένωσης που περιμένουν: ':'Ύποπτες ενώσεις που περιμένουν: ')+v;});}catch(e){}}
-async function load(force){try{if(window.hhRole!=='admin')return;var t=tok();if(!t)return;var pj=(function(){var c=null;try{c=currentProject;}catch(e){}return c==='Pakis'?'Pakis':'Rent';})();/*hhPolish122*/if(pj!==window.__hhCntP){window.__hhCntP=pj;counts={suggestions:null,suspicious:null};paint();force=true;}if(!force&&Date.now()-lastAt<5*60*1000)return;lastAt=Date.now();var r=await fetch(SB+'/rest/v1/rpc/hh_admin_counts',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({p_project:pj})});if(!r.ok)return;counts=await r.json();paint();}catch(e){}}
+async function load(force){try{if(window.hhRole!=='admin')return;var t=tok();if(!t)return;var pj=(function(){var c=null;try{c=currentProject;}catch(e){}return (c==='Pakis'||c==='xirosigma')?c:'Rent';})();/*hhPolish122*/if(pj!==window.__hhCntP){window.__hhCntP=pj;counts={suggestions:null,suspicious:null};paint();force=true;}if(!force&&Date.now()-lastAt<5*60*1000)return;lastAt=Date.now();var r=await fetch(SB+'/rest/v1/rpc/hh_admin_counts',{method:'POST',headers:{apikey:AK,Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({p_project:pj})});if(!r.ok)return;counts=await r.json();paint();}catch(e){}}
 setInterval(function(){load(false);paint();},1500);
 document.addEventListener('visibilitychange',function(){if(!document.hidden)load(true);});
 window.hhRefreshCounts=function(){load(true);};
@@ -5537,7 +5538,7 @@ setInterval(scan,900); setTimeout(scan,400);
 
 <script>/*hhPolish11*/(function(){try{
 function comb(){try{return [].concat(window.allListings||[],window.extraListings||[]);}catch(e){return [];}}
-function inProj(h){try{return (currentProject==='all' ? !/^(Rent|Pakis)$/.test(h.project||'Fameli') : (h.project||'Fameli')===currentProject);}catch(e){return true;}}
+function inProj(h){try{return (currentProject==='all' ? !/^(Rent|Pakis|xirosigma)$/.test(h.project||'Fameli') : (h.project||'Fameli')===currentProject);}catch(e){return true;}}
 var lastKey='';
 function recount(){try{
   var bar=document.getElementById('platform-bar'); if(!bar) return;
@@ -5627,7 +5628,7 @@ var st=document.createElement('style');st.id='hh-polish13';st.textContent=
 document.head.appendChild(st);
 
 /* ---------- 1. platform counts, with the project rule applyFilters() actually uses ---------- */
-function inProj(h){try{var p=h.project||'Fameli';return currentProject==='all'?!/^(Rent|Pakis)$/.test(p):p===currentProject;}catch(e){return true;}}
+function inProj(h){try{var p=h.project||'Fameli';return currentProject==='all'?!/^(Rent|Pakis|xirosigma)$/.test(p):p===currentProject;}catch(e){return true;}}
 function recountPlatforms(){try{
   var bar=document.getElementById('platform-bar'); if(!bar) return;
   var comb=[].concat(window.allListings||[],window.extraListings||[]);
@@ -7101,7 +7102,7 @@ window.hhGeoCluster = function(items){
     +'-webkit-text-fill-color:#fff!important;text-shadow:none!important;'
     +'border-bottom:1px solid rgba(0,0,0,.28);position:relative;z-index:8;'
     +'pointer-events:none;flex:none}'
-    +'.hh-projbadge[data-p="Rent"]{background:#0f7a63}.hh-projbadge[data-p="Pakis"]{background:#b45309}'
+    +'.hh-projbadge[data-p="Rent"]{background:#0f7a63}.hh-projbadge[data-p="Pakis"]{background:#b45309}.hh-projbadge[data-p="xirosigma"]{background:#1d4ed8}'
     +'.hh-projbadge[data-p="2xFam"]{background:#6b3fc4}'
     +'.hh-projbadge[data-p="Fameli"]{background:#8a6d1f}'
     /* το ανοιχτό θέμα: ίδια λευκά γράμματα, λίγο πιο σκούρα πλακίδια + σκιά */
@@ -7504,7 +7505,7 @@ function comb(){
 }
 function inProj(h){
   try{ var p=(h&&h.project)||'Fameli';
-       return currentProject==='all' ? !/^(Rent|Pakis)$/.test(p) : p===currentProject; }
+       return currentProject==='all' ? !/^(Rent|Pakis|xirosigma)$/.test(p) : p===currentProject; }
   catch(e){ return true; }
 }
 function stripAcc(t){
@@ -8829,7 +8830,7 @@ function houseRows(hid){
 }
 function inProj(h){
   try{ var p=(h&&h.project)||'Fameli';
-       return currentProject==='all' ? !/^(Rent|Pakis)$/.test(p) : p===currentProject; }
+       return currentProject==='all' ? !/^(Rent|Pakis|xirosigma)$/.test(p) : p===currentProject; }
   catch(e){ return true; }
 }
 function qbox(){ try{ var n=$('numSearch'); return n?String(n.value||'').trim():''; }catch(e){ return ''; } }
@@ -13830,7 +13831,7 @@ function map(){
     try{
       var pj=r.project||'Fameli';
       if(cp&&cp!=='all') return pj===cp;
-      return !/^(Rent|Pakis)$/.test(pj);
+      return !/^(Rent|Pakis|xirosigma)$/.test(pj);
     }catch(e){ return true; }
   }
   for(i=0;i<a.length;i++){
@@ -15588,7 +15589,7 @@ function build(hid,url,j){
   if(j){
     if(j.location||j.type) parts.push((j.location||'')+(j.type?' · '+j.type:''));
     if(j.sqm) parts.push(j.sqm+' τ.μ.');
-    var p=money(j.price_lo||j.price_any); if(p) parts.push(p+(/^(Rent|Pakis)$/.test(j.project||'')?'/μήνα':''));
+    var p=money(j.price_lo||j.price_any); if(p) parts.push(p+(/^(Rent|Pakis|xirosigma)$/.test(j.project||'')?'/μήνα':''));
   }
   return { link:link, txt: head+(parts.length?'\n'+parts.join(' · '):'')+'\n'+link };
 }
@@ -16217,7 +16218,7 @@ var n=0, iv=setInterval(function(){ n++; if(wrap()||n>120) clearInterval(iv); },
 <script>/*hhPolish122*/(function(){try{
 /* 6 Oct 2026 — 🔀 Ενώσεις and ⚠ Ύποπτες per category: on the Pakis tab they open the Pakis merge screen
    (merge.html?p=Pakis) and count Pakis pairs; Con (Pakis admin) now sees both buttons. */
-function pj(){var c=null;try{c=currentProject;}catch(e){}return c==='Pakis'?'Pakis':'Rent';}
+function pj(){var c=null;try{c=currentProject;}catch(e){}return (c==='Pakis'||c==='xirosigma')?c:'Rent';}
 function upd(){try{var p=pj(),q=(p==='Rent'?'':'?p='+p);
   var m=document.getElementById('hh-mergebtn'),u=document.getElementById('hh-suspbtn');
   if(m&&m.getAttribute('href')!=='merge.html'+q) m.setAttribute('href','merge.html'+q);
