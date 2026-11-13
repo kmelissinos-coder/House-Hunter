@@ -1,7 +1,7 @@
 /* House Hunter v2 — one data store, one renderer. Built on kit.js (shared base). */
-import { esc, $, $$, num, createStore, saved, makeI18n, applyTheme, toast, pagerHTML, lightbox, debounce, fold, matchWords } from './kit.js?v=1';
+import { esc, $, $$, num, createStore, saved, makeI18n, applyTheme, toast, pagerHTML, lightbox, debounce, fold, matchWords } from './kit.js?v=2';
 
-const BUILD = 'v2.001';
+const BUILD = 'v2.002';
 const SB = 'https://ofvanbbujgcqhbiyihgy.supabase.co';
 const AK = 'sb_publishable_JuWg32nAFZN7nMmOGVYSsA_-bYnDiUr'; // public key, same as the current site
 const PER_PAGE = 50, MAP_PER_PAGE = 20;
@@ -363,10 +363,10 @@ function homeHTML(h, d) {
   <div class="flds">${h.s0 ? `<div class="fld"><small>m²</small><b>${range(h.s0, h.s1)}</b></div>` : ''}${h.b0 != null ? `<div class="fld"><small>${t('beds')}</small><b>${range(h.b0, h.b1)}</b></div>` : ''}
     ${field(t('floor'), u('fl'))}${field(t('year'), u('yr'))}${field(t('energy'), u('en'))}${field(t('heating'), u('he').slice(0, 3))}${h.c0 ? `<div class="fld"><small>${t('first_seen')}</small><b>${dmy(h.c0)}</b></div>` : ''}</div>
   ${d.summary ? `<section><h4>${t('summary')}</h4><p class="sum">${esc(d.summary)}</p></section>` : ''}
-  <section><h4>${t('agencies')} (${ads.length})</h4><div class="ads">${ads.map((a) => `<div class="ad${a.del ? ' del' : ''}">
-      <div class="ad-a"><b>${esc(a.ag || '—')}</b><small>${pfChips([a.pf])} #${a.no}${a.agnr ? ` · ${t('code')} ${esc(a.agnr)}` : ''}${a.del ? ` · ⛔ ${t('removed')} ${dmy(a.goneat)}` : ''}</small></div>
-      <div class="ad-b">${a.price ? '€' + N(a.price) : '—'}<small>${[a.sqm ? N(a.sqm) + ' m²' : '', a.beds ? esc(a.beds) + ' ' + t('bed') : '', a.fl ? esc(a.fl) : ''].filter(Boolean).join(' · ')}</small></div>
-      <div class="ad-c">${tel(a.tel)}${a.vid ? `<a href="${esc(a.vid)}" target="_blank" rel="noopener">▶ ${t('video')}</a>` : ''}<a class="btn sm" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${t('open_ad')} ↗</a></div></div>`).join('')}</div></section>
+  <section><h4>${t('agencies')} (${ads.length})</h4><div class="offers">${ads.map((a) => `<div class="offer${a.del ? ' del' : ''}">
+      <div class="of-a"><b>${esc(a.ag || '—')}</b><small>${pfChips([a.pf])} #${a.no}${a.agnr ? ` · ${t('code')} ${esc(a.agnr)}` : ''}${a.del ? ` · ⛔ ${t('removed')} ${dmy(a.goneat)}` : ''}</small></div>
+      <div class="of-b">${a.price ? '€' + N(a.price) : '—'}<small>${[a.sqm ? N(a.sqm) + ' m²' : '', a.beds ? esc(a.beds) + ' ' + t('bed') : '', a.fl ? esc(a.fl) : ''].filter(Boolean).join(' · ')}</small></div>
+      <div class="of-c">${tel(a.tel)}${a.vid ? `<a href="${esc(a.vid)}" target="_blank" rel="noopener">▶ ${t('video')}</a>` : ''}<a class="btn sm" href="${esc(a.url)}" target="_blank" rel="noopener noreferrer">${t('open_ad')} ↗</a></div></div>`).join('')}</div></section>
   ${(d.prices || []).length ? `<section><h4>${t('price_hist')}</h4><div class="ph-list">${d.prices.map((p) => `<div><span>${dmy(p.at)}</span><span>${esc(p.ag || p.pf || '')} #${p.no}</span><b class="${+p.new < +p.old ? 'down' : 'up'}">€${N(p.old)} → €${N(p.new)}</b></div>`).join('')}</div></section>` : ''}
   <section class="two"><div><h4>${t('where')}</h4>${ads.some((a) => a.lat) ? `<div id="ov-map"></div>` : '<p class="muted">—</p>'}${u('addr').length ? `<p class="muted">${u('addr').map(esc).join(' · ')}</p>` : ''}</div>
     <div><h4>${t('ratings')} & ${t('notes')}</h4>
