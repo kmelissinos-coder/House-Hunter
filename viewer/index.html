@@ -2639,6 +2639,82 @@ function groupByHouseId(listings) {
   return { groupCards, singles };
 }
 
+/*hh145 (13 Nov 2026, Dusty): 50 homes per page instead of drawing every card at once (the page got slow with 1.500+ homes).
+  Page buttons above and below the results. Any change of category, view, sort, filter or search (a click or typing outside the
+  results) sends you back to page 1; rating or ticking a card keeps the page you are on. */
+var HH_PAGE_SIZE = 50;
+window.__hhPage = window.__hhPage || 0;
+function hhPagerHtml(p, pages, from, to, n, pos, noun, fn) {
+  if (n <= HH_PAGE_SIZE) return '';
+  fn = fn || 'hhGoPage';
+  var b = function (i, label, dis, cur) { return '<button type="button" class="hh-pg-b' + (cur ? ' cur' : '') + '"' + (dis ? ' disabled' : '') + ' onclick="' + fn + '(' + i + ')">' + label + '</button>'; };
+  var last = pages - 1, set = {}, nums = [], prev = -1;
+  [0, 1, p - 2, p - 1, p, p + 1, p + 2, last - 1, last].forEach(function (i) { if (i >= 0 && i <= last) set[i] = 1; });
+  Object.keys(set).map(Number).sort(function (a, c) { return a - c; }).forEach(function (i) {
+    if (prev >= 0 && i - prev > 1) nums.push('<span class="hh-pg-gap">…</span>');
+    nums.push(b(i, String(i + 1), false, i === p)); prev = i; });
+  return '<div class="hh-pager hh-pager-' + pos + '"><span class="hh-pg-info">' + (from + 1).toLocaleString('el') + '–' + to.toLocaleString('el') + ' από ' + n.toLocaleString('el') + ' ' + (noun || '') + '</span>'
+    + b(p - 1, '‹ Προηγ.', p === 0) + nums.join('') + b(p + 1, 'Επόμ. ›', p === last) + '</div>';
+}
+function hhPageSlice(arr, noun) {
+  var n = arr.length, pages = Math.max(1, Math.ceil(n / HH_PAGE_SIZE));
+  if (window.__hhPageResetAt && Date.now() - window.__hhPageResetAt < 2500) window.__hhPage = 0;
+  window.__hhPageResetAt = 0;
+  var p = Math.min(Math.max(0, window.__hhPage | 0), pages - 1); window.__hhPage = p;
+  var from = p * HH_PAGE_SIZE, to = Math.min(n, from + HH_PAGE_SIZE);
+  return { items: arr.slice(from, to), bar: hhPagerHtml(p, pages, from, to, n, 'top', noun), bar2: pages > 1 ? hhPagerHtml(p, pages, from, to, n, 'bottom', noun) : '' };
+}
+window.hhGoPage = function (i) {
+  window.__hhPage = i; window.__hhPageResetAt = 0; window._savedScroll = undefined; window._hhWantTop = true;
+  try { renderListings(); } catch (e) {}
+  try { var mc = document.getElementById('main-content'); var y = mc ? mc.getBoundingClientRect().top + window.scrollY - 60 : 0; window.scrollTo(0, Math.max(0, y)); } catch (e) {}
+};
+window.hhGoMapPage = function (i) {
+  window.__hhMapPage = i;
+  try { window.hhFilterMapList && window.hhFilterMapList(); } catch (e) {}
+  try { var l = document.getElementById('mapList'); if (l) l.scrollTop = 0; } catch (e) {}
+};
+(function () {
+  try {
+    var st = document.createElement('style'); st.id = 'hh145-pager';
+    st.textContent = '.hh-pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin:8px 0 12px;font-size:13px}'
+      + '.hh-pager-bottom{margin:16px 0 28px}.hh-pg-info{color:var(--text2,#a8a294);margin-right:8px}.hh-pg-gap{color:var(--text2,#a8a294);padding:0 2px}'
+      + '.hh-pg-b{background:rgba(0,0,0,.25);border:1px solid #2e2c27;color:#e8e4dc;border-radius:8px;padding:5px 10px;min-width:34px;cursor:pointer;font:inherit;line-height:1.3}'
+      + '.hh-pg-b:hover:not([disabled]){border-color:#d4a853}.hh-pg-b.cur{background:#c8a84b;color:#1a1916;border-color:#c8a84b;font-weight:700}'
+      + '.hh-pg-b[disabled]{opacity:.4;cursor:default}body.light .hh-pg-b{background:#fff;border-color:#d8cba4;color:#2a2620}'
+      + 'body.light .hh-pg-b.cur{background:#c8a84b;color:#1a1916}#hhMapPager .hh-pager{margin:2px 0 6px}';
+    document.head.appendChild(st);
+  } catch (e) {}
+  ['click', 'input', 'change'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      try {
+        var t = e.target; if (!t || !t.closest) return;
+        if (t.closest('#main-content,#listingOverlay,#galleryOverlay,.modal,.modal-overlay,#ms-bar,#hh-mergeq,.hh-pager')) return;
+        window.__hhPageResetAt = Date.now(); window.__hhMapPage = 0;
+      } catch (_) {}
+    }, true);
+  });
+})();
+
+function hhCardKey(c) { return String(c && c._isGroup ? c.houseId : (c && c.house_id)); }
+function hhMapVisible() {
+  var arr = window.__hhMapCards || [], map = window._hhMap, pins = window._pinLL || {}, b = null;
+  try { if (map && map.getContainer && map.getContainer().isConnected) b = map.getBounds(); } catch (e) { b = null; }
+  var known = 0, vis = [];
+  for (var i = 0; i < arr.length; i++) { var ll = pins[hhCardKey(arr[i])]; if (ll) known++; if (b && ll && b.contains(ll)) vis.push(arr[i]); }
+  if (!b || known === 0) { vis = arr.slice(); known = 0; }
+  return { vis: vis, known: known };
+}
+function hhMapPageHtml(r) {
+  r = r || hhMapVisible();
+  var n = r.vis.length, pages = Math.max(1, Math.ceil(n / HH_PAGE_SIZE));
+  var p = Math.min(Math.max(0, window.__hhMapPage | 0), pages - 1); window.__hhMapPage = p;
+  var from = p * HH_PAGE_SIZE, to = Math.min(n, from + HH_PAGE_SIZE);
+  var bar = hhPagerHtml(p, pages, from, to, n, 'top', r.known ? 'σπίτια στην προβολή' : 'σπίτια', 'hhGoMapPage');
+  return '<div id="hhMapPager" style="flex:1 1 100%;width:100%">' + bar + '</div>'
+    + r.vis.slice(from, to).map(function (c) { return c._isGroup ? renderGroupedCard(c) : renderCard(c); }).join('');
+}
+
 function renderListings() {
   // Multi-select bar
   (function(){
@@ -2660,7 +2736,8 @@ function renderListings() {
   if (currentView === 'map') {
     const { groupCards, singles } = groupByHouseId(filtered);
     const _allMap=_sortCards([...groupCards, ...singles]);
-    const cardsHtml = _allMap.map(function(c){return c._isGroup?renderGroupedCard(c):renderCard(c);}).join('');
+    window.__hhMapCards = _allMap; /*hh145: the list beside the map draws only the 50 cards of the current page*/
+    const cardsHtml = hhMapPageHtml();
     container.innerHTML = `<div id="map-split">
       <div id="mapList">${cardsHtml}</div>
       <div id="map"></div>
@@ -2689,13 +2766,15 @@ function renderListings() {
       });
     })();
     document.getElementById('resultsCount').innerHTML = (function(){function _pc(p){try{var s=allListings.filter(function(h){return (h.project||'Fameli')===p;});var g=groupByHouseId(s);return g.groupCards.length+g.singles.length;}catch(e){return 0;}}var _b=[['Fameli','rgba(255,255,255,0.10)'],['2xFam','rgba(150,90,240,0.32)'],['Rent','rgba(20,150,120,0.32)'],['Pakis','rgba(180,83,9,0.40)'],['xirosigma','rgba(29,78,216,0.40)']];return _b.map(function(x){var n=_pc(x[0]);return n?'<span style="display:inline-block;padding:1px 8px;border-radius:9px;background:'+x[1]+';margin-right:5px">'+x[0]+' '+n+'</span>':'';}).join('');})();
-    container.innerHTML = `<div class="grid-container">${all.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>`;
+    const _pg = hhPageSlice(all, 'σπίτια'); /*hh145*/
+    container.innerHTML = _pg.bar + `<div class="grid-container">${_pg.items.map(h=>h._isGroup?renderGroupedCard(h):renderCard(h)).join('')}</div>` + _pg.bar2;
   if(window._savedScroll!==undefined){setTimeout(()=>{window.scrollTo(0,window._savedScroll);window._savedScroll=undefined;},30);}
     renderRejectedSection();
     return;
   }
   renderRejectedSection();
-  container.innerHTML = `<div class="list-container">${filtered.map(renderListItem).join('')}</div>`;
+  const _pl = hhPageSlice(filtered, 'αγγελίες'); /*hh145*/
+  container.innerHTML = _pl.bar + `<div class="list-container">${_pl.items.map(renderListItem).join('')}</div>` + _pl.bar2;
   if(window._savedScroll!==undefined){setTimeout(()=>{window.scrollTo(0,window._savedScroll);window._savedScroll=undefined;},30);}
 }
 
@@ -4470,19 +4549,18 @@ var st=document.createElement('style');st.textContent='.hh-grpsib{background:lin
 loadFavs();
 })();</script>
 <script>/*mapFilter*/(function(){
-  window.hhFilterMapList=function(){
-    var map=window._hhMap, list=document.getElementById("mapList");
-    if(!map||!list||!window._pinLL)return;
-    var b; try{b=map.getBounds();}catch(e){return;}
-    var cards=[].filter.call(list.children,function(c){return c.nodeType===1&&c.hasAttribute&&c.hasAttribute("data-hhh");});
-    if(!cards.length)return;
-    var shown=0,known=0,vis=[];
-    for(var i=0;i<cards.length;i++){var ll=window._pinLL[cards[i].getAttribute("data-hhh")];if(ll)known++;var sv=ll?b.contains(ll):false;vis.push(sv);if(sv)shown++;}
-    if(known===0){cards.forEach(function(c){c.style.display="";});return;}
-    for(var k=0;k<cards.length;k++)cards[k].style.display=vis[k]?"":"none";
+  window.hhFilterMapList=function(ev){
+    /*hh145: the list beside the map is drawn from the data, 50 cards of the homes inside the visible map area per page
+      (it used to hold every card and hide the ones outside the map). Moving the map starts again at page 1. */
+    if(ev&&ev.type)window.__hhMapPage=0;
+    var list=document.getElementById("mapList");if(!list)return;
+    var r=hhMapVisible();
+    list.innerHTML=hhMapPageHtml(r);
+    if(r.known===0)return;
+    var shown=r.vis.length;
     var badge=document.getElementById("hhMapCount");
     if(!badge){var mp=document.getElementById("map");if(mp){badge=document.createElement("div");badge.id="hhMapCount";badge.style.cssText="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:600;background:rgba(20,20,24,0.88);color:#c8a84b;font-size:12px;font-weight:600;padding:4px 12px;border-radius:14px;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.4);";mp.appendChild(badge);}}
-    if(badge)badge.textContent=shown+(shown===1?" \u03ba\u03b1\u03c4\u03bf\u03b9\u03ba\u03af\u03b1":" \u03ba\u03b1\u03c4\u03bf\u03b9\u03ba\u03af\u03b5\u03c2")+" \u03c3\u03c4\u03b7\u03bd \u03c0\u03c1\u03bf\u03b2\u03bf\u03bb\u03ae";
+    if(badge)badge.textContent=shown+(shown===1?" κατοικία":" κατοικίες")+" στην προβολή";
   };
   var _oim=window.initMap;
   if(typeof _oim==="function"&&!_oim.__wrapped){
