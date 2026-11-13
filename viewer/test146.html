@@ -2280,7 +2280,8 @@ async function tryFetch() {
         </div>`;
     } else {
       buildUI();
-      setTimeout(function () { try { hhHydrateHeavy(); } catch (_e3) {} }, 50); /*hh146*/
+      /*hh146: details start after the loading screen is gone, so the first photos get the full connection */
+      (function (t0) { (function w() { if (window.__hh86 || !document.getElementById('hh86-boot') || Date.now() - t0 > 25000) { try { hhHydrateHeavy(); } catch (_e3) {} } else setTimeout(w, 300); })(); })(Date.now());
     }
   } catch(e) {
     document.getElementById('main-content').innerHTML =
