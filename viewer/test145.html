@@ -2696,6 +2696,25 @@ window.hhGoMapPage = function (i) {
   });
 })();
 
+function hhCardKey(c) { return String(c && c._isGroup ? c.houseId : (c && c.house_id)); }
+function hhMapVisible() {
+  var arr = window.__hhMapCards || [], map = window._hhMap, pins = window._pinLL || {}, b = null;
+  try { if (map && map.getContainer && map.getContainer().isConnected) b = map.getBounds(); } catch (e) { b = null; }
+  var known = 0, vis = [];
+  for (var i = 0; i < arr.length; i++) { var ll = pins[hhCardKey(arr[i])]; if (ll) known++; if (b && ll && b.contains(ll)) vis.push(arr[i]); }
+  if (!b || known === 0) { vis = arr.slice(); known = 0; }
+  return { vis: vis, known: known };
+}
+function hhMapPageHtml(r) {
+  r = r || hhMapVisible();
+  var n = r.vis.length, pages = Math.max(1, Math.ceil(n / HH_PAGE_SIZE));
+  var p = Math.min(Math.max(0, window.__hhMapPage | 0), pages - 1); window.__hhMapPage = p;
+  var from = p * HH_PAGE_SIZE, to = Math.min(n, from + HH_PAGE_SIZE);
+  var bar = hhPagerHtml(p, pages, from, to, n, 'top', r.known ? 'σπίτια στην προβολή' : 'σπίτια', 'hhGoMapPage');
+  return '<div id="hhMapPager" style="flex:1 1 100%;width:100%">' + bar + '</div>'
+    + r.vis.slice(from, to).map(function (c) { return c._isGroup ? renderGroupedCard(c) : renderCard(c); }).join('');
+}
+
 function renderListings() {
   // Multi-select bar
   (function(){
@@ -2717,7 +2736,8 @@ function renderListings() {
   if (currentView === 'map') {
     const { groupCards, singles } = groupByHouseId(filtered);
     const _allMap=_sortCards([...groupCards, ...singles]);
-    const cardsHtml = _allMap.map(function(c){return c._isGroup?renderGroupedCard(c):renderCard(c);}).join('');
+    window.__hhMapCards = _allMap; /*hh145: the list beside the map draws only the 50 cards of the current page*/
+    const cardsHtml = hhMapPageHtml();
     container.innerHTML = `<div id="map-split">
       <div id="mapList">${cardsHtml}</div>
       <div id="map"></div>
@@ -4529,19 +4549,18 @@ var st=document.createElement('style');st.textContent='.hh-grpsib{background:lin
 loadFavs();
 })();</script>
 <script>/*mapFilter*/(function(){
-  window.hhFilterMapList=function(ev){if(ev&&ev.type)window.__hhMapPage=0;/*hh145: moving the map starts again at page 1*/
-    var map=window._hhMap, list=document.getElementById("mapList");
-    if(!map||!list||!window._pinLL)return;
-    var b; try{b=map.getBounds();}catch(e){return;}
-    var cards=[].filter.call(list.children,function(c){return c.nodeType===1&&c.hasAttribute&&c.hasAttribute("data-hhh");});
-    if(!cards.length)return;
-    var shown=0,known=0,vis=[];
-    for(var i=0;i<cards.length;i++){var ll=window._pinLL[cards[i].getAttribute("data-hhh")];if(ll)known++;var sv=ll?b.contains(ll):false;vis.push(sv);if(sv)shown++;}
-    if(known===0){cards.forEach(function(c){c.style.display="";});return;}
-    /*hh145: at most 50 cards of the visible map area at a time, with page buttons*/var _vi=[];for(var k=0;k<cards.length;k++){if(vis[k])_vi.push(k);}var _pgs=Math.max(1,Math.ceil(_vi.length/50)),_p=Math.min(Math.max(0,window.__hhMapPage|0),_pgs-1);window.__hhMapPage=_p;var _on={};_vi.slice(_p*50,_p*50+50).forEach(function(x){_on[x]=1;});for(var k2=0;k2<cards.length;k2++)cards[k2].style.display=_on[k2]?"":"none";try{var _bar=document.getElementById("hhMapPager");if(!_bar){_bar=document.createElement("div");_bar.id="hhMapPager";_bar.style.cssText="flex:1 1 100%;width:100%";list.insertBefore(_bar,list.firstChild);}_bar.innerHTML=(_vi.length>50&&typeof hhPagerHtml==="function")?hhPagerHtml(_p,_pgs,_p*50,Math.min(_vi.length,_p*50+50),_vi.length,"top","σπίτια στην προβολή","hhGoMapPage"):"";}catch(e){}
+  window.hhFilterMapList=function(ev){
+    /*hh145: the list beside the map is drawn from the data, 50 cards of the homes inside the visible map area per page
+      (it used to hold every card and hide the ones outside the map). Moving the map starts again at page 1. */
+    if(ev&&ev.type)window.__hhMapPage=0;
+    var list=document.getElementById("mapList");if(!list)return;
+    var r=hhMapVisible();
+    list.innerHTML=hhMapPageHtml(r);
+    if(r.known===0)return;
+    var shown=r.vis.length;
     var badge=document.getElementById("hhMapCount");
     if(!badge){var mp=document.getElementById("map");if(mp){badge=document.createElement("div");badge.id="hhMapCount";badge.style.cssText="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:600;background:rgba(20,20,24,0.88);color:#c8a84b;font-size:12px;font-weight:600;padding:4px 12px;border-radius:14px;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.4);";mp.appendChild(badge);}}
-    if(badge)badge.textContent=shown+(shown===1?" \u03ba\u03b1\u03c4\u03bf\u03b9\u03ba\u03af\u03b1":" \u03ba\u03b1\u03c4\u03bf\u03b9\u03ba\u03af\u03b5\u03c2")+" \u03c3\u03c4\u03b7\u03bd \u03c0\u03c1\u03bf\u03b2\u03bf\u03bb\u03ae";
+    if(badge)badge.textContent=shown+(shown===1?" κατοικία":" κατοικίες")+" στην προβολή";
   };
   var _oim=window.initMap;
   if(typeof _oim==="function"&&!_oim.__wrapped){
