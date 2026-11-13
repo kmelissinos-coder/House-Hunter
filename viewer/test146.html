@@ -2150,7 +2150,7 @@ function hhApplyHeavy(rows, rerender) {
     /* map view: refresh only the cards beside the map (re-drawing the whole map would flash) */
     var _q = ((document.getElementById('numSearch') || {}).value || '').trim();
     if (currentView === 'map' && !_q) {
-      try { var _gs = groupByHouseId(filtered); window.__hhMapCards = _sortCards([..._gs.groupCards, ..._gs.singles]); if (window.hhFilterMapList) window.hhFilterMapList(); }
+      try { var _gs = groupByHouseId(filtered); window.__hhMapCards = _sortCards([..._gs.groupCards, ..._gs.singles]); window.__hhMapCardsV = (window.__hhMapCardsV || 0) + 1; if (window.hhFilterMapList) window.hhFilterMapList(); }
       catch (e) { try { applyFilters(); } catch (_) {} }
     } else { try { applyFilters(); } catch (e) {} }
     try {
@@ -4650,17 +4650,23 @@ loadFavs();
 })();</script>
 <script>/*mapFilter*/(function(){
   window.hhFilterMapList=function(ev){
-    /*hh145: the list beside the map is drawn from the data, 50 cards of the homes inside the visible map area per page
-      (it used to hold every card and hide the ones outside the map). Moving the map starts again at page 1. */
-    if(ev&&ev.type)window.__hhMapPage=0;
+    /*hh145/146: the list beside the map is drawn from the data, 50 cards of the homes inside the visible map area per page.
+      It is re-drawn only when the homes in view, the page or the data change (the map sends many «moved» signals that are not
+      real moves). A real move that changes the homes in view starts again at page 1. */
     var list=document.getElementById("mapList");if(!list)return;
     var r=hhMapVisible();
-    list.innerHTML=hhMapPageHtml(r);
+    var vs=r.vis.length+':'+r.vis.map(hhCardKey).join(',');
+    if(ev&&ev.type&&list.__hhVis!==undefined&&list.__hhVis!==vs)window.__hhMapPage=0;
+    var pages=Math.max(1,Math.ceil(r.vis.length/HH_PAGE_SIZE)),p=Math.min(Math.max(0,window.__hhMapPage|0),pages-1);
+    var sig=vs+'#'+p+'#'+(window.__hhMapCardsV||0);
+    if(list.__hhSig!==sig){list.innerHTML=hhMapPageHtml(r);list.__hhSig=sig;}
+    list.__hhVis=vs;
     if(r.known===0)return;
     var shown=r.vis.length;
     var badge=document.getElementById("hhMapCount");
     if(!badge){var mp=document.getElementById("map");if(mp){badge=document.createElement("div");badge.id="hhMapCount";badge.style.cssText="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:600;background:rgba(20,20,24,0.88);color:#c8a84b;font-size:12px;font-weight:600;padding:4px 12px;border-radius:14px;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.4);";mp.appendChild(badge);}}
-    if(badge)badge.textContent=shown+(shown===1?" κατοικία":" κατοικίες")+" στην προβολή";
+    var bt=shown+(shown===1?" κατοικία":" κατοικίες")+" στην προβολή";
+    if(badge&&badge.textContent!==bt)badge.textContent=bt;
   };
   var _oim=window.initMap;
   if(typeof _oim==="function"&&!_oim.__wrapped){
