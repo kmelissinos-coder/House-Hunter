@@ -1627,7 +1627,7 @@ try{
       /* hh142: τα μετρητάκια του admin (hh_admin_counts) και τα logs (app_events) δεν κρατάνε το overlay,
          και κανένα αίτημα δεν το κρατάει πάνω από 8" */
       var _u=''; try{ _u=String((arguments[0]&&arguments[0].url)||arguments[0]||''); }catch(x){}
-      if(/rpc\/hh_admin_counts|\/app_events/.test(_u)) return _f.apply(this,arguments);
+      if(/rpc\/hh_admin_counts|\/app_events|#hhbg/.test(_u)) return _f.apply(this,arguments); /*hh146: background detail loading does not hold the loading screen*/
       inflight++; touch();
       var _fin=false; function fin(){ if(_fin) return; _fin=true; inflight--; touch(); }
       setTimeout(fin, 8000);
@@ -2117,6 +2117,96 @@ async function loadData() {
   await tryFetch();
 }
 
+/*hh146 (13 Nov 2026, Dusty: «αργεί να φορτώσει πάρα πολύ»): the first load asks only for what the cards, the map and the
+  filters need (≈5 MB instead of ≈25 MB). Descriptions and photo lists come right after in the background, are kept between
+  refreshes, and a home opened before they arrive fetches its own ads at once and refreshes its window when they are in. */
+const HH_SLIM_SEL = 'id,house_id,location,type,url,rooms,baths,sqm_raw,sqm,year,price,price_raw,price_per_sqm,platform,floor,lvl,energy,heating,notes,available,agency,agency_nr,platform_nr,image_url,published,updated,deleted,favorited,hidden,personal_score,visit_date,personal_notes,created_at,has_changes,address,address_lat,address_lng,sent_efi,seen_it,video_url,project,hhl_id,platform_lat,platform_lng,geo_radius_m,address_confirmed,also_on,gone_confirmed,off_market,off_market_at,off_market_by,phones';
+window.__hhHeavy = window.__hhHeavy || {};
+function hhMergeHeavy(item) {
+  var hv = window.__hhHeavy[item.id];
+  if (hv) { item.description = hv.d; item.extra_images = hv.x; item._slim = false; } else { item._slim = true; }
+}
+function hhApplyHeavy(rows, rerender) {
+  var byId = {}, touched = {}, n = 0;
+  (allListings || []).forEach(function (h) { byId[h._dbId || h.id] = h; });
+  (rows || []).forEach(function (r) {
+    if (!r || !r.id) return;
+    window.__hhHeavy[r.id] = { d: r.description, x: r.extra_images };
+    var h = byId[r.id]; if (!h) return;
+    h.description = r.description; h.extra_images = r.extra_images; h._slim = false; n++;
+    var hid = String(h.house_id || '').trim(); if (hid && hid !== '0') touched[hid] = 1;
+    try {
+      var out = enrichFromDescription(h);
+      if (out) {
+        Object.assign(h, out);
+        if (out.sqm && !h.sqmRaw) h.sqmRaw = out.sqm + 'τ.μ.';
+        if (out.sqm && !(h.pricePerSqm > 0) && h.price > 0) h.pricePerSqm = Math.round(h.price / out.sqm);
+        if (h._dbId) _enrichQueue.push({ id: h._dbId, out: out });
+      }
+    } catch (e) {}
+  });
+  try { _drainEnrichQueue(); } catch (e) {}
+  if (rerender && n) {
+    /* map view: refresh only the cards beside the map (re-drawing the whole map would flash) */
+    var _q = ((document.getElementById('numSearch') || {}).value || '').trim();
+    if (currentView === 'map' && !_q) {
+      try { var _gs = groupByHouseId(filtered); window.__hhMapCards = _sortCards([..._gs.groupCards, ..._gs.singles]); window.__hhMapCardsV = (window.__hhMapCardsV || 0) + 1; if (window.hhFilterMapList) window.hhFilterMapList(); }
+      catch (e) { try { applyFilters(); } catch (_) {} }
+    } else { try { applyFilters(); } catch (e) {} }
+    try {
+      var ov = document.getElementById('listingOverlay');
+      var oh = new URLSearchParams(location.search).get('house');
+      if (ov && ov.classList.contains('open') && oh && touched[oh]) {
+        window.__hh146Reopen = true;
+        try { window.openListingOverlay(null, oh, 0); } finally { window.__hh146Reopen = false; }
+      }
+    } catch (e) {}
+  }
+  return n;
+}
+async function hhFetchHeavyIds(ids) {
+  var rows = [], hdr = sb.headers();
+  for (var j = 0; j < ids.length; j += 80) {
+    var r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=id,description,extra_images&id=in.(${ids.slice(j, j + 80).join(',')})#hhbg`, { headers: hdr });
+    if (!r.ok) throw new Error('heavy ' + r.status);
+    rows.push.apply(rows, await r.json());
+  }
+  return rows;
+}
+window.__hhHyRunning = false;
+async function hhHydrateHeavy() {
+  if (window.__hhHyRunning) return; window.__hhHyRunning = true;
+  try {
+    var need = (allListings || []).filter(function (h) { return h._slim; });
+    if (!need.length) return;
+    var rows = [];
+    if (need.length > 400) {
+      var hdr = sb.headers(), more = true;
+      for (var off = 0; more && off < 20000; off += 4000) {
+        var pages = await Promise.all([0, 1000, 2000, 3000].map(async function (d) {
+          var r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=id,description,extra_images&order=created_at.desc,id.asc&limit=1000&offset=${off + d}#hhbg`, { headers: hdr });
+          if (!r.ok) throw new Error('heavy ' + r.status);
+          return r.json();
+        }));
+        for (var i = 0; i < pages.length; i++) { rows.push.apply(rows, pages[i]); if (pages[i].length < 1000) { more = false; break; } }
+      }
+    } else {
+      rows = await hhFetchHeavyIds(need.map(function (h) { return h._dbId || h.id; }).filter(Boolean));
+    }
+    window.__hhHyDone = Date.now();
+    hhApplyHeavy(rows, true);
+  } catch (e) { try { console.warn('hh146 hydrate', e); } catch (_) {} }
+  finally { window.__hhHyRunning = false; }
+}
+async function hhEnsureFull(rows) {
+  try {
+    var ids = (rows || []).filter(function (h) { return h && h._slim && (h._dbId || h.id); }).map(function (h) { return h._dbId || h.id; });
+    if (!ids.length) return true;
+    hhApplyHeavy(await hhFetchHeavyIds(ids), false);
+    return true;
+  } catch (e) { return false; }
+}
+
 async function tryFetch() {
   window._hhLoading = true; /*hhPolish125*/ try {
   if(!window._hhSilent) document.getElementById('main-content').innerHTML = `
@@ -2128,7 +2218,7 @@ async function tryFetch() {
     let _more = true;
     for (let _off = 0; _more && _off < 20000; _off += 4000) {
       const _pages = await Promise.all([0, 1000, 2000, 3000].map(async (_d) => {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc,id.asc&limit=1000&offset=${_off + _d}`, {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?select=${HH_SLIM_SEL}&order=created_at.desc,id.asc&limit=1000&offset=${_off + _d}`, {
           method: 'GET',
           headers: sb.headers()
         });
@@ -2150,11 +2240,13 @@ async function tryFetch() {
       const _sig = data.length + ':' + _n + ':' + _h;
       if (window._hhSilent && window.__hhDataSig === _sig && Array.isArray(allListings) && allListings.length) {
         (document.querySelector('.refresh-btn')||{}).disabled = false;
+        try { if (allListings.some(function (x) { return x._slim; })) setTimeout(hhHydrateHeavy, 50); } catch (_e2) {} /*hh146*/
         return;
       }
       window.__hhDataSig = _sig;
     } catch (_e) {}
     
+    data.forEach(hhMergeHeavy); /*hh146: descriptions/photo lists already fetched are kept*/
     allListings = data.map(item => ({
       ...item,
       _dbId: item.id,
@@ -2188,6 +2280,8 @@ async function tryFetch() {
         </div>`;
     } else {
       buildUI();
+      /*hh146: details start after the loading screen is gone, so the first photos get the full connection */
+      (function (t0) { (function w() { if (window.__hh86 || !document.getElementById('hh86-boot') || Date.now() - t0 > 25000) { try { hhHydrateHeavy(); } catch (_e3) {} } else setTimeout(w, 300); })(); })(Date.now());
     }
   } catch(e) {
     document.getElementById('main-content').innerHTML =
@@ -3924,6 +4018,12 @@ document.addEventListener('keydown', e => {
 let _loSiblings=[], _loFeatIdx=0;
 
 function openListingOverlay(url, houseId, startIdx) {
+  /*hh146: opened before the descriptions/photos arrived → fetch this home's ads now and refresh the window */
+  try { if (!window.__hh146Reopen) { let _rw = [];
+    if (url && !houseId) { const _h = getByUrl(url); if (_h) { const _hid = (_h.house_id || '').trim(); _rw = (_hid && _hid !== '0') ? allListings.filter(x => (x.house_id || '').trim() === _hid) : [_h]; } }
+    else if (houseId) { _rw = allListings.filter(x => (x.house_id || '').trim() === String(houseId)); }
+    if (_rw.some(x => x._slim)) { hhEnsureFull(_rw).then(ok => { const ov = document.getElementById('listingOverlay');
+      if (ok && ov && ov.classList.contains('open')) { window.__hh146Reopen = true; try { window.openListingOverlay(url, houseId, startIdx); } finally { window.__hh146Reopen = false; } } }); } } } catch (_e) {}
   if(url && !houseId) {
     const h=getByUrl(url); if(!h){openModal(url);return;}
     const hid=(h.house_id||'').trim();
@@ -4550,17 +4650,23 @@ loadFavs();
 })();</script>
 <script>/*mapFilter*/(function(){
   window.hhFilterMapList=function(ev){
-    /*hh145: the list beside the map is drawn from the data, 50 cards of the homes inside the visible map area per page
-      (it used to hold every card and hide the ones outside the map). Moving the map starts again at page 1. */
-    if(ev&&ev.type)window.__hhMapPage=0;
+    /*hh145/146: the list beside the map is drawn from the data, 50 cards of the homes inside the visible map area per page.
+      It is re-drawn only when the homes in view, the page or the data change (the map sends many «moved» signals that are not
+      real moves). A real move that changes the homes in view starts again at page 1. */
     var list=document.getElementById("mapList");if(!list)return;
     var r=hhMapVisible();
-    list.innerHTML=hhMapPageHtml(r);
+    var vs=r.vis.length+':'+r.vis.map(hhCardKey).join(',');
+    if(ev&&ev.type&&list.__hhVis!==undefined&&list.__hhVis!==vs)window.__hhMapPage=0;
+    var pages=Math.max(1,Math.ceil(r.vis.length/HH_PAGE_SIZE)),p=Math.min(Math.max(0,window.__hhMapPage|0),pages-1);
+    var sig=vs+'#'+p+'#'+(window.__hhMapCardsV||0);
+    if(list.__hhSig!==sig){list.innerHTML=hhMapPageHtml(r);list.__hhSig=sig;}
+    list.__hhVis=vs;
     if(r.known===0)return;
     var shown=r.vis.length;
     var badge=document.getElementById("hhMapCount");
     if(!badge){var mp=document.getElementById("map");if(mp){badge=document.createElement("div");badge.id="hhMapCount";badge.style.cssText="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:600;background:rgba(20,20,24,0.88);color:#c8a84b;font-size:12px;font-weight:600;padding:4px 12px;border-radius:14px;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,0.4);";mp.appendChild(badge);}}
-    if(badge)badge.textContent=shown+(shown===1?" κατοικία":" κατοικίες")+" στην προβολή";
+    var bt=shown+(shown===1?" κατοικία":" κατοικίες")+" στην προβολή";
+    if(badge&&badge.textContent!==bt)badge.textContent=bt;
   };
   var _oim=window.initMap;
   if(typeof _oim==="function"&&!_oim.__wrapped){
@@ -6976,12 +7082,12 @@ window.hhGeoCluster = function(items){
   function norm(x){ return String(x==null?'':x).toLowerCase().replace(/[^a-z0-9α-ω]/gi,''); }
   var CACHE=new WeakMap();
   function hay(h){
-    var c=CACHE.get(h);
+    var c=CACHE.get(h); if(c&&c._d!==h.description) c=null; /*hh146: description may arrive after the first search*/
     if(c) return c;
     var plain=[h.location,h.type,h.agency,h.notes,h.heating,h.platformNr,h.agencyNr,
                h.agency_nr,h.platform_nr,h.house_id,h.hhl_id,h.description,h.address,h.url,h.phones/*hh138*/]
               .map(function(v){return v==null?'':String(v);}).join(' ').toLowerCase();
-    c={plain:plain, squashed:norm(plain)};
+    c={plain:plain, squashed:norm(plain), _d:h.description};
     CACHE.set(h,c);
     return c;
   }
